@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($src = \"C:\\\\Users\\\\INTEL\\\\Desktop\\\\Ai\\\\app-scaffold\"; $dst = \"C:\\\\Users\\\\INTEL\\\\Desktop\\\\Ai\"; Get-ChildItem -Path $src -Force | ForEach-Object { Move-Item -Path $_.FullName -Destination $dst -Force }; Remove-Item -Path $src -Force -Recurse -Confirm:$false; Get-ChildItem -Path $dst -Force | Select-Object Name)",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
+      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('hex'\\)\\)\")",
+      "Bash(sed -i s/SESSION_SECRET=change-me-to-a-long-random-string/SESSION_SECRET=__CMDSUB_OUTPUT__/ /c/Users/INTEL/Desktop/Ai/.env.local)"
+    ]
+  }
+}
