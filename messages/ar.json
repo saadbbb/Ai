@@ -554,7 +554,7 @@
     "triggerAppointmentCreated": "عند حجز موعد جديد",
     "actionAddTag": "إضافة وسم \"{tag}\" لجهة الاتصال",
     "actionRemoveTag": "إزالة الوسم \"{tag}\" من جهة الاتصال",
-    "actionNotifyOwner": "إرسال بريد إلكتروني لي",
+    "actionNotifyOwner": "إشعاري",
     "delaySummary": "بعد {days} يوم",
     "new": {
       "title": "أتمتة جديدة",
@@ -584,12 +584,12 @@
       "actions": {
         "add_contact_tag": "وسم العميل",
         "remove_contact_tag": "إزالة وسم من العميل",
-        "notify_owner_email": "إرسال بريد إلكتروني لي"
+        "notify_owner_email": "إشعاري"
       },
       "tagPlaceholder": "الوسم، مثال: عميل",
-      "subjectPlaceholder": "موضوع البريد (اختياري)",
-      "messagePlaceholder": "نص البريد — استخدم '{{contactName}}' لاسم العميل",
-      "messageHint": "'{{contactName}}' سيُستبدَل باسم العميل.",
+      "subjectPlaceholder": "العنوان (اختياري)",
+      "messagePlaceholder": "النص — استخدم '{{contactName}}' لاسم العميل",
+      "messageHint": "يصلك كإشعار داخل النظام وكبريد إلكتروني معاً — '{{contactName}}' سيُستبدَل باسم العميل.",
       "delayLabel": "الانتظار قبل التنفيذ (اختياري)",
       "delayPlaceholder": "عدد الأيام، مثال: 3 — اتركه فارغاً للتنفيذ الفوري",
       "submit": "إنشاء الأتمتة",

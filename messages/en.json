@@ -554,7 +554,7 @@
     "triggerAppointmentCreated": "When a new appointment is booked",
     "actionAddTag": "Tag the contact \"{tag}\"",
     "actionRemoveTag": "Remove the tag \"{tag}\" from the contact",
-    "actionNotifyOwner": "Email me",
+    "actionNotifyOwner": "Notify me",
     "delaySummary": "after {days} days",
     "new": {
       "title": "New automation",
@@ -584,12 +584,12 @@
       "actions": {
         "add_contact_tag": "Tag the customer",
         "remove_contact_tag": "Remove a tag from the customer",
-        "notify_owner_email": "Email me"
+        "notify_owner_email": "Notify me"
       },
       "tagPlaceholder": "Tag, e.g. customer",
-      "subjectPlaceholder": "Email subject (optional)",
-      "messagePlaceholder": "Email message — use '{{contactName}}' for the customer's name",
-      "messageHint": "'{{contactName}}' will be replaced with the customer's name.",
+      "subjectPlaceholder": "Subject (optional)",
+      "messagePlaceholder": "Message — use '{{contactName}}' for the customer's name",
+      "messageHint": "Sent to you as an in-app notification and an email — '{{contactName}}' will be replaced with the customer's name.",
       "delayLabel": "Wait before running (optional)",
       "delayPlaceholder": "Days, e.g. 3 — leave empty to run immediately",
       "submit": "Create automation",

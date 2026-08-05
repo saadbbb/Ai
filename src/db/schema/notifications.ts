@@ -2,14 +2,17 @@ import { boolean, index, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-
 import { workspaces } from "./workspaces";
 
 /**
- * Currently only created by the subscription-check cron (see
- * subscriptionCheckService) — kept as an enum rather than a free-text type so
- * new notification sources (new lead, AI handover, etc. — see Part 3/7 of the
- * spec) can be added later without a schema change, just a new enum value.
+ * Kept as an enum rather than a free-text type so new notification sources
+ * can be added later without a schema change, just a new enum value.
+ * "automation" = created by the automation engine's notify_owner_email
+ * action (src/features/automation/services/automation.service.ts) — the
+ * in-app copy is unconditional even if the paired email fails, same pattern
+ * as the subscription ones below.
  */
 export const notificationTypeEnum = pgEnum("notification_type", [
   "subscription_expiring",
   "subscription_suspended",
+  "automation",
 ]);
 
 export const notifications = pgTable(

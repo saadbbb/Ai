@@ -9,6 +9,7 @@ import type {
   WorkflowTriggerConfig,
 } from "@/db/schema";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
+import { notificationRepository } from "@/features/notifications/repository/notification.repository";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { userRepository } from "@/features/auth/repository/user.repository";
 import { emailService } from "@/lib/email";
@@ -73,17 +74,34 @@ async function runAction(workspaceId: string, workflow: Workflow, event: Automat
   }
 
   if (workflow.actionType === "notify_owner_email") {
-    const ownerUserId = await membershipRepository.findOwnerUserId(workspaceId);
-    const owner = ownerUserId ? await userRepository.findById(ownerUserId) : null;
-    if (!owner) throw new AppError("INTERNAL_ERROR", "Workspace has no owner to notify.");
-
     const message = (workflow.actionConfig.message ?? "").replaceAll("{{contactName}}", contact?.fullName ?? "");
-    await emailService.sendNotificationEmail({
-      to: owner.email,
-      subject: workflow.actionConfig.subject || workflow.name,
-      text: message,
+    const subject = workflow.actionConfig.subject || workflow.name;
+
+    // In-app and email are independent channels — the in-app notification is
+    // unconditional, created before the owner/email lookup even runs, so it
+    // never gets skipped by an email failure OR a missing owner (Resend is
+    // still sandboxed, see DEFERRED_TASKS.md, so email delivery can't be
+    // relied on for every owner yet; the bell icon is the channel guaranteed
+    // to reach them).
+    await notificationRepository.create({
+      workspaceId,
+      type: "automation",
+      title: subject,
+      message,
+      link: `/dashboard/automations/${workflow.id}`,
     });
-    return `Emailed ${owner.email}`;
+
+    try {
+      const ownerUserId = await membershipRepository.findOwnerUserId(workspaceId);
+      const owner = ownerUserId ? await userRepository.findById(ownerUserId) : null;
+      if (!owner) throw new AppError("INTERNAL_ERROR", "Workspace has no owner to email.");
+
+      await emailService.sendNotificationEmail({ to: owner.email, subject, text: message });
+      return `Notified owner (in-app + emailed ${owner.email})`;
+    } catch (error) {
+      console.error(`[automation] notify_owner_email email failed for workflow ${workflow.id}:`, error);
+      return "Notified owner (in-app only — email failed)";
+    }
   }
 
   return null;
