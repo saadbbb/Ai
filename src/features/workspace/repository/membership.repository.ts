@@ -26,4 +26,14 @@ export const membershipRepository = {
       .where(eq(workspaceMembers.userId, userId))
       .orderBy(workspaceMembers.joinedAt);
   },
+
+  async findOwnerUserId(workspaceId: string): Promise<string | null> {
+    const [row] = await db
+      .select({ userId: workspaceMembers.userId })
+      .from(workspaceMembers)
+      .innerJoin(roles, eq(workspaceMembers.roleId, roles.id))
+      .where(and(eq(workspaceMembers.workspaceId, workspaceId), eq(roles.key, "owner")))
+      .limit(1);
+    return row?.userId ?? null;
+  },
 };

@@ -35,4 +35,18 @@ export const resendEmailProvider: EmailService = {
       throw new AppError("INTERNAL_ERROR", "Failed to send email. Please try again.");
     }
   },
+
+  async sendNotificationEmail({ to, subject, text }) {
+    const from = process.env.EMAIL_FROM;
+    if (!from) {
+      throw new AppError("INTERNAL_ERROR", "EMAIL_FROM is not configured.");
+    }
+
+    const { error } = await getResendClient().emails.send({ from, to, subject, text });
+
+    if (error) {
+      console.error("[resend] failed to send notification email:", error);
+      throw new AppError("INTERNAL_ERROR", "Failed to send email. Please try again.");
+    }
+  },
 };

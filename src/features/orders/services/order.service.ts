@@ -1,5 +1,6 @@
 import "server-only";
 import type { Order, OrderStatus } from "@/db/schema";
+import { automationService } from "@/features/automation/services/automation.service";
 import { AppError } from "@/lib/errors/app-error";
 import { orderRepository, type OrderListItem } from "../repository/order.repository";
 
@@ -55,6 +56,13 @@ async function updateOrderStatus(workspaceId: string, orderId: string, status: O
   if (!order) {
     throw new AppError("NOT_FOUND", "Order not found.");
   }
+
+  await automationService.dispatch(workspaceId, {
+    type: "order_status_changed",
+    contactId: order.contactId,
+    status,
+  });
+
   return order;
 }
 

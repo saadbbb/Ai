@@ -224,6 +224,7 @@
     "leadsLink": "کڕیارە ئەگەرییەکان",
     "ordersLink": "داواکارییەکان",
     "appointmentsLink": "کاتە دیاریکراوەکان",
+    "automationsLink": "خۆکارکردن",
     "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
     "settingsLink": "ڕێکخستنەکان",
     "knowledgeBaseLink": "بنکەی زانیاری",
@@ -333,6 +334,49 @@
       "notesLabel": "تێبینی (ئارەزوومەندانە)",
       "total": "کۆی گشتی: {total}",
       "submit": "دروستکردنی داواکاری",
+      "submitting": "دروست دەکرێت..."
+    }
+  },
+  "automations": {
+    "title": "خۆکارکردن",
+    "description": "با دوایکەوتنە دووبارەبووەکان خۆیان ڕوو بدەن.",
+    "newWorkflow": "خۆکارکردنی نوێ",
+    "emptyState": "هێشتا هیچ خۆکارکردنێک نییە. یەکێک دروست بکە بۆ وەڵامدانەوەی خۆکار بۆ ئەوەی لە بزنسەکەت ڕوودەدات.",
+    "backLink": "← گەڕانەوە بۆ خۆکارکردن",
+    "pause": "وەستاندن",
+    "resume": "دووبارە چالاککردنەوە",
+    "executionsHeading": "جێبەجێکردنە دواییەکان",
+    "noExecutions": "ئەم خۆکارکردنە هێشتا جێبەجێ نەکراوە.",
+    "succeeded": "بە سەرکەوتوویی جێبەجێ کرا",
+    "failed": "شکستی هێنا",
+    "triggerLeadStage": "کاتێک قۆناغی کڕیارێکی ئەگەری دەبێتە {stage}",
+    "triggerOrderStatus": "کاتێک دۆخی داواکارییەک دەبێتە {status}",
+    "triggerHandedOver": "کاتێک کارمەندە زیرەکە گفتوگۆیەک دەگوازێتەوە بۆ کەسێکی مرۆڤ",
+    "actionAddTag": "نیشانکردنی پەیوەندییەکە بە \"{tag}\"",
+    "actionNotifyOwner": "ئیمەیلێکم بۆ بنێرە",
+    "new": {
+      "title": "خۆکارکردنی نوێ",
+      "description": "شتێک هەڵبژێرە کە لە بزنسەکەت ڕوودەدات، و شتێک کە دەبێت خۆکارانە وەک وەڵام ڕوو بدات.",
+      "nameLabel": "ناو",
+      "namePlaceholder": "بۆ نموونە: ئاگادارم بکەوە کاتێک مامەڵەیەک دەبردرێتەوە",
+      "triggerLabel": "کاتێک...",
+      "triggers": {
+        "lead_stage_changed": "قۆناغی کڕیارێکی ئەگەری دەگۆڕدرێت",
+        "order_status_changed": "دۆخی داواکارییەک دەگۆڕدرێت",
+        "conversation_handed_over": "کارمەندە زیرەکە گفتوگۆیەک دەگوازێتەوە بۆ کەسێکی مرۆڤ"
+      },
+      "stagePlaceholder": "قۆناغێک هەڵبژێرە",
+      "statusPlaceholder": "دۆخێک هەڵبژێرە",
+      "actionLabel": "ئەوا...",
+      "actions": {
+        "add_contact_tag": "نیشانکردنی کڕیار",
+        "notify_owner_email": "ئیمەیلێکم بۆ بنێرە"
+      },
+      "tagPlaceholder": "نیشانە، بۆ نموونە: کڕیار",
+      "subjectPlaceholder": "بابەتی ئیمەیل (ئارەزوومەندانە)",
+      "messagePlaceholder": "نامەی ئیمەیل — '{{contactName}}' بەکاربێنە بۆ ناوی کڕیار",
+      "messageHint": "'{{contactName}}' دەگۆڕدرێت بە ناوی کڕیار.",
+      "submit": "دروستکردنی خۆکارکردن",
       "submitting": "دروست دەکرێت..."
     }
   },

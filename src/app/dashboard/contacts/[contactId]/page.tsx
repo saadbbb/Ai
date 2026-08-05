@@ -52,6 +52,15 @@ export default async function ContactDetailPage({ params }: PageProps) {
           <p className="text-sm text-muted-foreground">
             {[contact.phone, contact.email].filter(Boolean).join(" · ") || t("noContactInfo")}
           </p>
+          {contact.tags.length > 0 && (
+            <div className="mt-1 flex flex-wrap gap-1">
+              {contact.tags.map((tag) => (
+                <span key={tag} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex shrink-0 gap-2">
           <Button asChild variant="outline" size="sm">

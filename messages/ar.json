@@ -224,6 +224,7 @@
     "leadsLink": "العملاء المحتملون",
     "ordersLink": "الطلبات",
     "appointmentsLink": "المواعيد",
+    "automationsLink": "الأتمتة",
     "testAiLink": "جرّب موظفك الذكي",
     "settingsLink": "الإعدادات",
     "knowledgeBaseLink": "قاعدة المعرفة",
@@ -333,6 +334,49 @@
       "notesLabel": "ملاحظات (اختياري)",
       "total": "الإجمالي: {total}",
       "submit": "إنشاء الطلب",
+      "submitting": "جارٍ الإنشاء..."
+    }
+  },
+  "automations": {
+    "title": "الأتمتة",
+    "description": "خلّ المتابعات المتكرّرة تصير لحالها.",
+    "newWorkflow": "أتمتة جديدة",
+    "emptyState": "لا توجد أتمتة بعد. أنشئ واحدة للرد تلقائياً على ما يحدث في نشاطك التجاري.",
+    "backLink": "← الرجوع إلى الأتمتة",
+    "pause": "إيقاف مؤقت",
+    "resume": "استئناف",
+    "executionsHeading": "التشغيلات الأخيرة",
+    "noExecutions": "هذه الأتمتة لم تُشغَّل بعد.",
+    "succeeded": "اكتملت بنجاح",
+    "failed": "فشلت",
+    "triggerLeadStage": "عندما تصبح مرحلة العميل المحتمل {stage}",
+    "triggerOrderStatus": "عندما تصبح حالة الطلب {status}",
+    "triggerHandedOver": "عندما يحوّل الذكاء الاصطناعي محادثة إلى موظف بشري",
+    "actionAddTag": "إضافة وسم \"{tag}\" لجهة الاتصال",
+    "actionNotifyOwner": "إرسال بريد إلكتروني لي",
+    "new": {
+      "title": "أتمتة جديدة",
+      "description": "اختر شيئاً يحدث في نشاطك التجاري، وشيئاً يجب أن يحدث تلقائياً كردّ فعل.",
+      "nameLabel": "الاسم",
+      "namePlaceholder": "مثال: أخبرني عندما أفوز بصفقة",
+      "triggerLabel": "عندما...",
+      "triggers": {
+        "lead_stage_changed": "تتغيّر مرحلة عميل محتمل",
+        "order_status_changed": "تتغيّر حالة طلب",
+        "conversation_handed_over": "الذكاء الاصطناعي يحوّل محادثة لموظف بشري"
+      },
+      "stagePlaceholder": "اختر مرحلة",
+      "statusPlaceholder": "اختر حالة",
+      "actionLabel": "افعل...",
+      "actions": {
+        "add_contact_tag": "وسم العميل",
+        "notify_owner_email": "إرسال بريد إلكتروني لي"
+      },
+      "tagPlaceholder": "الوسم، مثال: عميل",
+      "subjectPlaceholder": "موضوع البريد (اختياري)",
+      "messagePlaceholder": "نص البريد — استخدم '{{contactName}}' لاسم العميل",
+      "messageHint": "'{{contactName}}' سيُستبدَل باسم العميل.",
+      "submit": "إنشاء الأتمتة",
       "submitting": "جارٍ الإنشاء..."
     }
   },

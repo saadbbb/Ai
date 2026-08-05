@@ -1,5 +1,6 @@
 import "server-only";
 import type { Lead, LeadStage } from "@/db/schema";
+import { automationService } from "@/features/automation/services/automation.service";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { AppError } from "@/lib/errors/app-error";
 import { leadRepository, type LeadListItem } from "../repository/lead.repository";
@@ -33,6 +34,13 @@ async function updateLeadStage(workspaceId: string, leadId: string, stage: LeadS
   if (!lead) {
     throw new AppError("NOT_FOUND", "Lead not found.");
   }
+
+  await automationService.dispatch(workspaceId, {
+    type: "lead_stage_changed",
+    contactId: lead.contactId,
+    stage,
+  });
+
   return lead;
 }
 

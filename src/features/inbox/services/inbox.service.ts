@@ -1,6 +1,7 @@
 import "server-only";
 import type { ChatMessage } from "@/features/ai/providers/types";
 import { aiService } from "@/features/ai/services/ai.service";
+import { automationService } from "@/features/automation/services/automation.service";
 import { AppError } from "@/lib/errors/app-error";
 import { channelRepository } from "../repository/channel.repository";
 import { contactRepository } from "../repository/contact.repository";
@@ -31,7 +32,7 @@ function toChatHistory(history: Message[]): ChatMessage[] {
  * instead of throwing back through the caller (see claude.provider.ts, which
  * throws AppError today because ANTHROPIC_API_KEY isn't set yet).
  */
-async function triggerAiReply(workspaceId: string, conversationId: string): Promise<Message> {
+async function triggerAiReply(workspaceId: string, conversationId: string, contactId: string): Promise<Message> {
   const history = await messageRepository.findByConversationId(conversationId, workspaceId);
 
   try {
@@ -47,6 +48,7 @@ async function triggerAiReply(workspaceId: string, conversationId: string): Prom
 
     if (result.needsHumanHandover) {
       await conversationRepository.updateAiStatus(conversationId, workspaceId, "handed_over");
+      await automationService.dispatch(workspaceId, { type: "conversation_handed_over", contactId });
     }
 
     return message;
@@ -59,6 +61,7 @@ async function triggerAiReply(workspaceId: string, conversationId: string): Prom
       content: "The AI employee couldn't generate a reply. This conversation needs a human.",
     });
     await conversationRepository.updateAiStatus(conversationId, workspaceId, "handed_over");
+    await automationService.dispatch(workspaceId, { type: "conversation_handed_over", contactId });
     return message;
   }
 }
@@ -116,7 +119,7 @@ async function startConversation(workspaceId: string, input: StartConversationIn
   });
   await conversationRepository.touchLastMessage(conversation.id, workspaceId, previewOf(input.initialMessage));
 
-  await triggerAiReply(workspaceId, conversation.id);
+  await triggerAiReply(workspaceId, conversation.id, contact.id);
 
   return { id: conversation.id };
 }
@@ -139,7 +142,7 @@ async function logCustomerMessage(workspaceId: string, conversationId: string, c
   await contactRepository.touchLastContact(item.contact.id, workspaceId);
 
   if (item.conversation.aiStatus === "active") {
-    const replyMessage = await triggerAiReply(workspaceId, conversationId);
+    const replyMessage = await triggerAiReply(workspaceId, conversationId, item.contact.id);
     return [customerMessage, replyMessage];
   }
 

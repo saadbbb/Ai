@@ -34,6 +34,15 @@ export default async function ContactsPage() {
                 <p className="truncate text-sm text-muted-foreground">
                   {[contact.phone, contact.email].filter(Boolean).join(" · ") || t("noContactInfo")}
                 </p>
+                {contact.tags.length > 0 && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {contact.tags.map((tag) => (
+                      <span key={tag} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               {contact.lastContactAt && (
                 <span className="shrink-0 text-xs text-muted-foreground">

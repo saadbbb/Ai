@@ -13,4 +13,8 @@ export const consoleEmailProvider: EmailService = {
       `\n[email:mock] To: ${to}\nSubject: ${subject}\nYour verification code is: ${code}\n(Expires in 10 minutes.)\n`,
     );
   },
+
+  async sendNotificationEmail({ to, subject, text }) {
+    console.log(`\n[email:mock] To: ${to}\nSubject: ${subject}\n${text}\n`);
+  },
 };

@@ -27,4 +27,18 @@ export const contactRepository = {
       .set({ lastContactAt: new Date(), updatedAt: new Date() })
       .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
   },
+
+  async addTag(id: string, workspaceId: string, tag: string): Promise<void> {
+    const [contact] = await db
+      .select({ tags: contacts.tags })
+      .from(contacts)
+      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)))
+      .limit(1);
+    if (!contact || contact.tags.includes(tag)) return;
+
+    await db
+      .update(contacts)
+      .set({ tags: [...contact.tags, tag], updatedAt: new Date() })
+      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
+  },
 };

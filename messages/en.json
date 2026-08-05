@@ -224,6 +224,7 @@
     "leadsLink": "Leads",
     "ordersLink": "Orders",
     "appointmentsLink": "Appointments",
+    "automationsLink": "Automations",
     "testAiLink": "Test your AI employee",
     "settingsLink": "Settings",
     "knowledgeBaseLink": "Knowledge Base",
@@ -333,6 +334,49 @@
       "notesLabel": "Notes (optional)",
       "total": "Total: {total}",
       "submit": "Create order",
+      "submitting": "Creating..."
+    }
+  },
+  "automations": {
+    "title": "Automations",
+    "description": "Let repetitive follow-ups happen by themselves.",
+    "newWorkflow": "New automation",
+    "emptyState": "No automations yet. Create one to react automatically to what happens in your business.",
+    "backLink": "← Back to Automations",
+    "pause": "Pause",
+    "resume": "Resume",
+    "executionsHeading": "Recent runs",
+    "noExecutions": "This automation hasn't run yet.",
+    "succeeded": "Ran successfully",
+    "failed": "Failed",
+    "triggerLeadStage": "When a lead becomes {stage}",
+    "triggerOrderStatus": "When an order becomes {status}",
+    "triggerHandedOver": "When the AI hands a conversation to a human",
+    "actionAddTag": "Tag the contact \"{tag}\"",
+    "actionNotifyOwner": "Email me",
+    "new": {
+      "title": "New automation",
+      "description": "Pick something that happens in your business, and something that should happen automatically in response.",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Notify me when a deal is won",
+      "triggerLabel": "When...",
+      "triggers": {
+        "lead_stage_changed": "A lead's stage changes",
+        "order_status_changed": "An order's status changes",
+        "conversation_handed_over": "The AI hands a conversation to a human"
+      },
+      "stagePlaceholder": "Select a stage",
+      "statusPlaceholder": "Select a status",
+      "actionLabel": "Then...",
+      "actions": {
+        "add_contact_tag": "Tag the customer",
+        "notify_owner_email": "Email me"
+      },
+      "tagPlaceholder": "Tag, e.g. customer",
+      "subjectPlaceholder": "Email subject (optional)",
+      "messagePlaceholder": "Email message — use '{{contactName}}' for the customer's name",
+      "messageHint": "'{{contactName}}' will be replaced with the customer's name.",
+      "submit": "Create automation",
       "submitting": "Creating..."
     }
   },
