@@ -519,7 +519,10 @@
         "automations": "Automations",
         "knowledge_base": "Knowledge Base",
         "analytics": "Analytics"
-      }
+      },
+      "pricePlaceholder": "Price in IQD (optional)",
+      "priceSummary": "{price} {currency}/mo",
+      "noPriceSet": "No price set yet — excluded from MRR/ARR."
     },
     "settings": {
       "title": "Platform Settings",
@@ -555,6 +558,19 @@
       "title": "Audit Log",
       "description": "Every sensitive action taken by a platform admin — plans, subscriptions, admin access, settings.",
       "emptyState": "No audit events recorded yet."
+    },
+    "revenueLink": "Revenue",
+    "revenue": {
+      "title": "Revenue",
+      "description": "Monthly and annual recurring revenue from active, priced subscriptions.",
+      "mrr": "MRR",
+      "arr": "ARR",
+      "activeSubscriptions": "Active subscriptions",
+      "unpriced": "Unpriced subscriptions",
+      "unpricedHint": "Some active workspaces are on a plan with no price set — set a price on that plan to include it in MRR/ARR.",
+      "byPlanHeading": "By plan",
+      "emptyState": "No active, priced subscriptions yet.",
+      "planSubscriptions": "{count} subscriptions"
     }
   },
   "automations": {

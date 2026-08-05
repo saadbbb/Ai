@@ -519,7 +519,10 @@
         "automations": "الأتمتة",
         "knowledge_base": "قاعدة المعرفة",
         "analytics": "التحليلات"
-      }
+      },
+      "pricePlaceholder": "السعر بالدينار العراقي (اختياري)",
+      "priceSummary": "{price} {currency}/شهرياً",
+      "noPriceSet": "السعر غير محدد بعد — مستثنى من حساب MRR/ARR."
     },
     "settings": {
       "title": "إعدادات المنصة",
@@ -555,6 +558,19 @@
       "title": "سجل التدقيق",
       "description": "كل إجراء حساس قام به أحد مسؤولي المنصة — الخطط، الاشتراكات، صلاحيات المسؤولين، الإعدادات.",
       "emptyState": "لا توجد أحداث مسجلة بعد."
+    },
+    "revenueLink": "الإيرادات",
+    "revenue": {
+      "title": "الإيرادات",
+      "description": "الإيراد الشهري والسنوي المتكرر من الاشتراكات النشطة المسعّرة.",
+      "mrr": "MRR",
+      "arr": "ARR",
+      "activeSubscriptions": "الاشتراكات النشطة",
+      "unpriced": "اشتراكات غير مسعّرة",
+      "unpricedHint": "بعض الحسابات النشطة على خطة بدون سعر محدد — حدد سعراً لتلك الخطة عشان تنحسب ضمن MRR/ARR.",
+      "byPlanHeading": "حسب الخطة",
+      "emptyState": "لا توجد اشتراكات نشطة مسعّرة بعد.",
+      "planSubscriptions": "{count} اشتراك"
     }
   },
   "automations": {

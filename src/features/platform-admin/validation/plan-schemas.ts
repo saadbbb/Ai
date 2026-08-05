@@ -8,6 +8,13 @@ export const planFormSchema = z.object({
   billingCycle: z.enum(billingCycleEnum.enumValues),
   defaultDurationDays: z.coerce.number().int().positive().max(3650),
   enabledFeatures: z.array(z.enum(FEATURE_KEYS)),
+  // Optional on purpose — a plan can exist unpriced; see the comment on plans.price.
+  price: z.coerce
+    .number()
+    .nonnegative()
+    .max(999_999_999)
+    .transform((value) => value.toFixed(2))
+    .optional(),
 });
 
 export const deletePlanSchema = z.object({ id: z.string().uuid() });

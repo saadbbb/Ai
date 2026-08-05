@@ -16,9 +16,16 @@ interface Draft {
   billingCycle: BillingCycle;
   defaultDurationDays: string;
   enabledFeatures: FeatureKey[];
+  price: string;
 }
 
-const emptyDraft: Draft = { name: "", billingCycle: "monthly", defaultDurationDays: "30", enabledFeatures: [] };
+const emptyDraft: Draft = {
+  name: "",
+  billingCycle: "monthly",
+  defaultDurationDays: "30",
+  enabledFeatures: [],
+  price: "",
+};
 
 function FeatureCheckboxes({
   t,
@@ -61,12 +68,13 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
       billingCycle: plan.billingCycle,
       defaultDurationDays: String(plan.defaultDurationDays),
       enabledFeatures: plan.enabledFeatures as FeatureKey[],
+      price: plan.price ?? "",
     });
   }
 
   async function saveEdit(id: string) {
     setIsSaving(true);
-    const result = await savePlanAction({ id, ...editDraft });
+    const result = await savePlanAction({ id, ...editDraft, price: editDraft.price.trim() || undefined });
     setIsSaving(false);
 
     if (!result.success) {
@@ -94,7 +102,7 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
     if (!newDraft.name.trim()) return;
 
     setIsSaving(true);
-    const result = await savePlanAction(newDraft);
+    const result = await savePlanAction({ ...newDraft, price: newDraft.price.trim() || undefined });
     setIsSaving(false);
 
     if (!result.success) {
@@ -140,6 +148,14 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
                 placeholder={t("daysPlaceholder")}
               />
             </div>
+            <Input
+              type="number"
+              min="0"
+              step="0.01"
+              value={editDraft.price}
+              onChange={(event) => setEditDraft({ ...editDraft, price: event.target.value })}
+              placeholder={t("pricePlaceholder")}
+            />
             <FeatureCheckboxes
               t={t}
               selected={editDraft.enabledFeatures}
@@ -161,6 +177,9 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
                 {plan.name} <span className="text-sm text-muted-foreground">— {t(`cycles.${plan.billingCycle}`)}</span>
               </p>
               <p className="text-sm text-muted-foreground">{t("daysSummary", { days: plan.defaultDurationDays })}</p>
+              <p className="text-sm text-muted-foreground">
+                {plan.price ? t("priceSummary", { price: plan.price, currency: plan.currency }) : t("noPriceSet")}
+              </p>
               <p className="text-sm text-muted-foreground">
                 {plan.enabledFeatures.length === 0
                   ? t("noFeatures")
@@ -209,6 +228,14 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
             placeholder={t("daysPlaceholder")}
           />
         </div>
+        <Input
+          type="number"
+          min="0"
+          step="0.01"
+          value={newDraft.price}
+          onChange={(event) => setNewDraft({ ...newDraft, price: event.target.value })}
+          placeholder={t("pricePlaceholder")}
+        />
         <FeatureCheckboxes
           t={t}
           selected={newDraft.enabledFeatures}

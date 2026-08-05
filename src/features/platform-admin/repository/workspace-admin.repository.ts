@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
+  type BillingCycle,
   type Plan,
   plans,
   roles,
@@ -75,5 +76,14 @@ export const workspaceAdminRepository = {
 
   async setReminderSent(id: string, days: number): Promise<void> {
     await db.update(workspaces).set({ lastReminderDaysSent: days }).where(eq(workspaces.id, id));
+  },
+
+  /** Feeds calculateRevenue() (see lib/revenue.ts) — only active subscriptions count toward MRR/ARR. */
+  async findActiveWithPlan(): Promise<{ planName: string; price: string | null; billingCycle: BillingCycle }[]> {
+    return db
+      .select({ planName: plans.name, price: plans.price, billingCycle: plans.billingCycle })
+      .from(workspaces)
+      .innerJoin(plans, eq(plans.id, workspaces.planId))
+      .where(eq(workspaces.subscriptionStatus, "active"));
   },
 };
