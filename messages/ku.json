@@ -238,6 +238,7 @@
       "revenue": "داهات (گەیشتووەکان)",
       "aiActive": "کارمەندە زیرەکە ئێستا وەڵام دەداتەوە",
       "needsHuman": "پێویستی بە کەسێکی مرۆڤە",
+      "aiRequestsToday": "داواکاری کارمەندە زیرەکە ئەمڕۆ",
       "totalContacts": "کۆی گشتی پەیوەندییەکان"
     },
     "pipelineHeading": "دابەشکردنی هێڵی فرۆشتن",
@@ -373,7 +374,21 @@
     "backToDashboard": "گەڕانەوە بۆ داشبۆردەکەت",
     "workspacesLink": "بازنەکان",
     "plansLink": "پاکێجەکان",
+    "aiUsageLink": "بەکارهێنانی کارمەندە زیرەکە",
     "settingsLink": "ڕێکخستنەکان",
+    "aiUsage": {
+      "title": "بەکارهێنانی کارمەندە زیرەکە",
+      "description": "داواکارییەکان، تۆکنەکان، و متمانەپێکراوی لە هەموو بازنەکاندا.",
+      "totalRequests": "کۆی گشتی داواکارییەکان",
+      "successRate": "ڕێژەی سەرکەوتن",
+      "avgLatency": "تێمەڕی کاتی وەڵامدانەوە",
+      "msValue": "{ms} چرکەی میلی",
+      "totalTokens": "کۆی گشتی تۆکنەکان",
+      "byWorkspaceHeading": "بەپێی بازنە",
+      "emptyState": "هێشتا هیچ داواکارییەکی کارمەندە زیرەکە تۆمار نەکراوە.",
+      "workspaceRequests": "{count} داواکاری",
+      "tokens": "تۆکن"
+    },
     "adminsLink": "بەڕێوەبەران",
     "workspaces": {
       "title": "بازنەکان",

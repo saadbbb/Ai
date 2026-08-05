@@ -1,5 +1,6 @@
 import "server-only";
 import { leadStageEnum, type LeadStage } from "@/db/schema";
+import { aiUsageRepository } from "@/features/ai/repository/ai-usage.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
@@ -23,6 +24,7 @@ export interface DashboardSummary {
   revenueTotal: number;
   aiActiveCount: number;
   needsHumanCount: number;
+  aiRequestsToday: number;
   totalContacts: number;
   pipelineByStage: { stage: LeadStage; count: number }[];
   recentActivity: ActivityItem[];
@@ -45,11 +47,12 @@ function isToday(date: Date): boolean {
  * load" rule this deliberately isn't violating yet.
  */
 async function getSummary(workspaceId: string): Promise<DashboardSummary> {
-  const [conversations, leads, orders, contacts] = await Promise.all([
+  const [conversations, leads, orders, contacts, aiRequestsToday] = await Promise.all([
     conversationRepository.findByWorkspaceId(workspaceId),
     leadRepository.findByWorkspaceId(workspaceId),
     orderRepository.findByWorkspaceId(workspaceId),
     contactRepository.findByWorkspaceId(workspaceId),
+    aiUsageRepository.countTodayByWorkspace(workspaceId),
   ]);
 
   const pipelineByStage = leadStageEnum.enumValues.map((stage) => ({
@@ -99,6 +102,7 @@ async function getSummary(workspaceId: string): Promise<DashboardSummary> {
       .reduce((sum, item) => sum + orderTotal(item.items), 0),
     aiActiveCount: conversations.filter((item) => item.conversation.aiStatus === "active").length,
     needsHumanCount: conversations.filter((item) => item.conversation.aiStatus === "handed_over").length,
+    aiRequestsToday,
     totalContacts: contacts.length,
     pipelineByStage,
     recentActivity,

@@ -238,6 +238,7 @@
       "revenue": "الإيرادات (المُسلَّمة)",
       "aiActive": "الذكاء الاصطناعي يرد الآن",
       "needsHuman": "بحاجة إلى موظف بشري",
+      "aiRequestsToday": "طلبات الذكاء الاصطناعي اليوم",
       "totalContacts": "إجمالي جهات الاتصال"
     },
     "pipelineHeading": "توزيع مسار المبيعات",
@@ -373,7 +374,21 @@
     "backToDashboard": "الرجوع للوحة تحكمك",
     "workspacesLink": "المساحات",
     "plansLink": "الباقات",
+    "aiUsageLink": "استخدام الذكاء الاصطناعي",
     "settingsLink": "الإعدادات",
+    "aiUsage": {
+      "title": "استخدام الذكاء الاصطناعي",
+      "description": "الطلبات والرموز (tokens) وموثوقية الأداء عبر كل مساحات العمل.",
+      "totalRequests": "إجمالي الطلبات",
+      "successRate": "معدّل النجاح",
+      "avgLatency": "متوسط زمن الاستجابة",
+      "msValue": "{ms} مللي ثانية",
+      "totalTokens": "إجمالي الرموز",
+      "byWorkspaceHeading": "حسب مساحة العمل",
+      "emptyState": "لا توجد طلبات ذكاء اصطناعي مسجّلة بعد.",
+      "workspaceRequests": "{count} طلب",
+      "tokens": "رمز"
+    },
     "adminsLink": "المسؤولون",
     "workspaces": {
       "title": "المساحات",

@@ -2,7 +2,7 @@ import "server-only";
 import { createClaudeProvider } from "../providers/claude.provider";
 import type { AIProvider } from "../providers/types";
 
-const DEFAULT_MODEL = "claude-haiku-4-5";
+export const DEFAULT_MODEL = "claude-haiku-4-5";
 
 /**
  * Single provider today. This is the seam where multi-provider routing and

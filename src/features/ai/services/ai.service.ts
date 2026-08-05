@@ -5,8 +5,9 @@ import { productRepository } from "@/features/knowledge-base/repository/product.
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
 import { AppError } from "@/lib/errors/app-error";
 import { aiAgentRepository } from "../repository/ai-agent.repository";
+import { aiUsageRepository } from "../repository/ai-usage.repository";
 import { buildSystemPrompt } from "../prompt/prompt-builder";
-import { selectProvider } from "../router/ai-router";
+import { DEFAULT_MODEL, selectProvider } from "../router/ai-router";
 import type { ChatMessage, GenerateReplyResult } from "../providers/types";
 
 async function generateReply(workspaceId: string, history: ChatMessage[]): Promise<GenerateReplyResult> {
@@ -24,8 +25,33 @@ async function generateReply(workspaceId: string, history: ChatMessage[]): Promi
 
   const systemPrompt = buildSystemPrompt({ agent, faqs, products, services, policy });
   const provider = selectProvider();
+  const startedAt = Date.now();
 
-  return provider.generateReply({ systemPrompt, history });
+  try {
+    const result = await provider.generateReply({ systemPrompt, history });
+    await aiUsageRepository.create({
+      workspaceId,
+      provider: "claude",
+      model: DEFAULT_MODEL,
+      inputTokens: result.usage.inputTokens,
+      outputTokens: result.usage.outputTokens,
+      latencyMs: Date.now() - startedAt,
+      success: true,
+    });
+    return result;
+  } catch (error) {
+    await aiUsageRepository.create({
+      workspaceId,
+      provider: "claude",
+      model: DEFAULT_MODEL,
+      inputTokens: 0,
+      outputTokens: 0,
+      latencyMs: Date.now() - startedAt,
+      success: false,
+      errorMessage: error instanceof Error ? error.message : "Unknown error",
+    });
+    throw error;
+  }
 }
 
 export const aiService = {

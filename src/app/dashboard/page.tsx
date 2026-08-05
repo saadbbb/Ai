@@ -33,6 +33,7 @@ export default async function DashboardPage() {
         <StatTile label={t("stats.revenue")} value={summary.revenueTotal.toFixed(2)} />
         <StatTile label={t("stats.aiActive")} value={summary.aiActiveCount} />
         <StatTile label={t("stats.needsHuman")} value={summary.needsHumanCount} />
+        <StatTile label={t("stats.aiRequestsToday")} value={summary.aiRequestsToday} />
         <StatTile label={t("stats.totalContacts")} value={summary.totalContacts} />
       </div>
 

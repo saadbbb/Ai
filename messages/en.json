@@ -238,6 +238,7 @@
       "revenue": "Revenue (delivered)",
       "aiActive": "AI replying now",
       "needsHuman": "Needs a human",
+      "aiRequestsToday": "AI requests today",
       "totalContacts": "Total contacts"
     },
     "pipelineHeading": "Pipeline breakdown",
@@ -373,8 +374,22 @@
     "backToDashboard": "Back to your dashboard",
     "workspacesLink": "Workspaces",
     "plansLink": "Plans",
+    "aiUsageLink": "AI Usage",
     "settingsLink": "Settings",
     "adminsLink": "Admins",
+    "aiUsage": {
+      "title": "AI Usage",
+      "description": "Requests, tokens, and reliability across every workspace.",
+      "totalRequests": "Total requests",
+      "successRate": "Success rate",
+      "avgLatency": "Avg. latency",
+      "msValue": "{ms} ms",
+      "totalTokens": "Total tokens",
+      "byWorkspaceHeading": "By workspace",
+      "emptyState": "No AI requests logged yet.",
+      "workspaceRequests": "{count} requests",
+      "tokens": "tokens"
+    },
     "workspaces": {
       "title": "Workspaces",
       "description": "Every business on the platform. Activate a subscription by hand until real billing exists.",
