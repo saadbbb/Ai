@@ -212,7 +212,17 @@
   "dashboard": {
     "welcomeBack": "Welcome back",
     "signedInAs": "Signed in as {email}.",
-    "yourRole": "Your role: {role} · Timezone: {timezone}"
+    "yourRole": "Your role: {role} · Timezone: {timezone}",
+    "testAiLink": "Test your AI employee"
+  },
+  "aiTest": {
+    "title": "Test your AI employee",
+    "description": "Chat with your AI employee exactly as a customer would. Nothing here is saved or sent to a real customer.",
+    "emptyState": "Send a message to see how your AI employee replies.",
+    "placeholder": "Type a message...",
+    "send": "Send",
+    "sending": "Sending...",
+    "humanHandoverBadge": "This would be handed over to a human."
   },
   "localeSwitcher": {
     "label": "Language"

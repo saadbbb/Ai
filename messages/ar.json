@@ -212,7 +212,17 @@
   "dashboard": {
     "welcomeBack": "مرحباً بعودتك",
     "signedInAs": "مسجّل الدخول باسم {email}.",
-    "yourRole": "دورك: {role} · المنطقة الزمنية: {timezone}"
+    "yourRole": "دورك: {role} · المنطقة الزمنية: {timezone}",
+    "testAiLink": "جرّب موظفك الذكي"
+  },
+  "aiTest": {
+    "title": "جرّب موظفك الذكي",
+    "description": "تحدّث مع موظفك الذكي تماماً كما يفعل العميل. لا شيء هنا يُحفظ أو يُرسل لعميل حقيقي.",
+    "emptyState": "أرسل رسالة لترى كيف يرد موظفك الذكي.",
+    "placeholder": "اكتب رسالة...",
+    "send": "إرسال",
+    "sending": "جارٍ الإرسال...",
+    "humanHandoverBadge": "هذه الحالة ستُحوَّل إلى موظف بشري."
   },
   "localeSwitcher": {
     "label": "اللغة"

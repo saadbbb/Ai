@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { requireUser } from "@/lib/auth/auth-guard";
 
@@ -9,8 +11,15 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">{t("welcomeBack")}</h1>
-      <p className="text-muted-foreground">{t("signedInAs", { email: user.email })}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("welcomeBack")}</h1>
+          <p className="text-muted-foreground">{t("signedInAs", { email: user.email })}</p>
+        </div>
+        <Button asChild variant="outline">
+          <Link href="/dashboard/test-ai">{t("testAiLink")}</Link>
+        </Button>
+      </div>
       {workspaceMemberships.map(({ workspace, role }) => (
         <div key={workspace.id} className="rounded-lg border p-4">
           <p className="font-medium">{workspace.name}</p>
