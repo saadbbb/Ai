@@ -1,0 +1,24 @@
+"use server";
+
+import type { Lead } from "@/db/schema";
+import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
+import { crmService } from "../services/crm.service";
+import { updateLeadStageSchema } from "../validation/schemas";
+
+export async function updateLeadStageAction(input: unknown): Promise<ActionResult<Lead>> {
+  const parsed = updateLeadStageSchema.safeParse(input);
+  if (!parsed.success) {
+    return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
+  }
+
+  const user = await requireUser();
+  const workspace = await requireWorkspaceForUser(user.id);
+
+  try {
+    const lead = await crmService.updateLeadStage(workspace.id, parsed.data.leadId, parsed.data.stage);
+    return actionOk(lead);
+  } catch (error) {
+    return actionFail(error);
+  }
+}

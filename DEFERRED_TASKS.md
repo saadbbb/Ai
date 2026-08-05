@@ -7,10 +7,10 @@ every time a new item like this comes up — don't let it go stale.
 ## Blocked right now — code is ready, waiting on an external account/credential
 
 ### 1. Claude (Anthropic) API key
-- **What's built:** Full AI provider layer (`AIProvider`/`AIRouter`/`ClaudeProvider`/prompt builder) + a "Test your AI employee" chat screen in the dashboard.
+- **What's built:** Full AI provider layer (`AIProvider`/`AIRouter`/`ClaudeProvider`/prompt builder) + a "Test your AI employee" chat screen in the dashboard + the real Inbox (`src/features/inbox`), which calls the same `aiService.generateReply` to auto-reply inside conversations.
 - **Blocked on:** A real `ANTHROPIC_API_KEY` from [console.anthropic.com](https://console.anthropic.com).
 - **To unblock:** Add the key to `.env.local` (local) and to the Vercel project's Environment Variables (production), then redeploy.
-- **Status:** User is buying the key tomorrow (2026-08-06).
+- **Status:** User is buying the key tomorrow (2026-08-06). Until then, `inboxService.triggerAiReply` catches the provider's `AppError` gracefully — the customer message still saves, a system note ("AI employee couldn't generate a reply") gets logged, and the conversation flips to `handed_over` instead of crashing. So the Inbox is fully testable end-to-end today except for the actual AI reply text.
 
 ### 2. Real email delivery (Resend)
 - **What's built:** `EmailService` abstraction with a Resend provider already wired in (`src/lib/email/resend-email-provider.ts`); falls back to a console-log mock provider when no key is set.
@@ -25,10 +25,10 @@ every time a new item like this comes up — don't let it go stale.
 - **Status:** App works correctly without it (every session lookup just hits Postgres directly) — this is a performance optimization, not a blocker for anything else.
 
 ### 4. WhatsApp Business + Instagram DM (Meta OAuth)
-- **What's built:** Onboarding step 10 ("Connect your channels") shows both channels with a "Coming soon" placeholder button; no OAuth flow, no webhook receiver, no message-sending code exists yet.
+- **What's built:** Onboarding step 10 ("Connect your channels") shows both channels with a "Coming soon" placeholder button. As of 2026-08-05, the underlying data model is real and channel-agnostic: `channels`/`contacts`/`conversations`/`messages` tables, a `channelRepository.ensureDefaultChannels` that already creates `not_connected` rows for `whatsapp`/`instagram` per workspace, and a Unified Inbox (`/dashboard/inbox`) built entirely against those tables. What's still missing is only the Meta-specific part: OAuth connection flow, webhook receiver, and outbound message-sending — once those exist they just insert into the same `messages` table the manual channel already uses, no redesign needed.
 - **Blocked on:** A Meta Developer account, Business verification, and Meta App Review approval for the WhatsApp Business API and Instagram Graph API — this is a real, multi-week external approval process, not just an API key.
 - **To unblock:** Register the business on Meta for Developers, submit for App Review with the required permissions, get WhatsApp Business API access provisioned.
-- **Status:** Not started beyond the placeholder UI. This is its own future architecture phase (per the original Part 3 "Channel Connection" spec).
+- **Status:** Placeholder UI + ready-to-receive data model. OAuth/webhook/send code not started — next up once Meta approval is in progress.
 
 ## Known future items — not built yet, but will need an external account when we get there
 

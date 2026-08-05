@@ -220,9 +220,81 @@
     "signedInAs": "مسجّل الدخول باسم {email}.",
     "yourRole": "دورك: {role} · المنطقة الزمنية: {timezone}",
     "homeLink": "الرئيسية",
+    "inboxLink": "صندوق المحادثات",
+    "leadsLink": "العملاء المحتملون",
     "testAiLink": "جرّب موظفك الذكي",
     "settingsLink": "الإعدادات",
     "knowledgeBaseLink": "قاعدة المعرفة"
+  },
+  "inbox": {
+    "list": {
+      "title": "صندوق المحادثات",
+      "description": "كل محادثة يجريها موظفك الذكي، في مكان واحد.",
+      "newConversation": "محادثة جديدة",
+      "emptyState": "لا توجد محادثات بعد. ابدأ واحدة لترى كيف يرد موظفك الذكي.",
+      "noMessages": "لا توجد رسائل بعد.",
+      "closedBadge": "مغلقة",
+      "channelManual": "يدوي",
+      "channelWhatsapp": "واتساب",
+      "channelInstagram": "إنستغرام",
+      "aiActive": "الذكاء الاصطناعي يرد",
+      "aiPaused": "الذكاء الاصطناعي متوقف مؤقتاً",
+      "aiHandedOver": "بحاجة إلى موظف بشري"
+    },
+    "new": {
+      "title": "ابدأ محادثة",
+      "description": "سجّل محادثة كما لو أن عميلاً تواصل للتو — مفيد لاختبار موظفك الذكي أو تسجيل مكالمة هاتفية. رسائل واتساب وإنستغرام الحقيقية ستظهر هنا تلقائياً بمجرد ربطها.",
+      "contactNameLabel": "اسم العميل",
+      "phoneLabel": "رقم الهاتف (اختياري)",
+      "messageLabel": "رسالة العميل",
+      "messagePlaceholder": "ماذا قال العميل؟",
+      "submit": "ابدأ المحادثة",
+      "submitting": "جارٍ البدء..."
+    },
+    "thread": {
+      "backLink": "← الرجوع إلى صندوق المحادثات",
+      "pauseAi": "إيقاف الذكاء الاصطناعي مؤقتاً",
+      "resumeAi": "استئناف الذكاء الاصطناعي",
+      "closeConversation": "إغلاق المحادثة",
+      "closedBadge": "مغلقة",
+      "senderAi": "الموظف الذكي",
+      "senderYou": "أنت",
+      "senderSystem": "النظام",
+      "switchToReply": "الرد بدلاً من ذلك",
+      "logCustomerMessage": "تسجيل رسالة من العميل بدلاً من ذلك",
+      "logCustomerPlaceholder": "ماذا قال العميل؟",
+      "replyPlaceholder": "اكتب ردّك...",
+      "sendReply": "إرسال الرد",
+      "sending": "جارٍ الإرسال...",
+      "logSubmit": "تسجيل الرسالة",
+      "channel": {
+        "manual": "يدوي",
+        "whatsapp": "واتساب",
+        "instagram": "إنستغرام"
+      },
+      "createLead": "إنشاء عميل محتمل",
+      "leadCreated": "تم إنشاء العميل المحتمل.",
+      "viewInPipeline": "عرضه في مسار المبيعات ←"
+    }
+  },
+  "leads": {
+    "title": "العملاء المحتملون",
+    "description": "كل عميل محتمل لديك، مجمّع حسب المرحلة. لا سحب وإفلات بعد — فقط غيّر المرحلة من البطاقة.",
+    "emptyBoard": "لا يوجد عملاء محتملون بعد. افتح محادثة من صندوق المحادثات وأنشئ عميلاً محتملاً منها.",
+    "emptyStage": "لا يوجد شيء هنا.",
+    "viewConversation": "عرض المحادثة ←",
+    "stages": {
+      "new": "عميل محتمل جديد",
+      "qualified": "مؤهّل",
+      "contacted": "تم التواصل",
+      "negotiation": "تفاوض",
+      "waiting": "بانتظار",
+      "appointment": "موعد",
+      "proposal_sent": "تم إرسال عرض",
+      "won": "تم الفوز به",
+      "lost": "خسارة",
+      "cancelled": "ملغى"
+    }
   },
   "aiTest": {
     "title": "جرّب موظفك الذكي",

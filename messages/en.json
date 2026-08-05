@@ -220,9 +220,81 @@
     "signedInAs": "Signed in as {email}.",
     "yourRole": "Your role: {role} · Timezone: {timezone}",
     "homeLink": "Dashboard",
+    "inboxLink": "Inbox",
+    "leadsLink": "Leads",
     "testAiLink": "Test your AI employee",
     "settingsLink": "Settings",
     "knowledgeBaseLink": "Knowledge Base"
+  },
+  "inbox": {
+    "list": {
+      "title": "Inbox",
+      "description": "Every conversation your AI employee is having, in one place.",
+      "newConversation": "New conversation",
+      "emptyState": "No conversations yet. Start one to see your AI employee reply.",
+      "noMessages": "No messages yet.",
+      "closedBadge": "Closed",
+      "channelManual": "Manual",
+      "channelWhatsapp": "WhatsApp",
+      "channelInstagram": "Instagram",
+      "aiActive": "AI replying",
+      "aiPaused": "AI paused",
+      "aiHandedOver": "Needs a human"
+    },
+    "new": {
+      "title": "Start a conversation",
+      "description": "Log a conversation as if a customer just reached out — useful for testing your AI employee, or recording a call. Real WhatsApp and Instagram messages will appear here automatically once connected.",
+      "contactNameLabel": "Customer name",
+      "phoneLabel": "Phone (optional)",
+      "messageLabel": "Customer's message",
+      "messagePlaceholder": "What did the customer say?",
+      "submit": "Start conversation",
+      "submitting": "Starting..."
+    },
+    "thread": {
+      "backLink": "← Back to Inbox",
+      "pauseAi": "Pause AI",
+      "resumeAi": "Resume AI",
+      "closeConversation": "Close conversation",
+      "closedBadge": "Closed",
+      "senderAi": "AI employee",
+      "senderYou": "You",
+      "senderSystem": "System",
+      "switchToReply": "Reply instead",
+      "logCustomerMessage": "Log a customer message instead",
+      "logCustomerPlaceholder": "What did the customer say?",
+      "replyPlaceholder": "Type your reply...",
+      "sendReply": "Send reply",
+      "sending": "Sending...",
+      "logSubmit": "Log message",
+      "channel": {
+        "manual": "Manual",
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram"
+      },
+      "createLead": "Create lead",
+      "leadCreated": "Lead created.",
+      "viewInPipeline": "View in Pipeline →"
+    }
+  },
+  "leads": {
+    "title": "Leads",
+    "description": "Every lead your business has, grouped by stage. Drag nowhere yet — just change the stage on a card.",
+    "emptyBoard": "No leads yet. Open a conversation in the Inbox and create a lead from it.",
+    "emptyStage": "Nothing here.",
+    "viewConversation": "View conversation →",
+    "stages": {
+      "new": "New Lead",
+      "qualified": "Qualified",
+      "contacted": "Contacted",
+      "negotiation": "Negotiation",
+      "waiting": "Waiting",
+      "appointment": "Appointment",
+      "proposal_sent": "Proposal Sent",
+      "won": "Won",
+      "lost": "Lost",
+      "cancelled": "Cancelled"
+    }
   },
   "aiTest": {
     "title": "Test your AI employee",
