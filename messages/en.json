@@ -223,6 +223,7 @@
     "inboxLink": "Inbox",
     "contactsLink": "Contacts",
     "leadsLink": "Leads",
+    "ordersLink": "Orders",
     "testAiLink": "Test your AI employee",
     "settingsLink": "Settings",
     "knowledgeBaseLink": "Knowledge Base"
@@ -276,6 +277,47 @@
       "createLead": "Create lead",
       "leadCreated": "Lead created.",
       "viewInPipeline": "View in Pipeline →"
+    }
+  },
+  "orders": {
+    "title": "Orders",
+    "description": "Every order your business has taken, from draft to delivered.",
+    "newOrder": "New order",
+    "emptyState": "No orders yet. Create one from a contact.",
+    "itemCount": "{count} items",
+    "backLink": "← Back to Orders",
+    "notesHeading": "Notes",
+    "totalHeading": "Total",
+    "noOrdersForContact": "No orders for this contact yet.",
+    "statuses": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "new": {
+      "title": "New order",
+      "description": "Pick a customer, add items from your catalog or type a custom one, and save.",
+      "contactLabel": "Customer",
+      "contactPlaceholder": "Select a customer",
+      "contactRequired": "Select a customer first.",
+      "itemsLabel": "Items",
+      "productPlaceholder": "Pick from catalog (optional)",
+      "itemNamePlaceholder": "Item name",
+      "unitPricePlaceholder": "Price",
+      "quantityPlaceholder": "Qty",
+      "removeItem": "Remove",
+      "addItem": "Add item",
+      "itemRequired": "Add at least one item.",
+      "notesLabel": "Notes (optional)",
+      "total": "Total: {total}",
+      "submit": "Create order",
+      "submitting": "Creating..."
     }
   },
   "contacts": {

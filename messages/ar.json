@@ -223,6 +223,7 @@
     "inboxLink": "صندوق المحادثات",
     "contactsLink": "جهات الاتصال",
     "leadsLink": "العملاء المحتملون",
+    "ordersLink": "الطلبات",
     "testAiLink": "جرّب موظفك الذكي",
     "settingsLink": "الإعدادات",
     "knowledgeBaseLink": "قاعدة المعرفة"
@@ -276,6 +277,47 @@
       "createLead": "إنشاء عميل محتمل",
       "leadCreated": "تم إنشاء العميل المحتمل.",
       "viewInPipeline": "عرضه في مسار المبيعات ←"
+    }
+  },
+  "orders": {
+    "title": "الطلبات",
+    "description": "كل طلب استلمه نشاطك التجاري، من المسودة حتى التسليم.",
+    "newOrder": "طلب جديد",
+    "emptyState": "لا توجد طلبات بعد. أنشئ واحداً من صفحة جهة اتصال.",
+    "itemCount": "{count} عنصر",
+    "backLink": "← الرجوع إلى الطلبات",
+    "notesHeading": "ملاحظات",
+    "totalHeading": "الإجمالي",
+    "noOrdersForContact": "لا توجد طلبات لهذه الجهة بعد.",
+    "statuses": {
+      "draft": "مسودة",
+      "pending": "قيد الانتظار",
+      "confirmed": "مؤكَّد",
+      "preparing": "قيد التحضير",
+      "ready": "جاهز",
+      "delivered": "تم التسليم",
+      "completed": "مكتمل",
+      "cancelled": "ملغى",
+      "refunded": "مُسترجَع"
+    },
+    "new": {
+      "title": "طلب جديد",
+      "description": "اختر عميلاً، أضف عناصر من كتالوجك أو اكتب عنصراً مخصصاً، ثم احفظ.",
+      "contactLabel": "العميل",
+      "contactPlaceholder": "اختر عميلاً",
+      "contactRequired": "اختر عميلاً أولاً.",
+      "itemsLabel": "العناصر",
+      "productPlaceholder": "اختر من الكتالوج (اختياري)",
+      "itemNamePlaceholder": "اسم العنصر",
+      "unitPricePlaceholder": "السعر",
+      "quantityPlaceholder": "الكمية",
+      "removeItem": "إزالة",
+      "addItem": "إضافة عنصر",
+      "itemRequired": "أضف عنصراً واحداً على الأقل.",
+      "notesLabel": "ملاحظات (اختياري)",
+      "total": "الإجمالي: {total}",
+      "submit": "إنشاء الطلب",
+      "submitting": "جارٍ الإنشاء..."
     }
   },
   "contacts": {

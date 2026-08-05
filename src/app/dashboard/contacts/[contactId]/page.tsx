@@ -1,10 +1,13 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { AiStatusBadge } from "@/features/inbox/components/ai-status-badge";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
+import { orderTotal } from "@/features/orders/lib/order-total";
+import { orderRepository } from "@/features/orders/repository/order.repository";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 interface PageProps {
@@ -17,13 +20,15 @@ export default async function ContactDetailPage({ params }: PageProps) {
   const workspace = await requireWorkspaceForUser(user.id);
   const t = await getTranslations("contacts");
   const tLeads = await getTranslations("leads");
+  const tOrders = await getTranslations("orders");
 
   const contact = await contactRepository.findById(contactId, workspace.id);
   if (!contact) notFound();
 
-  const [conversations, leads] = await Promise.all([
+  const [conversations, leads, orders] = await Promise.all([
     conversationRepository.findByContactId(contactId, workspace.id),
     leadRepository.findByContactId(contactId, workspace.id),
+    orderRepository.findByContactId(contactId, workspace.id),
   ]);
 
   return (
@@ -32,11 +37,37 @@ export default async function ContactDetailPage({ params }: PageProps) {
         {t("backLink")}
       </Link>
 
-      <div>
-        <h1 className="text-xl font-semibold">{contact.fullName}</h1>
-        <p className="text-sm text-muted-foreground">
-          {[contact.phone, contact.email].filter(Boolean).join(" · ") || t("noContactInfo")}
-        </p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">{contact.fullName}</h1>
+          <p className="text-sm text-muted-foreground">
+            {[contact.phone, contact.email].filter(Boolean).join(" · ") || t("noContactInfo")}
+          </p>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/dashboard/orders/new?contactId=${contact.id}`}>{tOrders("newOrder")}</Link>
+        </Button>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-medium">{tOrders("title")}</h2>
+        {orders.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{tOrders("noOrdersForContact")}</p>
+        ) : (
+          <div className="divide-y rounded-lg border">
+            {orders.map(({ order, items }) => (
+              <Link
+                key={order.id}
+                href={`/dashboard/orders/${order.id}`}
+                className="flex items-center justify-between gap-4 p-3 hover:bg-muted"
+              >
+                <span className="text-sm">
+                  {tOrders(`statuses.${order.status}`)} · {orderTotal(items).toFixed(2)}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="space-y-3">

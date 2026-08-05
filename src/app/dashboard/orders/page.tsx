@@ -1,0 +1,51 @@
+import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { OrderStatusSelect } from "@/features/orders/components/order-status-select";
+import { orderTotal } from "@/features/orders/lib/order-total";
+import { orderService } from "@/features/orders/services/order.service";
+import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+
+export default async function OrdersPage() {
+  const user = await requireUser();
+  const workspace = await requireWorkspaceForUser(user.id);
+  const t = await getTranslations("orders");
+
+  const orders = await orderService.listOrders(workspace.id);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("description")}</p>
+        </div>
+        <Button asChild>
+          <Link href="/dashboard/orders/new">{t("newOrder")}</Link>
+        </Button>
+      </div>
+
+      {orders.length === 0 ? (
+        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+          {t("emptyState")}
+        </p>
+      ) : (
+        <div className="divide-y rounded-lg border">
+          {orders.map(({ order, contact, items }) => (
+            <div key={order.id} className="flex items-center justify-between gap-4 p-4">
+              <Link href={`/dashboard/orders/${order.id}`} className="min-w-0 flex-1">
+                <p className="truncate font-medium hover:underline">{contact.fullName}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("itemCount", { count: items.length })} · {orderTotal(items).toFixed(2)}
+                </p>
+              </Link>
+              <div className="w-40 shrink-0">
+                <OrderStatusSelect orderId={order.id} initialStatus={order.status} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

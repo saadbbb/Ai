@@ -19,6 +19,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/dashboard/inbox", label: t("inboxLink") },
     { href: "/dashboard/contacts", label: t("contactsLink") },
     { href: "/dashboard/leads", label: t("leadsLink") },
+    { href: "/dashboard/orders", label: t("ordersLink") },
     { href: "/dashboard/test-ai", label: t("testAiLink") },
     { href: "/dashboard/settings", label: t("settingsLink") },
     { href: "/dashboard/knowledge-base", label: t("knowledgeBaseLink") },

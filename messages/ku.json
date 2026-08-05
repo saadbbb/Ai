@@ -223,6 +223,7 @@
     "inboxLink": "سندوقی گفتوگۆکان",
     "contactsLink": "پەیوەندییەکان",
     "leadsLink": "کڕیارە ئەگەرییەکان",
+    "ordersLink": "داواکارییەکان",
     "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
     "settingsLink": "ڕێکخستنەکان",
     "knowledgeBaseLink": "بنکەی زانیاری"
@@ -276,6 +277,47 @@
       "createLead": "دروستکردنی کڕیاری ئەگەری",
       "leadCreated": "کڕیارە ئەگەرییەکە دروست کرا.",
       "viewInPipeline": "بینین لە هێڵی فرۆشتن ←"
+    }
+  },
+  "orders": {
+    "title": "داواکارییەکان",
+    "description": "هەموو داواکارییەک کە بزنسەکەت وەریگرتووە، لە ڕەشنووس تا گەیاندن.",
+    "newOrder": "داواکاری نوێ",
+    "emptyState": "هێشتا هیچ داواکارییەک نییە. یەکێک لە لاپەڕەی پەیوەندییەکەوە دروست بکە.",
+    "itemCount": "{count} بەرهەم",
+    "backLink": "← گەڕانەوە بۆ داواکارییەکان",
+    "notesHeading": "تێبینییەکان",
+    "totalHeading": "کۆی گشتی",
+    "noOrdersForContact": "هێشتا هیچ داواکارییەک بۆ ئەم پەیوەندییە نییە.",
+    "statuses": {
+      "draft": "ڕەشنووس",
+      "pending": "چاوەڕوان",
+      "confirmed": "پشتڕاستکراوە",
+      "preparing": "ئامادەکردن",
+      "ready": "ئامادەیە",
+      "delivered": "گەیشتووە",
+      "completed": "تەواو بووە",
+      "cancelled": "هەڵوەشێنرایەوە",
+      "refunded": "پارەکە گەرێندرایەوە"
+    },
+    "new": {
+      "title": "داواکاری نوێ",
+      "description": "کڕیارێک هەڵبژێرە، بەرهەم لە کاتالۆگەکەت زیاد بکە یان بەرهەمێکی تایبەت بنووسە، پاشان پاشەکەوت بکە.",
+      "contactLabel": "کڕیار",
+      "contactPlaceholder": "کڕیارێک هەڵبژێرە",
+      "contactRequired": "سەرەتا کڕیارێک هەڵبژێرە.",
+      "itemsLabel": "بەرهەمەکان",
+      "productPlaceholder": "لە کاتالۆگ هەڵبژێرە (ئارەزوومەندانە)",
+      "itemNamePlaceholder": "ناوی بەرهەم",
+      "unitPricePlaceholder": "نرخ",
+      "quantityPlaceholder": "ژمارە",
+      "removeItem": "لابردن",
+      "addItem": "زیادکردنی بەرهەم",
+      "itemRequired": "لانیکەم یەک بەرهەم زیاد بکە.",
+      "notesLabel": "تێبینی (ئارەزوومەندانە)",
+      "total": "کۆی گشتی: {total}",
+      "submit": "دروستکردنی داواکاری",
+      "submitting": "دروست دەکرێت..."
     }
   },
   "contacts": {
