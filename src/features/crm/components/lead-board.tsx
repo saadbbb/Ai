@@ -7,9 +7,10 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { leadStageEnum, type LeadStage } from "@/db/schema";
+import { leadTemperature } from "@/features/crm/lib/lead-score";
 import { cn } from "@/lib/utils";
 import { updateLeadStageAction } from "../actions/update-lead-stage.action";
-import type { LeadListItem } from "../repository/lead.repository";
+import type { LeadListItemWithScore } from "../services/crm.service";
 
 const STAGES = leadStageEnum.enumValues;
 
@@ -19,7 +20,14 @@ const STAGE_ACCENT: Partial<Record<LeadStage, string>> = {
   cancelled: "border-t-destructive",
 };
 
-export function LeadBoard({ initialLeads }: { initialLeads: LeadListItem[] }) {
+const TEMPERATURE_COLOR: Record<string, string> = {
+  priority: "bg-destructive/10 text-destructive",
+  hot: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+  warm: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  cold: "bg-muted text-muted-foreground",
+};
+
+export function LeadBoard({ initialLeads }: { initialLeads: LeadListItemWithScore[] }) {
   const t = useTranslations("leads");
   const [leads, setLeads] = useState(initialLeads);
 
@@ -45,7 +53,7 @@ export function LeadBoard({ initialLeads }: { initialLeads: LeadListItem[] }) {
   return (
     <div className="flex gap-4 overflow-x-auto pb-4">
       {STAGES.map((stage) => {
-        const stageLeads = leads.filter((item) => item.lead.stage === stage);
+        const stageLeads = leads.filter((item) => item.lead.stage === stage).sort((a, b) => b.score - a.score);
         return (
           <div key={stage} className="w-64 shrink-0 space-y-3">
             <div className="flex items-center justify-between px-1">
@@ -53,12 +61,22 @@ export function LeadBoard({ initialLeads }: { initialLeads: LeadListItem[] }) {
               <span className="text-xs text-muted-foreground">{stageLeads.length}</span>
             </div>
             <div className="space-y-2">
-              {stageLeads.map(({ lead, contact }) => (
+              {stageLeads.map(({ lead, contact, score }) => (
                 <Card key={lead.id} className={cn("border-t-2", STAGE_ACCENT[stage] ?? "border-t-border")}>
                   <div className="space-y-2 px-4">
-                    <div>
-                      <p className="truncate text-sm font-medium">{contact.fullName}</p>
-                      {contact.phone && <p className="truncate text-xs text-muted-foreground">{contact.phone}</p>}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">{contact.fullName}</p>
+                        {contact.phone && <p className="truncate text-xs text-muted-foreground">{contact.phone}</p>}
+                      </div>
+                      <span
+                        className={cn(
+                          "shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
+                          TEMPERATURE_COLOR[leadTemperature(score)],
+                        )}
+                      >
+                        {score}
+                      </span>
                     </div>
                     <Select value={lead.stage} onValueChange={(value) => handleStageChange(lead.id, value as LeadStage)}>
                       <SelectTrigger className="w-full">

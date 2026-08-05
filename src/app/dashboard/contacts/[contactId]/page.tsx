@@ -6,12 +6,14 @@ import { appointmentRepository } from "@/features/appointments/repository/appoin
 import { NotePanel } from "@/features/crm/components/note-panel";
 import { TaskPanel } from "@/features/crm/components/task-panel";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
+import { calculateLeadScore, leadTemperature } from "@/features/crm/lib/lead-score";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { noteRepository } from "@/features/crm/repository/note.repository";
 import { taskRepository } from "@/features/crm/repository/task.repository";
 import { AiStatusBadge } from "@/features/inbox/components/ai-status-badge";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
+import { messageRepository } from "@/features/inbox/repository/message.repository";
 import { orderTotal } from "@/features/orders/lib/order-total";
 import { orderRepository } from "@/features/orders/repository/order.repository";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -48,6 +50,11 @@ export default async function ContactDetailPage({ params }: PageProps) {
     dateStyle: "medium",
     timeStyle: "short",
   });
+
+  const leadConversationIds = leads.map((lead) => lead.conversationId).filter((id): id is string => id !== null);
+  const messageCounts = await messageRepository.countByConversationIds(leadConversationIds);
+  const hasOrder = orders.length > 0;
+  const hasAppointment = appointmentList.length > 0;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -131,19 +138,34 @@ export default async function ContactDetailPage({ params }: PageProps) {
           <p className="text-sm text-muted-foreground">{t("noLeads")}</p>
         ) : (
           <div className="divide-y rounded-lg border">
-            {leads.map((lead) => (
-              <div key={lead.id} className="flex items-center justify-between p-3 text-sm">
-                <span>{tLeads(`stages.${lead.stage}`)}</span>
-                {lead.conversationId && (
-                  <Link
-                    href={`/dashboard/inbox/${lead.conversationId}`}
-                    className="text-xs text-muted-foreground hover:text-foreground hover:underline"
-                  >
-                    {tLeads("viewConversation")}
-                  </Link>
-                )}
-              </div>
-            ))}
+            {leads.map((lead) => {
+              const score = calculateLeadScore({
+                messageCount: lead.conversationId ? (messageCounts.get(lead.conversationId) ?? 0) : 0,
+                hasOrder,
+                hasAppointment,
+                tags: contact.tags,
+                stage: lead.stage,
+                lastContactAt: contact.lastContactAt,
+              });
+              return (
+                <div key={lead.id} className="flex items-center justify-between p-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span>{tLeads(`stages.${lead.stage}`)}</span>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                      {tLeads(`temperature.${leadTemperature(score)}`)} · {score}
+                    </span>
+                  </div>
+                  {lead.conversationId && (
+                    <Link
+                      href={`/dashboard/inbox/${lead.conversationId}`}
+                      className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+                    >
+                      {tLeads("viewConversation")}
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

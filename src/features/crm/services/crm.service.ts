@@ -1,13 +1,49 @@
 import "server-only";
 import type { Lead, LeadStage } from "@/db/schema";
+import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { automationService } from "@/features/automation/services/automation.service";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
+import { messageRepository } from "@/features/inbox/repository/message.repository";
+import { orderRepository } from "@/features/orders/repository/order.repository";
 import { AppError } from "@/lib/errors/app-error";
 import { activityRepository, type ActivityActor } from "../repository/activity.repository";
 import { leadRepository, type LeadListItem } from "../repository/lead.repository";
+import { calculateLeadScore } from "../lib/lead-score";
 
-async function listLeads(workspaceId: string): Promise<LeadListItem[]> {
-  return leadRepository.findByWorkspaceId(workspaceId);
+export interface LeadListItemWithScore extends LeadListItem {
+  score: number;
+}
+
+/**
+ * One grouped query per signal (messages/orders/appointments) rather than a
+ * per-lead lookup — see the repository methods this calls for why.
+ */
+async function listLeads(workspaceId: string): Promise<LeadListItemWithScore[]> {
+  const items = await leadRepository.findByWorkspaceId(workspaceId);
+  if (items.length === 0) return [];
+
+  const conversationIds = items
+    .map((item) => item.lead.conversationId)
+    .filter((id): id is string => id !== null);
+  const contactIds = [...new Set(items.map((item) => item.contact.id))];
+
+  const [messageCounts, contactsWithOrders, contactsWithAppointments] = await Promise.all([
+    messageRepository.countByConversationIds(conversationIds),
+    orderRepository.findContactIdsWithOrders(workspaceId, contactIds),
+    appointmentRepository.findContactIdsWithAppointments(workspaceId, contactIds),
+  ]);
+
+  return items.map((item) => ({
+    ...item,
+    score: calculateLeadScore({
+      messageCount: item.lead.conversationId ? (messageCounts.get(item.lead.conversationId) ?? 0) : 0,
+      hasOrder: contactsWithOrders.has(item.contact.id),
+      hasAppointment: contactsWithAppointments.has(item.contact.id),
+      tags: item.contact.tags,
+      stage: item.lead.stage,
+      lastContactAt: item.contact.lastContactAt,
+    }),
+  }));
 }
 
 /**

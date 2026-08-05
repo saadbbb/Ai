@@ -688,6 +688,12 @@
       "won": "Won",
       "lost": "Lost",
       "cancelled": "Cancelled"
+    },
+    "temperature": {
+      "cold": "Cold",
+      "warm": "Warm",
+      "hot": "Hot",
+      "priority": "Priority"
     }
   },
   "aiTest": {

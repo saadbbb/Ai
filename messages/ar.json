@@ -688,6 +688,12 @@
       "won": "تم الفوز به",
       "lost": "خسارة",
       "cancelled": "ملغى"
+    },
+    "temperature": {
+      "cold": "بارد",
+      "warm": "دافئ",
+      "hot": "ساخن",
+      "priority": "أولوية"
     }
   },
   "aiTest": {

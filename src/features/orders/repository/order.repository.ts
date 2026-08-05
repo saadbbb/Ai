@@ -97,4 +97,14 @@ export const orderRepository = {
       .returning();
     return order ?? null;
   },
+
+  /** Used for lead scoring (see lead-score.ts) — one query instead of an order check per lead. */
+  async findContactIdsWithOrders(workspaceId: string, contactIds: string[]): Promise<Set<string>> {
+    if (contactIds.length === 0) return new Set();
+    const rows = await db
+      .selectDistinct({ contactId: orders.contactId })
+      .from(orders)
+      .where(and(eq(orders.workspaceId, workspaceId), inArray(orders.contactId, contactIds)));
+    return new Set(rows.map((row) => row.contactId));
+  },
 };

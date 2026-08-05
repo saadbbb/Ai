@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   type Appointment,
@@ -57,5 +57,15 @@ export const appointmentRepository = {
       .where(and(eq(appointments.id, id), eq(appointments.workspaceId, workspaceId)))
       .returning();
     return appointment ?? null;
+  },
+
+  /** Used for lead scoring (see lead-score.ts) — one query instead of an appointment check per lead. */
+  async findContactIdsWithAppointments(workspaceId: string, contactIds: string[]): Promise<Set<string>> {
+    if (contactIds.length === 0) return new Set();
+    const rows = await db
+      .selectDistinct({ contactId: appointments.contactId })
+      .from(appointments)
+      .where(and(eq(appointments.workspaceId, workspaceId), inArray(appointments.contactId, contactIds)));
+    return new Set(rows.map((row) => row.contactId));
   },
 };
