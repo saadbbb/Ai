@@ -3,11 +3,12 @@ import Link from "next/link";
 import { AppointmentStatusSelect } from "@/features/appointments/components/appointment-status-select";
 import { appointmentService } from "@/features/appointments/services/appointment.service";
 import { Button } from "@/components/ui/button";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function AppointmentsPage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireFeature(workspace, "appointments");
   const t = await getTranslations("appointments");
 
   const appointments = await appointmentService.listAppointments(workspace.id);

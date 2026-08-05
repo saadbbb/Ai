@@ -7,11 +7,12 @@ import { faqRepository } from "@/features/knowledge-base/repository/faq.reposito
 import { policyRepository } from "@/features/knowledge-base/repository/policy.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function KnowledgeBasePage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireFeature(workspace, "knowledge_base");
   const t = await getTranslations("knowledgeBasePage");
 
   const [faqs, products, services, policy] = await Promise.all([

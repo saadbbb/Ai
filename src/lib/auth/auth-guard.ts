@@ -2,6 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { userRepository } from "@/features/auth/repository/user.repository";
+import type { FeatureKey } from "@/features/platform-admin/lib/features";
+import { featureAccessService } from "@/features/platform-admin/services/feature-access.service";
 import { platformAdminService } from "@/features/platform-admin/services/platform-admin.service";
 import { workspaceService } from "@/features/workspace/services/workspace.service";
 import type { User, Workspace } from "@/db/schema";
@@ -45,3 +47,13 @@ export const requirePlatformAdmin = cache(async (): Promise<User> => {
 
   return user;
 });
+
+/**
+ * Server-side enforcement of a module's plan gate, for the module's entry
+ * page — the dashboard nav already hides links a workspace's plan doesn't
+ * include, but a stale bookmark or direct URL shouldn't still work.
+ */
+export async function requireFeature(workspace: Workspace, feature: FeatureKey): Promise<void> {
+  const allowed = await featureAccessService.hasFeature(workspace, feature);
+  if (!allowed) redirect("/dashboard/billing");
+}

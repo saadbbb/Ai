@@ -5,11 +5,12 @@ import type { Workflow } from "@/db/schema";
 import { DeleteWorkflowButton } from "@/features/automation/components/delete-workflow-button";
 import { WorkflowStatusToggle } from "@/features/automation/components/workflow-status-toggle";
 import { automationService } from "@/features/automation/services/automation.service";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function AutomationsPage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireFeature(workspace, "automations");
   const t = await getTranslations("automations");
   const tLeads = await getTranslations("leads");
   const tOrders = await getTranslations("orders");

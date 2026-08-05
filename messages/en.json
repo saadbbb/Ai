@@ -354,6 +354,7 @@
       "suspended": "Suspended"
     },
     "activeDescription": "You're subscribed. Thanks for being a customer!",
+    "expiresOn": "Renews/expires on {date}",
     "ctaDescription": "We don't charge cards yet — message us on WhatsApp and we'll set your subscription up personally.",
     "whatsappCta": "Subscribe via WhatsApp",
     "fallbackWithEmail": "Subscriptions aren't open yet. Email {email} if you're interested.",
@@ -364,17 +365,48 @@
     "badge": "Platform Admin",
     "backToDashboard": "Back to your dashboard",
     "workspacesLink": "Workspaces",
+    "plansLink": "Plans",
     "settingsLink": "Settings",
     "adminsLink": "Admins",
     "workspaces": {
       "title": "Workspaces",
-      "description": "Every business on the platform. Set a workspace's subscription status by hand until real billing exists.",
+      "description": "Every business on the platform. Activate a subscription by hand until real billing exists.",
       "emptyState": "No workspaces yet.",
       "noOwner": "No owner",
       "statuses": {
         "trial": "Trial",
         "active": "Active",
         "suspended": "Suspended"
+      },
+      "activate": "Activate",
+      "planLabel": "Plan",
+      "planPlaceholder": "Select a plan",
+      "daysLabel": "Days",
+      "activating": "Activating...",
+      "confirmActivate": "Confirm",
+      "planSummary": "Plan: {plan}",
+      "expiresOn": "Expires {date}"
+    },
+    "plans": {
+      "title": "Plans",
+      "description": "Build packages: pick which features are included and how many days they last. Assign one to a workspace from the Workspaces page.",
+      "namePlaceholder": "Plan name, e.g. Pro",
+      "daysPlaceholder": "Days",
+      "cycles": {
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      },
+      "daysSummary": "{days} days",
+      "noFeatures": "No features included.",
+      "addPlan": "Add plan",
+      "features": {
+        "inbox": "Inbox",
+        "contacts": "Contacts",
+        "leads": "Leads",
+        "orders": "Orders",
+        "appointments": "Appointments",
+        "automations": "Automations",
+        "knowledge_base": "Knowledge Base"
       }
     },
     "settings": {

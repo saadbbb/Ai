@@ -1,4 +1,5 @@
 import { integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { plans } from "./plans";
 
 /**
  * Shared across workspaces.language (dashboard/UI language) and ai_agents.language
@@ -27,6 +28,11 @@ export const workspaces = pgTable("workspaces", {
   onboardingStep: integer("onboarding_step").notNull().default(0),
   onboardingCompletedAt: timestamp("onboarding_completed_at", { withTimezone: true }),
   subscriptionStatus: subscriptionStatusEnum("subscription_status").notNull().default("trial"),
+  planId: uuid("plan_id").references(() => plans.id, { onDelete: "set null" }),
+  subscriptionExpiresAt: timestamp("subscription_expires_at", { withTimezone: true }),
+  // Which "days remaining" reminder was last sent (3, 2, or 1) — prevents the
+  // daily cron from re-sending the same reminder if it runs more than once.
+  lastReminderDaysSent: integer("last_reminder_days_sent"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

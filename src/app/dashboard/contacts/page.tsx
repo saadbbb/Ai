@@ -1,11 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function ContactsPage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireFeature(workspace, "contacts");
   const t = await getTranslations("contacts");
 
   const contacts = await contactRepository.findByWorkspaceId(workspace.id);

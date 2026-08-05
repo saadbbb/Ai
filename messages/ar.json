@@ -354,6 +354,7 @@
       "suspended": "موقوفة"
     },
     "activeDescription": "أنت مشترك بالفعل. شكراً لكونك عميلاً معنا!",
+    "expiresOn": "يتجدّد/ينتهي بتاريخ {date}",
     "ctaDescription": "لسا ما نستقبل دفع بالبطاقات — راسلنا على واتساب وراح نفعّل اشتراكك بأنفسنا.",
     "whatsappCta": "اشترك عبر واتساب",
     "fallbackWithEmail": "الاشتراكات لسا ما فُتحت. راسلنا على {email} إذا مهتم.",
@@ -364,17 +365,48 @@
     "badge": "إدارة المنصة",
     "backToDashboard": "الرجوع للوحة تحكمك",
     "workspacesLink": "المساحات",
+    "plansLink": "الباقات",
     "settingsLink": "الإعدادات",
     "adminsLink": "المسؤولون",
     "workspaces": {
       "title": "المساحات",
-      "description": "كل نشاط تجاري على المنصة. اضبط حالة اشتراك كل مساحة يدوياً لحد ما يصير عندنا نظام فوترة حقيقي.",
+      "description": "كل نشاط تجاري على المنصة. فعّل اشتراكاً يدوياً لحد ما يصير عندنا نظام فوترة حقيقي.",
       "emptyState": "لا توجد مساحات بعد.",
       "noOwner": "بدون مالك",
       "statuses": {
         "trial": "تجريبية",
         "active": "نشطة",
         "suspended": "موقوفة"
+      },
+      "activate": "تفعيل",
+      "planLabel": "الباقة",
+      "planPlaceholder": "اختر باقة",
+      "daysLabel": "الأيام",
+      "activating": "جارٍ التفعيل...",
+      "confirmActivate": "تأكيد",
+      "planSummary": "الباقة: {plan}",
+      "expiresOn": "تنتهي {date}"
+    },
+    "plans": {
+      "title": "الباقات",
+      "description": "ابنِ باقات: اختر الميزات المشمولة وعدد الأيام. اربط باقة بمساحة عمل من صفحة المساحات.",
+      "namePlaceholder": "اسم الباقة، مثال: احترافية",
+      "daysPlaceholder": "الأيام",
+      "cycles": {
+        "monthly": "شهرية",
+        "yearly": "سنوية"
+      },
+      "daysSummary": "{days} يوم",
+      "noFeatures": "لا توجد ميزات مشمولة.",
+      "addPlan": "إضافة باقة",
+      "features": {
+        "inbox": "صندوق المحادثات",
+        "contacts": "جهات الاتصال",
+        "leads": "العملاء المحتملون",
+        "orders": "الطلبات",
+        "appointments": "المواعيد",
+        "automations": "الأتمتة",
+        "knowledge_base": "قاعدة المعرفة"
       }
     },
     "settings": {

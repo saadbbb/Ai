@@ -12,9 +12,11 @@ const STATUSES = subscriptionStatusEnum.enumValues;
 export function WorkspaceSubscriptionSelect({
   workspaceId,
   initialStatus,
+  onChange,
 }: {
   workspaceId: string;
   initialStatus: SubscriptionStatus;
+  onChange?: (status: SubscriptionStatus) => void;
 }) {
   const t = useTranslations("platformAdmin.workspaces");
   const [status, setStatus] = useState(initialStatus);
@@ -27,7 +29,10 @@ export function WorkspaceSubscriptionSelect({
     if (!result.success) {
       toast.error(result.error.message);
       setStatus(previous);
+      return;
     }
+
+    onChange?.(next);
   }
 
   return (

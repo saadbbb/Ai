@@ -22,3 +22,4 @@ export * from "./appointments";
 export * from "./workflows";
 export * from "./platform-admin";
 export * from "./platform-settings";
+export * from "./plans";

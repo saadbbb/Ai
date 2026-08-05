@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { OrderStatusSelect } from "@/features/orders/components/order-status-select";
 import { orderTotal } from "@/features/orders/lib/order-total";
 import { orderService } from "@/features/orders/services/order.service";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function OrdersPage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireFeature(workspace, "orders");
   const t = await getTranslations("orders");
 
   const orders = await orderService.listOrders(workspace.id);

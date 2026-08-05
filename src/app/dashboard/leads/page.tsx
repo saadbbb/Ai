@@ -1,11 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { LeadBoard } from "@/features/crm/components/lead-board";
 import { crmService } from "@/features/crm/services/crm.service";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function LeadsPage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireFeature(workspace, "leads");
   const t = await getTranslations("leads");
 
   const leads = await crmService.listLeads(workspace.id);

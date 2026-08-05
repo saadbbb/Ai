@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AiStatusBadge } from "@/features/inbox/components/ai-status-badge";
 import { inboxService } from "@/features/inbox/services/inbox.service";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 const CHANNEL_LABEL_KEY = {
   manual: "channelManual",
@@ -14,6 +14,7 @@ const CHANNEL_LABEL_KEY = {
 export default async function InboxPage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireFeature(workspace, "inbox");
   const t = await getTranslations("inbox.list");
 
   const conversations = await inboxService.listConversations(workspace.id);

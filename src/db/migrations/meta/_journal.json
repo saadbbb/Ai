@@ -71,6 +71,13 @@
       "when": 1785946803336,
       "tag": "0009_rare_hardball",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1785947751445,
+      "tag": "0010_dizzy_firebird",
+      "breakpoints": true
     }
   ]
 }
