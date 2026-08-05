@@ -496,7 +496,8 @@
       "activating": "Activating...",
       "confirmActivate": "Confirm",
       "planSummary": "Plan: {plan}",
-      "expiresOn": "Expires {date}"
+      "expiresOn": "Expires {date}",
+      "view": "View"
     },
     "plans": {
       "title": "Plans",
@@ -571,6 +572,23 @@
       "byPlanHeading": "By plan",
       "emptyState": "No active, priced subscriptions yet.",
       "planSubscriptions": "{count} subscriptions"
+    },
+    "impersonation": {
+      "banner": "🔒 Viewing \"{workspace}\" as Super Admin — read-only, logged in the audit log.",
+      "readOnlyNotice": "This is a read-only snapshot for support/diagnostics. Nothing here can be edited.",
+      "stats": {
+        "contacts": "Contacts",
+        "activePipeline": "Active pipeline",
+        "activeOrders": "Active orders",
+        "needsHuman": "Needs human"
+      },
+      "conversationsHeading": "Conversations",
+      "contactsHeading": "Contacts",
+      "leadsHeading": "Leads",
+      "ordersHeading": "Orders",
+      "appointmentsHeading": "Appointments",
+      "empty": "Nothing here yet.",
+      "noMessages": "No messages yet."
     }
   },
   "automations": {

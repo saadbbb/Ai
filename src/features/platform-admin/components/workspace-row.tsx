@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -15,11 +16,13 @@ export function WorkspaceRow({
   ownerEmail,
   initialPlan,
   allPlans,
+  canImpersonate,
 }: {
   workspace: Workspace;
   ownerEmail: string | null;
   initialPlan: Plan | null;
   allPlans: Plan[];
+  canImpersonate: boolean;
 }) {
   const t = useTranslations("platformAdmin.workspaces");
   const [plan, setPlan] = useState(initialPlan);
@@ -76,6 +79,11 @@ export function WorkspaceRow({
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          {canImpersonate && (
+            <Button asChild variant="ghost" size="sm">
+              <Link href={`/admin/workspaces/${workspace.id}/view`}>{t("view")}</Link>
+            </Button>
+          )}
           <div className="w-36">
             <WorkspaceSubscriptionSelect
               key={status}

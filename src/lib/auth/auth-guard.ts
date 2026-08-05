@@ -57,6 +57,19 @@ export const requirePlatformAdmin = cache(async (): Promise<User> => {
 });
 
 /**
+ * Gates workspace impersonation — bootstrap (PLATFORM_ADMIN_EMAILS) admins
+ * only, never a self-service database-managed admin. Redirects a regular
+ * platform admin back to the workspace list rather than /dashboard, since
+ * they do have access to /admin, just not to this one operation.
+ */
+export const requirePrimaryPlatformAdmin = cache(async (): Promise<User> => {
+  const user = await requirePlatformAdmin();
+  if (!platformAdminService.isBootstrapAdmin(user.email)) redirect("/admin/workspaces");
+
+  return user;
+});
+
+/**
  * Server-side enforcement of a module's plan gate, for the module's entry
  * page — the dashboard nav already hides links a workspace's plan doesn't
  * include, but a stale bookmark or direct URL shouldn't still work.

@@ -496,7 +496,8 @@
       "activating": "چالاک دەکرێت...",
       "confirmActivate": "پشتڕاستکردنەوە",
       "planSummary": "پاکێج: {plan}",
-      "expiresOn": "کۆتایی دێت {date}"
+      "expiresOn": "کۆتایی دێت {date}",
+      "view": "بینین"
     },
     "plans": {
       "title": "پاکێجەکان",
@@ -571,6 +572,23 @@
       "byPlanHeading": "بەپێی پلان",
       "emptyState": "هێشتا هیچ بەشداربوونی چالاک و نرخداری نییە.",
       "planSubscriptions": "{count} بەشداربوون"
+    },
+    "impersonation": {
+      "banner": "🔒 ئێستا \"{workspace}\" وەک سوپەر ئەدمین دەبینیت — تەنها بینین، تۆمار کراوە لە تۆماری پشکنین.",
+      "readOnlyNotice": "ئەمە وێنەیەکی تەنها-بۆ-بینینە بۆ پشتگیری/شیکردنەوە. هیچ شتێک لێرە ناتوانرێت بگۆڕدرێت.",
+      "stats": {
+        "contacts": "پەیوەندییەکان",
+        "activePipeline": "هێڵی فرۆشتنی چالاک",
+        "activeOrders": "داواکارییە چالاکەکان",
+        "needsHuman": "پێویستی بە مرۆڤ هەیە"
+      },
+      "conversationsHeading": "گفتوگۆکان",
+      "contactsHeading": "پەیوەندییەکان",
+      "leadsHeading": "کڕیارە ئەگەرییەکان",
+      "ordersHeading": "داواکارییەکان",
+      "appointmentsHeading": "چاوپێکەوتنەکان",
+      "empty": "هێشتا هیچ شتێک لێرە نییە.",
+      "noMessages": "هێشتا هیچ نامەیەک نییە."
     }
   },
   "automations": {

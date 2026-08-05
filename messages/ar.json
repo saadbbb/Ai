@@ -496,7 +496,8 @@
       "activating": "جارٍ التفعيل...",
       "confirmActivate": "تأكيد",
       "planSummary": "الباقة: {plan}",
-      "expiresOn": "تنتهي {date}"
+      "expiresOn": "تنتهي {date}",
+      "view": "عرض"
     },
     "plans": {
       "title": "الباقات",
@@ -571,6 +572,23 @@
       "byPlanHeading": "حسب الخطة",
       "emptyState": "لا توجد اشتراكات نشطة مسعّرة بعد.",
       "planSubscriptions": "{count} اشتراك"
+    },
+    "impersonation": {
+      "banner": "🔒 تعرض الآن \"{workspace}\" كمشرف رئيسي — للعرض فقط، ومسجّل بسجل التدقيق.",
+      "readOnlyNotice": "هذه لقطة للعرض فقط لأغراض الدعم والتشخيص. لا يمكن تعديل أي شيء هنا.",
+      "stats": {
+        "contacts": "جهات الاتصال",
+        "activePipeline": "خط المبيعات النشط",
+        "activeOrders": "الطلبات النشطة",
+        "needsHuman": "تحتاج تدخل بشري"
+      },
+      "conversationsHeading": "المحادثات",
+      "contactsHeading": "جهات الاتصال",
+      "leadsHeading": "العملاء المحتملون",
+      "ordersHeading": "الطلبات",
+      "appointmentsHeading": "المواعيد",
+      "empty": "لا يوجد شيء هنا بعد.",
+      "noMessages": "لا توجد رسائل بعد."
     }
   },
   "automations": {

@@ -15,6 +15,7 @@ export const auditActionEnum = pgEnum("audit_action", [
   "plan_saved",
   "plan_deleted",
   "platform_settings_updated",
+  "impersonation_started",
 ]);
 
 export const auditLogs = pgTable(
