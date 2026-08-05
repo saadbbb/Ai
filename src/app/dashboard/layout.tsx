@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { platformAdminService } from "@/features/platform-admin/services/platform-admin.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -13,7 +14,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/onboarding/business");
   }
 
-  const t = await getTranslations("dashboard");
+  const [t, isPlatformAdmin] = await Promise.all([
+    getTranslations("dashboard"),
+    platformAdminService.isPlatformAdmin(user.email),
+  ]);
   const navLinks = [
     { href: "/dashboard", label: t("homeLink") },
     { href: "/dashboard/inbox", label: t("inboxLink") },
@@ -33,13 +37,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <header className="flex items-center justify-between border-b px-6 py-4">
         <span className="font-medium">{user.email}</span>
         <div className="flex items-center gap-3">
+          {isPlatformAdmin && (
+            <Link
+              href="/admin/settings"
+              className="rounded-full bg-foreground px-3 py-1 text-xs font-semibold text-background hover:opacity-90"
+            >
+              {t("platformAdminLink")}
+            </Link>
+          )}
           <LocaleSwitcher />
           <LogoutButton />
         </div>
       </header>
-      <nav className="flex items-center gap-4 border-b px-6 py-2 text-sm">
+      <nav className="flex items-center gap-4 overflow-x-auto border-b px-6 py-2 text-sm">
         {navLinks.map((link) => (
-          <Link key={link.href} href={link.href} className="text-muted-foreground hover:text-foreground">
+          <Link key={link.href} href={link.href} className="shrink-0 text-muted-foreground hover:text-foreground">
             {link.label}
           </Link>
         ))}
