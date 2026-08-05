@@ -10,6 +10,7 @@ export default async function AppointmentsPage() {
   const workspace = await requireWorkspaceForUser(user.id);
   await requireFeature(workspace, "appointments");
   const t = await getTranslations("appointments");
+  const tCommon = await getTranslations("common");
 
   const appointments = await appointmentService.listAppointments(workspace.id);
   const formatter = new Intl.DateTimeFormat("en-GB", {
@@ -25,9 +26,14 @@ export default async function AppointmentsPage() {
           <h1 className="text-xl font-semibold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/appointments/new">{t("newAppointment")}</Link>
-        </Button>
+        <div className="flex shrink-0 gap-2">
+          <Button asChild variant="outline" size="sm">
+            <a href="/api/reports/appointments">{tCommon("exportCsv")}</a>
+          </Button>
+          <Button asChild>
+            <Link href="/dashboard/appointments/new">{t("newAppointment")}</Link>
+          </Button>
+        </div>
       </div>
 
       {appointments.length === 0 ? (

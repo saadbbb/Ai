@@ -11,6 +11,7 @@ export default async function OrdersPage() {
   const workspace = await requireWorkspaceForUser(user.id);
   await requireFeature(workspace, "orders");
   const t = await getTranslations("orders");
+  const tCommon = await getTranslations("common");
 
   const orders = await orderService.listOrders(workspace.id);
 
@@ -21,9 +22,14 @@ export default async function OrdersPage() {
           <h1 className="text-xl font-semibold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/orders/new">{t("newOrder")}</Link>
-        </Button>
+        <div className="flex shrink-0 gap-2">
+          <Button asChild variant="outline" size="sm">
+            <a href="/api/reports/orders">{tCommon("exportCsv")}</a>
+          </Button>
+          <Button asChild>
+            <Link href="/dashboard/orders/new">{t("newOrder")}</Link>
+          </Button>
+        </div>
       </div>
 
       {orders.length === 0 ? (

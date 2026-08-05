@@ -11,7 +11,8 @@
     "edit": "دەستکاریکردن",
     "delete": "سڕینەوە",
     "cancel": "پاشگەزبوونەوە",
-    "confirmDelete": "دڵنیایت لە سڕینەوەی ئەمە؟"
+    "confirmDelete": "دڵنیایت لە سڕینەوەی ئەمە؟",
+    "exportCsv": "هەناردەکردنی CSV"
   },
   "auth": {
     "register": {
