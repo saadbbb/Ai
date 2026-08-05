@@ -3,6 +3,7 @@
 import type { PlatformAdmin } from "@/db/schema";
 import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, AppError, type ActionResult } from "@/lib/errors/app-error";
+import { auditLogRepository } from "../repository/audit-log.repository";
 import { platformAdminRepository } from "../repository/platform-admin.repository";
 import { addPlatformAdminSchema } from "../validation/schemas";
 
@@ -24,6 +25,16 @@ export async function addPlatformAdminAction(input: unknown): Promise<ActionResu
       email: parsed.data.email,
       addedByEmail: admin.email,
     });
+
+    await auditLogRepository.log({
+      actorUserId: admin.id,
+      actorEmail: admin.email,
+      action: "platform_admin_added",
+      targetType: "platform_admin",
+      targetId: created.id,
+      summary: `Granted platform admin access to ${created.email}.`,
+    });
+
     return actionOk(created);
   } catch (error) {
     return actionFail(error);

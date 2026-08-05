@@ -7,6 +7,11 @@ export const platformAdminRepository = {
     return db.select().from(platformAdmins).orderBy(platformAdmins.createdAt);
   },
 
+  async findById(id: string): Promise<PlatformAdmin | null> {
+    const [row] = await db.select().from(platformAdmins).where(eq(platformAdmins.id, id)).limit(1);
+    return row ?? null;
+  },
+
   async findByEmail(email: string): Promise<PlatformAdmin | null> {
     const [row] = await db
       .select()

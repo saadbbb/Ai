@@ -540,6 +540,12 @@
       "emailPlaceholder": "email@example.com",
       "add": "Add",
       "adding": "Adding..."
+    },
+    "auditLogLink": "Audit Log",
+    "auditLog": {
+      "title": "Audit Log",
+      "description": "Every sensitive action taken by a platform admin — plans, subscriptions, admin access, settings.",
+      "emptyState": "No audit events recorded yet."
     }
   },
   "automations": {

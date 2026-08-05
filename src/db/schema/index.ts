@@ -30,3 +30,4 @@ export * from "./rate-limits";
 export * from "./activities";
 export * from "./tasks";
 export * from "./notes";
+export * from "./audit-logs";

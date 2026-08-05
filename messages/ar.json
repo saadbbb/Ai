@@ -540,6 +540,12 @@
       "emailPlaceholder": "email@example.com",
       "add": "إضافة",
       "adding": "جارٍ الإضافة..."
+    },
+    "auditLogLink": "سجل التدقيق",
+    "auditLog": {
+      "title": "سجل التدقيق",
+      "description": "كل إجراء حساس قام به أحد مسؤولي المنصة — الخطط، الاشتراكات، صلاحيات المسؤولين، الإعدادات.",
+      "emptyState": "لا توجد أحداث مسجلة بعد."
     }
   },
   "automations": {
