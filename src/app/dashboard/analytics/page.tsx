@@ -87,7 +87,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           title={t("charts.revenueByDay")}
           data={summary.revenueByDay.map((row) => ({ label: row.day.slice(5), value: row.value }))}
           emptyMessage={t("charts.empty")}
-          valueFormatter={currency}
+          format="currency"
         />
         <BarChartCard
           title={t("charts.ordersByStatus")}

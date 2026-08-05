@@ -8,21 +8,28 @@ interface ChartDatum {
   value: number;
 }
 
+type ValueFormat = "number" | "currency";
+
+const FORMATTERS: Record<ValueFormat, (value: number) => string> = {
+  number: (value) => value.toLocaleString(),
+  currency: (value) => value.toFixed(2),
+};
+
 function ChartTooltip({
   active,
   payload,
-  valueFormatter,
+  format,
 }: {
   active?: boolean;
   payload?: { payload: ChartDatum }[];
-  valueFormatter: (value: number) => string;
+  format: ValueFormat;
 }) {
   if (!active || !payload?.length) return null;
   const datum = payload[0].payload;
   return (
     <div className="rounded-md border bg-popover px-2.5 py-1.5 text-xs shadow-sm">
       <p className="font-medium text-popover-foreground">{datum.label}</p>
-      <p className="text-muted-foreground">{valueFormatter(datum.value)}</p>
+      <p className="text-muted-foreground">{FORMATTERS[format](datum.value)}</p>
     </div>
   );
 }
@@ -32,17 +39,20 @@ function ChartTooltip({
  * the data-viz method, per-category rainbow coloring is reserved for when
  * category identity is compared *across* series; a lone count-per-category
  * measure like this only needs identity from the axis labels themselves.
+ *
+ * `format` is a plain string, not a formatter function — a Server Component
+ * page can't pass a function prop across the client-component boundary.
  */
 export function BarChartCard({
   title,
   data,
   emptyMessage,
-  valueFormatter = (value: number) => value.toLocaleString(),
+  format = "number",
 }: {
   title: string;
   data: ChartDatum[];
   emptyMessage: string;
-  valueFormatter?: (value: number) => string;
+  format?: ValueFormat;
 }) {
   const hasData = data.some((row) => row.value > 0);
 
@@ -64,10 +74,7 @@ export function BarChartCard({
                   tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
                   interval="preserveStartEnd"
                 />
-                <Tooltip
-                  cursor={{ fill: "var(--muted)" }}
-                  content={<ChartTooltip valueFormatter={valueFormatter} />}
-                />
+                <Tooltip cursor={{ fill: "var(--muted)" }} content={<ChartTooltip format={format} />} />
                 <Bar dataKey="value" fill="var(--chart-1)" radius={[4, 4, 0, 0]} maxBarSize={40} />
               </BarChart>
             </ResponsiveContainer>
