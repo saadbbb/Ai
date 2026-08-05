@@ -223,6 +223,7 @@
     "contactsLink": "جهات الاتصال",
     "leadsLink": "العملاء المحتملون",
     "ordersLink": "الطلبات",
+    "appointmentsLink": "المواعيد",
     "testAiLink": "جرّب موظفك الذكي",
     "settingsLink": "الإعدادات",
     "knowledgeBaseLink": "قاعدة المعرفة",
@@ -332,6 +333,37 @@
       "notesLabel": "ملاحظات (اختياري)",
       "total": "الإجمالي: {total}",
       "submit": "إنشاء الطلب",
+      "submitting": "جارٍ الإنشاء..."
+    }
+  },
+  "appointments": {
+    "title": "المواعيد",
+    "description": "كل موعد لدى نشاطك التجاري، مرتّب زمنياً.",
+    "newAppointment": "موعد جديد",
+    "emptyState": "لا توجد مواعيد بعد. أنشئ واحداً من صفحة جهة اتصال.",
+    "noAppointmentsForContact": "لا توجد مواعيد لهذه الجهة بعد.",
+    "statuses": {
+      "scheduled": "مجدوَل",
+      "confirmed": "مؤكَّد",
+      "completed": "مكتمل",
+      "cancelled": "ملغى",
+      "no_show": "لم يحضر"
+    },
+    "new": {
+      "title": "موعد جديد",
+      "description": "اختر عميلاً، وخدمة اختيارية، وتاريخاً ووقتاً.",
+      "contactLabel": "العميل",
+      "contactPlaceholder": "اختر عميلاً",
+      "contactRequired": "اختر عميلاً أولاً.",
+      "dateRequired": "اختر تاريخاً ووقتاً.",
+      "serviceLabel": "الخدمة (اختياري)",
+      "servicePlaceholder": "اختر من الكتالوج",
+      "serviceNameLabel": "اسم الخدمة",
+      "serviceNamePlaceholder": "مثال: استشارة",
+      "dateTimeLabel": "التاريخ والوقت",
+      "durationLabel": "المدة (دقائق)",
+      "notesLabel": "ملاحظات (اختياري)",
+      "submit": "إنشاء الموعد",
       "submitting": "جارٍ الإنشاء..."
     }
   },

@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { AiStatusBadge } from "@/features/inbox/components/ai-status-badge";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
@@ -21,15 +22,23 @@ export default async function ContactDetailPage({ params }: PageProps) {
   const t = await getTranslations("contacts");
   const tLeads = await getTranslations("leads");
   const tOrders = await getTranslations("orders");
+  const tAppointments = await getTranslations("appointments");
 
   const contact = await contactRepository.findById(contactId, workspace.id);
   if (!contact) notFound();
 
-  const [conversations, leads, orders] = await Promise.all([
+  const [conversations, leads, orders, appointmentList] = await Promise.all([
     conversationRepository.findByContactId(contactId, workspace.id),
     leadRepository.findByContactId(contactId, workspace.id),
     orderRepository.findByContactId(contactId, workspace.id),
+    appointmentRepository.findByContactId(contactId, workspace.id),
   ]);
+
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: workspace.timezone,
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -44,9 +53,33 @@ export default async function ContactDetailPage({ params }: PageProps) {
             {[contact.phone, contact.email].filter(Boolean).join(" · ") || t("noContactInfo")}
           </p>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/dashboard/orders/new?contactId=${contact.id}`}>{tOrders("newOrder")}</Link>
-        </Button>
+        <div className="flex shrink-0 gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/dashboard/appointments/new?contactId=${contact.id}`}>{tAppointments("newAppointment")}</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/dashboard/orders/new?contactId=${contact.id}`}>{tOrders("newOrder")}</Link>
+          </Button>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-medium">{tAppointments("title")}</h2>
+        {appointmentList.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{tAppointments("noAppointmentsForContact")}</p>
+        ) : (
+          <div className="divide-y rounded-lg border">
+            {appointmentList.map(({ appointment }) => (
+              <div key={appointment.id} className="flex items-center justify-between p-3 text-sm">
+                <span>
+                  {formatter.format(appointment.scheduledAt)}
+                  {appointment.serviceName ? ` · ${appointment.serviceName}` : ""}
+                </span>
+                <span className="text-xs text-muted-foreground">{tAppointments(`statuses.${appointment.status}`)}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="space-y-3">

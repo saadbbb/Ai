@@ -223,6 +223,7 @@
     "contactsLink": "Contacts",
     "leadsLink": "Leads",
     "ordersLink": "Orders",
+    "appointmentsLink": "Appointments",
     "testAiLink": "Test your AI employee",
     "settingsLink": "Settings",
     "knowledgeBaseLink": "Knowledge Base",
@@ -332,6 +333,37 @@
       "notesLabel": "Notes (optional)",
       "total": "Total: {total}",
       "submit": "Create order",
+      "submitting": "Creating..."
+    }
+  },
+  "appointments": {
+    "title": "Appointments",
+    "description": "Every booking your business has, in order of time.",
+    "newAppointment": "New appointment",
+    "emptyState": "No appointments yet. Create one from a contact.",
+    "noAppointmentsForContact": "No appointments for this contact yet.",
+    "statuses": {
+      "scheduled": "Scheduled",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No Show"
+    },
+    "new": {
+      "title": "New appointment",
+      "description": "Pick a customer, an optional service, and a date and time.",
+      "contactLabel": "Customer",
+      "contactPlaceholder": "Select a customer",
+      "contactRequired": "Select a customer first.",
+      "dateRequired": "Pick a date and time.",
+      "serviceLabel": "Service (optional)",
+      "servicePlaceholder": "Pick from catalog",
+      "serviceNameLabel": "Service name",
+      "serviceNamePlaceholder": "e.g. Consultation",
+      "dateTimeLabel": "Date & time",
+      "durationLabel": "Duration (minutes)",
+      "notesLabel": "Notes (optional)",
+      "submit": "Create appointment",
       "submitting": "Creating..."
     }
   },

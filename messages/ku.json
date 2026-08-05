@@ -223,6 +223,7 @@
     "contactsLink": "پەیوەندییەکان",
     "leadsLink": "کڕیارە ئەگەرییەکان",
     "ordersLink": "داواکارییەکان",
+    "appointmentsLink": "کاتە دیاریکراوەکان",
     "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
     "settingsLink": "ڕێکخستنەکان",
     "knowledgeBaseLink": "بنکەی زانیاری",
@@ -332,6 +333,37 @@
       "notesLabel": "تێبینی (ئارەزوومەندانە)",
       "total": "کۆی گشتی: {total}",
       "submit": "دروستکردنی داواکاری",
+      "submitting": "دروست دەکرێت..."
+    }
+  },
+  "appointments": {
+    "title": "کاتە دیاریکراوەکان",
+    "description": "هەموو کاتێکی دیاریکراوی بزنسەکەت، ڕیزکراو بەپێی کات.",
+    "newAppointment": "کاتی دیاریکراوی نوێ",
+    "emptyState": "هێشتا هیچ کاتێکی دیاریکراو نییە. یەکێک لە لاپەڕەی پەیوەندییەکەوە دروست بکە.",
+    "noAppointmentsForContact": "هێشتا هیچ کاتێکی دیاریکراو بۆ ئەم پەیوەندییە نییە.",
+    "statuses": {
+      "scheduled": "کاتی بۆ دانراوە",
+      "confirmed": "پشتڕاستکراوە",
+      "completed": "تەواو بووە",
+      "cancelled": "هەڵوەشێنرایەوە",
+      "no_show": "نەهات"
+    },
+    "new": {
+      "title": "کاتی دیاریکراوی نوێ",
+      "description": "کڕیارێک هەڵبژێرە، خزمەتگوزارییەکی ئارەزوومەندانە، و ڕێکەوت و کاتێک.",
+      "contactLabel": "کڕیار",
+      "contactPlaceholder": "کڕیارێک هەڵبژێرە",
+      "contactRequired": "سەرەتا کڕیارێک هەڵبژێرە.",
+      "dateRequired": "ڕێکەوت و کاتێک هەڵبژێرە.",
+      "serviceLabel": "خزمەتگوزاری (ئارەزوومەندانە)",
+      "servicePlaceholder": "لە کاتالۆگ هەڵبژێرە",
+      "serviceNameLabel": "ناوی خزمەتگوزاری",
+      "serviceNamePlaceholder": "بۆ نموونە: ڕاوێژکاری",
+      "dateTimeLabel": "ڕێکەوت و کات",
+      "durationLabel": "ماوە (خولەک)",
+      "notesLabel": "تێبینی (ئارەزوومەندانە)",
+      "submit": "دروستکردنی کاتی دیاریکراو",
       "submitting": "دروست دەکرێت..."
     }
   },

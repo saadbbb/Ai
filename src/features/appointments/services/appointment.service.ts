@@ -1,0 +1,58 @@
+import "server-only";
+import type { Appointment, AppointmentStatus } from "@/db/schema";
+import { AppError } from "@/lib/errors/app-error";
+import { appointmentRepository, type AppointmentListItem } from "../repository/appointment.repository";
+
+interface CreateAppointmentInput {
+  contactId: string;
+  serviceId?: string;
+  serviceName?: string;
+  conversationId?: string;
+  scheduledAt: Date;
+  durationMinutes: number;
+  notes?: string;
+}
+
+async function listAppointments(workspaceId: string): Promise<AppointmentListItem[]> {
+  return appointmentRepository.findByWorkspaceId(workspaceId);
+}
+
+async function getAppointment(workspaceId: string, appointmentId: string): Promise<AppointmentListItem> {
+  const appointment = await appointmentRepository.findById(appointmentId, workspaceId);
+  if (!appointment) {
+    throw new AppError("NOT_FOUND", "Appointment not found.");
+  }
+  return appointment;
+}
+
+async function createAppointment(workspaceId: string, input: CreateAppointmentInput): Promise<Appointment> {
+  return appointmentRepository.create({
+    workspaceId,
+    contactId: input.contactId,
+    serviceId: input.serviceId ?? null,
+    serviceName: input.serviceName ?? null,
+    conversationId: input.conversationId ?? null,
+    scheduledAt: input.scheduledAt,
+    durationMinutes: input.durationMinutes,
+    notes: input.notes ?? null,
+  });
+}
+
+async function updateAppointmentStatus(
+  workspaceId: string,
+  appointmentId: string,
+  status: AppointmentStatus,
+): Promise<Appointment> {
+  const appointment = await appointmentRepository.updateStatus(appointmentId, workspaceId, status);
+  if (!appointment) {
+    throw new AppError("NOT_FOUND", "Appointment not found.");
+  }
+  return appointment;
+}
+
+export const appointmentService = {
+  listAppointments,
+  getAppointment,
+  createAppointment,
+  updateAppointmentStatus,
+};
