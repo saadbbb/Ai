@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { db } from "../client";
 import { permissions } from "../schema/permissions";
 import { rolePermissions } from "../schema/role-permissions";
