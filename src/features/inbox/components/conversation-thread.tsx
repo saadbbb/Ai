@@ -1,16 +1,19 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Channel, Contact, Conversation, ConversationAiStatus, Message, MessageSenderType } from "@/db/schema";
 import { cn } from "@/lib/utils";
+import { getConversationAction } from "../actions/get-conversation.action";
 import { logCustomerMessageAction } from "../actions/log-customer-message.action";
 import { closeConversationAction, pauseAiAction, resumeAiAction } from "../actions/set-ai-status.action";
 import { sendAgentReplyAction } from "../actions/send-agent-reply.action";
 import { AiStatusBadge } from "./ai-status-badge";
+
+const POLL_INTERVAL_MS = 4000;
 
 interface ConversationThreadProps {
   conversation: Conversation;
@@ -48,6 +51,26 @@ export function ConversationThread({ conversation, contact, channel, initialMess
   const [logMode, setLogMode] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isTogglingAi, setIsTogglingAi] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status !== "open") return;
+
+    const interval = setInterval(async () => {
+      const result = await getConversationAction({ conversationId: conversation.id });
+      if (result.success && result.data) {
+        setMessages(result.data.messages);
+        setAiStatus(result.data.conversation.aiStatus);
+        setStatus(result.data.conversation.status);
+      }
+    }, POLL_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [conversation.id, status]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length]);
 
   const senderLabel: Record<MessageSenderType, string> = {
     customer: contact.fullName,
@@ -136,6 +159,7 @@ export function ConversationThread({ conversation, contact, channel, initialMess
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       {status === "open" && (

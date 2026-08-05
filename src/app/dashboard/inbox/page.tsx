@@ -1,15 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { AiStatusBadge } from "@/features/inbox/components/ai-status-badge";
+import { InboxList } from "@/features/inbox/components/inbox-list";
 import { inboxService } from "@/features/inbox/services/inbox.service";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
-
-const CHANNEL_LABEL_KEY = {
-  manual: "channelManual",
-  whatsapp: "channelWhatsapp",
-  instagram: "channelInstagram",
-} as const;
 
 export default async function InboxPage() {
   const user = await requireUser();
@@ -31,39 +25,7 @@ export default async function InboxPage() {
         </Button>
       </div>
 
-      {conversations.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-          {t("emptyState")}
-        </p>
-      ) : (
-        <div className="divide-y rounded-lg border">
-          {conversations.map(({ conversation, contact, channel }) => (
-            <Link
-              key={conversation.id}
-              href={`/dashboard/inbox/${conversation.id}`}
-              className="flex items-center justify-between gap-4 p-4 hover:bg-muted"
-            >
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="truncate font-medium">{contact.fullName}</p>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {t(CHANNEL_LABEL_KEY[channel.type])}
-                  </span>
-                </div>
-                <p className="truncate text-sm text-muted-foreground">
-                  {conversation.lastMessagePreview ?? t("noMessages")}
-                </p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                {conversation.status === "closed" && (
-                  <span className="text-xs text-muted-foreground">{t("closedBadge")}</span>
-                )}
-                <AiStatusBadge status={conversation.aiStatus} />
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      <InboxList initialConversations={conversations} />
     </div>
   );
 }
