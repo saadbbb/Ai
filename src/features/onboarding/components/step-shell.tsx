@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -11,12 +12,14 @@ interface StepShellProps {
 }
 
 export function StepShell({ step, title, description, children }: StepShellProps) {
+  const t = useTranslations("common");
+
   return (
     <Card>
       <CardHeader>
         <div className="space-y-2">
           <p className="text-xs font-medium text-muted-foreground">
-            Step {step} of {TOTAL_STEPS}
+            {t("stepOf", { step, total: TOTAL_STEPS })}
           </p>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div

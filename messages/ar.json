@@ -1,0 +1,220 @@
+{
+  "common": {
+    "continue": "متابعة",
+    "back": "رجوع",
+    "saving": "جارٍ الحفظ...",
+    "finishSetup": "إنهاء الإعداد",
+    "comingSoon": "قريباً",
+    "stepOf": "الخطوة {step} من {total}"
+  },
+  "auth": {
+    "register": {
+      "title": "أنشئ حسابك",
+      "description": "سنرسل رمز تحقق إلى بريدك الإلكتروني.",
+      "emailLabel": "البريد الإلكتروني",
+      "submit": "متابعة",
+      "submitting": "جارٍ إرسال الرمز...",
+      "haveAccount": "لديك حساب بالفعل؟",
+      "login": "تسجيل الدخول"
+    },
+    "verify": {
+      "missingEmailTitle": "البريد الإلكتروني مفقود",
+      "missingEmailDescription": "ابدأ عملية التسجيل من جديد من صفحة إنشاء الحساب.",
+      "otpTitle": "تحقق من بريدك الإلكتروني",
+      "otpDescription": "أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى {email}.",
+      "codeLabel": "رمز التحقق",
+      "verify": "تحقق",
+      "verifying": "جارٍ التحقق...",
+      "passwordTitle": "أنشئ كلمة مرور",
+      "passwordDescription": "اختر كلمة مرور لحساب {email}.",
+      "passwordLabel": "كلمة المرور",
+      "acceptTerms": "أوافق على شروط الخدمة وسياسة الخصوصية.",
+      "submit": "إنشاء الحساب",
+      "submitting": "جارٍ إنشاء الحساب...",
+      "success": "تم إنشاء الحساب!"
+    },
+    "login": {
+      "title": "تسجيل الدخول",
+      "description": "مرحباً بعودتك.",
+      "emailLabel": "البريد الإلكتروني",
+      "passwordLabel": "كلمة المرور",
+      "rememberMe": "تذكرني",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "submit": "تسجيل الدخول",
+      "submitting": "جارٍ تسجيل الدخول...",
+      "noAccount": "ليس لديك حساب؟",
+      "signUp": "إنشاء حساب"
+    },
+    "forgotPassword": {
+      "title": "نسيت كلمة المرور",
+      "description": "سنرسل لك رمزاً لإعادة تعيين كلمة المرور.",
+      "emailLabel": "البريد الإلكتروني",
+      "submit": "إرسال الرمز",
+      "submitting": "جارٍ إرسال الرمز...",
+      "backToLogin": "الرجوع لتسجيل الدخول"
+    },
+    "resetPassword": {
+      "missingEmailTitle": "البريد الإلكتروني مفقود",
+      "missingEmailDescription": "ابدأ من جديد من صفحة نسيت كلمة المرور.",
+      "otpTitle": "تحقق من بريدك الإلكتروني",
+      "otpDescription": "أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى {email}.",
+      "codeLabel": "رمز التحقق",
+      "verify": "تحقق",
+      "verifying": "جارٍ التحقق...",
+      "passwordTitle": "عيّن كلمة مرور جديدة",
+      "passwordDescription": "اختر كلمة مرور جديدة لحساب {email}.",
+      "passwordLabel": "كلمة المرور الجديدة",
+      "submit": "تحديث كلمة المرور",
+      "submitting": "جارٍ التحديث...",
+      "success": "تم تحديث كلمة المرور. الرجاء تسجيل الدخول."
+    },
+    "logout": "تسجيل الخروج"
+  },
+  "validation": {
+    "emailInvalid": "أدخل بريداً إلكترونياً صحيحاً.",
+    "codeLength": "أدخل الرمز المكوّن من 6 أرقام.",
+    "passwordMin": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
+    "acceptTermsRequired": "يجب الموافقة على الشروط للمتابعة.",
+    "passwordRequired": "كلمة المرور مطلوبة.",
+    "nameRequired": "اسم النشاط التجاري مطلوب.",
+    "businessTypeRequired": "نوع النشاط التجاري مطلوب.",
+    "countryRequired": "الدولة مطلوبة.",
+    "timezoneRequired": "المنطقة الزمنية مطلوبة.",
+    "agentNameRequired": "أعطِ موظفك الذكي اسماً.",
+    "businessDescriptionRequired": "أخبرنا عن نشاطك التجاري."
+  },
+  "onboarding": {
+    "languages": {
+      "ar": "العربية",
+      "en": "الإنجليزية",
+      "ku": "الكردية"
+    },
+    "business": {
+      "title": "أخبرنا عن نشاطك التجاري",
+      "description": "هذا يساعد موظفك الذكي على تقديم نشاطك التجاري بشكل صحيح.",
+      "nameLabel": "اسم النشاط التجاري",
+      "businessTypeLabel": "نوع النشاط التجاري",
+      "businessTypePlaceholder": "اختر نوع النشاط التجاري",
+      "countryLabel": "الدولة",
+      "timezoneLabel": "المنطقة الزمنية",
+      "languageLabel": "لغة لوحة التحكم",
+      "logoLabel": "رابط الشعار (اختياري)",
+      "businessTypes": {
+        "smallBusiness": "مشروع صغير",
+        "clinic": "عيادة",
+        "restaurant": "مطعم",
+        "realEstate": "عقارات",
+        "carDealer": "معرض سيارات",
+        "beautyCenter": "مركز تجميل",
+        "medicalCenter": "مركز طبي",
+        "lawFirm": "مكتب محاماة",
+        "educationalCenter": "مركز تعليمي",
+        "instagramShop": "متجر إنستغرام",
+        "homeBusiness": "مشروع منزلي",
+        "localStore": "متجر محلي",
+        "other": "أخرى"
+      }
+    },
+    "agentName": {
+      "title": "أنشئ موظفك الذكي",
+      "description": "أعطِ موظفك الذكي اسماً — هذا من سيتحدث معه عملاؤك.",
+      "nameLabel": "اسم الموظف الذكي",
+      "namePlaceholder": "سارة، أحمد، مساعد المبيعات..."
+    },
+    "description": {
+      "title": "صف نشاطك التجاري",
+      "description": "من أنتم؟ ماذا تبيعون؟ كيف يجب أن يتصرف الذكاء الاصطناعي؟ ما الذي يميز شركتكم؟",
+      "label": "وصف النشاط التجاري"
+    },
+    "language": {
+      "title": "بأي لغة يجب أن يرد ذكاؤك الاصطناعي؟",
+      "description": "هذه هي اللغة التي يستخدمها موظفك الذكي عند التحدث مع العملاء."
+    },
+    "tone": {
+      "title": "اختر أسلوب ذكائك الاصطناعي",
+      "description": "كيف تريد أن يبدو أسلوب موظفك الذكي عند التحدث مع العملاء؟",
+      "options": {
+        "friendly": "ودّي",
+        "professional": "احترافي",
+        "luxury": "فاخر",
+        "formal": "رسمي",
+        "casual": "غير رسمي",
+        "medical": "طبي",
+        "corporate": "مؤسسي"
+      }
+    },
+    "creativity": {
+      "title": "ما مدى إبداع ذكائك الاصطناعي؟",
+      "description": "هذا يتحكم في مدى تنوّع ردود ذكائك الاصطناعي.",
+      "options": {
+        "low": { "label": "منخفض", "description": "يلتزم بالحقائق والردود الجاهزة." },
+        "medium": { "label": "متوسط", "description": "متوازن — طبيعي لكن يمكن توقعه." },
+        "high": { "label": "عالٍ", "description": "أكثر حيوية وتعبيراً في المحادثة." }
+      }
+    },
+    "hours": {
+      "title": "حدّد ساعات العمل",
+      "description": "يمكن لذكائك الاصطناعي إخبار العملاء بأوقات توفر الفريق.",
+      "timezoneLabel": "المنطقة الزمنية",
+      "closedLabel": "مغلق",
+      "holidayNotesLabel": "ملاحظات العطلات / أيام الإغلاق (اختياري)",
+      "holidayNotesPlaceholder": "مثال: مغلق في العطلات الرسمية",
+      "weekdays": {
+        "mon": "الاثنين",
+        "tue": "الثلاثاء",
+        "wed": "الأربعاء",
+        "thu": "الخميس",
+        "fri": "الجمعة",
+        "sat": "السبت",
+        "sun": "الأحد"
+      }
+    },
+    "handover": {
+      "title": "التحويل إلى موظف بشري",
+      "description": "أخبر ذكاءك الاصطناعي متى يجب أن يحوّل المحادثة إلى فريقك.",
+      "enableLabel": "تفعيل التحويل إلى موظف بشري",
+      "instructionsLabel": "تعليمات التحويل / خارج أوقات الدوام (اختياري)",
+      "instructionsPlaceholder": "مثال: حوّل الشكاوى والمبالغ المستردة والاستفسارات الطبية إلى موظف بشري"
+    },
+    "knowledgeBase": {
+      "title": "ابنِ قاعدة المعرفة",
+      "description": "الأسئلة الشائعة والمنتجات والخدمات والسياسات التي يمكن لذكائك الاصطناعي الإجابة منها. كل شيء هنا اختياري — يمكنك إضافة المزيد لاحقاً.",
+      "faqsHeading": "الأسئلة الشائعة",
+      "alreadySaved": "تم حفظ {count} مسبقاً.",
+      "questionPlaceholder": "السؤال",
+      "answerPlaceholder": "الإجابة",
+      "remove": "إزالة",
+      "addFaq": "إضافة سؤال شائع",
+      "productsHeading": "المنتجات",
+      "productNamePlaceholder": "اسم المنتج",
+      "descriptionPlaceholder": "الوصف (اختياري)",
+      "pricePlaceholder": "السعر (اختياري)",
+      "addProduct": "إضافة منتج",
+      "servicesHeading": "الخدمات",
+      "serviceNamePlaceholder": "اسم الخدمة",
+      "durationPlaceholder": "المدة (بالدقائق)",
+      "addService": "إضافة خدمة",
+      "policiesHeading": "السياسات (اختياري)",
+      "shippingPlaceholder": "سياسة الشحن",
+      "returnsPlaceholder": "سياسة الإرجاع",
+      "paymentsPlaceholder": "سياسة الدفع"
+    },
+    "channels": {
+      "title": "اربط قنواتك",
+      "description": "اربط واتساب وإنستغرام حتى يبدأ موظفك الذكي بالرد. يمكنك أيضاً فعل هذا لاحقاً من الإعدادات.",
+      "whatsappName": "واتساب بزنس",
+      "whatsappDescription": "الرد على العملاء تلقائياً عبر واتساب.",
+      "instagramName": "رسائل إنستغرام",
+      "instagramDescription": "الرد على العملاء تلقائياً عبر إنستغرام.",
+      "finishSuccess": "موظفك الذكي جاهز الآن!"
+    }
+  },
+  "dashboard": {
+    "welcomeBack": "مرحباً بعودتك",
+    "signedInAs": "مسجّل الدخول باسم {email}.",
+    "yourRole": "دورك: {role} · المنطقة الزمنية: {timezone}"
+  },
+  "localeSwitcher": {
+    "label": "اللغة"
+  }
+}

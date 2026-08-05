@@ -1,0 +1,220 @@
+{
+  "common": {
+    "continue": "Continue",
+    "back": "Back",
+    "saving": "Saving...",
+    "finishSetup": "Finish setup",
+    "comingSoon": "Coming soon",
+    "stepOf": "Step {step} of {total}"
+  },
+  "auth": {
+    "register": {
+      "title": "Create your account",
+      "description": "We'll send a verification code to your email.",
+      "emailLabel": "Email",
+      "submit": "Continue",
+      "submitting": "Sending code...",
+      "haveAccount": "Already have an account?",
+      "login": "Log in"
+    },
+    "verify": {
+      "missingEmailTitle": "Missing email",
+      "missingEmailDescription": "Start the registration process again from the sign-up page.",
+      "otpTitle": "Check your email",
+      "otpDescription": "Enter the 6-digit code we sent to {email}.",
+      "codeLabel": "Verification code",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "passwordTitle": "Create a password",
+      "passwordDescription": "Choose a password for {email}.",
+      "passwordLabel": "Password",
+      "acceptTerms": "I agree to the Terms of Service and Privacy Policy.",
+      "submit": "Create account",
+      "submitting": "Creating account...",
+      "success": "Account created!"
+    },
+    "login": {
+      "title": "Log in",
+      "description": "Welcome back.",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Log in",
+      "submitting": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "We'll send a code to reset your password.",
+      "emailLabel": "Email",
+      "submit": "Send code",
+      "submitting": "Sending code...",
+      "backToLogin": "Back to log in"
+    },
+    "resetPassword": {
+      "missingEmailTitle": "Missing email",
+      "missingEmailDescription": "Start again from the forgot password page.",
+      "otpTitle": "Check your email",
+      "otpDescription": "Enter the 6-digit code we sent to {email}.",
+      "codeLabel": "Verification code",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "passwordTitle": "Set a new password",
+      "passwordDescription": "Choose a new password for {email}.",
+      "passwordLabel": "New password",
+      "submit": "Update password",
+      "submitting": "Updating...",
+      "success": "Password updated. Please log in."
+    },
+    "logout": "Log out"
+  },
+  "validation": {
+    "emailInvalid": "Enter a valid email address.",
+    "codeLength": "Enter the 6-digit code.",
+    "passwordMin": "Password must be at least 8 characters.",
+    "acceptTermsRequired": "You must accept the terms to continue.",
+    "passwordRequired": "Password is required.",
+    "nameRequired": "Business name is required.",
+    "businessTypeRequired": "Business type is required.",
+    "countryRequired": "Country is required.",
+    "timezoneRequired": "Timezone is required.",
+    "agentNameRequired": "Give your AI employee a name.",
+    "businessDescriptionRequired": "Tell us about your business."
+  },
+  "onboarding": {
+    "languages": {
+      "ar": "Arabic",
+      "en": "English",
+      "ku": "Kurdish"
+    },
+    "business": {
+      "title": "Tell us about your business",
+      "description": "This helps your AI employee introduce your business correctly.",
+      "nameLabel": "Business name",
+      "businessTypeLabel": "Business type",
+      "businessTypePlaceholder": "Select a business type",
+      "countryLabel": "Country",
+      "timezoneLabel": "Timezone",
+      "languageLabel": "Dashboard language",
+      "logoLabel": "Logo URL (optional)",
+      "businessTypes": {
+        "smallBusiness": "Small Business",
+        "clinic": "Clinic",
+        "restaurant": "Restaurant",
+        "realEstate": "Real Estate",
+        "carDealer": "Car Dealer",
+        "beautyCenter": "Beauty Center",
+        "medicalCenter": "Medical Center",
+        "lawFirm": "Law Firm",
+        "educationalCenter": "Educational Center",
+        "instagramShop": "Instagram Shop",
+        "homeBusiness": "Home Business",
+        "localStore": "Local Store",
+        "other": "Other"
+      }
+    },
+    "agentName": {
+      "title": "Create your AI employee",
+      "description": "Give your AI employee a name — this is who your customers will be talking to.",
+      "nameLabel": "AI employee name",
+      "namePlaceholder": "Sara, Ahmed, Sales Assistant..."
+    },
+    "description": {
+      "title": "Describe your business",
+      "description": "Who are you? What do you sell? How should the AI behave? What makes your company unique?",
+      "label": "Business description"
+    },
+    "language": {
+      "title": "What language should your AI reply in?",
+      "description": "This is the language your AI employee uses when talking to customers."
+    },
+    "tone": {
+      "title": "Choose your AI's tone",
+      "description": "How should your AI employee sound when talking to customers?",
+      "options": {
+        "friendly": "Friendly",
+        "professional": "Professional",
+        "luxury": "Luxury",
+        "formal": "Formal",
+        "casual": "Casual",
+        "medical": "Medical",
+        "corporate": "Corporate"
+      }
+    },
+    "creativity": {
+      "title": "How creative should your AI be?",
+      "description": "This controls how much your AI varies its replies.",
+      "options": {
+        "low": { "label": "Low", "description": "Sticks closely to facts and scripted answers." },
+        "medium": { "label": "Medium", "description": "Balanced — natural but predictable." },
+        "high": { "label": "High", "description": "More conversational and expressive." }
+      }
+    },
+    "hours": {
+      "title": "Set your working hours",
+      "description": "Your AI can let customers know when the team is available.",
+      "timezoneLabel": "Timezone",
+      "closedLabel": "Closed",
+      "holidayNotesLabel": "Holiday / closed-date notes (optional)",
+      "holidayNotesPlaceholder": "e.g. Closed on public holidays",
+      "weekdays": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
+    },
+    "handover": {
+      "title": "Transfer to a human",
+      "description": "Let your AI know when it should hand a conversation over to your team.",
+      "enableLabel": "Enable transfer to human",
+      "instructionsLabel": "Offline / handover instructions (optional)",
+      "instructionsPlaceholder": "e.g. Transfer complaints, refunds, or medical questions to a human"
+    },
+    "knowledgeBase": {
+      "title": "Build your knowledge base",
+      "description": "FAQs, products, services, and policies your AI can answer from. Everything here is optional — you can add more later.",
+      "faqsHeading": "FAQs",
+      "alreadySaved": "{count} already saved.",
+      "questionPlaceholder": "Question",
+      "answerPlaceholder": "Answer",
+      "remove": "Remove",
+      "addFaq": "Add FAQ",
+      "productsHeading": "Products",
+      "productNamePlaceholder": "Product name",
+      "descriptionPlaceholder": "Description (optional)",
+      "pricePlaceholder": "Price (optional)",
+      "addProduct": "Add product",
+      "servicesHeading": "Services",
+      "serviceNamePlaceholder": "Service name",
+      "durationPlaceholder": "Duration (minutes)",
+      "addService": "Add service",
+      "policiesHeading": "Policies (optional)",
+      "shippingPlaceholder": "Shipping policy",
+      "returnsPlaceholder": "Returns policy",
+      "paymentsPlaceholder": "Payments policy"
+    },
+    "channels": {
+      "title": "Connect your channels",
+      "description": "Connect WhatsApp and Instagram so your AI employee can start replying. You can also do this later from settings.",
+      "whatsappName": "WhatsApp Business",
+      "whatsappDescription": "Answer customers on WhatsApp automatically.",
+      "instagramName": "Instagram DM",
+      "instagramDescription": "Answer customers on Instagram automatically.",
+      "finishSuccess": "Your AI employee is ready!"
+    }
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back",
+    "signedInAs": "Signed in as {email}.",
+    "yourRole": "Your role: {role} · Timezone: {timezone}"
+  },
+  "localeSwitcher": {
+    "label": "Language"
+  }
+}

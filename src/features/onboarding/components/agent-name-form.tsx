@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -8,21 +9,23 @@ import { toast } from "sonner";
 import type { z } from "zod";
 import { Field } from "@/components/form/field";
 import { Input } from "@/components/ui/input";
-import { agentNameSchema } from "@/features/ai/validation/schemas";
+import { createAgentNameSchema } from "@/features/ai/validation/schemas";
 import { saveAgentNameAction } from "../actions/save-agent-name.action";
 import { StepFooter } from "./step-footer";
 import { StepShell } from "./step-shell";
 
-type AgentNameInput = z.infer<typeof agentNameSchema>;
+type AgentNameInput = z.infer<ReturnType<typeof createAgentNameSchema>>;
 
 export function AgentNameForm({ defaultValues }: { defaultValues: Partial<AgentNameInput> }) {
   const router = useRouter();
+  const t = useTranslations("onboarding.agentName");
+  const tValidation = useTranslations("validation");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<AgentNameInput>({ resolver: zodResolver(agentNameSchema), defaultValues });
+  } = useForm<AgentNameInput>({ resolver: zodResolver(createAgentNameSchema(tValidation)), defaultValues });
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -38,14 +41,10 @@ export function AgentNameForm({ defaultValues }: { defaultValues: Partial<AgentN
   });
 
   return (
-    <StepShell
-      step={2}
-      title="Create your AI employee"
-      description="Give your AI employee a name — this is who your customers will be talking to."
-    >
+    <StepShell step={2} title={t("title")} description={t("description")}>
       <form onSubmit={onSubmit} className="space-y-4">
-        <Field label="AI employee name" htmlFor="name" error={errors.name}>
-          <Input id="name" placeholder="Sara, Ahmed, Sales Assistant..." {...register("name")} />
+        <Field label={t("nameLabel")} htmlFor="name" error={errors.name}>
+          <Input id="name" placeholder={t("namePlaceholder")} {...register("name")} />
         </Field>
         <StepFooter backHref="/onboarding/business" isSubmitting={isSubmitting} />
       </form>

@@ -1,11 +1,13 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { authService } from "../services/auth.service";
-import { verifyOtpSchema } from "../validation/schemas";
+import { createVerifyOtpSchema } from "../validation/schemas";
 
 export async function verifyRegistrationOtpAction(input: unknown): Promise<ActionResult> {
-  const parsed = verifyOtpSchema.safeParse(input);
+  const t = await getTranslations("validation");
+  const parsed = createVerifyOtpSchema(t).safeParse(input);
   if (!parsed.success) {
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
@@ -19,7 +21,8 @@ export async function verifyRegistrationOtpAction(input: unknown): Promise<Actio
 }
 
 export async function verifyPasswordResetOtpAction(input: unknown): Promise<ActionResult> {
-  const parsed = verifyOtpSchema.safeParse(input);
+  const t = await getTranslations("validation");
+  const parsed = createVerifyOtpSchema(t).safeParse(input);
   if (!parsed.success) {
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }

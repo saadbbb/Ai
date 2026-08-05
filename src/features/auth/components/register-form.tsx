@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,18 +13,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { registerAction } from "../actions/register.action";
-import { registerSchema } from "../validation/schemas";
+import { createRegisterSchema } from "../validation/schemas";
 
-type RegisterInput = z.infer<typeof registerSchema>;
+type RegisterInput = z.infer<ReturnType<typeof createRegisterSchema>>;
 
 export function RegisterForm() {
   const router = useRouter();
+  const t = useTranslations("auth.register");
+  const tValidation = useTranslations("validation");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) });
+  } = useForm<RegisterInput>({ resolver: zodResolver(createRegisterSchema(tValidation)) });
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -41,21 +44,21 @@ export function RegisterForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create your account</CardTitle>
-        <CardDescription>We&apos;ll send a verification code to your email.</CardDescription>
+        <CardTitle>{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
-          <Field label="Email" htmlFor="email" error={errors.email}>
+          <Field label={t("emailLabel")} htmlFor="email" error={errors.email}>
             <Input id="email" type="email" autoComplete="email" {...register("email")} />
           </Field>
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Sending code..." : "Continue"}
+            {isSubmitting ? t("submitting") : t("submit")}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t("haveAccount")}{" "}
             <Link href="/login" className="font-medium text-foreground underline underline-offset-4">
-              Log in
+              {t("login")}
             </Link>
           </p>
         </form>

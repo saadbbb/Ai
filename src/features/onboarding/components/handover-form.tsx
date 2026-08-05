@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -19,6 +20,7 @@ type HandoverInput = z.infer<typeof handoverSchema>;
 
 export function HandoverForm({ defaultValues }: { defaultValues: HandoverInput }) {
   const router = useRouter();
+  const t = useTranslations("onboarding.handover");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
@@ -43,11 +45,7 @@ export function HandoverForm({ defaultValues }: { defaultValues: HandoverInput }
   });
 
   return (
-    <StepShell
-      step={8}
-      title="Transfer to a human"
-      description="Let your AI know when it should hand a conversation over to your team."
-    >
+    <StepShell step={8} title={t("title")} description={t("description")}>
       <form onSubmit={onSubmit} className="space-y-4">
         <Controller
           control={control}
@@ -55,15 +53,15 @@ export function HandoverForm({ defaultValues }: { defaultValues: HandoverInput }
           render={({ field }) => (
             <div className="flex items-center gap-2">
               <Switch id="handoverEnabled" checked={field.value} onCheckedChange={field.onChange} />
-              <Label htmlFor="handoverEnabled">Enable transfer to human</Label>
+              <Label htmlFor="handoverEnabled">{t("enableLabel")}</Label>
             </div>
           )}
         />
 
-        <Field label="Offline / handover instructions (optional)" htmlFor="handoverInstructions">
+        <Field label={t("instructionsLabel")} htmlFor="handoverInstructions">
           <Textarea
             id="handoverInstructions"
-            placeholder="e.g. Transfer complaints, refunds, or medical questions to a human"
+            placeholder={t("instructionsPlaceholder")}
             disabled={!handoverEnabled}
             {...register("handoverInstructions")}
           />

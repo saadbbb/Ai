@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,16 +14,18 @@ import { Input } from "@/components/ui/input";
 import { resetPasswordAction } from "../actions/reset-password.action";
 import { verifyPasswordResetOtpAction } from "../actions/verify-otp.action";
 
-const otpStepSchema = z.object({ code: z.string().length(6, "Enter the 6-digit code.") });
-const passwordStepSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters.") });
-
-type OtpStepInput = z.infer<typeof otpStepSchema>;
-type PasswordStepInput = z.infer<typeof passwordStepSchema>;
-
 export function ResetPasswordForm({ email }: { email: string }) {
   const router = useRouter();
+  const t = useTranslations("auth.resetPassword");
+  const tValidation = useTranslations("validation");
   const [step, setStep] = useState<"otp" | "password">("otp");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const otpStepSchema = z.object({ code: z.string().length(6, tValidation("codeLength")) });
+  const passwordStepSchema = z.object({ password: z.string().min(8, tValidation("passwordMin")) });
+
+  type OtpStepInput = z.infer<typeof otpStepSchema>;
+  type PasswordStepInput = z.infer<typeof passwordStepSchema>;
 
   const otpForm = useForm<OtpStepInput>({ resolver: zodResolver(otpStepSchema) });
   const passwordForm = useForm<PasswordStepInput>({ resolver: zodResolver(passwordStepSchema) });
@@ -50,7 +53,7 @@ export function ResetPasswordForm({ email }: { email: string }) {
       return;
     }
 
-    toast.success("Password updated. Please log in.");
+    toast.success(t("success"));
     router.push("/login");
   });
 
@@ -58,8 +61,8 @@ export function ResetPasswordForm({ email }: { email: string }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Missing email</CardTitle>
-          <CardDescription>Start again from the forgot password page.</CardDescription>
+          <CardTitle>{t("missingEmailTitle")}</CardTitle>
+          <CardDescription>{t("missingEmailDescription")}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -69,16 +72,16 @@ export function ResetPasswordForm({ email }: { email: string }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Check your email</CardTitle>
-          <CardDescription>Enter the 6-digit code we sent to {email}.</CardDescription>
+          <CardTitle>{t("otpTitle")}</CardTitle>
+          <CardDescription>{t("otpDescription", { email })}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmitOtp} className="space-y-4">
-            <Field label="Verification code" htmlFor="code" error={otpForm.formState.errors.code}>
+            <Field label={t("codeLabel")} htmlFor="code" error={otpForm.formState.errors.code}>
               <Input id="code" inputMode="numeric" maxLength={6} {...otpForm.register("code")} />
             </Field>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Verifying..." : "Verify"}
+              {isSubmitting ? t("verifying") : t("verify")}
             </Button>
           </form>
         </CardContent>
@@ -89,12 +92,12 @@ export function ResetPasswordForm({ email }: { email: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Set a new password</CardTitle>
-        <CardDescription>Choose a new password for {email}.</CardDescription>
+        <CardTitle>{t("passwordTitle")}</CardTitle>
+        <CardDescription>{t("passwordDescription", { email })}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmitPassword} className="space-y-4">
-          <Field label="New password" htmlFor="password" error={passwordForm.formState.errors.password}>
+          <Field label={t("passwordLabel")} htmlFor="password" error={passwordForm.formState.errors.password}>
             <Input
               id="password"
               type="password"
@@ -103,7 +106,7 @@ export function ResetPasswordForm({ email }: { email: string }) {
             />
           </Field>
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Updating..." : "Update password"}
+            {isSubmitting ? t("submitting") : t("submit")}
           </Button>
         </form>
       </CardContent>

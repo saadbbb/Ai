@@ -1,11 +1,14 @@
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "../actions/logout.action";
 
-export function LogoutButton() {
+export async function LogoutButton() {
+  const t = await getTranslations("auth");
+
   return (
     <form action={logoutAction}>
       <Button type="submit" variant="outline" size="sm">
-        Log out
+        {t("logout")}
       </Button>
     </form>
   );

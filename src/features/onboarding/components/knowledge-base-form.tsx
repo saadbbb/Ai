@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -23,6 +24,7 @@ interface KnowledgeBaseFormProps {
 
 export function KnowledgeBaseForm({ existing }: KnowledgeBaseFormProps) {
   const router = useRouter();
+  const t = useTranslations("onboarding.knowledgeBase");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, control } = useForm<KnowledgeBaseInput>({
     resolver: zodResolver(knowledgeBaseSchema),
@@ -54,47 +56,48 @@ export function KnowledgeBaseForm({ existing }: KnowledgeBaseFormProps) {
   });
 
   return (
-    <StepShell
-      step={9}
-      title="Build your knowledge base"
-      description="FAQs, products, services, and policies your AI can answer from. Everything here is optional — you can add more later."
-    >
+    <StepShell step={9} title={t("title")} description={t("description")}>
       <form onSubmit={onSubmit} className="space-y-6">
         <section className="space-y-3">
-          <h3 className="text-sm font-medium">FAQs</h3>
+          <h3 className="text-sm font-medium">{t("faqsHeading")}</h3>
           {existing.faqs.length > 0 && (
-            <p className="text-xs text-muted-foreground">{existing.faqs.length} already saved.</p>
+            <p className="text-xs text-muted-foreground">{t("alreadySaved", { count: existing.faqs.length })}</p>
           )}
           {faqFields.fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 rounded-lg border border-input p-2">
               <div className="flex-1 space-y-2">
-                <Input placeholder="Question" {...register(`faqs.${index}.question`)} />
-                <Textarea placeholder="Answer" {...register(`faqs.${index}.answer`)} />
+                <Input placeholder={t("questionPlaceholder")} {...register(`faqs.${index}.question`)} />
+                <Textarea placeholder={t("answerPlaceholder")} {...register(`faqs.${index}.answer`)} />
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={() => faqFields.remove(index)}>
-                Remove
+                {t("remove")}
               </Button>
             </div>
           ))}
           <Button type="button" variant="outline" size="sm" onClick={() => faqFields.append({ question: "", answer: "" })}>
-            Add FAQ
+            {t("addFaq")}
           </Button>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-sm font-medium">Products</h3>
+          <h3 className="text-sm font-medium">{t("productsHeading")}</h3>
           {existing.products.length > 0 && (
-            <p className="text-xs text-muted-foreground">{existing.products.length} already saved.</p>
+            <p className="text-xs text-muted-foreground">{t("alreadySaved", { count: existing.products.length })}</p>
           )}
           {productFields.fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 rounded-lg border border-input p-2">
               <div className="flex-1 space-y-2">
-                <Input placeholder="Product name" {...register(`products.${index}.name`)} />
-                <Textarea placeholder="Description (optional)" {...register(`products.${index}.description`)} />
-                <Input type="number" step="0.01" placeholder="Price (optional)" {...register(`products.${index}.price`)} />
+                <Input placeholder={t("productNamePlaceholder")} {...register(`products.${index}.name`)} />
+                <Textarea placeholder={t("descriptionPlaceholder")} {...register(`products.${index}.description`)} />
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder={t("pricePlaceholder")}
+                  {...register(`products.${index}.price`)}
+                />
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={() => productFields.remove(index)}>
-                Remove
+                {t("remove")}
               </Button>
             </div>
           ))}
@@ -104,31 +107,36 @@ export function KnowledgeBaseForm({ existing }: KnowledgeBaseFormProps) {
             size="sm"
             onClick={() => productFields.append({ name: "", description: "", price: undefined })}
           >
-            Add product
+            {t("addProduct")}
           </Button>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-sm font-medium">Services</h3>
+          <h3 className="text-sm font-medium">{t("servicesHeading")}</h3>
           {existing.services.length > 0 && (
-            <p className="text-xs text-muted-foreground">{existing.services.length} already saved.</p>
+            <p className="text-xs text-muted-foreground">{t("alreadySaved", { count: existing.services.length })}</p>
           )}
           {serviceFields.fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 rounded-lg border border-input p-2">
               <div className="flex-1 space-y-2">
-                <Input placeholder="Service name" {...register(`services.${index}.name`)} />
-                <Textarea placeholder="Description (optional)" {...register(`services.${index}.description`)} />
+                <Input placeholder={t("serviceNamePlaceholder")} {...register(`services.${index}.name`)} />
+                <Textarea placeholder={t("descriptionPlaceholder")} {...register(`services.${index}.description`)} />
                 <div className="flex gap-2">
-                  <Input type="number" step="0.01" placeholder="Price (optional)" {...register(`services.${index}.price`)} />
                   <Input
                     type="number"
-                    placeholder="Duration (minutes)"
+                    step="0.01"
+                    placeholder={t("pricePlaceholder")}
+                    {...register(`services.${index}.price`)}
+                  />
+                  <Input
+                    type="number"
+                    placeholder={t("durationPlaceholder")}
                     {...register(`services.${index}.durationMinutes`)}
                   />
                 </div>
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={() => serviceFields.remove(index)}>
-                Remove
+                {t("remove")}
               </Button>
             </div>
           ))}
@@ -138,18 +146,18 @@ export function KnowledgeBaseForm({ existing }: KnowledgeBaseFormProps) {
             size="sm"
             onClick={() => serviceFields.append({ name: "", description: "", price: undefined, durationMinutes: undefined })}
           >
-            Add service
+            {t("addService")}
           </Button>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-sm font-medium">Policies (optional)</h3>
-          <Textarea placeholder="Shipping policy" {...register("shippingPolicy")} />
-          <Textarea placeholder="Returns policy" {...register("returnsPolicy")} />
-          <Textarea placeholder="Payments policy" {...register("paymentsPolicy")} />
+          <h3 className="text-sm font-medium">{t("policiesHeading")}</h3>
+          <Textarea placeholder={t("shippingPlaceholder")} {...register("shippingPolicy")} />
+          <Textarea placeholder={t("returnsPlaceholder")} {...register("returnsPolicy")} />
+          <Textarea placeholder={t("paymentsPlaceholder")} {...register("paymentsPolicy")} />
         </section>
 
-        <StepFooter backHref="/onboarding/handover" isSubmitting={isSubmitting} continueLabel="Continue" />
+        <StepFooter backHref="/onboarding/handover" isSubmitting={isSubmitting} />
       </form>
     </StepShell>
   );

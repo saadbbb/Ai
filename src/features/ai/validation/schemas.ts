@@ -1,12 +1,17 @@
 import { z } from "zod";
+import type { TranslateFn } from "@/i18n/config";
 
-export const agentNameSchema = z.object({
-  name: z.string().trim().min(1, "Give your AI employee a name.").max(100),
-});
+export function createAgentNameSchema(t: TranslateFn) {
+  return z.object({
+    name: z.string().trim().min(1, t("agentNameRequired")).max(100),
+  });
+}
 
-export const businessDescriptionSchema = z.object({
-  businessDescription: z.string().trim().min(1, "Tell us about your business.").max(4000),
-});
+export function createBusinessDescriptionSchema(t: TranslateFn) {
+  return z.object({
+    businessDescription: z.string().trim().min(1, t("businessDescriptionRequired")).max(4000),
+  });
+}
 
 export const languageEnumSchema = z.enum(["ar", "en", "ku"]);
 
@@ -58,3 +63,6 @@ export const handoverSchema = z.object({
   handoverEnabled: z.boolean(),
   handoverInstructions: z.string().trim().max(2000).optional().nullable(),
 });
+
+export type AgentNameInput = z.infer<ReturnType<typeof createAgentNameSchema>>;
+export type BusinessDescriptionInput = z.infer<ReturnType<typeof createBusinessDescriptionSchema>>;

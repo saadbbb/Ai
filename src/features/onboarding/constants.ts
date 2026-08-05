@@ -1,40 +1,21 @@
-export const BUSINESS_TYPES = [
-  "Small Business",
-  "Clinic",
-  "Restaurant",
-  "Real Estate",
-  "Car Dealer",
-  "Beauty Center",
-  "Medical Center",
-  "Law Firm",
-  "Educational Center",
-  "Instagram Shop",
-  "Home Business",
-  "Local Store",
-  "Other",
-];
-
-export const LANGUAGE_OPTIONS: Array<{ value: "ar" | "en" | "ku"; label: string }> = [
-  { value: "ar", label: "Arabic" },
-  { value: "en", label: "English" },
-  { value: "ku", label: "Kurdish" },
-];
-
-export const TONE_OPTIONS: Array<{
-  value: "friendly" | "professional" | "luxury" | "formal" | "casual" | "medical" | "corporate";
-  label: string;
-}> = [
-  { value: "friendly", label: "Friendly" },
-  { value: "professional", label: "Professional" },
-  { value: "luxury", label: "Luxury" },
-  { value: "formal", label: "Formal" },
-  { value: "casual", label: "Casual" },
-  { value: "medical", label: "Medical" },
-  { value: "corporate", label: "Corporate" },
-];
-
-export const CREATIVITY_OPTIONS: Array<{ value: "low" | "medium" | "high"; label: string; description: string }> = [
-  { value: "low", label: "Low", description: "Sticks closely to facts and scripted answers." },
-  { value: "medium", label: "Medium", description: "Balanced — natural but predictable." },
-  { value: "high", label: "High", description: "More conversational and expressive." },
-];
+/**
+ * Stable keys stored in workspaces.businessType (a free-text column) and used as
+ * translation keys under onboarding.business.businessTypes — never store the
+ * translated label itself, or the saved value would depend on whatever language
+ * was active when it was picked.
+ */
+export const BUSINESS_TYPE_KEYS = [
+  "smallBusiness",
+  "clinic",
+  "restaurant",
+  "realEstate",
+  "carDealer",
+  "beautyCenter",
+  "medicalCenter",
+  "lawFirm",
+  "educationalCenter",
+  "instagramShop",
+  "homeBusiness",
+  "localStore",
+  "other",
+] as const;

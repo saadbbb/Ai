@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -8,21 +9,26 @@ import { toast } from "sonner";
 import type { z } from "zod";
 import { Field } from "@/components/form/field";
 import { Textarea } from "@/components/ui/textarea";
-import { businessDescriptionSchema } from "@/features/ai/validation/schemas";
+import { createBusinessDescriptionSchema } from "@/features/ai/validation/schemas";
 import { saveBusinessDescriptionAction } from "../actions/save-business-description.action";
 import { StepFooter } from "./step-footer";
 import { StepShell } from "./step-shell";
 
-type BusinessDescriptionInput = z.infer<typeof businessDescriptionSchema>;
+type BusinessDescriptionInput = z.infer<ReturnType<typeof createBusinessDescriptionSchema>>;
 
 export function BusinessDescriptionForm({ defaultValues }: { defaultValues: Partial<BusinessDescriptionInput> }) {
   const router = useRouter();
+  const t = useTranslations("onboarding.description");
+  const tValidation = useTranslations("validation");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<BusinessDescriptionInput>({ resolver: zodResolver(businessDescriptionSchema), defaultValues });
+  } = useForm<BusinessDescriptionInput>({
+    resolver: zodResolver(createBusinessDescriptionSchema(tValidation)),
+    defaultValues,
+  });
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -38,13 +44,9 @@ export function BusinessDescriptionForm({ defaultValues }: { defaultValues: Part
   });
 
   return (
-    <StepShell
-      step={3}
-      title="Describe your business"
-      description="Who are you? What do you sell? How should the AI behave? What makes your company unique?"
-    >
+    <StepShell step={3} title={t("title")} description={t("description")}>
       <form onSubmit={onSubmit} className="space-y-4">
-        <Field label="Business description" htmlFor="businessDescription" error={errors.businessDescription}>
+        <Field label={t("label")} htmlFor="businessDescription" error={errors.businessDescription}>
           <Textarea id="businessDescription" rows={8} {...register("businessDescription")} />
         </Field>
         <StepFooter backHref="/onboarding/agent-name" isSubmitting={isSubmitting} />

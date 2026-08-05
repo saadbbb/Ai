@@ -1,13 +1,15 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { workspaceService } from "@/features/workspace/services/workspace.service";
 import { getRequestContext } from "@/lib/auth/request-context";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { authService } from "../services/auth.service";
-import { setPasswordSchema } from "../validation/schemas";
+import { createSetPasswordSchema } from "../validation/schemas";
 
 export async function completeRegistrationAction(input: unknown): Promise<ActionResult> {
-  const parsed = setPasswordSchema.safeParse(input);
+  const t = await getTranslations("validation");
+  const parsed = createSetPasswordSchema(t).safeParse(input);
   if (!parsed.success) {
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }

@@ -1,31 +1,51 @@
 import { z } from "zod";
+import type { TranslateFn } from "@/i18n/config";
 
-export const registerSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Enter a valid email address."),
-});
+export function createRegisterSchema(t: TranslateFn) {
+  return z.object({
+    email: z.string().trim().toLowerCase().email(t("emailInvalid")),
+  });
+}
 
-export const verifyOtpSchema = z.object({
-  email: z.string().trim().toLowerCase().email(),
-  code: z.string().length(6, "Enter the 6-digit code."),
-});
+export function createVerifyOtpSchema(t: TranslateFn) {
+  return z.object({
+    email: z.string().trim().toLowerCase().email(t("emailInvalid")),
+    code: z.string().length(6, t("codeLength")),
+  });
+}
 
-export const setPasswordSchema = z.object({
-  email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8, "Password must be at least 8 characters."),
-  acceptTerms: z.literal(true, { message: "You must accept the terms to continue." }),
-});
+export function createSetPasswordSchema(t: TranslateFn) {
+  return z.object({
+    email: z.string().trim().toLowerCase().email(t("emailInvalid")),
+    password: z.string().min(8, t("passwordMin")),
+    acceptTerms: z.literal(true, { message: t("acceptTermsRequired") }),
+  });
+}
 
-export const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
-  rememberMe: z.boolean().optional(),
-});
+export function createLoginSchema(t: TranslateFn) {
+  return z.object({
+    email: z.string().trim().toLowerCase().email(t("emailInvalid")),
+    password: z.string().min(1, t("passwordRequired")),
+    rememberMe: z.boolean().optional(),
+  });
+}
 
-export const requestPasswordResetSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Enter a valid email address."),
-});
+export function createRequestPasswordResetSchema(t: TranslateFn) {
+  return z.object({
+    email: z.string().trim().toLowerCase().email(t("emailInvalid")),
+  });
+}
 
-export const resetPasswordSchema = z.object({
-  email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8, "Password must be at least 8 characters."),
-});
+export function createResetPasswordSchema(t: TranslateFn) {
+  return z.object({
+    email: z.string().trim().toLowerCase().email(t("emailInvalid")),
+    password: z.string().min(8, t("passwordMin")),
+  });
+}
+
+export type RegisterInput = z.infer<ReturnType<typeof createRegisterSchema>>;
+export type VerifyOtpInput = z.infer<ReturnType<typeof createVerifyOtpSchema>>;
+export type SetPasswordInput = z.infer<ReturnType<typeof createSetPasswordSchema>>;
+export type LoginInput = z.infer<ReturnType<typeof createLoginSchema>>;
+export type RequestPasswordResetInput = z.infer<ReturnType<typeof createRequestPasswordResetSchema>>;
+export type ResetPasswordInput = z.infer<ReturnType<typeof createResetPasswordSchema>>;

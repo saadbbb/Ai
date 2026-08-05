@@ -17,12 +17,12 @@ export const DEFAULT_WORKING_HOURS: WorkingHours = {
   holidayNotes: null,
 };
 
-export const WEEKDAYS: Array<{ key: keyof WorkingHours["schedule"]; label: string }> = [
-  { key: "mon", label: "Monday" },
-  { key: "tue", label: "Tuesday" },
-  { key: "wed", label: "Wednesday" },
-  { key: "thu", label: "Thursday" },
-  { key: "fri", label: "Friday" },
-  { key: "sat", label: "Saturday" },
-  { key: "sun", label: "Sunday" },
+export const WEEKDAY_KEYS: Array<keyof WorkingHours["schedule"]> = [
+  "mon",
+  "tue",
+  "wed",
+  "thu",
+  "fri",
+  "sat",
+  "sun",
 ];
