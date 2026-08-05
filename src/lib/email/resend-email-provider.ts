@@ -1,0 +1,38 @@
+import "server-only";
+import { Resend } from "resend";
+import { AppError } from "@/lib/errors/app-error";
+import type { EmailService } from "./email-service";
+
+const SUBJECTS = {
+  registration: "Verify your email",
+  password_reset: "Reset your password",
+} as const;
+
+// Constructed lazily so merely importing this module (e.g. transitively, via any
+// route that touches the auth feature) never throws when RESEND_API_KEY is unset.
+let resendClient: Resend | undefined;
+function getResendClient(): Resend {
+  resendClient ??= new Resend(process.env.RESEND_API_KEY);
+  return resendClient;
+}
+
+export const resendEmailProvider: EmailService = {
+  async sendOtpEmail({ to, code, purpose }) {
+    const from = process.env.EMAIL_FROM;
+    if (!from) {
+      throw new AppError("INTERNAL_ERROR", "EMAIL_FROM is not configured.");
+    }
+
+    const { error } = await getResendClient().emails.send({
+      from,
+      to,
+      subject: SUBJECTS[purpose],
+      text: `Your verification code is: ${code}\n\nThis code expires in 10 minutes.`,
+    });
+
+    if (error) {
+      console.error("[resend] failed to send email:", error);
+      throw new AppError("INTERNAL_ERROR", "Failed to send email. Please try again.");
+    }
+  },
+};
