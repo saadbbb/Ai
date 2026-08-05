@@ -5,6 +5,7 @@ import { generateOtpCode, getOtpExpiry, hashOtpCode, OTP_MAX_ATTEMPTS, verifyOtp
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { emailService } from "@/lib/email";
 import { AppError } from "@/lib/errors/app-error";
+import { checkRateLimit } from "@/lib/rate-limit/rate-limit";
 import { otpRepository } from "../repository/otp.repository";
 import { userRepository } from "../repository/user.repository";
 
@@ -19,6 +20,11 @@ export interface SessionContext {
 }
 
 async function issueOtp(email: string, purpose: OtpPurpose): Promise<void> {
+  const allowed = await checkRateLimit(`otp:${email.toLowerCase()}:${purpose}`, { windowSeconds: 60, max: 1 });
+  if (!allowed) {
+    throw new AppError("RATE_LIMITED", "Please wait a moment before requesting another code.");
+  }
+
   const code = generateOtpCode();
   await otpRepository.create({
     email,
@@ -90,6 +96,11 @@ async function completeRegistration(
 }
 
 async function login(email: string, password: string, context: SessionContext = {}): Promise<User> {
+  const allowed = await checkRateLimit(`login:${email.toLowerCase()}`, { windowSeconds: 15 * 60, max: 5 });
+  if (!allowed) {
+    throw new AppError("RATE_LIMITED", "Too many login attempts. Please try again in a few minutes.");
+  }
+
   const user = await userRepository.findByEmail(email);
   if (!user?.passwordHash || !user.emailVerifiedAt) {
     throw new AppError("INVALID_CREDENTIALS", "Invalid email or password.");
