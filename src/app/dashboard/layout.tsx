@@ -3,6 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { NotificationBell } from "@/features/notifications/components/notification-bell";
+import { notificationService } from "@/features/notifications/services/notification.service";
 import type { FeatureKey } from "@/features/platform-admin/lib/features";
 import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
 import { featureAccessService } from "@/features/platform-admin/services/feature-access.service";
@@ -17,9 +19,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/onboarding/business");
   }
 
-  const [t, isPlatformAdmin] = await Promise.all([
+  const [t, isPlatformAdmin, { notifications, unreadCount }] = await Promise.all([
     getTranslations("dashboard"),
     platformAdminService.isPlatformAdmin(user.email),
+    notificationService.getForWorkspace(workspace.id),
   ]);
   const isSuspended = workspace.subscriptionStatus === "suspended";
   const [settings, enabledFeatures] = await Promise.all([
@@ -46,6 +49,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <header className="flex items-center justify-between border-b px-6 py-4">
         <span className="font-medium">{user.email}</span>
         <div className="flex items-center gap-3">
+          <NotificationBell initialNotifications={notifications} initialUnreadCount={unreadCount} />
           {isPlatformAdmin && (
             <Link
               href="/admin/settings"

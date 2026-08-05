@@ -252,6 +252,13 @@
       "whatsappCta": "تواصل معنا عبر واتساب"
     }
   },
+  "notifications": {
+    "bellLabel": "الإشعارات",
+    "closeLabel": "إغلاق الإشعارات",
+    "title": "الإشعارات",
+    "markAllRead": "تعليم الكل كمقروء",
+    "empty": "لا توجد إشعارات بعد."
+  },
   "inbox": {
     "list": {
       "title": "صندوق المحادثات",

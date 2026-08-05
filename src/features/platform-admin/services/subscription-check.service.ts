@@ -1,6 +1,7 @@
 import "server-only";
 import type { Workspace } from "@/db/schema";
 import { userRepository } from "@/features/auth/repository/user.repository";
+import { notificationRepository } from "@/features/notifications/repository/notification.repository";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { emailService } from "@/lib/email";
 import { platformSettingsRepository } from "../repository/platform-settings.repository";
@@ -9,20 +10,50 @@ import { workspaceAdminRepository } from "../repository/workspace-admin.reposito
 const REMINDER_DAYS = [3, 2, 1];
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * In-app (notifications table) and email are independent channels here —
+ * the in-app one always gets created even if the email fails, which matters
+ * today specifically because Resend is still in sandbox mode (see
+ * DEFERRED_TASKS.md) and can't actually deliver to real customer inboxes yet.
+ */
 async function sendExpiryReminder(workspace: Workspace, daysLeft: number): Promise<void> {
-  const ownerUserId = await membershipRepository.findOwnerUserId(workspace.id);
-  const owner = ownerUserId ? await userRepository.findById(ownerUserId) : null;
-  if (!owner) return;
+  const dayWord = daysLeft === 1 ? "day" : "days";
 
-  const settings = await platformSettingsRepository.get();
-  const contactLine = settings?.whatsappNumber
-    ? `\n\nWhatsApp: https://wa.me/${settings.whatsappNumber.replace(/[^0-9]/g, "")}`
-    : "";
+  await notificationRepository.create({
+    workspaceId: workspace.id,
+    type: "subscription_expiring",
+    title: `Your subscription expires in ${daysLeft} ${dayWord}`,
+    message: `Your subscription for "${workspace.name}" expires in ${daysLeft} ${dayWord}. Renew to avoid any interruption.`,
+    link: "/dashboard/billing",
+  });
 
-  await emailService.sendNotificationEmail({
-    to: owner.email,
-    subject: `Your subscription expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`,
-    text: `Hi,\n\nYour subscription for "${workspace.name}" expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}. Get in touch to renew and avoid any interruption.${contactLine}`,
+  try {
+    const ownerUserId = await membershipRepository.findOwnerUserId(workspace.id);
+    const owner = ownerUserId ? await userRepository.findById(ownerUserId) : null;
+    if (!owner) return;
+
+    const settings = await platformSettingsRepository.get();
+    const contactLine = settings?.whatsappNumber
+      ? `\n\nWhatsApp: https://wa.me/${settings.whatsappNumber.replace(/[^0-9]/g, "")}`
+      : "";
+
+    await emailService.sendNotificationEmail({
+      to: owner.email,
+      subject: `Your subscription expires in ${daysLeft} ${dayWord}`,
+      text: `Hi,\n\nYour subscription for "${workspace.name}" expires in ${daysLeft} ${dayWord}. Get in touch to renew and avoid any interruption.${contactLine}`,
+    });
+  } catch (error) {
+    console.error(`[subscription-check] reminder email failed for workspace ${workspace.id}:`, error);
+  }
+}
+
+async function notifySuspended(workspace: Workspace): Promise<void> {
+  await notificationRepository.create({
+    workspaceId: workspace.id,
+    type: "subscription_suspended",
+    title: "Your subscription has been suspended",
+    message: `"${workspace.name}"'s subscription expired and wasn't renewed in time. Contact us to reactivate it.`,
+    link: "/dashboard/billing",
   });
 }
 
@@ -48,6 +79,7 @@ async function runDailyCheck(): Promise<SubscriptionCheckResult> {
 
       if (daysLeft <= 0) {
         await workspaceAdminRepository.updateSubscriptionStatus(workspace.id, "suspended");
+        await notifySuspended(workspace);
         suspended += 1;
         continue;
       }

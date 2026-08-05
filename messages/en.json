@@ -252,6 +252,13 @@
       "whatsappCta": "Contact us on WhatsApp"
     }
   },
+  "notifications": {
+    "bellLabel": "Notifications",
+    "closeLabel": "Close notifications",
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "No notifications yet."
+  },
   "inbox": {
     "list": {
       "title": "Inbox",
