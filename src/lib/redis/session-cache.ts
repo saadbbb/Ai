@@ -12,6 +12,8 @@ const MAX_TTL_SECONDS = 300;
 const keyFor = (sessionId: string) => `session:${sessionId}`;
 
 export async function getCachedSession(sessionId: string): Promise<Session | null> {
+  if (!redis) return null;
+
   try {
     const raw = await redis.get(keyFor(sessionId));
     if (!raw) return null;
@@ -29,6 +31,8 @@ export async function getCachedSession(sessionId: string): Promise<Session | nul
 }
 
 export async function setCachedSession(session: Session): Promise<void> {
+  if (!redis) return;
+
   const ttlSeconds = Math.min(MAX_TTL_SECONDS, Math.floor((session.expiresAt.getTime() - Date.now()) / 1000));
   if (ttlSeconds <= 0) return;
 
@@ -40,6 +44,8 @@ export async function setCachedSession(session: Session): Promise<void> {
 }
 
 export async function invalidateCachedSession(sessionId: string): Promise<void> {
+  if (!redis) return;
+
   try {
     await redis.del(keyFor(sessionId));
   } catch {
