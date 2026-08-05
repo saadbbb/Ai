@@ -218,7 +218,6 @@
   "dashboard": {
     "welcomeBack": "Welcome back",
     "signedInAs": "Signed in as {email}.",
-    "yourRole": "Your role: {role} · Timezone: {timezone}",
     "homeLink": "Dashboard",
     "inboxLink": "Inbox",
     "contactsLink": "Contacts",
@@ -226,7 +225,23 @@
     "ordersLink": "Orders",
     "testAiLink": "Test your AI employee",
     "settingsLink": "Settings",
-    "knowledgeBaseLink": "Knowledge Base"
+    "knowledgeBaseLink": "Knowledge Base",
+    "stats": {
+      "conversationsToday": "Conversations today",
+      "newLeadsToday": "New leads today",
+      "activePipeline": "Active leads",
+      "activeOrders": "Active orders",
+      "revenue": "Revenue (delivered)",
+      "aiActive": "AI replying now",
+      "needsHuman": "Needs a human",
+      "totalContacts": "Total contacts"
+    },
+    "pipelineHeading": "Pipeline breakdown",
+    "recentActivityHeading": "Recent activity",
+    "noActivity": "Nothing yet.",
+    "activityNewConversation": "New conversation — {name}",
+    "activityNewLead": "New lead — {name}",
+    "activityNewOrder": "New order — {name}"
   },
   "inbox": {
     "list": {

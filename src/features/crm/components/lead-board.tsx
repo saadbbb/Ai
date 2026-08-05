@@ -6,23 +6,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { LeadStage } from "@/db/schema";
+import { leadStageEnum, type LeadStage } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import { updateLeadStageAction } from "../actions/update-lead-stage.action";
 import type { LeadListItem } from "../repository/lead.repository";
 
-const STAGES: LeadStage[] = [
-  "new",
-  "qualified",
-  "contacted",
-  "negotiation",
-  "waiting",
-  "appointment",
-  "proposal_sent",
-  "won",
-  "lost",
-  "cancelled",
-];
+const STAGES = leadStageEnum.enumValues;
 
 const STAGE_ACCENT: Partial<Record<LeadStage, string>> = {
   won: "border-t-primary",

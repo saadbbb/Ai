@@ -218,7 +218,6 @@
   "dashboard": {
     "welcomeBack": "مرحباً بعودتك",
     "signedInAs": "مسجّل الدخول باسم {email}.",
-    "yourRole": "دورك: {role} · المنطقة الزمنية: {timezone}",
     "homeLink": "الرئيسية",
     "inboxLink": "صندوق المحادثات",
     "contactsLink": "جهات الاتصال",
@@ -226,7 +225,23 @@
     "ordersLink": "الطلبات",
     "testAiLink": "جرّب موظفك الذكي",
     "settingsLink": "الإعدادات",
-    "knowledgeBaseLink": "قاعدة المعرفة"
+    "knowledgeBaseLink": "قاعدة المعرفة",
+    "stats": {
+      "conversationsToday": "محادثات اليوم",
+      "newLeadsToday": "عملاء محتملون جدد اليوم",
+      "activePipeline": "عملاء محتملون نشطون",
+      "activeOrders": "طلبات نشطة",
+      "revenue": "الإيرادات (المُسلَّمة)",
+      "aiActive": "الذكاء الاصطناعي يرد الآن",
+      "needsHuman": "بحاجة إلى موظف بشري",
+      "totalContacts": "إجمالي جهات الاتصال"
+    },
+    "pipelineHeading": "توزيع مسار المبيعات",
+    "recentActivityHeading": "النشاط الأخير",
+    "noActivity": "لا يوجد شيء بعد.",
+    "activityNewConversation": "محادثة جديدة — {name}",
+    "activityNewLead": "عميل محتمل جديد — {name}",
+    "activityNewOrder": "طلب جديد — {name}"
   },
   "inbox": {
     "list": {

@@ -4,20 +4,10 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { OrderStatus } from "@/db/schema";
+import { orderStatusEnum, type OrderStatus } from "@/db/schema";
 import { updateOrderStatusAction } from "../actions/update-order-status.action";
 
-const STATUSES: OrderStatus[] = [
-  "draft",
-  "pending",
-  "confirmed",
-  "preparing",
-  "ready",
-  "delivered",
-  "completed",
-  "cancelled",
-  "refunded",
-];
+const STATUSES = orderStatusEnum.enumValues;
 
 export function OrderStatusSelect({ orderId, initialStatus }: { orderId: string; initialStatus: OrderStatus }) {
   const t = useTranslations("orders");

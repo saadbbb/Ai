@@ -218,7 +218,6 @@
   "dashboard": {
     "welcomeBack": "بەخێربێیتەوە",
     "signedInAs": "چوویتەژوورەوە وەک {email}.",
-    "yourRole": "ڕۆڵت: {role} · ناوچەی کاتی: {timezone}",
     "homeLink": "داشبۆرد",
     "inboxLink": "سندوقی گفتوگۆکان",
     "contactsLink": "پەیوەندییەکان",
@@ -226,7 +225,23 @@
     "ordersLink": "داواکارییەکان",
     "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
     "settingsLink": "ڕێکخستنەکان",
-    "knowledgeBaseLink": "بنکەی زانیاری"
+    "knowledgeBaseLink": "بنکەی زانیاری",
+    "stats": {
+      "conversationsToday": "گفتوگۆکانی ئەمڕۆ",
+      "newLeadsToday": "کڕیارە ئەگەرییە نوێیەکانی ئەمڕۆ",
+      "activePipeline": "کڕیارە ئەگەرییە چالاکەکان",
+      "activeOrders": "داواکارییە چالاکەکان",
+      "revenue": "داهات (گەیشتووەکان)",
+      "aiActive": "کارمەندە زیرەکە ئێستا وەڵام دەداتەوە",
+      "needsHuman": "پێویستی بە کەسێکی مرۆڤە",
+      "totalContacts": "کۆی گشتی پەیوەندییەکان"
+    },
+    "pipelineHeading": "دابەشکردنی هێڵی فرۆشتن",
+    "recentActivityHeading": "چالاکی نوێ",
+    "noActivity": "هێشتا هیچ شتێک نییە.",
+    "activityNewConversation": "گفتوگۆی نوێ — {name}",
+    "activityNewLead": "کڕیاری ئەگەری نوێ — {name}",
+    "activityNewOrder": "داواکاری نوێ — {name}"
   },
   "inbox": {
     "list": {
