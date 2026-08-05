@@ -263,6 +263,14 @@
       "title": "Your account is suspended",
       "description": "Get in touch with us to sort this out and get back to work.",
       "whatsappCta": "Contact us on WhatsApp"
+    },
+    "insights": {
+      "heading": "AI Insights",
+      "loading": "Reading today's numbers...",
+      "unavailable": "Insights aren't available right now.",
+      "empty": "Nothing stands out today — business looks steady.",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing..."
     }
   },
   "analytics": {

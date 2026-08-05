@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { InsightsPanel } from "@/features/ai/components/insights-panel";
 import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { dashboardService } from "@/features/dashboard/services/dashboard.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -24,6 +25,8 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-semibold">{t("welcomeBack")}</h1>
         <p className="text-muted-foreground">{t("signedInAs", { email: user.email })}</p>
       </div>
+
+      <InsightsPanel />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile label={t("stats.conversationsToday")} value={summary.conversationsToday} />

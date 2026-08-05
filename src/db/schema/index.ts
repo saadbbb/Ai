@@ -31,3 +31,4 @@ export * from "./activities";
 export * from "./tasks";
 export * from "./notes";
 export * from "./audit-logs";
+export * from "./ai-insights";
