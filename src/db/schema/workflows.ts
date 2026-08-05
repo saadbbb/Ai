@@ -1,13 +1,22 @@
-import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { contacts } from "./contacts";
 import { workspaces } from "./workspaces";
 
 export const workflowTriggerEnum = pgEnum("workflow_trigger", [
   "lead_stage_changed",
   "order_status_changed",
   "conversation_handed_over",
+  "order_created",
+  "lead_created",
+  "appointment_created",
+  "appointment_status_changed",
 ]);
 
-export const workflowActionEnum = pgEnum("workflow_action", ["add_contact_tag", "notify_owner_email"]);
+export const workflowActionEnum = pgEnum("workflow_action", [
+  "add_contact_tag",
+  "notify_owner_email",
+  "remove_contact_tag",
+]);
 
 export const workflowStatusEnum = pgEnum("workflow_status", ["active", "paused"]);
 
@@ -40,12 +49,44 @@ export const workflows = pgTable(
     actionType: workflowActionEnum("action_type").notNull(),
     actionConfig: jsonb("action_config").$type<WorkflowActionConfig>().notNull().default({}),
     status: workflowStatusEnum("status").notNull().default("active"),
+    /** Null/0 = run the action immediately when the trigger fires (original behavior). */
+    delayDays: integer("delay_days"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     index("workflows_workspace_id_idx").on(table.workspaceId),
     index("workflows_trigger_type_idx").on(table.triggerType),
+  ],
+);
+
+/**
+ * Queue for workflows whose action is delayed (workflows.delayDays > 0).
+ * Populated by automationService.dispatch, drained by processDueRuns() on a
+ * daily cron (src/app/api/cron/automation-delays) — day granularity only,
+ * since a daily cron is the only scheduling primitive this app has.
+ */
+export const workflowPendingRuns = pgTable(
+  "workflow_pending_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    workflowId: uuid("workflow_id")
+      .notNull()
+      .references(() => workflows.id, { onDelete: "cascade" }),
+    contactId: uuid("contact_id")
+      .notNull()
+      .references(() => contacts.id, { onDelete: "cascade" }),
+    eventType: workflowTriggerEnum("event_type").notNull(),
+    eventPayload: jsonb("event_payload").$type<WorkflowTriggerConfig>().notNull().default({}),
+    runAfter: timestamp("run_after", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("workflow_pending_runs_workspace_id_idx").on(table.workspaceId),
+    index("workflow_pending_runs_run_after_idx").on(table.runAfter),
   ],
 );
 
@@ -74,3 +115,5 @@ export type WorkflowAction = (typeof workflowActionEnum.enumValues)[number];
 export type WorkflowStatus = (typeof workflowStatusEnum.enumValues)[number];
 export type WorkflowExecution = typeof workflowExecutions.$inferSelect;
 export type NewWorkflowExecution = typeof workflowExecutions.$inferInsert;
+export type WorkflowPendingRun = typeof workflowPendingRuns.$inferSelect;
+export type NewWorkflowPendingRun = typeof workflowPendingRuns.$inferInsert;

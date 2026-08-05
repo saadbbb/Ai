@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { describeAction, describeDelay, describeTrigger } from "@/features/automation/lib/describe-workflow";
 import { automationService } from "@/features/automation/services/automation.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 import { AppError } from "@/lib/errors/app-error";
@@ -13,7 +14,13 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
   const { workflowId } = await params;
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
-  const t = await getTranslations("automations");
+  const [t, tLeads, tOrders, tAppointments] = await Promise.all([
+    getTranslations("automations"),
+    getTranslations("leads"),
+    getTranslations("orders"),
+    getTranslations("appointments"),
+  ]);
+  const translators = { automations: t, leads: tLeads, orders: tOrders, appointments: tAppointments };
 
   let data;
   try {
@@ -29,6 +36,7 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
     dateStyle: "medium",
     timeStyle: "short",
   });
+  const delay = describeDelay(workflow, translators);
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -36,7 +44,13 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
         {t("backLink")}
       </Link>
 
-      <h1 className="text-xl font-semibold">{workflow.name}</h1>
+      <div>
+        <h1 className="text-xl font-semibold">{workflow.name}</h1>
+        <p className="text-sm text-muted-foreground">
+          {describeTrigger(workflow, translators)} → {delay ? `${delay} ` : ""}
+          {describeAction(workflow, translators)}
+        </p>
+      </div>
 
       <div className="space-y-3">
         <h2 className="text-sm font-medium">{t("executionsHeading")}</h2>

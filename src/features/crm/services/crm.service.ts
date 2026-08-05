@@ -22,11 +22,15 @@ async function createLeadFromConversation(workspaceId: string, conversationId: s
     throw new AppError("NOT_FOUND", "Conversation not found.");
   }
 
-  return leadRepository.create({
+  const lead = await leadRepository.create({
     workspaceId,
     contactId: conversation.contact.id,
     conversationId,
   });
+
+  await automationService.dispatch(workspaceId, { type: "lead_created", contactId: lead.contactId });
+
+  return lead;
 }
 
 async function updateLeadStage(workspaceId: string, leadId: string, stage: LeadStage): Promise<Lead> {

@@ -1,11 +1,14 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, lte } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   type NewWorkflow,
   type NewWorkflowExecution,
+  type NewWorkflowPendingRun,
   type Workflow,
   type WorkflowExecution,
   workflowExecutions,
+  type WorkflowPendingRun,
+  workflowPendingRuns,
   workflows,
   type WorkflowStatus,
   type WorkflowTrigger,
@@ -68,5 +71,19 @@ export const workflowRepository = {
       .where(and(eq(workflowExecutions.workflowId, workflowId), eq(workflowExecutions.workspaceId, workspaceId)))
       .orderBy(desc(workflowExecutions.triggeredAt))
       .limit(20);
+  },
+
+  async createPendingRun(data: NewWorkflowPendingRun): Promise<WorkflowPendingRun> {
+    const [pendingRun] = await db.insert(workflowPendingRuns).values(data).returning();
+    return pendingRun;
+  },
+
+  /** Cross-workspace by design — only ever called from the automation-delays cron sweep. */
+  async findDuePendingRuns(now: Date): Promise<WorkflowPendingRun[]> {
+    return db.select().from(workflowPendingRuns).where(lte(workflowPendingRuns.runAfter, now));
+  },
+
+  async deletePendingRun(id: string): Promise<void> {
+    await db.delete(workflowPendingRuns).where(eq(workflowPendingRuns.id, id));
   },
 };

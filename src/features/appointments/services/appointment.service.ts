@@ -1,5 +1,6 @@
 import "server-only";
 import type { Appointment, AppointmentStatus } from "@/db/schema";
+import { automationService } from "@/features/automation/services/automation.service";
 import { AppError } from "@/lib/errors/app-error";
 import { appointmentRepository, type AppointmentListItem } from "../repository/appointment.repository";
 
@@ -26,7 +27,7 @@ async function getAppointment(workspaceId: string, appointmentId: string): Promi
 }
 
 async function createAppointment(workspaceId: string, input: CreateAppointmentInput): Promise<Appointment> {
-  return appointmentRepository.create({
+  const appointment = await appointmentRepository.create({
     workspaceId,
     contactId: input.contactId,
     serviceId: input.serviceId ?? null,
@@ -36,6 +37,10 @@ async function createAppointment(workspaceId: string, input: CreateAppointmentIn
     durationMinutes: input.durationMinutes,
     notes: input.notes ?? null,
   });
+
+  await automationService.dispatch(workspaceId, { type: "appointment_created", contactId: appointment.contactId });
+
+  return appointment;
 }
 
 async function updateAppointmentStatus(
@@ -47,6 +52,13 @@ async function updateAppointmentStatus(
   if (!appointment) {
     throw new AppError("NOT_FOUND", "Appointment not found.");
   }
+
+  await automationService.dispatch(workspaceId, {
+    type: "appointment_status_changed",
+    contactId: appointment.contactId,
+    status,
+  });
+
   return appointment;
 }
 

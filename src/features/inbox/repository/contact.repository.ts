@@ -41,4 +41,21 @@ export const contactRepository = {
       .set({ tags: [...contact.tags, tag], updatedAt: new Date() })
       .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
   },
+
+  async removeTag(id: string, workspaceId: string, tag: string): Promise<void> {
+    const [contact] = await db
+      .select({ tags: contacts.tags })
+      .from(contacts)
+      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)))
+      .limit(1);
+    if (!contact || !contact.tags.includes(tag)) return;
+
+    await db
+      .update(contacts)
+      .set({
+        tags: contact.tags.filter((existing) => existing !== tag),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
+  },
 };

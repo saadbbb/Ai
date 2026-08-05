@@ -35,7 +35,7 @@ async function createOrder(workspaceId: string, input: CreateOrderInput): Promis
     throw new AppError("VALIDATION_ERROR", "An order needs at least one item.");
   }
 
-  return orderRepository.create(
+  const created = await orderRepository.create(
     {
       workspaceId,
       contactId: input.contactId,
@@ -49,6 +49,10 @@ async function createOrder(workspaceId: string, input: CreateOrderInput): Promis
       quantity: item.quantity,
     })),
   );
+
+  await automationService.dispatch(workspaceId, { type: "order_created", contactId: created.order.contactId });
+
+  return created;
 }
 
 async function updateOrderStatus(workspaceId: string, orderId: string, status: OrderStatus): Promise<Order> {
