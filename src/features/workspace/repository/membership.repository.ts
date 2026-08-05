@@ -23,6 +23,7 @@ export const membershipRepository = {
       .from(workspaceMembers)
       .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
       .innerJoin(roles, eq(workspaceMembers.roleId, roles.id))
-      .where(eq(workspaceMembers.userId, userId));
+      .where(eq(workspaceMembers.userId, userId))
+      .orderBy(workspaceMembers.joinedAt);
   },
 };

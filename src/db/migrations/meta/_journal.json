@@ -8,6 +8,13 @@
       "when": 1785877579473,
       "tag": "0000_confused_major_mapleleaf",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785892000958,
+      "tag": "0001_greedy_lizard",
+      "breakpoints": true
     }
   ]
 }

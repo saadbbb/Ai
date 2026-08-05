@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import type { Workspace } from "@/db/schema";
 import { workspaceMembers, workspaces } from "@/db/schema";
 import { AppError } from "@/lib/errors/app-error";
+import { membershipRepository } from "../repository/membership.repository";
 import { roleRepository } from "../repository/role.repository";
 
 function slugify(input: string): string {
@@ -66,6 +67,16 @@ async function createWorkspaceForNewUser(userId: string, email: string): Promise
   });
 }
 
+/**
+ * MVP: a user belongs to exactly one workspace (the one created at registration),
+ * so "primary" just means "first joined". Revisit once workspace switching exists.
+ */
+async function getPrimaryWorkspaceForUser(userId: string): Promise<Workspace | null> {
+  const memberships = await membershipRepository.findWorkspacesForUser(userId);
+  return memberships[0]?.workspace ?? null;
+}
+
 export const workspaceService = {
   createWorkspaceForNewUser,
+  getPrimaryWorkspaceForUser,
 };

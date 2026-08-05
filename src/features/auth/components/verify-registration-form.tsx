@@ -67,7 +67,7 @@ export function VerifyRegistrationForm({ email }: { email: string }) {
     }
 
     toast.success("Account created!");
-    router.push("/dashboard");
+    router.push("/onboarding/business");
     router.refresh();
   });
 

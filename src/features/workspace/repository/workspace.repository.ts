@@ -17,4 +17,13 @@ export const workspaceRepository = {
     const [workspace] = await db.select().from(workspaces).where(eq(workspaces.slug, slug)).limit(1);
     return workspace ?? null;
   },
+
+  async update(id: string, data: Partial<NewWorkspace>): Promise<Workspace> {
+    const [workspace] = await db
+      .update(workspaces)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(workspaces.id, id))
+      .returning();
+    return workspace;
+  },
 };

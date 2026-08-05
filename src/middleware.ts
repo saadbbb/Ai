@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   const hasSession = request.cookies.has("session");
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/dashboard") && !hasSession) {
+  if ((pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) && !hasSession) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -23,5 +23,13 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register", "/verify", "/forgot-password", "/reset-password"],
+  matcher: [
+    "/dashboard/:path*",
+    "/onboarding/:path*",
+    "/login",
+    "/register",
+    "/verify",
+    "/forgot-password",
+    "/reset-password",
+  ],
 };

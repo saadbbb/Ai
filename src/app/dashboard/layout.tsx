@@ -1,8 +1,14 @@
+import { redirect } from "next/navigation";
 import { LogoutButton } from "@/features/auth/components/logout-button";
-import { requireUser } from "@/lib/auth/auth-guard";
+import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
+  const workspace = await requireWorkspaceForUser(user.id);
+
+  if (!workspace.onboardingCompletedAt) {
+    redirect("/onboarding/business");
+  }
 
   return (
     <div className="flex min-h-full flex-1 flex-col">

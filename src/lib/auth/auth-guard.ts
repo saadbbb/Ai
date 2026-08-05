@@ -2,7 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { userRepository } from "@/features/auth/repository/user.repository";
-import type { User } from "@/db/schema";
+import { workspaceService } from "@/features/workspace/services/workspace.service";
+import type { User, Workspace } from "@/db/schema";
 import { getCurrentSession } from "./session";
 
 /**
@@ -17,4 +18,16 @@ export const requireUser = cache(async (): Promise<User> => {
   if (!user) redirect("/login");
 
   return user;
+});
+
+/**
+ * Every user gets a workspace at registration (see workspaceService.createWorkspaceForNewUser),
+ * so a missing one here means corrupted state, not an unauthenticated request — send them
+ * back through login rather than surfacing a raw error.
+ */
+export const requireWorkspaceForUser = cache(async (userId: string): Promise<Workspace> => {
+  const workspace = await workspaceService.getPrimaryWorkspaceForUser(userId);
+  if (!workspace) redirect("/login");
+
+  return workspace;
 });
