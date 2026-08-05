@@ -24,17 +24,14 @@ every time a new item like this comes up — don't let it go stale.
 - **To unblock:** Create an Upstash Redis database, set `REDIS_URL` in `.env.local` and Vercel.
 - **Status:** App works correctly without it (every session lookup just hits Postgres directly) — this is a performance optimization, not a blocker for anything else.
 
-### 4. Platform Admin access in production
+### 4. Platform Admin access in production — RESOLVED 2026-08-05
 - **What's built:** A Super Admin Platform first slice, gated by `requirePlatformAdmin()` — two layers: `PLATFORM_ADMIN_EMAILS` env var (recovery/bootstrap, never locked out by DB state) plus a `platform_admins` DB table any current admin can add/remove emails from. Pages: `/admin/settings` (WhatsApp number/message), `/admin/admins`, `/admin/plans` (build packages — pick which of Inbox/Contacts/Leads/Orders/Appointments/Automations/Knowledge Base a plan includes, monthly or yearly, default duration), and `/admin/workspaces` (see every workspace, activate a plan for one with a specific number of days, or manually suspend/resume). A workspace's dashboard nav and each gated page hide/block anything its plan doesn't include (`requireFeature()` in `auth-guard.ts`); a suspended workspace sees a full block screen instead of its dashboard.
-- **Blocked on:** Nothing external — but `PLATFORM_ADMIN_EMAILS=ssaadbbbb@gmail.com` was only added to local `.env.local`, not to Vercel's Environment Variables yet.
-- **To unblock:** Add `PLATFORM_ADMIN_EMAILS` to the Vercel project's Environment Variables (same value, or a permanent email once one exists — user flagged the current account is temporary), then redeploy. Until then, `/admin/*` on production will redirect everyone to `/dashboard`, including the account that should have access.
-- **Status:** Code is done and tested against the local DB; just needs the env var set on Vercel.
+- **Resolved:** `PLATFORM_ADMIN_EMAILS` is set as a Production env var on the `ai` Vercel project (`saadbbbs-projects/ai`, alias `ai-delta-navy-52.vercel.app`) and the production deploy has picked it up.
+- **Note found along the way:** the Vercel CLI on this machine had been logged into the wrong account (`dafatrapp-boop`, unrelated projects). Re-logged into the correct account (`saadbbb`) and linked this repo to the `ai` project — future `vercel` CLI commands in this repo should now work directly.
 
-### 5. Cron secret in production
-- **What's built:** `/api/cron/subscription-check` — runs daily (see `vercel.json`, `0 6 * * *`), sends "3/2/1 days left" reminder emails, and auto-suspends any workspace whose `subscriptionExpiresAt` has passed. Locally tested directly with `curl` + the `Authorization: Bearer <CRON_SECRET>` header and confirmed working (0 workspaces currently have an expiry set, so it's a no-op today).
-- **Blocked on:** `CRON_SECRET` was only added to local `.env.local`, not Vercel's Environment Variables. Without it set on Vercel, the route has no auth check at all (open per DEFERRED_TASKS convention of graceful-degradation-over-breaking, but not what you want in production).
-- **To unblock:** Add `CRON_SECRET` (same value as local, or generate a new one) to the Vercel project's Environment Variables, then redeploy — Vercel automatically sends it as the `Authorization` header on cron-triggered requests once it's set. `vercel.json` is committed to the repo, so the schedule itself needs no manual Vercel dashboard setup, just the env var.
-- **Status:** Code done and tested locally; needs the env var set on Vercel like items 1 and 4.
+### 5. Cron secret in production — RESOLVED 2026-08-05
+- **What's built:** `/api/cron/subscription-check` — runs daily (see `vercel.json`, `0 6 * * *`), sends "3/2/1 days left" reminder emails, and auto-suspends any workspace whose `subscriptionExpiresAt` has passed.
+- **Resolved:** `CRON_SECRET` added as a Production env var on Vercel (same value as local `.env.local`) and production redeployed. Verified live: `curl` without an `Authorization` header now returns `401`, and with `Authorization: Bearer <CRON_SECRET>` returns `200` — the route is no longer open.
 
 ### 6. WhatsApp Business + Instagram DM (Meta OAuth) — the AI's own auto-reply channels
 - **Not to be confused with:** item 4's WhatsApp CTA on `/dashboard/billing` — that's a plain `wa.me` deep link (no API, no approval needed) for *customers to contact the platform owner* about subscribing. This item is about the AI employee itself auto-replying to *end customers* on a business's own WhatsApp number, which does need the Business API.

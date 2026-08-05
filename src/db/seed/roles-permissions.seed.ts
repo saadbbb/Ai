@@ -10,6 +10,7 @@ const PERMISSIONS = [
   { key: "workspace.members.view", description: "View workspace members" },
   { key: "workspace.members.invite", description: "Invite new workspace members" },
   { key: "workspace.members.manage", description: "Change member roles or remove members" },
+  { key: "analytics.view", description: "View the Analytics & Business Intelligence dashboard" },
 ] as const;
 
 const ROLES: Array<{ key: string; name: string; description: string; permissionKeys: string[] }> = [
@@ -29,13 +30,19 @@ const ROLES: Array<{ key: string; name: string; description: string; permissionK
       "workspace.members.view",
       "workspace.members.invite",
       "workspace.members.manage",
+      "analytics.view",
     ],
   },
   {
     key: "manager",
     name: "Manager",
     description: "Manages day-to-day operations and invites team members",
-    permissionKeys: ["workspace.settings.view", "workspace.members.view", "workspace.members.invite"],
+    permissionKeys: [
+      "workspace.settings.view",
+      "workspace.members.view",
+      "workspace.members.invite",
+      "analytics.view",
+    ],
   },
   {
     key: "agent",

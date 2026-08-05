@@ -22,13 +22,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/onboarding/business");
   }
 
-  const [t, isPlatformAdmin, { notifications, unreadCount }, memberships, canViewTeam] = await Promise.all([
-    getTranslations("dashboard"),
-    platformAdminService.isPlatformAdmin(user.email),
-    notificationService.getForWorkspace(workspace.id),
-    membershipRepository.findWorkspacesForUser(user.id),
-    permissionService.hasPermission(user.id, workspace.id, "workspace.members.view"),
-  ]);
+  const [t, isPlatformAdmin, { notifications, unreadCount }, memberships, canViewTeam, canViewAnalytics] =
+    await Promise.all([
+      getTranslations("dashboard"),
+      platformAdminService.isPlatformAdmin(user.email),
+      notificationService.getForWorkspace(workspace.id),
+      membershipRepository.findWorkspacesForUser(user.id),
+      permissionService.hasPermission(user.id, workspace.id, "workspace.members.view"),
+      permissionService.hasPermission(user.id, workspace.id, "analytics.view"),
+    ]);
   const isSuspended = workspace.subscriptionStatus === "suspended";
   const [settings, enabledFeatures] = await Promise.all([
     isSuspended ? platformSettingsRepository.get() : Promise.resolve(null),
@@ -46,6 +48,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/dashboard/test-ai", label: t("testAiLink") },
     { href: "/dashboard/settings", label: t("settingsLink") },
     { href: "/dashboard/knowledge-base", label: t("knowledgeBaseLink"), feature: "knowledge_base" },
+    ...(canViewAnalytics ? [{ href: "/dashboard/analytics", label: t("analyticsLink"), feature: "analytics" as const }] : []),
     ...(canViewTeam ? [{ href: "/dashboard/team", label: t("teamLink") }] : []),
   ];
   const navLinks = allNavLinks.filter((link) => !link.feature || enabledFeatures.includes(link.feature));

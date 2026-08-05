@@ -225,6 +225,7 @@
     "ordersLink": "Orders",
     "appointmentsLink": "Appointments",
     "automationsLink": "Automations",
+    "analyticsLink": "Analytics",
     "billingLink": "Billing",
     "platformAdminLink": "Admin Panel",
     "testAiLink": "Test your AI employee",
@@ -252,6 +253,48 @@
       "title": "Your account is suspended",
       "description": "Get in touch with us to sort this out and get back to work.",
       "whatsappCta": "Contact us on WhatsApp"
+    }
+  },
+  "analytics": {
+    "title": "Analytics",
+    "description": "How your business is doing, at a glance.",
+    "range": {
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 90 days",
+      "month": "This month"
+    },
+    "kpis": {
+      "newLeads": "New leads",
+      "revenue": "Revenue (delivered)",
+      "ordersCompleted": "Orders completed",
+      "appointmentsCompleted": "Appointments completed",
+      "aiRequests": "AI requests",
+      "aiSuccessRate": "AI success rate"
+    },
+    "healthScore": {
+      "title": "Business health score",
+      "noData": "Not enough data yet in this range to calculate a score.",
+      "levels": {
+        "excellent": "Excellent",
+        "good": "Good",
+        "needs_attention": "Needs attention",
+        "critical": "Critical"
+      },
+      "breakdown": {
+        "leadConversion": "Lead conversion",
+        "orderCompletion": "Order completion",
+        "appointmentCompletion": "Appointment completion",
+        "aiSuccess": "AI success rate"
+      }
+    },
+    "charts": {
+      "leadsByDay": "New leads",
+      "revenueByDay": "Revenue",
+      "ordersByStatus": "Orders by status",
+      "appointmentsByStatus": "Appointments by status",
+      "conversationsByChannel": "Conversations by channel",
+      "empty": "No data yet for this range."
     }
   },
   "team": {
@@ -456,7 +499,8 @@
         "orders": "Orders",
         "appointments": "Appointments",
         "automations": "Automations",
-        "knowledge_base": "Knowledge Base"
+        "knowledge_base": "Knowledge Base",
+        "analytics": "Analytics"
       }
     },
     "settings": {

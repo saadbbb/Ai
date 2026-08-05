@@ -225,6 +225,7 @@
     "ordersLink": "داواکارییەکان",
     "appointmentsLink": "کاتە دیاریکراوەکان",
     "automationsLink": "خۆکارکردن",
+    "analyticsLink": "شیکاری",
     "billingLink": "پارەدان",
     "platformAdminLink": "پانێڵی بەڕێوەبردن",
     "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
@@ -252,6 +253,48 @@
       "title": "هەژمارەکەت وەستێنراوە",
       "description": "پەیوەندیمان پێوە بکە بۆ چارەسەرکردنی ئەمە و گەڕانەوە بۆ کار.",
       "whatsappCta": "لە ڕێگەی واتساپەوە پەیوەندیمان پێوە بکە"
+    }
+  },
+  "analytics": {
+    "title": "شیکاری",
+    "description": "دیمەنێکی خێرا لە چۆنیەتی کارەکەت.",
+    "range": {
+      "7d": "٧ ڕۆژی ڕابردوو",
+      "30d": "٣٠ ڕۆژی ڕابردوو",
+      "90d": "٩٠ ڕۆژی ڕابردوو",
+      "month": "ئەم مانگە"
+    },
+    "kpis": {
+      "newLeads": "ئامانجی نوێ",
+      "revenue": "داهات (گەیشتووە)",
+      "ordersCompleted": "داواکاری تەواوبووە",
+      "appointmentsCompleted": "چاوپێکەوتنی تەواوبووە",
+      "aiRequests": "داواکاری ژیریی دەستکرد",
+      "aiSuccessRate": "ڕێژەی سەرکەوتنی ژیریی دەستکرد"
+    },
+    "healthScore": {
+      "title": "خاڵی تەندروستی کار",
+      "noData": "زانیاری بەس نییە لەم ماوەیەدا بۆ ژماردنی خاڵ.",
+      "levels": {
+        "excellent": "زۆر باش",
+        "good": "باش",
+        "needs_attention": "پێویستی بە سەرنج هەیە",
+        "critical": "مەترسیدار"
+      },
+      "breakdown": {
+        "leadConversion": "گۆڕینی ئامانج",
+        "orderCompletion": "تەواوکردنی داواکاری",
+        "appointmentCompletion": "تەواوکردنی چاوپێکەوتن",
+        "aiSuccess": "سەرکەوتنی ژیریی دەستکرد"
+      }
+    },
+    "charts": {
+      "leadsByDay": "ئامانجی نوێ",
+      "revenueByDay": "داهات",
+      "ordersByStatus": "داواکاری بەپێی دۆخ",
+      "appointmentsByStatus": "چاوپێکەوتن بەپێی دۆخ",
+      "conversationsByChannel": "گفتوگۆ بەپێی کەناڵ",
+      "empty": "هێشتا زانیاری نییە بۆ ئەم ماوەیە."
     }
   },
   "team": {
@@ -456,7 +499,8 @@
         "orders": "داواکارییەکان",
         "appointments": "کاتە دیاریکراوەکان",
         "automations": "خۆکارکردن",
-        "knowledge_base": "بنکەی زانیاری"
+        "knowledge_base": "بنکەی زانیاری",
+        "analytics": "شیکاری"
       }
     },
     "settings": {
