@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { userRepository } from "@/features/auth/repository/user.repository";
+import { platformAdminService } from "@/features/platform-admin/services/platform-admin.service";
 import { workspaceService } from "@/features/workspace/services/workspace.service";
 import type { User, Workspace } from "@/db/schema";
 import { getCurrentSession } from "./session";
@@ -30,4 +31,17 @@ export const requireWorkspaceForUser = cache(async (userId: string): Promise<Wor
   if (!workspace) redirect("/login");
 
   return workspace;
+});
+
+/**
+ * Gates the Super Admin Platform (/admin/*) — completely separate from
+ * workspace membership/roles, which only govern access within a tenant.
+ * See platformAdminService for the two-layer (env var + database) check.
+ */
+export const requirePlatformAdmin = cache(async (): Promise<User> => {
+  const user = await requireUser();
+  const isAdmin = await platformAdminService.isPlatformAdmin(user.email);
+  if (!isAdmin) redirect("/dashboard");
+
+  return user;
 });

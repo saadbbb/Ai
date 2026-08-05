@@ -20,3 +20,5 @@ export * from "./leads";
 export * from "./orders";
 export * from "./appointments";
 export * from "./workflows";
+export * from "./platform-admin";
+export * from "./platform-settings";

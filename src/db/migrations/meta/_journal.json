@@ -57,6 +57,13 @@
       "when": 1785943764036,
       "tag": "0007_lazy_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1785945014163,
+      "tag": "0008_square_mattie_franklin",
+      "breakpoints": true
     }
   ]
 }

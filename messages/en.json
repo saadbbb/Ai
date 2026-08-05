@@ -225,6 +225,7 @@
     "ordersLink": "Orders",
     "appointmentsLink": "Appointments",
     "automationsLink": "Automations",
+    "billingLink": "Billing",
     "testAiLink": "Test your AI employee",
     "settingsLink": "Settings",
     "knowledgeBaseLink": "Knowledge Base",
@@ -335,6 +336,52 @@
       "total": "Total: {total}",
       "submit": "Create order",
       "submitting": "Creating..."
+    }
+  },
+  "billing": {
+    "title": "Billing",
+    "description": "Manage your subscription.",
+    "currentPlan": "Current plan",
+    "freePlanName": "Free",
+    "ctaDescription": "We don't charge cards yet — message us on WhatsApp and we'll set your subscription up personally.",
+    "whatsappCta": "Subscribe via WhatsApp",
+    "fallbackWithEmail": "Subscriptions aren't open yet. Email {email} if you're interested.",
+    "fallbackNoContact": "Subscriptions aren't open yet. Check back soon.",
+    "defaultMessage": "Hi! I'd like to subscribe to the AI Employee Platform for '{{workspaceName}}'."
+  },
+  "platformAdmin": {
+    "badge": "Platform Admin",
+    "backToDashboard": "Back to your dashboard",
+    "settingsLink": "Settings",
+    "adminsLink": "Admins",
+    "settings": {
+      "title": "Platform Settings",
+      "description": "Where the \"Subscribe\" button on customer dashboards points to.",
+      "whatsappNumberLabel": "WhatsApp number",
+      "whatsappNumberPlaceholder": "e.g. +964 750 123 4567",
+      "whatsappNumberHint": "Include the country code. Customers tap a button that opens a chat with this number.",
+      "messageTemplateLabel": "Pre-filled message",
+      "messageTemplatePlaceholder": "Hi! I'd like to subscribe for '{{workspaceName}}'.",
+      "messageTemplateHint": "'{{workspaceName}}' will be replaced with the customer's business name.",
+      "supportEmailLabel": "Support email (optional fallback)",
+      "supportEmailPlaceholder": "support@yourcompany.com",
+      "save": "Save",
+      "saving": "Saving...",
+      "saved": "Saved."
+    },
+    "admins": {
+      "title": "Platform Admins",
+      "description": "Who can access this Super Admin area.",
+      "bootstrapHeading": "Bootstrap admins",
+      "bootstrapDescription": "Set via the PLATFORM_ADMIN_EMAILS environment variable — always have access, even if the list below is empty. Change this by redeploying with a different value.",
+      "bootstrapBadge": "Environment variable",
+      "managedHeading": "Managed admins",
+      "noManagedAdmins": "No admins added here yet.",
+      "remove": "Remove",
+      "confirmRemove": "Remove this admin's access?",
+      "emailPlaceholder": "email@example.com",
+      "add": "Add",
+      "adding": "Adding..."
     }
   },
   "automations": {

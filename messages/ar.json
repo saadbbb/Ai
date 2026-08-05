@@ -225,6 +225,7 @@
     "ordersLink": "الطلبات",
     "appointmentsLink": "المواعيد",
     "automationsLink": "الأتمتة",
+    "billingLink": "الفوترة",
     "testAiLink": "جرّب موظفك الذكي",
     "settingsLink": "الإعدادات",
     "knowledgeBaseLink": "قاعدة المعرفة",
@@ -335,6 +336,52 @@
       "total": "الإجمالي: {total}",
       "submit": "إنشاء الطلب",
       "submitting": "جارٍ الإنشاء..."
+    }
+  },
+  "billing": {
+    "title": "الفوترة",
+    "description": "أدر اشتراكك.",
+    "currentPlan": "الخطة الحالية",
+    "freePlanName": "مجانية",
+    "ctaDescription": "لسا ما نستقبل دفع بالبطاقات — راسلنا على واتساب وراح نفعّل اشتراكك بأنفسنا.",
+    "whatsappCta": "اشترك عبر واتساب",
+    "fallbackWithEmail": "الاشتراكات لسا ما فُتحت. راسلنا على {email} إذا مهتم.",
+    "fallbackNoContact": "الاشتراكات لسا ما فُتحت. تابعنا قريباً.",
+    "defaultMessage": "مرحباً! أريد الاشتراك بمنصة الموظف الذكي لـ'{{workspaceName}}'."
+  },
+  "platformAdmin": {
+    "badge": "إدارة المنصة",
+    "backToDashboard": "الرجوع للوحة تحكمك",
+    "settingsLink": "الإعدادات",
+    "adminsLink": "المسؤولون",
+    "settings": {
+      "title": "إعدادات المنصة",
+      "description": "الوجهة اللي يودّي إليها زر \"اشتراك\" بلوحات تحكم العملاء.",
+      "whatsappNumberLabel": "رقم واتساب",
+      "whatsappNumberPlaceholder": "مثال: +964 750 123 4567",
+      "whatsappNumberHint": "أدرج رمز الدولة. العملاء يضغطون زر يفتح محادثة مع هذا الرقم.",
+      "messageTemplateLabel": "الرسالة الجاهزة مسبقاً",
+      "messageTemplatePlaceholder": "مرحباً! أريد الاشتراك لـ'{{workspaceName}}'.",
+      "messageTemplateHint": "'{{workspaceName}}' سيُستبدَل باسم نشاط العميل التجاري.",
+      "supportEmailLabel": "بريد الدعم (احتياطي اختياري)",
+      "supportEmailPlaceholder": "support@yourcompany.com",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ...",
+      "saved": "تم الحفظ."
+    },
+    "admins": {
+      "title": "مسؤولو المنصة",
+      "description": "من يقدر يدخل لمنطقة إدارة المنصة.",
+      "bootstrapHeading": "المسؤولون الأساسيون",
+      "bootstrapDescription": "مضبوطون عبر متغيّر البيئة PLATFORM_ADMIN_EMAILS — يملكون الوصول دائماً حتى لو كانت القائمة أدناه فارغة. لتغييرهم يلزم إعادة النشر بقيمة مختلفة.",
+      "bootstrapBadge": "متغيّر بيئة",
+      "managedHeading": "المسؤولون المُدارون",
+      "noManagedAdmins": "لم يُضف أي مسؤول من هنا بعد.",
+      "remove": "إزالة",
+      "confirmRemove": "إزالة صلاحية هذا المسؤول؟",
+      "emailPlaceholder": "email@example.com",
+      "add": "إضافة",
+      "adding": "جارٍ الإضافة..."
     }
   },
   "automations": {

@@ -225,6 +225,7 @@
     "ordersLink": "داواکارییەکان",
     "appointmentsLink": "کاتە دیاریکراوەکان",
     "automationsLink": "خۆکارکردن",
+    "billingLink": "پارەدان",
     "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
     "settingsLink": "ڕێکخستنەکان",
     "knowledgeBaseLink": "بنکەی زانیاری",
@@ -335,6 +336,52 @@
       "total": "کۆی گشتی: {total}",
       "submit": "دروستکردنی داواکاری",
       "submitting": "دروست دەکرێت..."
+    }
+  },
+  "billing": {
+    "title": "پارەدان",
+    "description": "بەشداریکردنەکەت بەڕێوە ببە.",
+    "currentPlan": "پلانی ئێستا",
+    "freePlanName": "بەخۆڕایی",
+    "ctaDescription": "هێشتا پارە لە کارتەکان وەرناگرین — لە واتساپەوە پەیامان بۆ بنێرە و بەشداریکردنەکەت بە دەستی ئامادە دەکەین.",
+    "whatsappCta": "بەشداری بکە لە ڕێگەی واتساپ",
+    "fallbackWithEmail": "بەشداریکردن هێشتا ناکرێت. ئەگەر ئارەزوومەندیت ئیمەیل بنێرە بۆ {email}.",
+    "fallbackNoContact": "بەشداریکردن هێشتا ناکرێت. دواتر سەردان بکەرەوە.",
+    "defaultMessage": "سڵاو! دەمەوێت بەشداری پلاتفۆرمی کارمەندی زیرەک بکەم بۆ '{{workspaceName}}'."
+  },
+  "platformAdmin": {
+    "badge": "بەڕێوەبردنی پلاتفۆرم",
+    "backToDashboard": "گەڕانەوە بۆ داشبۆردەکەت",
+    "settingsLink": "ڕێکخستنەکان",
+    "adminsLink": "بەڕێوەبەران",
+    "settings": {
+      "title": "ڕێکخستنەکانی پلاتفۆرم",
+      "description": "ئەو شوێنەی دوگمەی \"بەشداریکردن\" لە داشبۆردی کڕیاران دەیبات بۆی.",
+      "whatsappNumberLabel": "ژمارەی واتساپ",
+      "whatsappNumberPlaceholder": "بۆ نموونە: +964 750 123 4567",
+      "whatsappNumberHint": "کۆدی وڵات زیاد بکە. کڕیاران دوگمەیەک دەکەنە کە گفتوگۆیەک لەگەڵ ئەم ژمارەیە دەکاتەوە.",
+      "messageTemplateLabel": "پەیامی پێشوەخت ئامادەکراو",
+      "messageTemplatePlaceholder": "سڵاو! دەمەوێت بەشداری بکەم بۆ '{{workspaceName}}'.",
+      "messageTemplateHint": "'{{workspaceName}}' دەگۆڕدرێت بە ناوی بزنسی کڕیار.",
+      "supportEmailLabel": "ئیمەیلی پشتگیری (هەڵبژاردەی یەدەگ)",
+      "supportEmailPlaceholder": "support@yourcompany.com",
+      "save": "پاشەکەوتکردن",
+      "saving": "پاشەکەوت دەکرێت...",
+      "saved": "پاشەکەوت کرا."
+    },
+    "admins": {
+      "title": "بەڕێوەبەرانی پلاتفۆرم",
+      "description": "کێ دەتوانێت بچێتە ناو ئەم بەشەی بەڕێوەبردنی سەرەکی.",
+      "bootstrapHeading": "بەڕێوەبەرانی سەرەتایی",
+      "bootstrapDescription": "لە ڕێگەی گۆڕاوی ژینگەی PLATFORM_ADMIN_EMAILS دانراون — هەمیشە دەستیان دەگاتێ تەنانەت ئەگەر لیستی خوارەوە بەتاڵ بێت. بۆ گۆڕینیان پێویستە دووبارە بڵاوکردنەوە بکرێت بە بەهایەکی جیاواز.",
+      "bootstrapBadge": "گۆڕاوی ژینگە",
+      "managedHeading": "بەڕێوەبەرە بەڕێوەبراوەکان",
+      "noManagedAdmins": "هێشتا هیچ بەڕێوەبەرێک لێرەوە زیاد نەکراوە.",
+      "remove": "لابردن",
+      "confirmRemove": "دەستگەیشتنی ئەم بەڕێوەبەرە لابردرێت؟",
+      "emailPlaceholder": "email@example.com",
+      "add": "زیادکردن",
+      "adding": "زیاد دەکرێت..."
     }
   },
   "automations": {
