@@ -11,9 +11,10 @@ export async function saveResponseLanguageAction(input: unknown): Promise<Action
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
 
+  const user = await requireUser();
+  const workspace = await requireWorkspaceForUser(user.id);
+
   try {
-    const user = await requireUser();
-    const workspace = await requireWorkspaceForUser(user.id);
     await onboardingService.saveResponseLanguage(workspace.id, workspace, parsed.data.language);
     return actionOk(undefined);
   } catch (error) {

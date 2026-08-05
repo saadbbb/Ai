@@ -11,9 +11,10 @@ export async function saveBusinessDescriptionAction(input: unknown): Promise<Act
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
 
+  const user = await requireUser();
+  const workspace = await requireWorkspaceForUser(user.id);
+
   try {
-    const user = await requireUser();
-    const workspace = await requireWorkspaceForUser(user.id);
     await onboardingService.saveBusinessDescription(workspace.id, workspace, parsed.data.businessDescription);
     return actionOk(undefined);
   } catch (error) {
