@@ -230,6 +230,7 @@
     "testAiLink": "جرّب موظفك الذكي",
     "settingsLink": "الإعدادات",
     "knowledgeBaseLink": "قاعدة المعرفة",
+    "teamLink": "الفريق",
     "stats": {
       "conversationsToday": "محادثات اليوم",
       "newLeadsToday": "عملاء محتملون جدد اليوم",
@@ -251,6 +252,33 @@
       "title": "حسابك موقوف",
       "description": "تواصل معنا لحل الموضوع والرجوع للعمل.",
       "whatsappCta": "تواصل معنا عبر واتساب"
+    }
+  },
+  "team": {
+    "title": "الفريق",
+    "description": "من لديه صلاحية الوصول لهذه المساحة، وماذا يقدر يسوّي.",
+    "membersHeading": "الأعضاء",
+    "you": "أنت",
+    "pendingHeading": "دعوات معلّقة",
+    "revoke": "إلغاء",
+    "inviteHeading": "دعوة شخص",
+    "emailPlaceholder": "email@example.com",
+    "rolePlaceholder": "الدور",
+    "invite": "إرسال الدعوة",
+    "inviting": "جارٍ الإرسال...",
+    "linkHint": "رابط الدعوة (يُرسل بالبريد أيضاً إذا كان التوصيل مفعّلاً):",
+    "accept": {
+      "title": "الانضمام إلى {workspace}",
+      "description": "تمت دعوتك كـ{role}.",
+      "acceptButton": "قبول الدعوة",
+      "accepting": "جارٍ الانضمام...",
+      "accepted": "انضممت بنجاح!",
+      "invalidTitle": "هذه الدعوة غير متاحة",
+      "invalid": {
+        "not_found": "رابط الدعوة هذا غير موجود.",
+        "expired": "انتهت صلاحية هذه الدعوة. اطلب واحدة جديدة.",
+        "already_used": "تم استخدام هذه الدعوة أو إلغاؤها مسبقاً."
+      }
     }
   },
   "notifications": {

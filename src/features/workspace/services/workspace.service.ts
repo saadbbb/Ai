@@ -68,11 +68,18 @@ async function createWorkspaceForNewUser(userId: string, email: string): Promise
 }
 
 /**
- * MVP: a user belongs to exactly one workspace (the one created at registration),
- * so "primary" just means "first joined". Revisit once workspace switching exists.
+ * Every user gets a workspace automatically at registration, so accepting a
+ * team invitation always adds a *second* membership — "primary" defaults to
+ * the first-joined workspace, but the "current workspace" cookie (see
+ * switchWorkspaceAction) lets a multi-workspace user pick which one they're
+ * actually looking at.
  */
-async function getPrimaryWorkspaceForUser(userId: string): Promise<Workspace | null> {
+async function getPrimaryWorkspaceForUser(userId: string, preferredWorkspaceId?: string): Promise<Workspace | null> {
   const memberships = await membershipRepository.findWorkspacesForUser(userId);
+  if (preferredWorkspaceId) {
+    const preferred = memberships.find((membership) => membership.workspace.id === preferredWorkspaceId);
+    if (preferred) return preferred.workspace;
+  }
   return memberships[0]?.workspace ?? null;
 }
 

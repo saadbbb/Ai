@@ -7,4 +7,13 @@ export const roleRepository = {
     const [role] = await db.select().from(roles).where(eq(roles.key, key)).limit(1);
     return role ?? null;
   },
+
+  async findById(id: string): Promise<Role | null> {
+    const [role] = await db.select().from(roles).where(eq(roles.id, id)).limit(1);
+    return role ?? null;
+  },
+
+  async findAll(): Promise<Role[]> {
+    return db.select().from(roles);
+  },
 };

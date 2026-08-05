@@ -230,6 +230,7 @@
     "testAiLink": "Test your AI employee",
     "settingsLink": "Settings",
     "knowledgeBaseLink": "Knowledge Base",
+    "teamLink": "Team",
     "stats": {
       "conversationsToday": "Conversations today",
       "newLeadsToday": "New leads today",
@@ -251,6 +252,33 @@
       "title": "Your account is suspended",
       "description": "Get in touch with us to sort this out and get back to work.",
       "whatsappCta": "Contact us on WhatsApp"
+    }
+  },
+  "team": {
+    "title": "Team",
+    "description": "Who has access to this workspace, and what they can do.",
+    "membersHeading": "Members",
+    "you": "you",
+    "pendingHeading": "Pending invitations",
+    "revoke": "Revoke",
+    "inviteHeading": "Invite someone",
+    "emailPlaceholder": "email@example.com",
+    "rolePlaceholder": "Role",
+    "invite": "Send invite",
+    "inviting": "Sending...",
+    "linkHint": "Invite link (also emailed, if delivery is configured):",
+    "accept": {
+      "title": "Join {workspace}",
+      "description": "You've been invited as {role}.",
+      "acceptButton": "Accept invitation",
+      "accepting": "Joining...",
+      "accepted": "You're in!",
+      "invalidTitle": "This invitation isn't available",
+      "invalid": {
+        "not_found": "This invitation link doesn't exist.",
+        "expired": "This invitation has expired. Ask for a new one.",
+        "already_used": "This invitation was already used or revoked."
+      }
     }
   },
   "notifications": {
