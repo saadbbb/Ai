@@ -45,3 +45,20 @@ export function describeDelay(workflow: Workflow, t: Pick<DescribeWorkflowTransl
   if (!workflow.delayDays || workflow.delayDays <= 0) return null;
   return t.automations("delaySummary", { days: workflow.delayDays });
 }
+
+/** Null when the workflow has no conditions (runs on every matching trigger). */
+export function describeConditions(
+  workflow: Workflow,
+  t: Pick<DescribeWorkflowTranslators, "automations">,
+): string | null {
+  const conditions = workflow.conditions;
+  if (!conditions || conditions.rules.length === 0) return null;
+
+  const joiner = conditions.matchType === "any" ? t.automations("conditionOr") : t.automations("conditionAnd");
+  const parts = conditions.rules.map((rule) =>
+    rule.field === "tag"
+      ? t.automations("conditionTag", { value: rule.value })
+      : t.automations("conditionLanguage", { value: rule.value }),
+  );
+  return `${t.automations("conditionsPrefix")} ${parts.join(` ${joiner} `)}`;
+}

@@ -36,6 +36,25 @@ export interface WorkflowActionConfig {
   message?: string;
 }
 
+/**
+ * Evaluated against the event's contact before the action runs. Kept to a flat
+ * rule list with one top-level AND/OR (`matchType`) rather than nested groups —
+ * covers every example in the spec ("Tag contains VIP", "Language = Arabic")
+ * without a boolean-tree UI. null/no rules = unconditional (original behavior).
+ */
+export type WorkflowConditionField = "tag" | "language";
+export type WorkflowConditionMatchType = "all" | "any";
+
+export interface WorkflowConditionRule {
+  field: WorkflowConditionField;
+  value: string;
+}
+
+export interface WorkflowConditions {
+  matchType: WorkflowConditionMatchType;
+  rules: WorkflowConditionRule[];
+}
+
 export const workflows = pgTable(
   "workflows",
   {
@@ -48,6 +67,7 @@ export const workflows = pgTable(
     triggerConfig: jsonb("trigger_config").$type<WorkflowTriggerConfig>().notNull().default({}),
     actionType: workflowActionEnum("action_type").notNull(),
     actionConfig: jsonb("action_config").$type<WorkflowActionConfig>().notNull().default({}),
+    conditions: jsonb("conditions").$type<WorkflowConditions | null>(),
     status: workflowStatusEnum("status").notNull().default("active"),
     /** Null/0 = run the action immediately when the trigger fires (original behavior). */
     delayDays: integer("delay_days"),

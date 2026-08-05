@@ -608,8 +608,25 @@
       "delayLabel": "چاوەڕوانبوون پێش جێبەجێکردن (ئارەزوومەندانە)",
       "delayPlaceholder": "ژمارەی ڕۆژ، بۆ نموونە: 3 — بەتاڵی بهێڵەرەوە بۆ جێبەجێکردنی خێرا",
       "submit": "دروستکردنی خۆکارکردن",
-      "submitting": "دروست دەکرێت..."
-    }
+      "submitting": "دروست دەکرێت...",
+      "conditionsLabel": "تەنها کاتێک کار بکات ئەگەر (ئارەزوومەندانە)",
+      "conditionsHint": "بەتاڵی جێبهێڵە بۆ ئەوەی هەمیشە کار بکات کاتێک هۆکارەکە ڕوودەدات.",
+      "addCondition": "زیادکردنی مەرج",
+      "removeCondition": "سڕینەوە",
+      "matchAll": "پێویستە هەموو مەرجەکان ڕاست بن",
+      "matchAny": "یەک مەرج ڕاست بێت بەسە",
+      "conditionFields": {
+        "tag": "تاگ",
+        "language": "زمان"
+      },
+      "conditionTagPlaceholder": "تاگ، بۆ نموونە VIP",
+      "conditionLanguagePlaceholder": "بۆ نموونە ar، en، ku"
+    },
+    "conditionsPrefix": "تەنها ئەگەر",
+    "conditionAnd": "و",
+    "conditionOr": "یان",
+    "conditionTag": "تاگی \"{value}\"ی هەبێت",
+    "conditionLanguage": "زمان {value} بێت"
   },
   "appointments": {
     "title": "کاتە دیاریکراوەکان",

@@ -6,6 +6,11 @@ const triggerStatusValues = [...new Set([...orderStatusEnum.enumValues, ...appoi
   ...string[],
 ];
 
+const conditionRuleSchema = z.object({
+  field: z.enum(["tag", "language"]),
+  value: z.string().trim().min(1).max(100),
+});
+
 export const createWorkflowSchema = z
   .object({
     name: z.string().trim().min(1).max(200),
@@ -16,6 +21,8 @@ export const createWorkflowSchema = z
     actionTag: z.string().trim().max(60).optional(),
     actionSubject: z.string().trim().max(200).optional(),
     actionMessage: z.string().trim().max(2000).optional(),
+    conditions: z.array(conditionRuleSchema).max(5).optional(),
+    conditionsMatchType: z.enum(["all", "any"]).optional(),
     delayDays: z.coerce.number().int().min(0).max(365).optional(),
   })
   .superRefine((data, ctx) => {

@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { describeAction, describeDelay, describeTrigger } from "@/features/automation/lib/describe-workflow";
+import { describeAction, describeConditions, describeDelay, describeTrigger } from "@/features/automation/lib/describe-workflow";
 import { automationService } from "@/features/automation/services/automation.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 import { AppError } from "@/lib/errors/app-error";
@@ -37,6 +37,7 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
     timeStyle: "short",
   });
   const delay = describeDelay(workflow, translators);
+  const conditions = describeConditions(workflow, translators);
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -50,6 +51,7 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
           {describeTrigger(workflow, translators)} → {delay ? `${delay} ` : ""}
           {describeAction(workflow, translators)}
         </p>
+        {conditions && <p className="text-sm text-muted-foreground">{conditions}</p>}
       </div>
 
       <div className="space-y-3">

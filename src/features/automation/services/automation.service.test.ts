@@ -25,6 +25,12 @@ vi.mock("@/features/inbox/repository/contact.repository", () => ({
   },
 }));
 
+vi.mock("@/features/crm/repository/activity.repository", () => ({
+  activityRepository: {
+    log: vi.fn(),
+  },
+}));
+
 vi.mock("@/features/notifications/repository/notification.repository", () => ({
   notificationRepository: {
     create: vi.fn(),
@@ -51,6 +57,7 @@ vi.mock("@/lib/email", () => ({
 
 const { workflowRepository } = await import("../repository/workflow.repository");
 const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
+const { activityRepository } = await import("@/features/crm/repository/activity.repository");
 const { notificationRepository } = await import("@/features/notifications/repository/notification.repository");
 const { membershipRepository } = await import("@/features/workspace/repository/membership.repository");
 const { userRepository } = await import("@/features/auth/repository/user.repository");
@@ -69,6 +76,7 @@ function makeWorkflow(overrides: Partial<Workflow> = {}): Workflow {
     triggerConfig: {},
     actionType: "add_contact_tag",
     actionConfig: {},
+    conditions: null,
     status: "active",
     delayDays: null,
     createdAt: new Date(),
@@ -208,6 +216,9 @@ describe("automationService.dispatch — tag actions", () => {
 
     expect(contactRepository.addTag).toHaveBeenCalledWith(CONTACT_ID, WORKSPACE_ID, "VIP");
     expect(contactRepository.removeTag).not.toHaveBeenCalled();
+    expect(activityRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ contactId: CONTACT_ID, type: "contact_tagged", actor: { type: "automation" } }),
+    );
   });
 
   it("calls contactRepository.removeTag for remove_contact_tag", async () => {
@@ -330,5 +341,88 @@ describe("automationService.processDueRuns", () => {
     await automationService.processDueRuns();
 
     expect(workflowRepository.deletePendingRun).toHaveBeenCalledWith("pending-3");
+  });
+});
+
+describe("automationService.dispatch — conditions", () => {
+  it("does not run when a required tag is missing (matchType 'all', contact has no tags)", async () => {
+    const workflow = makeWorkflow({ conditions: { matchType: "all", rules: [{ field: "tag", value: "VIP" }] } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).not.toHaveBeenCalled();
+  });
+
+  it("runs once the contact actually has the required tag", async () => {
+    const workflow = makeWorkflow({
+      actionConfig: { tag: "Followed up" },
+      conditions: { matchType: "all", rules: [{ field: "tag", value: "VIP" }] },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(contactRepository.findById).mockResolvedValue({ ...CONTACT, tags: ["VIP"] });
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("matchType 'all' requires every rule — one mismatch blocks the run", async () => {
+    const workflow = makeWorkflow({
+      conditions: {
+        matchType: "all",
+        rules: [
+          { field: "tag", value: "VIP" },
+          { field: "language", value: "ar" },
+        ],
+      },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(contactRepository.findById).mockResolvedValue({ ...CONTACT, tags: ["VIP"], language: "en" });
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).not.toHaveBeenCalled();
+  });
+
+  it("matchType 'any' runs when at least one rule matches", async () => {
+    const workflow = makeWorkflow({
+      actionConfig: { tag: "Followed up" },
+      conditions: {
+        matchType: "any",
+        rules: [
+          { field: "tag", value: "VIP" },
+          { field: "language", value: "ar" },
+        ],
+      },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(contactRepository.findById).mockResolvedValue({ ...CONTACT, tags: [], language: "ar" });
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("fails closed when conditions are set but the contact can't be found", async () => {
+    const workflow = makeWorkflow({ conditions: { matchType: "all", rules: [{ field: "tag", value: "VIP" }] } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(contactRepository.findById).mockResolvedValue(null);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).not.toHaveBeenCalled();
+  });
+
+  it("a delayed workflow that fails its conditions at trigger time is never queued", async () => {
+    const workflow = makeWorkflow({
+      delayDays: 3,
+      conditions: { matchType: "all", rules: [{ field: "tag", value: "VIP" }] },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.createPendingRun).not.toHaveBeenCalled();
   });
 });

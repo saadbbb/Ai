@@ -1,9 +1,11 @@
 import "server-only";
 import type {
   AppointmentStatus,
+  Contact,
   LeadStage,
   OrderStatus,
   Workflow,
+  WorkflowConditions,
   WorkflowExecution,
   WorkflowStatus,
   WorkflowTriggerConfig,
@@ -57,9 +59,30 @@ function eventToPayload(event: AutomationEvent): WorkflowTriggerConfig {
   return {};
 }
 
-async function runAction(workspaceId: string, workflow: Workflow, event: AutomationEvent): Promise<string | null> {
-  const contact = await contactRepository.findById(event.contactId, workspaceId);
+/**
+ * No rules = unconditional (every workflow before conditions existed keeps
+ * working unchanged). A missing contact fails closed rather than matching
+ * everything — a workflow with conditions set should never fire blind.
+ */
+function evaluateConditions(conditions: WorkflowConditions | null, contact: Contact | null): boolean {
+  if (!conditions || conditions.rules.length === 0) return true;
+  if (!contact) return false;
 
+  const results = conditions.rules.map((rule) => {
+    if (rule.field === "tag") return contact.tags.includes(rule.value);
+    if (rule.field === "language") return contact.language === rule.value;
+    return false;
+  });
+
+  return conditions.matchType === "any" ? results.some(Boolean) : results.every(Boolean);
+}
+
+async function runAction(
+  workspaceId: string,
+  workflow: Workflow,
+  event: AutomationEvent,
+  contact: Contact | null,
+): Promise<string | null> {
   if (workflow.actionType === "add_contact_tag") {
     const tag = workflow.actionConfig.tag;
     if (!tag) throw new AppError("VALIDATION_ERROR", "Workflow is missing a tag to add.");
@@ -122,9 +145,14 @@ async function runAction(workspaceId: string, workflow: Workflow, event: Automat
   return null;
 }
 
-async function runAndLog(workspaceId: string, workflow: Workflow, event: AutomationEvent): Promise<void> {
+async function runAndLog(
+  workspaceId: string,
+  workflow: Workflow,
+  event: AutomationEvent,
+  contact: Contact | null,
+): Promise<void> {
   try {
-    const summary = await runAction(workspaceId, workflow, event);
+    const summary = await runAction(workspaceId, workflow, event, contact);
     await workflowRepository.logExecution({ workspaceId, workflowId: workflow.id, success: true, summary });
   } catch (error) {
     console.error(`[automation] workflow "${workflow.name}" (${workflow.id}) failed:`, error);
@@ -141,15 +169,23 @@ async function runAndLog(workspaceId: string, workflow: Workflow, event: Automat
  * Fires whenever something automation-relevant happens elsewhere in the app
  * (a lead's stage changes, an order's status changes, the AI hands a
  * conversation to a human). Never throws back to the caller — a broken
- * automation must never break the CRM action that triggered it. A workflow
- * with delayDays set doesn't run yet — it's queued in workflow_pending_runs
- * for processDueRuns() to pick up once due. Every immediate attempt (success
- * or failure) is logged to workflow_executions right away.
+ * automation must never break the CRM action that triggered it. Conditions
+ * (see evaluateConditions) are checked once, here, at trigger time — a
+ * delayed workflow that didn't match the conditions when the event happened
+ * is never queued, regardless of what the contact looks like later. A
+ * workflow with delayDays set doesn't run yet — it's queued in
+ * workflow_pending_runs for processDueRuns() to pick up once due. Every
+ * immediate attempt (success or failure) is logged to workflow_executions
+ * right away.
  */
 async function dispatch(workspaceId: string, event: AutomationEvent): Promise<void> {
   try {
     const workflows = await workflowRepository.findActiveByTrigger(workspaceId, event.type);
-    const matching = workflows.filter((workflow) => matchesTrigger(workflow, event));
+    const triggerMatches = workflows.filter((workflow) => matchesTrigger(workflow, event));
+    if (triggerMatches.length === 0) return;
+
+    const contact = await contactRepository.findById(event.contactId, workspaceId);
+    const matching = triggerMatches.filter((workflow) => evaluateConditions(workflow.conditions, contact));
 
     for (const workflow of matching) {
       if (workflow.delayDays && workflow.delayDays > 0) {
@@ -166,7 +202,7 @@ async function dispatch(workspaceId: string, event: AutomationEvent): Promise<vo
         continue;
       }
 
-      await runAndLog(workspaceId, workflow, event);
+      await runAndLog(workspaceId, workflow, event, contact);
     }
   } catch (error) {
     console.error("[automation] dispatch failed:", error);
@@ -193,7 +229,8 @@ async function processDueRuns(): Promise<void> {
           contactId: pendingRun.contactId,
           ...pendingRun.eventPayload,
         } as AutomationEvent;
-        await runAndLog(pendingRun.workspaceId, workflow, event);
+        const contact = await contactRepository.findById(pendingRun.contactId, pendingRun.workspaceId);
+        await runAndLog(pendingRun.workspaceId, workflow, event, contact);
       }
     } catch (error) {
       console.error(`[automation] pending run ${pendingRun.id} failed:`, error);
@@ -227,6 +264,10 @@ async function createWorkflow(workspaceId: string, input: z.infer<typeof createW
     triggerConfig: { stage: input.triggerStage, status: input.triggerStatus },
     actionType: input.actionType,
     actionConfig: { tag: input.actionTag, subject: input.actionSubject, message: input.actionMessage },
+    conditions:
+      input.conditions && input.conditions.length > 0
+        ? { matchType: input.conditionsMatchType ?? "all", rules: input.conditions }
+        : null,
     delayDays: input.delayDays || null,
   });
 }

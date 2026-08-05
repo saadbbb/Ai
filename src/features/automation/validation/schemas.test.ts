@@ -101,4 +101,46 @@ describe("createWorkflowSchema", () => {
     const result = createWorkflowSchema.safeParse({ ...BASE, triggerType: "lead_created" });
     expect(result.success).toBe(true);
   });
+
+  it("accepts conditions with a valid field and matchType", () => {
+    const result = createWorkflowSchema.safeParse({
+      ...BASE,
+      triggerType: "lead_created",
+      conditions: [{ field: "tag", value: "VIP" }],
+      conditionsMatchType: "any",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a condition with an unknown field", () => {
+    const result = createWorkflowSchema.safeParse({
+      ...BASE,
+      triggerType: "lead_created",
+      conditions: [{ field: "lead_score", value: "80" }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a condition with an empty value", () => {
+    const result = createWorkflowSchema.safeParse({
+      ...BASE,
+      triggerType: "lead_created",
+      conditions: [{ field: "tag", value: "" }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects more than 5 conditions", () => {
+    const result = createWorkflowSchema.safeParse({
+      ...BASE,
+      triggerType: "lead_created",
+      conditions: Array.from({ length: 6 }, (_, i) => ({ field: "tag" as const, value: `tag-${i}` })),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("allows conditions to be omitted entirely (unconditional workflow)", () => {
+    const result = createWorkflowSchema.safeParse({ ...BASE, triggerType: "lead_created" });
+    expect(result.success).toBe(true);
+  });
 });

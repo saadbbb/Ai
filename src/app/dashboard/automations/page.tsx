@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DeleteWorkflowButton } from "@/features/automation/components/delete-workflow-button";
 import { WorkflowStatusToggle } from "@/features/automation/components/workflow-status-toggle";
-import { describeAction, describeDelay, describeTrigger } from "@/features/automation/lib/describe-workflow";
+import { describeAction, describeConditions, describeDelay, describeTrigger } from "@/features/automation/lib/describe-workflow";
 import { automationService } from "@/features/automation/services/automation.service";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
@@ -41,6 +41,7 @@ export default async function AutomationsPage() {
         <div className="divide-y rounded-lg border">
           {workflows.map((workflow) => {
             const delay = describeDelay(workflow, translators);
+            const conditions = describeConditions(workflow, translators);
             return (
               <div key={workflow.id} className="flex items-center justify-between gap-4 p-4">
                 <Link href={`/dashboard/automations/${workflow.id}`} className="min-w-0 flex-1">
@@ -49,6 +50,7 @@ export default async function AutomationsPage() {
                     {describeTrigger(workflow, translators)} → {delay ? `${delay} ` : ""}
                     {describeAction(workflow, translators)}
                   </p>
+                  {conditions && <p className="truncate text-xs text-muted-foreground">{conditions}</p>}
                 </Link>
                 <div className="flex shrink-0 items-center gap-2">
                   <WorkflowStatusToggle workflowId={workflow.id} initialStatus={workflow.status} />

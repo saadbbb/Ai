@@ -15,6 +15,8 @@ import {
   orderStatusEnum,
   workflowActionEnum,
   type WorkflowAction,
+  type WorkflowConditionField,
+  type WorkflowConditionMatchType,
   workflowTriggerEnum,
   type WorkflowTrigger,
 } from "@/db/schema";
@@ -22,6 +24,13 @@ import { createWorkflowAction } from "../actions/create-workflow.action";
 
 const STATUS_TRIGGERS = new Set<WorkflowTrigger>(["order_status_changed", "appointment_status_changed"]);
 const TAG_ACTIONS = new Set<WorkflowAction>(["add_contact_tag", "remove_contact_tag"]);
+const CONDITION_FIELDS: WorkflowConditionField[] = ["tag", "language"];
+const MAX_CONDITIONS = 5;
+
+interface ConditionRow {
+  field: WorkflowConditionField;
+  value: string;
+}
 
 interface WorkflowTemplate {
   key: "tagNewLeads" | "notifyNewOrders" | "notifyHandover" | "tagCompletedAppointments";
@@ -59,6 +68,8 @@ export function NewWorkflowForm() {
   const [actionSubject, setActionSubject] = useState("");
   const [actionMessage, setActionMessage] = useState("");
   const [delayDays, setDelayDays] = useState("");
+  const [conditions, setConditions] = useState<ConditionRow[]>([]);
+  const [conditionsMatchType, setConditionsMatchType] = useState<WorkflowConditionMatchType>("all");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function applyTemplate(template: WorkflowTemplate) {
@@ -71,9 +82,26 @@ export function NewWorkflowForm() {
     setActionSubject("");
     setActionMessage("");
     setDelayDays("");
+    setConditions([]);
+    setConditionsMatchType("all");
+  }
+
+  function addConditionRow() {
+    if (conditions.length >= MAX_CONDITIONS) return;
+    setConditions((current) => [...current, { field: "tag", value: "" }]);
+  }
+
+  function updateConditionRow(index: number, patch: Partial<ConditionRow>) {
+    setConditions((current) => current.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  }
+
+  function removeConditionRow(index: number) {
+    setConditions((current) => current.filter((_, i) => i !== index));
   }
 
   async function handleSubmit() {
+    const filledConditions = conditions.filter((row) => row.value.trim().length > 0);
+
     setIsSubmitting(true);
     const result = await createWorkflowAction({
       name,
@@ -84,6 +112,8 @@ export function NewWorkflowForm() {
       actionTag: TAG_ACTIONS.has(actionType) ? actionTag || undefined : undefined,
       actionSubject: actionType === "notify_owner_email" ? actionSubject || undefined : undefined,
       actionMessage: actionType === "notify_owner_email" ? actionMessage || undefined : undefined,
+      conditions: filledConditions.length > 0 ? filledConditions : undefined,
+      conditionsMatchType: filledConditions.length > 1 ? conditionsMatchType : undefined,
       delayDays: delayDays || undefined,
     });
     setIsSubmitting(false);
@@ -174,6 +204,66 @@ export function NewWorkflowForm() {
               </SelectContent>
             </Select>
           )}
+        </div>
+
+        <div className="space-y-2 rounded-lg border border-dashed border-input p-3">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium">{t("conditionsLabel")}</label>
+            {conditions.length < MAX_CONDITIONS && (
+              <Button type="button" variant="outline" size="sm" onClick={addConditionRow}>
+                {t("addCondition")}
+              </Button>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">{t("conditionsHint")}</p>
+
+          {conditions.length > 1 && (
+            <Select
+              value={conditionsMatchType}
+              onValueChange={(value) => setConditionsMatchType(value as WorkflowConditionMatchType)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("matchAll")}</SelectItem>
+                <SelectItem value="any">{t("matchAny")}</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+
+          {conditions.map((row, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Select
+                value={row.field}
+                onValueChange={(value) => updateConditionRow(index, { field: value as WorkflowConditionField })}
+              >
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CONDITION_FIELDS.map((field) => (
+                    <SelectItem key={field} value={field}>
+                      {t(`conditionFields.${field}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                value={row.value}
+                onChange={(event) => updateConditionRow(index, { value: event.target.value })}
+                placeholder={row.field === "tag" ? t("conditionTagPlaceholder") : t("conditionLanguagePlaceholder")}
+                className="flex-1"
+              />
+              <button
+                type="button"
+                onClick={() => removeConditionRow(index)}
+                className="shrink-0 text-xs text-muted-foreground hover:text-destructive"
+              >
+                {t("removeCondition")}
+              </button>
+            </div>
+          ))}
         </div>
 
         <div className="space-y-2">

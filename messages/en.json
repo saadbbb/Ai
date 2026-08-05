@@ -608,8 +608,25 @@
       "delayLabel": "Wait before running (optional)",
       "delayPlaceholder": "Days, e.g. 3 — leave empty to run immediately",
       "submit": "Create automation",
-      "submitting": "Creating..."
-    }
+      "submitting": "Creating...",
+      "conditionsLabel": "Only run if (optional)",
+      "conditionsHint": "Leave empty to always run when the trigger fires.",
+      "addCondition": "Add condition",
+      "removeCondition": "Remove",
+      "matchAll": "All conditions must match",
+      "matchAny": "Any condition matches",
+      "conditionFields": {
+        "tag": "Tag",
+        "language": "Language"
+      },
+      "conditionTagPlaceholder": "Tag, e.g. VIP",
+      "conditionLanguagePlaceholder": "e.g. ar, en, ku"
+    },
+    "conditionsPrefix": "Only if",
+    "conditionAnd": "and",
+    "conditionOr": "or",
+    "conditionTag": "tagged \"{value}\"",
+    "conditionLanguage": "language is {value}"
   },
   "appointments": {
     "title": "Appointments",

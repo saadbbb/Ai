@@ -608,8 +608,25 @@
       "delayLabel": "الانتظار قبل التنفيذ (اختياري)",
       "delayPlaceholder": "عدد الأيام، مثال: 3 — اتركه فارغاً للتنفيذ الفوري",
       "submit": "إنشاء الأتمتة",
-      "submitting": "جارٍ الإنشاء..."
-    }
+      "submitting": "جارٍ الإنشاء...",
+      "conditionsLabel": "شغّل بس إذا (اختياري)",
+      "conditionsHint": "اتركه فارغ عشان يشتغل دايماً عند حدوث المحفّز.",
+      "addCondition": "إضافة شرط",
+      "removeCondition": "حذف",
+      "matchAll": "كل الشروط لازم تتحقق",
+      "matchAny": "أي شرط يتحقق كافي",
+      "conditionFields": {
+        "tag": "تاغ",
+        "language": "اللغة"
+      },
+      "conditionTagPlaceholder": "تاغ، مثلاً VIP",
+      "conditionLanguagePlaceholder": "مثلاً ar أو en أو ku"
+    },
+    "conditionsPrefix": "فقط إذا",
+    "conditionAnd": "و",
+    "conditionOr": "أو",
+    "conditionTag": "موسوم بـ\"{value}\"",
+    "conditionLanguage": "اللغة {value}"
   },
   "appointments": {
     "title": "المواعيد",
