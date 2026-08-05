@@ -32,6 +32,6 @@ every time a new item like this comes up — don't let it go stale.
 
 ## Known future items — not built yet, but will need an external account when we get there
 
-- **Payment gateway / billing** (Stripe or similar) — Part 2's schema plan includes Billing/Subscriptions/Invoices tables, but none of this exists yet. Whichever provider is chosen will need a real merchant account before payments can be tested end-to-end.
+- **Payment gateway / billing** (Stripe or similar) — Part 2's schema plan includes Billing/Subscriptions/Invoices tables, but none of this exists yet. As of 2026-08-05 there's a real `orders`/`order_items` model (`src/features/orders`) with a 9-stage status (draft → pending → confirmed → preparing → ready → delivered → completed → cancelled → refunded) that businesses can move through manually/COD today. Whichever payment provider is chosen later just needs to plug into that same status flow (e.g. `pending` → auto-`confirmed` on successful payment) — no redesign, but it still needs a real merchant account before online payment can be tested end-to-end.
 - **Cloudflare R2 (file storage)** — logo upload during onboarding is currently just a raw URL text field; a real upload widget needs an R2 bucket + API credentials.
 - **Sentry (monitoring)** / **PostHog (analytics)** — not integrated at all yet; both need their own account + project key when they're added.
