@@ -32,7 +32,10 @@ export const resendEmailProvider: EmailService = {
 
     if (error) {
       console.error("[resend] failed to send email:", error);
-      throw new AppError("INTERNAL_ERROR", "Failed to send email. Please try again.");
+      // TODO: once delivery is confirmed working, drop error.message from the user-facing
+      // text below — it's shown temporarily so the real cause is visible without digging
+      // through Vercel logs.
+      throw new AppError("INTERNAL_ERROR", `Failed to send email: ${error.name} - ${error.message}`);
     }
   },
 };
