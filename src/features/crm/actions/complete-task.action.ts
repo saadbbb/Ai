@@ -1,13 +1,13 @@
 "use server";
 
+import type { Task } from "@/db/schema";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
-import type { OrderListItem } from "../repository/order.repository";
-import { orderService } from "../services/order.service";
-import { createOrderSchema } from "../validation/schemas";
+import { taskService } from "../services/task.service";
+import { completeTaskSchema } from "../validation/schemas";
 
-export async function createOrderAction(input: unknown): Promise<ActionResult<OrderListItem>> {
-  const parsed = createOrderSchema.safeParse(input);
+export async function completeTaskAction(input: unknown): Promise<ActionResult<Task>> {
+  const parsed = completeTaskSchema.safeParse(input);
   if (!parsed.success) {
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
@@ -16,8 +16,8 @@ export async function createOrderAction(input: unknown): Promise<ActionResult<Or
   const workspace = await requireWorkspaceForUser(user.id);
 
   try {
-    const order = await orderService.createOrder(workspace.id, parsed.data, { type: "human", userId: user.id });
-    return actionOk(order);
+    const task = await taskService.completeTask(workspace.id, user.id, parsed.data.taskId);
+    return actionOk(task);
   } catch (error) {
     return actionFail(error);
   }

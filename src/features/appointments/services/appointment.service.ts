@@ -1,5 +1,6 @@
 import "server-only";
 import type { Appointment, AppointmentStatus } from "@/db/schema";
+import { activityRepository, type ActivityActor } from "@/features/crm/repository/activity.repository";
 import { automationService } from "@/features/automation/services/automation.service";
 import { AppError } from "@/lib/errors/app-error";
 import { appointmentRepository, type AppointmentListItem } from "../repository/appointment.repository";
@@ -26,7 +27,11 @@ async function getAppointment(workspaceId: string, appointmentId: string): Promi
   return appointment;
 }
 
-async function createAppointment(workspaceId: string, input: CreateAppointmentInput): Promise<Appointment> {
+async function createAppointment(
+  workspaceId: string,
+  input: CreateAppointmentInput,
+  actor: ActivityActor,
+): Promise<Appointment> {
   const appointment = await appointmentRepository.create({
     workspaceId,
     contactId: input.contactId,
@@ -39,6 +44,13 @@ async function createAppointment(workspaceId: string, input: CreateAppointmentIn
   });
 
   await automationService.dispatch(workspaceId, { type: "appointment_created", contactId: appointment.contactId });
+  await activityRepository.log({
+    workspaceId,
+    contactId: appointment.contactId,
+    type: "appointment_created",
+    actor,
+    summary: `Appointment booked${appointment.serviceName ? `: ${appointment.serviceName}` : ""}.`,
+  });
 
   return appointment;
 }
@@ -47,6 +59,7 @@ async function updateAppointmentStatus(
   workspaceId: string,
   appointmentId: string,
   status: AppointmentStatus,
+  actor: ActivityActor,
 ): Promise<Appointment> {
   const appointment = await appointmentRepository.updateStatus(appointmentId, workspaceId, status);
   if (!appointment) {
@@ -57,6 +70,13 @@ async function updateAppointmentStatus(
     type: "appointment_status_changed",
     contactId: appointment.contactId,
     status,
+  });
+  await activityRepository.log({
+    workspaceId,
+    contactId: appointment.contactId,
+    type: "appointment_status_changed",
+    actor,
+    summary: `Appointment status changed to "${status}".`,
   });
 
   return appointment;

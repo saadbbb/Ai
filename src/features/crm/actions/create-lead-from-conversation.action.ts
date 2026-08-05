@@ -16,7 +16,10 @@ export async function createLeadFromConversationAction(input: unknown): Promise<
   const workspace = await requireWorkspaceForUser(user.id);
 
   try {
-    const lead = await crmService.createLeadFromConversation(workspace.id, parsed.data.conversationId);
+    const lead = await crmService.createLeadFromConversation(workspace.id, parsed.data.conversationId, {
+      type: "human",
+      userId: user.id,
+    });
     return actionOk(lead);
   } catch (error) {
     return actionFail(error);

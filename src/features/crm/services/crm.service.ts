@@ -3,6 +3,7 @@ import type { Lead, LeadStage } from "@/db/schema";
 import { automationService } from "@/features/automation/services/automation.service";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { AppError } from "@/lib/errors/app-error";
+import { activityRepository, type ActivityActor } from "../repository/activity.repository";
 import { leadRepository, type LeadListItem } from "../repository/lead.repository";
 
 async function listLeads(workspaceId: string): Promise<LeadListItem[]> {
@@ -11,9 +12,10 @@ async function listLeads(workspaceId: string): Promise<LeadListItem[]> {
 
 /**
  * Idempotent — clicking "Create lead" twice on the same conversation returns
- * the lead that's already there instead of raising a second one.
+ * the lead that's already there instead of raising a second one. No timeline
+ * entry is logged on that early-return path — only a real creation is an event.
  */
-async function createLeadFromConversation(workspaceId: string, conversationId: string): Promise<Lead> {
+async function createLeadFromConversation(workspaceId: string, conversationId: string, actor: ActivityActor): Promise<Lead> {
   const existing = await leadRepository.findByConversationId(conversationId, workspaceId);
   if (existing) return existing;
 
@@ -29,11 +31,18 @@ async function createLeadFromConversation(workspaceId: string, conversationId: s
   });
 
   await automationService.dispatch(workspaceId, { type: "lead_created", contactId: lead.contactId });
+  await activityRepository.log({
+    workspaceId,
+    contactId: lead.contactId,
+    type: "lead_created",
+    actor,
+    summary: "Lead created.",
+  });
 
   return lead;
 }
 
-async function updateLeadStage(workspaceId: string, leadId: string, stage: LeadStage): Promise<Lead> {
+async function updateLeadStage(workspaceId: string, leadId: string, stage: LeadStage, actor: ActivityActor): Promise<Lead> {
   const lead = await leadRepository.updateStage(leadId, workspaceId, stage);
   if (!lead) {
     throw new AppError("NOT_FOUND", "Lead not found.");
@@ -43,6 +52,13 @@ async function updateLeadStage(workspaceId: string, leadId: string, stage: LeadS
     type: "lead_stage_changed",
     contactId: lead.contactId,
     stage,
+  });
+  await activityRepository.log({
+    workspaceId,
+    contactId: lead.contactId,
+    type: "lead_stage_changed",
+    actor,
+    summary: `Lead stage changed to "${stage}".`,
   });
 
   return lead;

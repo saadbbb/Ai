@@ -2,6 +2,7 @@ import "server-only";
 import type { ChatMessage } from "@/features/ai/providers/types";
 import { aiService } from "@/features/ai/services/ai.service";
 import { automationService } from "@/features/automation/services/automation.service";
+import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { AppError } from "@/lib/errors/app-error";
 import { channelRepository } from "../repository/channel.repository";
 import { contactRepository } from "../repository/contact.repository";
@@ -36,7 +37,7 @@ async function triggerAiReply(workspaceId: string, conversationId: string, conta
   const history = await messageRepository.findByConversationId(conversationId, workspaceId);
 
   try {
-    const result = await aiService.generateReply(workspaceId, toChatHistory(history));
+    const result = await aiService.generateReply(workspaceId, toChatHistory(history), { contactId, conversationId });
 
     const message = await messageRepository.create({
       workspaceId,
@@ -49,6 +50,14 @@ async function triggerAiReply(workspaceId: string, conversationId: string, conta
     if (result.needsHumanHandover) {
       await conversationRepository.updateAiStatus(conversationId, workspaceId, "handed_over");
       await automationService.dispatch(workspaceId, { type: "conversation_handed_over", contactId });
+      await activityRepository.log({
+        workspaceId,
+        contactId,
+        type: "conversation_handed_over",
+        actor: { type: "ai" },
+        summary: "AI handed the conversation to a human.",
+        link: `/dashboard/inbox/${conversationId}`,
+      });
     }
 
     return message;
@@ -62,6 +71,14 @@ async function triggerAiReply(workspaceId: string, conversationId: string, conta
     });
     await conversationRepository.updateAiStatus(conversationId, workspaceId, "handed_over");
     await automationService.dispatch(workspaceId, { type: "conversation_handed_over", contactId });
+    await activityRepository.log({
+      workspaceId,
+      contactId,
+      type: "conversation_handed_over",
+      actor: { type: "system" },
+      summary: "Conversation handed to a human — the AI employee failed to generate a reply.",
+      link: `/dashboard/inbox/${conversationId}`,
+    });
     return message;
   }
 }

@@ -8,6 +8,7 @@ import type {
   WorkflowStatus,
   WorkflowTriggerConfig,
 } from "@/db/schema";
+import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { notificationRepository } from "@/features/notifications/repository/notification.repository";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
@@ -63,6 +64,13 @@ async function runAction(workspaceId: string, workflow: Workflow, event: Automat
     const tag = workflow.actionConfig.tag;
     if (!tag) throw new AppError("VALIDATION_ERROR", "Workflow is missing a tag to add.");
     await contactRepository.addTag(event.contactId, workspaceId, tag);
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "contact_tagged",
+      actor: { type: "automation" },
+      summary: `Tagged with "${tag}" by automation "${workflow.name}".`,
+    });
     return contact ? `Tagged ${contact.fullName} with "${tag}"` : `Tagged contact with "${tag}"`;
   }
 
@@ -70,6 +78,13 @@ async function runAction(workspaceId: string, workflow: Workflow, event: Automat
     const tag = workflow.actionConfig.tag;
     if (!tag) throw new AppError("VALIDATION_ERROR", "Workflow is missing a tag to remove.");
     await contactRepository.removeTag(event.contactId, workspaceId, tag);
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "contact_untagged",
+      actor: { type: "automation" },
+      summary: `Removed tag "${tag}" by automation "${workflow.name}".`,
+    });
     return contact ? `Removed "${tag}" from ${contact.fullName}` : `Removed tag "${tag}"`;
   }
 

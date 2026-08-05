@@ -16,7 +16,10 @@ export async function updateOrderStatusAction(input: unknown): Promise<ActionRes
   const workspace = await requireWorkspaceForUser(user.id);
 
   try {
-    const order = await orderService.updateOrderStatus(workspace.id, parsed.data.orderId, parsed.data.status);
+    const order = await orderService.updateOrderStatus(workspace.id, parsed.data.orderId, parsed.data.status, {
+      type: "human",
+      userId: user.id,
+    });
     return actionOk(order);
   } catch (error) {
     return actionFail(error);

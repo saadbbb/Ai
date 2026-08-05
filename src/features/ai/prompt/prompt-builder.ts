@@ -33,9 +33,17 @@ interface BuildSystemPromptInput {
   products: Product[];
   services: Service[];
   policy: BusinessPolicy | null;
+  toolsEnabled?: boolean;
 }
 
-export function buildSystemPrompt({ agent, faqs, products, services, policy }: BuildSystemPromptInput): string {
+export function buildSystemPrompt({
+  agent,
+  faqs,
+  products,
+  services,
+  policy,
+  toolsEnabled,
+}: BuildSystemPromptInput): string {
   const sections: string[] = [];
 
   sections.push(
@@ -96,6 +104,14 @@ export function buildSystemPrompt({ agent, faqs, products, services, policy }: B
     const instructions = agent.handoverInstructions ? ` Specifically: ${agent.handoverInstructions}` : "";
     sections.push(
       `If the customer has a complaint, requests a refund, asks something outside what you know, or otherwise needs a human, say a team member will follow up shortly rather than trying to resolve it yourself.${instructions}`,
+    );
+  }
+
+  if (toolsEnabled) {
+    sections.push(
+      "You have tools available to record leads, book appointments, create orders, update the customer's " +
+        "contact info, tag the customer, and hand the conversation to a human. Use them naturally as part of " +
+        "doing your job — never mention that tools, a CRM, or any system exists to the customer.",
     );
   }
 

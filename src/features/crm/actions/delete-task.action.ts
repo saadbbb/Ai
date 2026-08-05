@@ -2,12 +2,11 @@
 
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
-import type { OrderListItem } from "../repository/order.repository";
-import { orderService } from "../services/order.service";
-import { createOrderSchema } from "../validation/schemas";
+import { taskService } from "../services/task.service";
+import { deleteTaskSchema } from "../validation/schemas";
 
-export async function createOrderAction(input: unknown): Promise<ActionResult<OrderListItem>> {
-  const parsed = createOrderSchema.safeParse(input);
+export async function deleteTaskAction(input: unknown): Promise<ActionResult<undefined>> {
+  const parsed = deleteTaskSchema.safeParse(input);
   if (!parsed.success) {
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
@@ -16,8 +15,8 @@ export async function createOrderAction(input: unknown): Promise<ActionResult<Or
   const workspace = await requireWorkspaceForUser(user.id);
 
   try {
-    const order = await orderService.createOrder(workspace.id, parsed.data, { type: "human", userId: user.id });
-    return actionOk(order);
+    await taskService.deleteTask(workspace.id, parsed.data.taskId);
+    return actionOk(undefined);
   } catch (error) {
     return actionFail(error);
   }

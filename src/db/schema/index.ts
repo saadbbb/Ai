@@ -25,4 +25,8 @@ export * from "./platform-settings";
 export * from "./plans";
 export * from "./notifications";
 export * from "./ai-usage";
+export * from "./ai-tool-executions";
 export * from "./rate-limits";
+export * from "./activities";
+export * from "./tasks";
+export * from "./notes";

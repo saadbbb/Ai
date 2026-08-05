@@ -3,7 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
+import { NotePanel } from "@/features/crm/components/note-panel";
+import { TaskPanel } from "@/features/crm/components/task-panel";
+import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
+import { noteRepository } from "@/features/crm/repository/note.repository";
+import { taskRepository } from "@/features/crm/repository/task.repository";
 import { AiStatusBadge } from "@/features/inbox/components/ai-status-badge";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
@@ -23,15 +28,19 @@ export default async function ContactDetailPage({ params }: PageProps) {
   const tLeads = await getTranslations("leads");
   const tOrders = await getTranslations("orders");
   const tAppointments = await getTranslations("appointments");
+  const tActivity = await getTranslations("activity");
 
   const contact = await contactRepository.findById(contactId, workspace.id);
   if (!contact) notFound();
 
-  const [conversations, leads, orders, appointmentList] = await Promise.all([
+  const [conversations, leads, orders, appointmentList, tasks, notes, activities] = await Promise.all([
     conversationRepository.findByContactId(contactId, workspace.id),
     leadRepository.findByContactId(contactId, workspace.id),
     orderRepository.findByContactId(contactId, workspace.id),
     appointmentRepository.findByContactId(contactId, workspace.id),
+    taskRepository.findByContactId(contactId, workspace.id),
+    noteRepository.findByContactId(contactId, workspace.id),
+    activityRepository.findByContactId(contactId, workspace.id),
   ]);
 
   const formatter = new Intl.DateTimeFormat("en-GB", {
@@ -71,6 +80,10 @@ export default async function ContactDetailPage({ params }: PageProps) {
           </Button>
         </div>
       </div>
+
+      <TaskPanel contactId={contact.id} initialTasks={tasks} />
+
+      <NotePanel contactId={contact.id} initialNotes={notes} />
 
       <div className="space-y-3">
         <h2 className="text-sm font-medium">{tAppointments("title")}</h2>
@@ -151,6 +164,31 @@ export default async function ContactDetailPage({ params }: PageProps) {
                 <AiStatusBadge status={conversation.aiStatus} />
               </Link>
             ))}
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-medium">{tActivity("title")}</h2>
+        {activities.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{tActivity("empty")}</p>
+        ) : (
+          <div className="divide-y rounded-lg border">
+            {activities.map((activity) => {
+              const row = (
+                <div className="flex items-center justify-between gap-3 p-3 text-sm">
+                  <span>{activity.summary}</span>
+                  <span className="shrink-0 text-xs text-muted-foreground">{formatter.format(activity.createdAt)}</span>
+                </div>
+              );
+              return activity.link ? (
+                <Link key={activity.id} href={activity.link} className="block hover:bg-muted">
+                  {row}
+                </Link>
+              ) : (
+                <div key={activity.id}>{row}</div>
+              );
+            })}
           </div>
         )}
       </div>

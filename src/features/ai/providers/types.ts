@@ -5,10 +5,31 @@ export interface ChatMessage {
   content: string;
 }
 
+/** A tool the model may call, described in provider-agnostic JSON Schema. */
+export interface ToolDefinition {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+export interface ToolExecutionResult {
+  /** Text fed back to the model as the tool_result — success message or error explanation. */
+  content: string;
+  isError: boolean;
+}
+
 export interface GenerateReplyInput {
   systemPrompt: string;
   history: ChatMessage[];
   maxTokens?: number;
+  /**
+   * Optional — when present, the provider may call these tools mid-generation via
+   * executeTool and loop until it produces a final text reply (bounded, see
+   * MAX_TOOL_ITERATIONS in claude.provider.ts). The provider never knows what a
+   * tool actually does; that's the Tool Dispatcher's job (see ../tools).
+   */
+  tools?: ToolDefinition[];
+  executeTool?: (name: string, input: unknown) => Promise<ToolExecutionResult>;
 }
 
 export type ReplyStopReason = "end_turn" | "max_tokens" | "refusal" | "other";

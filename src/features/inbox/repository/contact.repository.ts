@@ -28,6 +28,19 @@ export const contactRepository = {
       .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
   },
 
+  async update(
+    id: string,
+    workspaceId: string,
+    data: Partial<Pick<NewContact, "fullName" | "phone" | "email">>,
+  ): Promise<Contact | null> {
+    const [contact] = await db
+      .update(contacts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)))
+      .returning();
+    return contact ?? null;
+  },
+
   async addTag(id: string, workspaceId: string, tag: string): Promise<void> {
     const [contact] = await db
       .select({ tags: contacts.tags })

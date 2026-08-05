@@ -16,7 +16,10 @@ export async function createAppointmentAction(input: unknown): Promise<ActionRes
   const workspace = await requireWorkspaceForUser(user.id);
 
   try {
-    const appointment = await appointmentService.createAppointment(workspace.id, parsed.data);
+    const appointment = await appointmentService.createAppointment(workspace.id, parsed.data, {
+      type: "human",
+      userId: user.id,
+    });
     return actionOk(appointment);
   } catch (error) {
     return actionFail(error);

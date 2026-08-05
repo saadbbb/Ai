@@ -20,6 +20,7 @@ export async function updateAppointmentStatusAction(input: unknown): Promise<Act
       workspace.id,
       parsed.data.appointmentId,
       parsed.data.status,
+      { type: "human", userId: user.id },
     );
     return actionOk(appointment);
   } catch (error) {

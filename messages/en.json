@@ -153,9 +153,18 @@
       "title": "How creative should your AI be?",
       "description": "This controls how much your AI varies its replies.",
       "options": {
-        "low": { "label": "Low", "description": "Sticks closely to facts and scripted answers." },
-        "medium": { "label": "Medium", "description": "Balanced — natural but predictable." },
-        "high": { "label": "High", "description": "More conversational and expressive." }
+        "low": {
+          "label": "Low",
+          "description": "Sticks closely to facts and scripted answers."
+        },
+        "medium": {
+          "label": "Medium",
+          "description": "Balanced — natural but predictable."
+        },
+        "high": {
+          "label": "High",
+          "description": "More conversational and expressive."
+        }
       }
     },
     "hours": {
@@ -688,5 +697,28 @@
   },
   "localeSwitcher": {
     "label": "Language"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "titlePlaceholder": "What needs to be done?",
+    "add": "Add task",
+    "empty": "No tasks for this contact yet.",
+    "delete": "Delete",
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
+  },
+  "notes": {
+    "title": "Notes",
+    "placeholder": "Write a note about this customer...",
+    "add": "Add note",
+    "empty": "No notes for this contact yet.",
+    "delete": "Delete"
+  },
+  "activity": {
+    "title": "Activity",
+    "empty": "No activity recorded for this contact yet."
   }
 }

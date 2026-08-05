@@ -16,7 +16,10 @@ export async function updateLeadStageAction(input: unknown): Promise<ActionResul
   const workspace = await requireWorkspaceForUser(user.id);
 
   try {
-    const lead = await crmService.updateLeadStage(workspace.id, parsed.data.leadId, parsed.data.stage);
+    const lead = await crmService.updateLeadStage(workspace.id, parsed.data.leadId, parsed.data.stage, {
+      type: "human",
+      userId: user.id,
+    });
     return actionOk(lead);
   } catch (error) {
     return actionFail(error);
