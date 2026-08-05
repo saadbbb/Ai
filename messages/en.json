@@ -221,6 +221,7 @@
     "yourRole": "Your role: {role} · Timezone: {timezone}",
     "homeLink": "Dashboard",
     "inboxLink": "Inbox",
+    "contactsLink": "Contacts",
     "leadsLink": "Leads",
     "testAiLink": "Test your AI employee",
     "settingsLink": "Settings",
@@ -276,6 +277,18 @@
       "leadCreated": "Lead created.",
       "viewInPipeline": "View in Pipeline →"
     }
+  },
+  "contacts": {
+    "title": "Contacts",
+    "description": "Everyone who has reached out, in one directory.",
+    "emptyState": "No contacts yet. They're created automatically from the Inbox.",
+    "noContactInfo": "No phone or email on file.",
+    "noMessagesYet": "No messages yet.",
+    "backLink": "← Back to Contacts",
+    "leadsHeading": "Leads",
+    "noLeads": "No leads for this contact yet.",
+    "conversationsHeading": "Conversations",
+    "noConversations": "No conversations yet."
   },
   "leads": {
     "title": "Leads",

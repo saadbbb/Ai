@@ -46,6 +46,16 @@ export const conversationRepository = {
     return row ?? null;
   },
 
+  async findByContactId(contactId: string, workspaceId: string): Promise<ConversationListItem[]> {
+    return db
+      .select(listSelection)
+      .from(conversations)
+      .innerJoin(contacts, eq(conversations.contactId, contacts.id))
+      .innerJoin(channels, eq(conversations.channelId, channels.id))
+      .where(and(eq(conversations.contactId, contactId), eq(conversations.workspaceId, workspaceId)))
+      .orderBy(desc(conversations.lastMessageAt), desc(conversations.createdAt));
+  },
+
   async create(data: NewConversation): Promise<Conversation> {
     const [conversation] = await db.insert(conversations).values(data).returning();
     return conversation;

@@ -1,0 +1,86 @@
+import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { leadRepository } from "@/features/crm/repository/lead.repository";
+import { AiStatusBadge } from "@/features/inbox/components/ai-status-badge";
+import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
+import { contactRepository } from "@/features/inbox/repository/contact.repository";
+import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+
+interface PageProps {
+  params: Promise<{ contactId: string }>;
+}
+
+export default async function ContactDetailPage({ params }: PageProps) {
+  const { contactId } = await params;
+  const user = await requireUser();
+  const workspace = await requireWorkspaceForUser(user.id);
+  const t = await getTranslations("contacts");
+  const tLeads = await getTranslations("leads");
+
+  const contact = await contactRepository.findById(contactId, workspace.id);
+  if (!contact) notFound();
+
+  const [conversations, leads] = await Promise.all([
+    conversationRepository.findByContactId(contactId, workspace.id),
+    leadRepository.findByContactId(contactId, workspace.id),
+  ]);
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-6">
+      <Link href="/dashboard/contacts" className="text-sm text-muted-foreground hover:text-foreground">
+        {t("backLink")}
+      </Link>
+
+      <div>
+        <h1 className="text-xl font-semibold">{contact.fullName}</h1>
+        <p className="text-sm text-muted-foreground">
+          {[contact.phone, contact.email].filter(Boolean).join(" · ") || t("noContactInfo")}
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-medium">{t("leadsHeading")}</h2>
+        {leads.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("noLeads")}</p>
+        ) : (
+          <div className="divide-y rounded-lg border">
+            {leads.map((lead) => (
+              <div key={lead.id} className="flex items-center justify-between p-3 text-sm">
+                <span>{tLeads(`stages.${lead.stage}`)}</span>
+                {lead.conversationId && (
+                  <Link
+                    href={`/dashboard/inbox/${lead.conversationId}`}
+                    className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+                  >
+                    {tLeads("viewConversation")}
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-medium">{t("conversationsHeading")}</h2>
+        {conversations.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("noConversations")}</p>
+        ) : (
+          <div className="divide-y rounded-lg border">
+            {conversations.map(({ conversation }) => (
+              <Link
+                key={conversation.id}
+                href={`/dashboard/inbox/${conversation.id}`}
+                className="flex items-center justify-between gap-4 p-3 hover:bg-muted"
+              >
+                <span className="truncate text-sm">{conversation.lastMessagePreview ?? t("noMessagesYet")}</span>
+                <AiStatusBadge status={conversation.aiStatus} />
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
