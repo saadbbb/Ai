@@ -6,10 +6,15 @@ declare global {
   var __pgPool: Pool | undefined;
 }
 
+const connectionString = process.env.DATABASE_URL;
+const isLocalDb = connectionString?.includes("localhost") || connectionString?.includes("127.0.0.1");
+
 const pool =
   globalThis.__pgPool ??
   new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
+    // Supabase (and most managed Postgres) require TLS; local Docker Postgres does not speak it.
+    ssl: isLocalDb ? false : { rejectUnauthorized: false },
   });
 
 if (process.env.NODE_ENV !== "production") {
