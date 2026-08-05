@@ -5,7 +5,13 @@
     "saving": "جارٍ الحفظ...",
     "finishSetup": "إنهاء الإعداد",
     "comingSoon": "قريباً",
-    "stepOf": "الخطوة {step} من {total}"
+    "stepOf": "الخطوة {step} من {total}",
+    "save": "حفظ",
+    "saved": "تم الحفظ",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "cancel": "إلغاء",
+    "confirmDelete": "هل أنت متأكد من حذف هذا؟"
   },
   "auth": {
     "register": {
@@ -213,7 +219,10 @@
     "welcomeBack": "مرحباً بعودتك",
     "signedInAs": "مسجّل الدخول باسم {email}.",
     "yourRole": "دورك: {role} · المنطقة الزمنية: {timezone}",
-    "testAiLink": "جرّب موظفك الذكي"
+    "homeLink": "الرئيسية",
+    "testAiLink": "جرّب موظفك الذكي",
+    "settingsLink": "الإعدادات",
+    "knowledgeBaseLink": "قاعدة المعرفة"
   },
   "aiTest": {
     "title": "جرّب موظفك الذكي",
@@ -223,6 +232,25 @@
     "send": "إرسال",
     "sending": "جارٍ الإرسال...",
     "humanHandoverBadge": "هذه الحالة ستُحوَّل إلى موظف بشري."
+  },
+  "settings": {
+    "pageTitle": "الإعدادات",
+    "pageDescription": "أدر موظفك الذكي وتفاصيل نشاطك التجاري.",
+    "businessInfoTitle": "معلومات النشاط التجاري",
+    "businessInfoDescription": "تفاصيل نشاطك التجاري ولغة لوحة التحكم.",
+    "agentProfileTitle": "الموظف الذكي",
+    "agentProfileDescription": "اسم موظفك الذكي ووصف نشاطك التجاري.",
+    "personalityTitle": "الشخصية",
+    "personalityDescription": "كيف يرد موظفك الذكي على العملاء.",
+    "workingHoursTitle": "ساعات العمل",
+    "workingHoursDescription": "أخبر موظفك الذكي بأوقات توفر فريقك.",
+    "handoverTitle": "التحويل إلى موظف بشري",
+    "handoverDescription": "تحكّم بمتى يحوّل موظفك الذكي المحادثة إلى فريقك."
+  },
+  "knowledgeBasePage": {
+    "pageTitle": "قاعدة المعرفة",
+    "pageDescription": "أدر الأسئلة الشائعة والمنتجات والخدمات والسياسات التي يمكن لموظفك الذكي الإجابة منها.",
+    "noItems": "لم تتم إضافة شيء بعد."
   },
   "localeSwitcher": {
     "label": "اللغة"

@@ -64,5 +64,25 @@ export const handoverSchema = z.object({
   handoverInstructions: z.string().trim().max(2000).optional().nullable(),
 });
 
+/**
+ * Onboarding split name/description and language/tone/creativity across separate
+ * wizard steps; a settings card doesn't need that granularity, so these combine
+ * them into one save each.
+ */
+export function createAgentProfileSchema(t: TranslateFn) {
+  return z.object({
+    name: z.string().trim().min(1, t("agentNameRequired")).max(100),
+    businessDescription: z.string().trim().min(1, t("businessDescriptionRequired")).max(4000),
+  });
+}
+
+export const personalitySchema = z.object({
+  language: languageEnumSchema,
+  tone: toneEnumSchema,
+  creativity: creativityEnumSchema,
+});
+
 export type AgentNameInput = z.infer<ReturnType<typeof createAgentNameSchema>>;
 export type BusinessDescriptionInput = z.infer<ReturnType<typeof createBusinessDescriptionSchema>>;
+export type AgentProfileInput = z.infer<ReturnType<typeof createAgentProfileSchema>>;
+export type PersonalityInput = z.infer<typeof personalitySchema>;

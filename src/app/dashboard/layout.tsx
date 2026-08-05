@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { LogoutButton } from "@/features/auth/components/logout-button";
@@ -11,6 +13,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/onboarding/business");
   }
 
+  const t = await getTranslations("dashboard");
+  const navLinks = [
+    { href: "/dashboard", label: t("homeLink") },
+    { href: "/dashboard/test-ai", label: t("testAiLink") },
+    { href: "/dashboard/settings", label: t("settingsLink") },
+    { href: "/dashboard/knowledge-base", label: t("knowledgeBaseLink") },
+  ];
+
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <header className="flex items-center justify-between border-b px-6 py-4">
@@ -20,6 +30,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <LogoutButton />
         </div>
       </header>
+      <nav className="flex items-center gap-4 border-b px-6 py-2 text-sm">
+        {navLinks.map((link) => (
+          <Link key={link.href} href={link.href} className="text-muted-foreground hover:text-foreground">
+            {link.label}
+          </Link>
+        ))}
+      </nav>
       <main className="flex-1 p-6">{children}</main>
     </div>
   );

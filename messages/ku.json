@@ -5,7 +5,13 @@
     "saving": "پاشەکەوت دەکرێت...",
     "finishSetup": "ڕێکخستن تەواو بکە",
     "comingSoon": "بەم زووانە",
-    "stepOf": "هەنگاوی {step} لە {total}"
+    "stepOf": "هەنگاوی {step} لە {total}",
+    "save": "پاشەکەوتکردن",
+    "saved": "پاشەکەوتکرا",
+    "edit": "دەستکاریکردن",
+    "delete": "سڕینەوە",
+    "cancel": "پاشگەزبوونەوە",
+    "confirmDelete": "دڵنیایت لە سڕینەوەی ئەمە؟"
   },
   "auth": {
     "register": {
@@ -213,7 +219,10 @@
     "welcomeBack": "بەخێربێیتەوە",
     "signedInAs": "چوویتەژوورەوە وەک {email}.",
     "yourRole": "ڕۆڵت: {role} · ناوچەی کاتی: {timezone}",
-    "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە"
+    "homeLink": "داشبۆرد",
+    "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
+    "settingsLink": "ڕێکخستنەکان",
+    "knowledgeBaseLink": "بنکەی زانیاری"
   },
   "aiTest": {
     "title": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
@@ -223,6 +232,25 @@
     "send": "ناردن",
     "sending": "دەنێردرێت...",
     "humanHandoverBadge": "ئەم دۆخە دەگوازرێتەوە بۆ کەسێکی مرۆڤ."
+  },
+  "settings": {
+    "pageTitle": "ڕێکخستنەکان",
+    "pageDescription": "کارمەندە زیرەکەکەت و زانیاری بزنسەکەت بەڕێوە ببە.",
+    "businessInfoTitle": "زانیاری بزنس",
+    "businessInfoDescription": "زانیاری بزنسەکەت و زمانی داشبۆرد.",
+    "agentProfileTitle": "کارمەندە زیرەکە",
+    "agentProfileDescription": "ناوی کارمەندە زیرەکەکەت و وەسفی بزنسەکەت.",
+    "personalityTitle": "کەسایەتی",
+    "personalityDescription": "کارمەندە زیرەکەکەت چۆن وەڵامی کڕیاران دەداتەوە.",
+    "workingHoursTitle": "کاتەکانی کارکردن",
+    "workingHoursDescription": "کارمەندە زیرەکەکەت ئاگادار بکەوە کە تیمەکەت کەی بەردەستە.",
+    "handoverTitle": "گواستنەوە بۆ کەسی مرۆڤ",
+    "handoverDescription": "کۆنترۆڵی ئەوە بکە کە کارمەندە زیرەکەکەت کەی گفتوگۆکە دەگوازێتەوە بۆ تیمەکەت."
+  },
+  "knowledgeBasePage": {
+    "pageTitle": "بنکەی زانیاری",
+    "pageDescription": "پرسیارە باوەکان و بەرهەم و خزمەتگوزاری و سیاسەتەکان بەڕێوە ببە کە کارمەندە زیرەکەکەت دەتوانێت لێیانەوە وەڵام بداتەوە.",
+    "noItems": "هێشتا هیچ زیاد نەکراوە."
   },
   "localeSwitcher": {
     "label": "زمان"

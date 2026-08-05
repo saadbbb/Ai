@@ -26,3 +26,17 @@ export const knowledgeBaseSchema = z.object({
   returnsPolicy: z.string().trim().max(2000).optional(),
   paymentsPolicy: z.string().trim().max(2000).optional(),
 });
+
+/**
+ * Settings' Knowledge Base page saves one row at a time: an id present means
+ * update that row, no id means create a new one.
+ */
+export const faqFormSchema = faqEntrySchema.extend({ id: z.string().uuid().optional() });
+export const productFormSchema = productEntrySchema.extend({ id: z.string().uuid().optional() });
+export const serviceFormSchema = serviceEntrySchema.extend({ id: z.string().uuid().optional() });
+
+export const policyFormSchema = z.object({
+  shippingPolicy: z.string().trim().max(2000).optional(),
+  returnsPolicy: z.string().trim().max(2000).optional(),
+  paymentsPolicy: z.string().trim().max(2000).optional(),
+});
