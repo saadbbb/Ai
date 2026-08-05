@@ -1,0 +1,2 @@
+CREATE TYPE "public"."subscription_status" AS ENUM('trial', 'active', 'suspended');--> statement-breakpoint
+ALTER TABLE "workspaces" ADD COLUMN "subscription_status" "subscription_status" DEFAULT 'trial' NOT NULL;

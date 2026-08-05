@@ -245,7 +245,12 @@
     "noActivity": "Nothing yet.",
     "activityNewConversation": "New conversation — {name}",
     "activityNewLead": "New lead — {name}",
-    "activityNewOrder": "New order — {name}"
+    "activityNewOrder": "New order — {name}",
+    "suspended": {
+      "title": "Your account is suspended",
+      "description": "Get in touch with us to sort this out and get back to work.",
+      "whatsappCta": "Contact us on WhatsApp"
+    }
   },
   "inbox": {
     "list": {
@@ -343,7 +348,12 @@
     "title": "Billing",
     "description": "Manage your subscription.",
     "currentPlan": "Current plan",
-    "freePlanName": "Free",
+    "statuses": {
+      "trial": "Trial",
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "activeDescription": "You're subscribed. Thanks for being a customer!",
     "ctaDescription": "We don't charge cards yet — message us on WhatsApp and we'll set your subscription up personally.",
     "whatsappCta": "Subscribe via WhatsApp",
     "fallbackWithEmail": "Subscriptions aren't open yet. Email {email} if you're interested.",
@@ -353,8 +363,20 @@
   "platformAdmin": {
     "badge": "Platform Admin",
     "backToDashboard": "Back to your dashboard",
+    "workspacesLink": "Workspaces",
     "settingsLink": "Settings",
     "adminsLink": "Admins",
+    "workspaces": {
+      "title": "Workspaces",
+      "description": "Every business on the platform. Set a workspace's subscription status by hand until real billing exists.",
+      "emptyState": "No workspaces yet.",
+      "noOwner": "No owner",
+      "statuses": {
+        "trial": "Trial",
+        "active": "Active",
+        "suspended": "Suspended"
+      }
+    },
     "settings": {
       "title": "Platform Settings",
       "description": "Where the \"Subscribe\" button on customer dashboards points to.",

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
 import { platformAdminService } from "@/features/platform-admin/services/platform-admin.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
@@ -18,6 +19,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     getTranslations("dashboard"),
     platformAdminService.isPlatformAdmin(user.email),
   ]);
+  const isSuspended = workspace.subscriptionStatus === "suspended";
+  const settings = isSuspended ? await platformSettingsRepository.get() : null;
   const navLinks = [
     { href: "/dashboard", label: t("homeLink") },
     { href: "/dashboard/inbox", label: t("inboxLink") },
@@ -49,14 +52,35 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <LogoutButton />
         </div>
       </header>
-      <nav className="flex items-center gap-4 overflow-x-auto border-b px-6 py-2 text-sm">
-        {navLinks.map((link) => (
-          <Link key={link.href} href={link.href} className="shrink-0 text-muted-foreground hover:text-foreground">
-            {link.label}
-          </Link>
-        ))}
-      </nav>
-      <main className="flex-1 p-6">{children}</main>
+      {isSuspended ? (
+        <main className="flex flex-1 items-center justify-center p-6">
+          <div className="max-w-sm space-y-3 rounded-lg border p-6 text-center">
+            <h1 className="font-medium">{t("suspended.title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("suspended.description")}</p>
+            {settings?.whatsappNumber && (
+              <a
+                href={`https://wa.me/${settings.whatsappNumber.replace(/[^0-9]/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-sm font-medium text-primary hover:underline"
+              >
+                {t("suspended.whatsappCta")}
+              </a>
+            )}
+          </div>
+        </main>
+      ) : (
+        <>
+          <nav className="flex items-center gap-4 overflow-x-auto border-b px-6 py-2 text-sm">
+            {navLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="shrink-0 text-muted-foreground hover:text-foreground">
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <main className="flex-1 p-6">{children}</main>
+        </>
+      )}
     </div>
   );
 }

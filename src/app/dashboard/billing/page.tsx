@@ -34,9 +34,11 @@ export default async function BillingPage() {
       <Card>
         <CardContent className="space-y-4 text-center">
           <p className="text-sm text-muted-foreground">{t("currentPlan")}</p>
-          <p className="text-lg font-semibold">{t("freePlanName")}</p>
+          <p className="text-lg font-semibold">{t(`statuses.${workspace.subscriptionStatus}`)}</p>
 
-          {whatsappHref ? (
+          {workspace.subscriptionStatus === "active" ? (
+            <p className="text-sm text-muted-foreground">{t("activeDescription")}</p>
+          ) : whatsappHref ? (
             <>
               <p className="text-sm text-muted-foreground">{t("ctaDescription")}</p>
               <Button asChild size="lg">

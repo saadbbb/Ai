@@ -9,6 +9,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const t = await getTranslations("platformAdmin");
 
   const navLinks = [
+    { href: "/admin/workspaces", label: t("workspacesLink") },
     { href: "/admin/settings", label: t("settingsLink") },
     { href: "/admin/admins", label: t("adminsLink") },
   ];

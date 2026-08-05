@@ -245,7 +245,12 @@
     "noActivity": "لا يوجد شيء بعد.",
     "activityNewConversation": "محادثة جديدة — {name}",
     "activityNewLead": "عميل محتمل جديد — {name}",
-    "activityNewOrder": "طلب جديد — {name}"
+    "activityNewOrder": "طلب جديد — {name}",
+    "suspended": {
+      "title": "حسابك موقوف",
+      "description": "تواصل معنا لحل الموضوع والرجوع للعمل.",
+      "whatsappCta": "تواصل معنا عبر واتساب"
+    }
   },
   "inbox": {
     "list": {
@@ -343,7 +348,12 @@
     "title": "الفوترة",
     "description": "أدر اشتراكك.",
     "currentPlan": "الخطة الحالية",
-    "freePlanName": "مجانية",
+    "statuses": {
+      "trial": "تجريبية",
+      "active": "نشطة",
+      "suspended": "موقوفة"
+    },
+    "activeDescription": "أنت مشترك بالفعل. شكراً لكونك عميلاً معنا!",
     "ctaDescription": "لسا ما نستقبل دفع بالبطاقات — راسلنا على واتساب وراح نفعّل اشتراكك بأنفسنا.",
     "whatsappCta": "اشترك عبر واتساب",
     "fallbackWithEmail": "الاشتراكات لسا ما فُتحت. راسلنا على {email} إذا مهتم.",
@@ -353,8 +363,20 @@
   "platformAdmin": {
     "badge": "إدارة المنصة",
     "backToDashboard": "الرجوع للوحة تحكمك",
+    "workspacesLink": "المساحات",
     "settingsLink": "الإعدادات",
     "adminsLink": "المسؤولون",
+    "workspaces": {
+      "title": "المساحات",
+      "description": "كل نشاط تجاري على المنصة. اضبط حالة اشتراك كل مساحة يدوياً لحد ما يصير عندنا نظام فوترة حقيقي.",
+      "emptyState": "لا توجد مساحات بعد.",
+      "noOwner": "بدون مالك",
+      "statuses": {
+        "trial": "تجريبية",
+        "active": "نشطة",
+        "suspended": "موقوفة"
+      }
+    },
     "settings": {
       "title": "إعدادات المنصة",
       "description": "الوجهة اللي يودّي إليها زر \"اشتراك\" بلوحات تحكم العملاء.",
