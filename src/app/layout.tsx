@@ -21,6 +21,15 @@ export const metadata: Metadata = {
   description: "Your AI employee that works 24/7.",
 };
 
+/**
+ * Every page's HTML depends on the NEXT_LOCALE cookie (see src/i18n/request.ts). Pages
+ * that don't also read the session cookie (the public auth pages) don't get Next's
+ * strong no-store cache-control by default, so Vercel's edge was caching one visitor's
+ * locale and serving it publicly to everyone else. Forcing dynamic rendering everywhere
+ * guarantees every response is private and locale-correct.
+ */
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
