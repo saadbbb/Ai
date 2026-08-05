@@ -45,3 +45,27 @@ every time a new item like this comes up — don't let it go stale.
 - **Automated payment gateway / billing** (Stripe or similar) — none of this exists yet, and per the user (2026-08-05) a real payment gateway needs a registered company first, which doesn't exist yet. **In the meantime, the full subscription lifecycle is manual but real, not a placeholder**: a customer messages via the WhatsApp CTA on `/dashboard/billing` → an admin activates a plan for them at `/admin/workspaces` with a specific number of days → the daily cron (item 5) emails them at 3/2/1 days before expiry and auto-suspends them if they don't renew. Whichever payment provider is chosen later just needs to call `workspaceAdminRepository.activateSubscription()` on successful payment instead of an admin clicking a button — no redesign. There's also a real `orders`/`order_items` model (`src/features/orders`) with a 9-stage status (draft → pending → confirmed → preparing → ready → delivered → completed → cancelled → refunded) that businesses can move through manually/COD today, separate from the platform's own subscription billing.
 - **Cloudflare R2 (file storage)** — logo upload during onboarding is currently just a raw URL text field; a real upload widget needs an R2 bucket + API credentials.
 - **Sentry (monitoring)** / **PostHog (analytics)** — not integrated at all yet; both need their own account + project key when they're added.
+
+## Needs your decision — not blocked on an account, but shouldn't be built without your sign-off
+
+Added 2026-08-06 while working through the remaining gaps from the Aii.txt spec. These are all technically buildable right now with no external dependency, but each involves a product or security judgment call that's the user's to make, not an engineering default.
+
+### 1. Visual drag-and-drop workflow builder (Part 6 of the spec)
+- **What exists today:** A fully functional form-based automation builder — trigger, conditions (AND/OR, added 2026-08-06), action, delay, templates, execution log. Every trigger/action the spec lists is wired up; only the *editing UI* is a form, not a canvas.
+- **What's missing:** The spec's canvas UI — drag & drop nodes, zoom, pan, undo/redo, a mini-map, node search. This is a multi-week feature on its own (typically means adopting a canvas library like React Flow, building a node-graph data model separate from the linear trigger→conditions→action shape workflows use today, persistence for node positions, etc.) — a real scope/investment decision, not a quick add.
+- **Ask:** Is the canvas builder worth building for MVP, given the form already covers every trigger/condition/action functionally? If yes, react-flow (MIT-licensed, no account needed) is the natural choice — say so and it can start.
+
+### 2. Real MRR/ARR revenue dashboard (Part 8/9 of the spec)
+- **What exists today:** Plans have a feature set + duration, but **no price field at all** — `plans` table has no `price`/`currency` column. Billing is fully manual (WhatsApp → admin activates a plan for N days), so no monetary amount is ever recorded anywhere in the system today.
+- **What's missing:** A real MRR/ARR/LTV dashboard needs actual prices to sum. Building the dashboard is trivial once prices exist; the blocker is that there are no real prices to show.
+- **Ask:** What are the actual plan prices and currency (IQD/USD/other)? Once that's answered, a `price`/`currency` column can be added to `plans` and the revenue dashboard becomes straightforward — this doesn't need the payment gateway itself, just the *numbers*.
+
+### 3. Super Admin impersonation ("log in as a customer")
+- **What exists today:** Nothing — not started.
+- **Why it's flagged, not just built:** Impersonation is explicitly listed in Part 9, but it's also one of the highest-risk features in the whole platform — whoever can use it can see and act inside any tenant's account. Building it needs at minimum: an explicit audit-logged event every time it's used (the new `audit_logs` table makes this easy), a visible "you are impersonating X" banner the whole time, and a decision on who besides the account owner is even allowed to trigger it.
+- **Ask:** Confirm you want this built, and who should be allowed to use it (all platform admins, or a narrower role).
+
+### 4. Global cross-entity search (Part 2/5 of the spec)
+- **What exists today:** Nothing — not started. Contacts/Leads/Orders/Appointments each have their own page but no single search box across all of them.
+- **Why it's flagged:** Not risky, just underspecified — "search everything" needs a decision on where it lives (a header search bar? a dedicated `/search` page?), what ranking/grouping looks like with mixed result types, and whether it's simple `ILIKE` matching (fine at current scale) or needs to be planned for Postgres full-text search from the start.
+- **Status:** Lower priority than the other three above — deprioritized this round for scope, not because it's harder.
