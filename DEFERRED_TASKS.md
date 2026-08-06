@@ -55,11 +55,17 @@ every time a new item like this comes up — don't let it go stale.
   - **Reset Password** template: same — show `{{ .Token }}` instead of the reset link.
   - Until this is done, the code-entry UI works perfectly (verified), but real users won't be able to see their code in the actual email they receive.
 
+### 9. Error/infra monitoring — Sentry (errors) + PostHog (product analytics)
+- **What's built:** Nothing yet — no SDK installed, no `Sentry.init()`, no PostHog client, no env vars referenced anywhere in the codebase. This is a clean "not started," not a partial integration.
+- **What exists instead today, as a partial substitute:** `console.error(...)` calls at every caught-failure boundary this session has touched (AI provider failures, automation action retries/failures, email send failures, ticket reply failures, etc.) — these land in Vercel's function logs, which is where errors are currently "monitored" (by someone manually checking Vercel's dashboard). There is no alerting, no aggregation, no error-rate dashboard, and no product-analytics/funnel tracking of any kind.
+- **Blocked on:** A Sentry account + project (for the DSN) and a PostHog account + project (for the API key) — both need to be created by the user; there's no way to provision either from inside this repo.
+- **To unblock:** Create a Sentry project (get a DSN), create a PostHog project (get an API key + host), add both as env vars locally and on Vercel, then wire `Sentry.init()` in `instrumentation.ts`/`sentry.*.config.ts` (Next.js 15's supported pattern) and a PostHog client provider around the app root. Once the accounts exist this is a same-session, low-risk addition — no architectural changes needed elsewhere.
+- **Why it wasn't stubbed/mocked like the email provider was:** unlike `EmailService` (which has a real interface with a working console-log fallback provider), error monitoring and product analytics have no meaningful "fake" mode worth building — a mock Sentry/PostHog client would just be `console.log`, which is already what's happening today. Better to wait for real accounts than build throwaway scaffolding.
+
 ## Known future items — not built yet, but will need an external account when we get there
 
 - **Automated payment gateway / billing** (Stripe or similar) — none of this exists yet, and per the user (2026-08-05) a real payment gateway needs a registered company first, which doesn't exist yet. **In the meantime, the full subscription lifecycle is manual but real, not a placeholder**: a customer messages via the WhatsApp CTA on `/dashboard/billing` → an admin activates a plan for them at `/admin/workspaces` with a specific number of days → the daily cron (item 5) emails them at 3/2/1 days before expiry and auto-suspends them if they don't renew. Whichever payment provider is chosen later just needs to call `workspaceAdminRepository.activateSubscription()` on successful payment instead of an admin clicking a button — no redesign. There's also a real `orders`/`order_items` model (`src/features/orders`) with a 9-stage status (draft → pending → confirmed → preparing → ready → delivered → completed → cancelled → refunded) that businesses can move through manually/COD today, separate from the platform's own subscription billing.
 - **Cloudflare R2 (file storage)** — logo upload during onboarding is currently just a raw URL text field; a real upload widget needs an R2 bucket + API credentials.
-- **Sentry (monitoring)** / **PostHog (analytics)** — not integrated at all yet; both need their own account + project key when they're added.
 
 ## Needs your decision — not blocked on an account, but shouldn't be built without your sign-off
 
