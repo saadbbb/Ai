@@ -35,4 +35,9 @@ export const userRepository = {
       .returning();
     return user;
   },
+
+  /** Trivial real query used by the /api/health probe to confirm the Postgres pool actually works. */
+  async pingHealth(): Promise<void> {
+    await db.select({ id: users.id }).from(users).limit(1);
+  },
 };

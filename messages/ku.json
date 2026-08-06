@@ -12,7 +12,9 @@
     "delete": "سڕینەوە",
     "cancel": "پاشگەزبوونەوە",
     "confirmDelete": "دڵنیایت لە سڕینەوەی ئەمە؟",
-    "exportCsv": "هەناردەکردنی CSV"
+    "exportCsv": "هەناردەکردنی CSV",
+    "search": "گەڕان",
+    "searchPlaceholder": "بە ناو بگەڕێ..."
   },
   "auth": {
     "register": {

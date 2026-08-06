@@ -18,8 +18,8 @@ export interface LeadListItemWithScore extends LeadListItem {
  * One grouped query per signal (messages/orders/appointments) rather than a
  * per-lead lookup — see the repository methods this calls for why.
  */
-async function listLeads(workspaceId: string): Promise<LeadListItemWithScore[]> {
-  const items = await leadRepository.findByWorkspaceId(workspaceId);
+async function listLeads(workspaceId: string, search?: string): Promise<LeadListItemWithScore[]> {
+  const items = await leadRepository.findByWorkspaceId(workspaceId, search);
   if (items.length === 0) return [];
 
   const conversationIds = items

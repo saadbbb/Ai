@@ -1,10 +1,21 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { db } from "@/db/client";
 import { type Contact, contacts, type NewContact } from "@/db/schema";
 
 export const contactRepository = {
-  async findByWorkspaceId(workspaceId: string): Promise<Contact[]> {
-    return db.select().from(contacts).where(eq(contacts.workspaceId, workspaceId)).orderBy(desc(contacts.createdAt));
+  async findByWorkspaceId(workspaceId: string, search?: string): Promise<Contact[]> {
+    const trimmed = search?.trim();
+    const pattern = trimmed ? `%${trimmed}%` : undefined;
+    return db
+      .select()
+      .from(contacts)
+      .where(
+        and(
+          eq(contacts.workspaceId, workspaceId),
+          pattern ? or(ilike(contacts.fullName, pattern), ilike(contacts.phone, pattern), ilike(contacts.email, pattern)) : undefined,
+        ),
+      )
+      .orderBy(desc(contacts.createdAt));
   },
 
   async findById(id: string, workspaceId: string): Promise<Contact | null> {

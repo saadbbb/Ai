@@ -5,17 +5,20 @@ import { DeleteWorkflowButton } from "@/features/automation/components/delete-wo
 import { WorkflowStatusToggle } from "@/features/automation/components/workflow-status-toggle";
 import { describeAction, describeConditions, describeDelay, describeTrigger } from "@/features/automation/lib/describe-workflow";
 import { automationService } from "@/features/automation/services/automation.service";
-import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { permissionService } from "@/features/workspace/services/permission.service";
+import { requireFeature, requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 
 export default async function AutomationsPage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
   await requireFeature(workspace, "automations");
-  const [t, tLeads, tOrders, tAppointments] = await Promise.all([
+  await requireWorkspacePermission(user.id, workspace.id, "automation.workflows.view");
+  const [t, tLeads, tOrders, tAppointments, canManage] = await Promise.all([
     getTranslations("automations"),
     getTranslations("leads"),
     getTranslations("orders"),
     getTranslations("appointments"),
+    permissionService.hasPermission(user.id, workspace.id, "automation.workflows.manage"),
   ]);
   const translators = { automations: t, leads: tLeads, orders: tOrders, appointments: tAppointments };
 
@@ -28,9 +31,11 @@ export default async function AutomationsPage() {
           <h1 className="text-xl font-semibold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/automations/new">{t("newWorkflow")}</Link>
-        </Button>
+        {canManage && (
+          <Button asChild>
+            <Link href="/dashboard/automations/new">{t("newWorkflow")}</Link>
+          </Button>
+        )}
       </div>
 
       {workflows.length === 0 ? (
@@ -52,10 +57,12 @@ export default async function AutomationsPage() {
                   </p>
                   {conditions && <p className="truncate text-xs text-muted-foreground">{conditions}</p>}
                 </Link>
-                <div className="flex shrink-0 items-center gap-2">
-                  <WorkflowStatusToggle workflowId={workflow.id} initialStatus={workflow.status} />
-                  <DeleteWorkflowButton workflowId={workflow.id} />
-                </div>
+                {canManage && (
+                  <div className="flex shrink-0 items-center gap-2">
+                    <WorkflowStatusToggle workflowId={workflow.id} initialStatus={workflow.status} />
+                    <DeleteWorkflowButton workflowId={workflow.id} />
+                  </div>
+                )}
               </div>
             );
           })}

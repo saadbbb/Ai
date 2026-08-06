@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { workflowStatusEnum, type Workflow } from "@/db/schema";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { automationService } from "../services/automation.service";
 
@@ -19,6 +19,7 @@ export async function setWorkflowStatusAction(input: unknown): Promise<ActionRes
 
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireWorkspacePermission(user.id, workspace.id, "automation.workflows.manage");
 
   try {
     const workflow = await automationService.setWorkflowStatus(workspace.id, parsed.data.workflowId, parsed.data.status);

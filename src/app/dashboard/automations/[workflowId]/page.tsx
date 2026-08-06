@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { describeAction, describeConditions, describeDelay, describeTrigger } from "@/features/automation/lib/describe-workflow";
 import { automationService } from "@/features/automation/services/automation.service";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 import { AppError } from "@/lib/errors/app-error";
 
 interface PageProps {
@@ -14,6 +14,7 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
   const { workflowId } = await params;
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireWorkspacePermission(user.id, workspace.id, "automation.workflows.view");
   const [t, tLeads, tOrders, tAppointments] = await Promise.all([
     getTranslations("automations"),
     getTranslations("leads"),

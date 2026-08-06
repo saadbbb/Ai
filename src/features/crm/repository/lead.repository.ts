@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ilike } from "drizzle-orm";
 import { db } from "@/db/client";
 import { type Contact, contacts, type Lead, leads, type LeadStage, type NewLead } from "@/db/schema";
 
@@ -10,12 +10,13 @@ export interface LeadListItem {
 const listSelection = { lead: leads, contact: contacts };
 
 export const leadRepository = {
-  async findByWorkspaceId(workspaceId: string): Promise<LeadListItem[]> {
+  async findByWorkspaceId(workspaceId: string, search?: string): Promise<LeadListItem[]> {
+    const trimmed = search?.trim();
     return db
       .select(listSelection)
       .from(leads)
       .innerJoin(contacts, eq(leads.contactId, contacts.id))
-      .where(eq(leads.workspaceId, workspaceId))
+      .where(and(eq(leads.workspaceId, workspaceId), trimmed ? ilike(contacts.fullName, `%${trimmed}%`) : undefined))
       .orderBy(desc(leads.createdAt));
   },
 

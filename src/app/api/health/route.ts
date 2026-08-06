@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db/client";
-import { users } from "@/db/schema";
+import { userRepository } from "@/features/auth/repository/user.repository";
 
 /**
  * Liveness/readiness probe — no auth needed (read-only, reveals nothing
@@ -10,7 +9,7 @@ import { users } from "@/db/schema";
  */
 export async function GET() {
   try {
-    await db.select({ id: users.id }).from(users).limit(1);
+    await userRepository.pingHealth();
     return NextResponse.json({ status: "ok", timestamp: new Date().toISOString() });
   } catch (error) {
     console.error("[health] database check failed:", error);

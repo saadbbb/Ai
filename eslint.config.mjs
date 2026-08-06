@@ -14,6 +14,30 @@ const eslintConfig = [
   {
     ignores: [".next/**", "out/**", "build/**", "next-env.d.ts"],
   },
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/ban-ts-comment": "error",
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@anthropic-ai/sdk",
+              message:
+                "Only src/features/ai/providers/claude.provider.ts may import the Anthropic SDK directly — go through AIService/AIProvider instead.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/features/ai/providers/claude.provider.ts"],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

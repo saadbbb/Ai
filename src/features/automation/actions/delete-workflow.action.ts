@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { automationService } from "../services/automation.service";
 import { workflowIdSchema } from "../validation/schemas";
@@ -13,6 +13,7 @@ export async function deleteWorkflowAction(input: unknown): Promise<ActionResult
 
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireWorkspacePermission(user.id, workspace.id, "automation.workflows.manage");
 
   try {
     await automationService.deleteWorkflow(workspace.id, parsed.data.workflowId);

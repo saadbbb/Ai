@@ -6,9 +6,16 @@ import { AppError } from "@/lib/errors/app-error";
 import { type InvitationListItem, invitationRepository } from "../repository/invitation.repository";
 import { type MemberListItem, membershipRepository } from "../repository/membership.repository";
 import { roleRepository } from "../repository/role.repository";
+import { workspaceAuditLogRepository } from "../repository/workspace-audit-log.repository";
 import { workspaceRepository } from "../repository/workspace.repository";
 
 const INVITATION_TTL_DAYS = 7;
+
+/** Who performed a team-management action — logged to the workspace's own audit trail. */
+interface AuditActor {
+  userId: string;
+  email: string;
+}
 
 function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
@@ -43,7 +50,7 @@ async function getTeam(
  */
 async function inviteMember(
   workspace: Workspace,
-  invitedByUserId: string,
+  actor: AuditActor,
   email: string,
   roleId: string,
 ): Promise<{ invitation: Invitation; link: string }> {
@@ -57,7 +64,7 @@ async function inviteMember(
     workspaceId: workspace.id,
     email,
     roleId,
-    invitedByUserId,
+    invitedByUserId: actor.userId,
     tokenHash: hashToken(token),
     expiresAt: new Date(Date.now() + INVITATION_TTL_DAYS * 24 * 60 * 60 * 1000),
   });
@@ -74,30 +81,73 @@ async function inviteMember(
     console.error("[team] invitation email failed:", error);
   }
 
+  await workspaceAuditLogRepository.log({
+    workspaceId: workspace.id,
+    actorUserId: actor.userId,
+    actorEmail: actor.email,
+    action: "member_invited",
+    targetType: "invitation",
+    targetId: invitation.id,
+    summary: `Invited ${email} to the workspace`,
+    metadata: { roleId },
+  });
+
   return { invitation, link };
 }
 
-async function revokeInvitation(workspaceId: string, invitationId: string): Promise<void> {
+async function revokeInvitation(workspaceId: string, invitationId: string, actor: AuditActor): Promise<void> {
   const updated = await invitationRepository.updateStatus(invitationId, workspaceId, "revoked");
   if (!updated) throw new AppError("NOT_FOUND", "Invitation not found.");
+
+  await workspaceAuditLogRepository.log({
+    workspaceId,
+    actorUserId: actor.userId,
+    actorEmail: actor.email,
+    action: "invitation_revoked",
+    targetType: "invitation",
+    targetId: invitationId,
+    summary: `Revoked invitation for ${updated.email}`,
+  });
 }
 
-async function updateMemberRole(workspaceId: string, memberId: string, roleId: string): Promise<void> {
+async function updateMemberRole(workspaceId: string, memberId: string, roleId: string, actor: AuditActor): Promise<void> {
   const members = await membershipRepository.findMembersByWorkspaceId(workspaceId);
   const target = members.find((item) => item.member.id === memberId);
   if (!target) throw new AppError("NOT_FOUND", "Member not found.");
   if (target.role.key === "owner") throw new AppError("VALIDATION_ERROR", "The workspace owner's role can't be changed.");
 
   await membershipRepository.updateRole(memberId, workspaceId, roleId);
+
+  const newRole = await roleRepository.findById(roleId);
+  await workspaceAuditLogRepository.log({
+    workspaceId,
+    actorUserId: actor.userId,
+    actorEmail: actor.email,
+    action: "member_role_changed",
+    targetType: "workspace_member",
+    targetId: memberId,
+    summary: `Changed ${target.user.email}'s role from ${target.role.name} to ${newRole?.name ?? roleId}`,
+    metadata: { previousRoleId: target.role.id, newRoleId: roleId },
+  });
 }
 
-async function removeMember(workspaceId: string, memberId: string): Promise<void> {
+async function removeMember(workspaceId: string, memberId: string, actor: AuditActor): Promise<void> {
   const members = await membershipRepository.findMembersByWorkspaceId(workspaceId);
   const target = members.find((item) => item.member.id === memberId);
   if (!target) throw new AppError("NOT_FOUND", "Member not found.");
   if (target.role.key === "owner") throw new AppError("VALIDATION_ERROR", "The workspace owner can't be removed.");
 
   await membershipRepository.remove(memberId, workspaceId);
+
+  await workspaceAuditLogRepository.log({
+    workspaceId,
+    actorUserId: actor.userId,
+    actorEmail: actor.email,
+    action: "member_removed",
+    targetType: "workspace_member",
+    targetId: memberId,
+    summary: `Removed ${target.user.email} from the workspace`,
+  });
 }
 
 export type InvitationPreviewStatus = "valid" | "not_found" | "expired" | "already_used";

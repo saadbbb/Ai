@@ -1,17 +1,23 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
-export default async function ContactsPage() {
+interface PageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function ContactsPage({ searchParams }: PageProps) {
+  const { q } = await searchParams;
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
   await requireFeature(workspace, "contacts");
   const t = await getTranslations("contacts");
   const tCommon = await getTranslations("common");
 
-  const contacts = await contactRepository.findByWorkspaceId(workspace.id);
+  const contacts = await contactRepository.findByWorkspaceId(workspace.id, q);
 
   return (
     <div className="space-y-6">
@@ -24,6 +30,10 @@ export default async function ContactsPage() {
           <a href="/api/reports/contacts">{tCommon("exportCsv")}</a>
         </Button>
       </div>
+
+      <form className="max-w-sm">
+        <Input type="search" name="q" defaultValue={q ?? ""} placeholder={tCommon("searchPlaceholder")} aria-label={tCommon("search")} />
+      </form>
 
       {contacts.length === 0 ? (
         <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">

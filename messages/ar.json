@@ -12,7 +12,9 @@
     "delete": "حذف",
     "cancel": "إلغاء",
     "confirmDelete": "هل أنت متأكد من حذف هذا؟",
-    "exportCsv": "تصدير CSV"
+    "exportCsv": "تصدير CSV",
+    "search": "بحث",
+    "searchPlaceholder": "ابحث بالاسم..."
   },
   "auth": {
     "register": {

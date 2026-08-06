@@ -19,8 +19,8 @@ interface CreateOrderInput {
   items: OrderItemInput[];
 }
 
-async function listOrders(workspaceId: string): Promise<OrderListItem[]> {
-  return orderRepository.findByWorkspaceId(workspaceId);
+async function listOrders(workspaceId: string, search?: string): Promise<OrderListItem[]> {
+  return orderRepository.findByWorkspaceId(workspaceId, search);
 }
 
 async function getOrder(workspaceId: string, orderId: string): Promise<OrderListItem> {

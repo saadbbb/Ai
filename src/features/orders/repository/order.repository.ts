@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   type Contact,
@@ -40,12 +40,13 @@ async function attachItems(rows: { order: Order; contact: Contact }[]): Promise<
 }
 
 export const orderRepository = {
-  async findByWorkspaceId(workspaceId: string): Promise<OrderListItem[]> {
+  async findByWorkspaceId(workspaceId: string, search?: string): Promise<OrderListItem[]> {
+    const trimmed = search?.trim();
     const rows = await db
       .select(listSelection)
       .from(orders)
       .innerJoin(contacts, eq(orders.contactId, contacts.id))
-      .where(eq(orders.workspaceId, workspaceId))
+      .where(and(eq(orders.workspaceId, workspaceId), trimmed ? ilike(contacts.fullName, `%${trimmed}%`) : undefined))
       .orderBy(desc(orders.createdAt));
     return attachItems(rows);
   },

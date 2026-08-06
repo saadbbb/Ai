@@ -11,6 +11,8 @@ const PERMISSIONS = [
   { key: "workspace.members.invite", description: "Invite new workspace members" },
   { key: "workspace.members.manage", description: "Change member roles or remove members" },
   { key: "analytics.view", description: "View the Analytics & Business Intelligence dashboard" },
+  { key: "automation.workflows.view", description: "View automation workflows and their execution history" },
+  { key: "automation.workflows.manage", description: "Create, edit, delete, and change the status of automation workflows" },
 ] as const;
 
 const ROLES: Array<{ key: string; name: string; description: string; permissionKeys: string[] }> = [
@@ -31,6 +33,8 @@ const ROLES: Array<{ key: string; name: string; description: string; permissionK
       "workspace.members.invite",
       "workspace.members.manage",
       "analytics.view",
+      "automation.workflows.view",
+      "automation.workflows.manage",
     ],
   },
   {
@@ -42,19 +46,21 @@ const ROLES: Array<{ key: string; name: string; description: string; permissionK
       "workspace.members.view",
       "workspace.members.invite",
       "analytics.view",
+      "automation.workflows.view",
+      "automation.workflows.manage",
     ],
   },
   {
     key: "agent",
     name: "Agent",
     description: "Handles conversations and daily work",
-    permissionKeys: ["workspace.settings.view", "workspace.members.view"],
+    permissionKeys: ["workspace.settings.view", "workspace.members.view", "automation.workflows.view"],
   },
   {
     key: "viewer",
     name: "Viewer",
     description: "Read-only access",
-    permissionKeys: ["workspace.settings.view"],
+    permissionKeys: ["workspace.settings.view", "automation.workflows.view"],
   },
 ];
 

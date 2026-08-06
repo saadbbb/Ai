@@ -1,4 +1,4 @@
-import { boolean, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { languageEnum, workspaces } from "./workspaces";
 
 export const aiToneEnum = pgEnum("ai_tone", [
@@ -34,26 +34,31 @@ export interface WorkingHours {
 }
 
 /**
- * One AI Employee per workspace for now — the settings captured across onboarding
- * steps 2-8 (name, description, language, tone, creativity, hours, handover).
+ * One AI Employee per workspace today — application code (see onboardingService
+ * and aiAgentRepository) only ever creates one per workspace via a check-then-create
+ * pattern, not a DB-level constraint, so multiple agents per workspace can be
+ * supported later without a breaking migration.
  */
-export const aiAgents = pgTable("ai_agents", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  workspaceId: uuid("workspace_id")
-    .notNull()
-    .unique()
-    .references(() => workspaces.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  businessDescription: text("business_description"),
-  language: languageEnum("language").notNull().default("en"),
-  tone: aiToneEnum("tone").notNull().default("friendly"),
-  creativity: aiCreativityEnum("creativity").notNull().default("medium"),
-  workingHours: jsonb("working_hours").$type<WorkingHours>(),
-  handoverEnabled: boolean("handover_enabled").notNull().default(false),
-  handoverInstructions: text("handover_instructions"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const aiAgents = pgTable(
+  "ai_agents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    businessDescription: text("business_description"),
+    language: languageEnum("language").notNull().default("en"),
+    tone: aiToneEnum("tone").notNull().default("friendly"),
+    creativity: aiCreativityEnum("creativity").notNull().default("medium"),
+    workingHours: jsonb("working_hours").$type<WorkingHours>(),
+    handoverEnabled: boolean("handover_enabled").notNull().default(false),
+    handoverInstructions: text("handover_instructions"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("ai_agents_workspace_id_idx").on(table.workspaceId)],
+);
 
 export type AiAgent = typeof aiAgents.$inferSelect;
 export type NewAiAgent = typeof aiAgents.$inferInsert;
