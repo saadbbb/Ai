@@ -1,4 +1,4 @@
-import { CheckEmailNotice } from "@/features/auth/components/check-email-notice";
+import { VerifySignupOtpForm } from "@/features/auth/components/verify-signup-otp-form";
 
 export default async function VerifyPage({
   searchParams,
@@ -6,5 +6,5 @@ export default async function VerifyPage({
   searchParams: Promise<{ email?: string }>;
 }) {
   const { email } = await searchParams;
-  return <CheckEmailNotice email={email ?? ""} />;
+  return <VerifySignupOtpForm email={email ?? ""} />;
 }

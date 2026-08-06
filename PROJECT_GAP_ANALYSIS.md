@@ -518,3 +518,24 @@ existing `DATABASE_URL`). Full migration from the custom email/OTP/session auth 
 - Full typecheck/lint/128-tests/build pass, same as every other phase.
 
 **Still open (see DEFERRED_TASKS.md):** Google OAuth is code-ready but needs the provider actually enabled in the Supabase dashboard (which itself needs a Google Cloud OAuth client) before that button does anything but error. `otp_codes`/`sessions` tables are now fully unused and can be dropped in a follow-up migration whenever convenient — not urgent, just schema debt.
+
+**2026-08-06 — Google OAuth completed, then a follow-up: email flows switched to OTP codes.** User
+finished the Google Cloud Console + Supabase provider setup (two rounds — first hit a
+`redirect_uri_mismatch` from Google because the Supabase callback URL wasn't registered on the Google
+OAuth Client, diagnosed by actually driving the button in a browser and reading Google's own error page
+rather than guessing; second attempt confirmed reaching Google's real consent screen). Verified live
+end-to-end. Also caught and fixed a real bug found the same way: the onboarding layout had no
+header/logout at all, so a user landing there right after a fresh signup had no way to switch accounts —
+added one.
+
+User then asked to replace Supabase's magic-link email confirmation/password-reset with a 6-digit-style
+OTP code entry (closer to the pre-migration UX). Implemented `verifySignupOtp`/`verifyRecoveryOtp` in
+`auth.service.ts` and new code-entry UIs for both `/verify` and `/forgot-password` → `/reset-password`.
+Verified fully end-to-end against the live project (Admin API's `generateLink` to obtain real codes
+without needing inbox access) — and this test caught two real things a guess would have missed:
+1. This project's actual OTP length is **8 digits**, not the assumed 6 — validation was built to accept 6-10 rather than hardcoding a count.
+2. `verifyOtp(type: "recovery")` grants a full session immediately, which the middleware's "redirect away from auth pages if already logged in" rule then bounced out of `/reset-password` before the user could set a new password — fixed by excluding that one route from the auth-pages redirect list.
+
+One remaining step needs the user: the Supabase email templates ("Confirm signup", "Reset Password")
+still need to display `{{ .Token }}` as visible text in the actual email — otherwise a real user has no
+way to read the code even though the whole verification pipeline is confirmed working.

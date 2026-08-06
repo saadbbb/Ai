@@ -35,10 +35,17 @@
       "redirecting": "Redirecting..."
     },
     "verify": {
-      "checkEmailTitle": "Check your email",
-      "checkEmailDescription": "We sent a confirmation link to {email}. Click it to finish creating your account.",
-      "checkEmailDescriptionGeneric": "We sent you a confirmation link. Click it to finish creating your account.",
-      "backToLogin": "Back to log in"
+      "missingEmailTitle": "Missing email",
+      "missingEmailDescription": "Start the registration process again from the sign-up page.",
+      "otpTitle": "Check your email",
+      "otpDescription": "Enter the code we sent to {email}.",
+      "codeLabel": "Verification code",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "success": "Account verified!",
+      "resendCode": "Resend code",
+      "resending": "Resending...",
+      "resendSuccess": "Sent a new code."
     },
     "login": {
       "title": "Log in",
@@ -54,13 +61,16 @@
     },
     "forgotPassword": {
       "title": "Forgot password",
-      "description": "We'll email you a link to reset your password.",
+      "description": "We'll email you a code to reset your password.",
       "emailLabel": "Email",
-      "submit": "Send reset link",
+      "submit": "Send code",
       "submitting": "Sending...",
       "backToLogin": "Back to log in",
-      "sentTitle": "Check your email",
-      "sentDescription": "If an account exists for that email, we've sent a link to reset the password."
+      "otpTitle": "Check your email",
+      "otpDescription": "Enter the code we sent to {email}.",
+      "codeLabel": "Verification code",
+      "verify": "Verify",
+      "verifying": "Verifying..."
     },
     "resetPassword": {
       "title": "Set a new password",
@@ -69,14 +79,14 @@
       "submit": "Update password",
       "submitting": "Updating...",
       "success": "Password updated.",
-      "invalidLinkTitle": "This link is invalid or has expired",
-      "invalidLinkDescription": "Request a new password reset link and try again."
+      "invalidLinkTitle": "This code has expired",
+      "invalidLinkDescription": "Request a new password reset code and try again."
     },
     "logout": "Log out"
   },
   "validation": {
     "emailInvalid": "Enter a valid email address.",
-    "codeLength": "Enter the 6-digit code.",
+    "codeLength": "Enter the verification code from your email.",
     "passwordMin": "Password must be at least 8 characters.",
     "acceptTermsRequired": "You must accept the terms to continue.",
     "passwordRequired": "Password is required.",

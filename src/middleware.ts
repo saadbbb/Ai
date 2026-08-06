@@ -1,7 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
-const AUTH_PAGES = ["/login", "/register", "/verify", "/forgot-password", "/reset-password"];
+// /reset-password is deliberately excluded — verifyOtp(type: "recovery") grants a real
+// session before the user has set their new password, so an authenticated visit there
+// must not bounce away like the other auth-only pages do.
+const AUTH_PAGES = ["/login", "/register", "/verify", "/forgot-password"];
 
 /**
  * Refreshes the Supabase session cookie on every matched request (the

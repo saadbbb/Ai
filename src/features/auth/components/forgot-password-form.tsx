@@ -3,29 +3,37 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import type { z } from "zod";
+import { z } from "zod";
 import { Field } from "@/components/form/field";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { requestPasswordResetAction } from "../actions/forgot-password.action";
-import { createRequestPasswordResetSchema } from "../validation/schemas";
+import { verifyRecoveryOtpAction } from "../actions/verify-recovery-otp.action";
+import { createOtpCodeSchema, createRequestPasswordResetSchema } from "../validation/schemas";
 
 type RequestResetInput = z.infer<ReturnType<typeof createRequestPasswordResetSchema>>;
 
 export function ForgotPasswordForm() {
+  const router = useRouter();
   const t = useTranslations("auth.forgotPassword");
   const tValidation = useTranslations("validation");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [email, setEmail] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<RequestResetInput>({ resolver: zodResolver(createRequestPasswordResetSchema(tValidation)) });
+
+  const otpSchema = z.object({ code: createOtpCodeSchema(tValidation) });
+  type OtpInput = z.infer<typeof otpSchema>;
+  const otpForm = useForm<OtpInput>({ resolver: zodResolver(otpSchema) });
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -37,20 +45,38 @@ export function ForgotPasswordForm() {
       return;
     }
 
-    setSent(true);
+    setEmail(values.email);
   });
 
-  if (sent) {
+  const onSubmitOtp = otpForm.handleSubmit(async (values) => {
+    setIsVerifying(true);
+    const result = await verifyRecoveryOtpAction({ email, code: values.code });
+    setIsVerifying(false);
+
+    if (!result.success) {
+      toast.error(result.error.message);
+      return;
+    }
+
+    router.push("/reset-password");
+  });
+
+  if (email) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("sentTitle")}</CardTitle>
-          <CardDescription>{t("sentDescription")}</CardDescription>
+          <CardTitle>{t("otpTitle")}</CardTitle>
+          <CardDescription>{t("otpDescription", { email })}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Link href="/login" className="text-sm font-medium text-foreground underline underline-offset-4">
-            {t("backToLogin")}
-          </Link>
+          <form onSubmit={onSubmitOtp} className="space-y-4">
+            <Field label={t("codeLabel")} htmlFor="code" error={otpForm.formState.errors.code}>
+              <Input id="code" inputMode="numeric" maxLength={10} autoComplete="one-time-code" {...otpForm.register("code")} />
+            </Field>
+            <Button type="submit" className="w-full" disabled={isVerifying}>
+              {isVerifying ? t("verifying") : t("verify")}
+            </Button>
+          </form>
         </CardContent>
       </Card>
     );
