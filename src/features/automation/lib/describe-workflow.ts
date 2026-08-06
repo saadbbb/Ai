@@ -56,6 +56,15 @@ export function describeAction(workflow: Workflow, t: Pick<DescribeWorkflowTrans
   if (workflow.actionType === "close_conversation") {
     return t.automations("actionCloseConversation");
   }
+  if (workflow.actionType === "assign_agent") {
+    return t.automations("actionAssignAgent");
+  }
+  if (workflow.actionType === "webhook_call") {
+    return t.automations("actionWebhookCall");
+  }
+  if (workflow.actionType === "trigger_another_workflow") {
+    return t.automations("actionTriggerAnotherWorkflow");
+  }
   return t.automations("actionNotifyOwner");
 }
 

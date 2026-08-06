@@ -643,6 +643,9 @@
     "actionUpdateContactLanguage": "دانانی زمانی پەیوەندییەکە بۆ {language}",
     "actionCreateLead": "دروستکردنی کڕیارێکی ئەگەری بۆ پەیوەندییەکە",
     "actionCloseConversation": "داخستنی گفتوگۆکە",
+    "actionAssignAgent": "دیاریکردنی گفتوگۆکە بۆ ئەندامێکی تیم",
+    "actionWebhookCall": "ناردنی داتا بۆ بەستەرێکی webhook",
+    "actionTriggerAnotherWorkflow": "کارپێکردنی خۆکارکردنێکی تر",
     "delaySummary": "دوای {days} ڕۆژ",
     "new": {
       "title": "خۆکارکردنی نوێ",
@@ -681,7 +684,10 @@
         "create_note": "زیادکردنی تێبینی",
         "update_contact_language": "دانانی زمانی کڕیار",
         "create_lead": "دروستکردنی کڕیارێکی ئەگەری",
-        "close_conversation": "داخستنی گفتوگۆکە"
+        "close_conversation": "داخستنی گفتوگۆکە",
+        "assign_agent": "دیاریکردن بۆ ئەندامێکی تیم",
+        "webhook_call": "ناردن بۆ webhook",
+        "trigger_another_workflow": "کارپێکردنی خۆکارکردنێکی تر"
       },
       "tagPlaceholder": "نیشانە، بۆ نموونە: کڕیار",
       "subjectPlaceholder": "ناونیشان (ئارەزوومەندانە)",
@@ -702,6 +708,11 @@
         "en": "ئینگلیزی",
         "ku": "کوردی"
       },
+      "assignedUserPlaceholder": "ئەندامێکی تیم هەڵبژێرە",
+      "webhookUrlPlaceholder": "https://example.com/webhook",
+      "webhookMessagePlaceholder": "تێبینی زیاتر (ئارەزوومەندانە) — '{{contactName}}' بەکاربێنە بۆ ناوی کڕیار",
+      "targetWorkflowPlaceholder": "خۆکارکردنێک هەڵبژێرە بۆ کارپێکردنی",
+      "noOtherWorkflows": "هێشتا هیچ خۆکارکردنێکی تر نییە بۆ کارپێکردنی.",
       "delayLabel": "چاوەڕوانبوون پێش جێبەجێکردن (ئارەزوومەندانە)",
       "delayPlaceholder": "ژمارەی ڕۆژ، بۆ نموونە: 3 — بەتاڵی بهێڵەرەوە بۆ جێبەجێکردنی خێرا",
       "submit": "دروستکردنی خۆکارکردن",

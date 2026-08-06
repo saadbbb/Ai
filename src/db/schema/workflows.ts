@@ -25,6 +25,9 @@ export const workflowActionEnum = pgEnum("workflow_action", [
   "update_contact_language",
   "create_lead",
   "close_conversation",
+  "assign_agent",
+  "webhook_call",
+  "trigger_another_workflow",
 ]);
 
 export const workflowStatusEnum = pgEnum("workflow_status", ["active", "paused"]);
@@ -43,9 +46,12 @@ export interface WorkflowTriggerConfig {
 
 /**
  * Shape depends on actionType: `tag` for add_contact_tag/remove_contact_tag,
- * `subject`/`message` for notify_owner_email, `taskTitle`/`taskPriority`/
- * `taskDueInDays` for create_task, `noteContent` for create_note,
- * `contactLanguage` for update_contact_language.
+ * `subject`/`message` for notify_owner_email (`message` is also reused as an
+ * optional free-text note sent in the webhook_call payload), `taskTitle`/
+ * `taskPriority`/`taskDueInDays` for create_task, `noteContent` for
+ * create_note, `contactLanguage` for update_contact_language,
+ * `assignedUserId` for assign_agent, `webhookUrl` for webhook_call,
+ * `targetWorkflowId` for trigger_another_workflow.
  */
 export interface WorkflowActionConfig {
   tag?: string;
@@ -56,6 +62,9 @@ export interface WorkflowActionConfig {
   taskDueInDays?: number;
   noteContent?: string;
   contactLanguage?: string;
+  assignedUserId?: string;
+  webhookUrl?: string;
+  targetWorkflowId?: string;
 }
 
 /**

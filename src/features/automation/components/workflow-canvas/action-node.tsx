@@ -119,6 +119,63 @@ export function ActionNode({ data }: NodeProps<Node<ActionNodeData>>) {
         </Select>
       )}
 
+      {data.actionType === "assign_agent" && (
+        <Select
+          value={data.actionAssignedUserId}
+          onValueChange={(value) => data.onChange({ actionAssignedUserId: value })}
+        >
+          <SelectTrigger className="w-full nodrag">
+            <SelectValue placeholder={t("assignedUserPlaceholder")} />
+          </SelectTrigger>
+          <SelectContent>
+            {data.memberOptions.map((member) => (
+              <SelectItem key={member.id} value={member.id}>
+                {member.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      {data.actionType === "webhook_call" && (
+        <>
+          <Input
+            className="nodrag"
+            value={data.actionWebhookUrl}
+            onChange={(event) => data.onChange({ actionWebhookUrl: event.target.value })}
+            placeholder={t("webhookUrlPlaceholder")}
+          />
+          <Textarea
+            className="nodrag"
+            value={data.actionMessage}
+            onChange={(event) => data.onChange({ actionMessage: event.target.value })}
+            placeholder={t("webhookMessagePlaceholder")}
+            rows={2}
+          />
+        </>
+      )}
+
+      {data.actionType === "trigger_another_workflow" &&
+        (data.workflowOptions.length > 0 ? (
+          <Select
+            value={data.actionTargetWorkflowId}
+            onValueChange={(value) => data.onChange({ actionTargetWorkflowId: value })}
+          >
+            <SelectTrigger className="w-full nodrag">
+              <SelectValue placeholder={t("targetWorkflowPlaceholder")} />
+            </SelectTrigger>
+            <SelectContent>
+              {data.workflowOptions.map((option) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <p className="text-xs text-muted-foreground">{t("noOtherWorkflows")}</p>
+        ))}
+
       <div className="space-y-1">
         <label className="text-xs text-muted-foreground">{t("delayLabel")}</label>
         <Input

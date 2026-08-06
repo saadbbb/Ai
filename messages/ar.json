@@ -643,6 +643,9 @@
     "actionUpdateContactLanguage": "تعيين لغة جهة الاتصال إلى {language}",
     "actionCreateLead": "إنشاء عميل محتمل لجهة الاتصال",
     "actionCloseConversation": "إغلاق المحادثة",
+    "actionAssignAgent": "تعيين المحادثة لعضو فريق",
+    "actionWebhookCall": "إرسال بيانات إلى رابط webhook",
+    "actionTriggerAnotherWorkflow": "تشغيل أتمتة أخرى",
     "delaySummary": "بعد {days} يوم",
     "new": {
       "title": "أتمتة جديدة",
@@ -681,7 +684,10 @@
         "create_note": "إضافة ملاحظة",
         "update_contact_language": "تعيين لغة العميل",
         "create_lead": "إنشاء عميل محتمل",
-        "close_conversation": "إغلاق المحادثة"
+        "close_conversation": "إغلاق المحادثة",
+        "assign_agent": "تعيين لعضو فريق",
+        "webhook_call": "إرسال إلى webhook",
+        "trigger_another_workflow": "تشغيل أتمتة أخرى"
       },
       "tagPlaceholder": "الوسم، مثال: عميل",
       "subjectPlaceholder": "العنوان (اختياري)",
@@ -702,6 +708,11 @@
         "en": "الإنجليزية",
         "ku": "الكردية"
       },
+      "assignedUserPlaceholder": "اختر عضو فريق",
+      "webhookUrlPlaceholder": "https://example.com/webhook",
+      "webhookMessagePlaceholder": "ملاحظة إضافية (اختياري) — استخدم '{{contactName}}' لاسم العميل",
+      "targetWorkflowPlaceholder": "اختر أتمتة لتشغيلها",
+      "noOtherWorkflows": "ما عندك أتمتة ثانية تقدر تشغّلها بعد.",
       "delayLabel": "الانتظار قبل التنفيذ (اختياري)",
       "delayPlaceholder": "عدد الأيام، مثال: 3 — اتركه فارغاً للتنفيذ الفوري",
       "submit": "إنشاء الأتمتة",

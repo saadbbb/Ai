@@ -32,6 +32,16 @@ export interface ConditionsNodeData {
   onMatchTypeChange: (matchType: WorkflowConditionMatchType) => void;
 }
 
+export interface WorkflowOption {
+  id: string;
+  name: string;
+}
+
+export interface MemberOption {
+  id: string;
+  label: string;
+}
+
 export interface ActionNodeData {
   [key: string]: unknown;
   actionType: WorkflowAction;
@@ -43,7 +53,12 @@ export interface ActionNodeData {
   actionTaskDueInDays: string;
   actionNoteContent: string;
   actionContactLanguage: string;
+  actionAssignedUserId: string;
+  actionWebhookUrl: string;
+  actionTargetWorkflowId: string;
   delayDays: string;
+  memberOptions: MemberOption[];
+  workflowOptions: WorkflowOption[];
   onChange: (
     patch: Partial<
       Pick<
@@ -57,6 +72,9 @@ export interface ActionNodeData {
         | "actionTaskDueInDays"
         | "actionNoteContent"
         | "actionContactLanguage"
+        | "actionAssignedUserId"
+        | "actionWebhookUrl"
+        | "actionTargetWorkflowId"
         | "delayDays"
       >
     >,

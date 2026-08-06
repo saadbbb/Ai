@@ -21,6 +21,7 @@ import { membershipRepository } from "@/features/workspace/repository/membership
 import { userRepository } from "@/features/auth/repository/user.repository";
 import { emailService } from "@/lib/email";
 import { AppError } from "@/lib/errors/app-error";
+import { safeWebhookPost } from "../lib/safe-webhook-fetch";
 import { workflowRepository } from "../repository/workflow.repository";
 import type { createWorkflowSchema } from "../validation/schemas";
 import type { z } from "zod";
@@ -40,6 +41,13 @@ export type AutomationEvent =
 
 /** Lead stages that mean "this lead is no longer actionable" — see the create_lead action's dedup check. */
 const TERMINAL_LEAD_STAGES: readonly LeadStage[] = ["won", "lost", "cancelled"];
+
+/**
+ * Hard cap on how many workflows trigger_another_workflow can chain through in
+ * one run, independent of the id-based cycle check below — belt-and-suspenders
+ * against runaway chains even if they never repeat the exact same workflow id.
+ */
+const MAX_WORKFLOW_CHAIN_DEPTH = 5;
 
 /** An action is retried this many times total before the run is logged as a failure. */
 const MAX_ACTION_ATTEMPTS = 2;
@@ -106,6 +114,7 @@ async function runAction(
   workflow: Workflow,
   event: AutomationEvent,
   contact: Contact | null,
+  chain: ReadonlySet<string>,
 ): Promise<string | null> {
   if (workflow.actionType === "add_contact_tag") {
     const tag = workflow.actionConfig.tag;
@@ -272,6 +281,70 @@ async function runAction(
     return contact ? `Closed the conversation with ${contact.fullName}` : "Closed the conversation";
   }
 
+  if (workflow.actionType === "assign_agent") {
+    const assignedUserId = workflow.actionConfig.assignedUserId;
+    if (!assignedUserId) throw new AppError("VALIDATION_ERROR", "Workflow is missing an agent to assign.");
+
+    const member = await membershipRepository.findByUserAndWorkspace(assignedUserId, workspaceId);
+    if (!member) throw new AppError("NOT_FOUND", "The assigned team member is no longer part of this workspace.");
+
+    const conversations = await conversationRepository.findByContactId(event.contactId, workspaceId);
+    const targetConversation = conversations[0]; // most recent — findByContactId orders by lastMessageAt/createdAt desc
+    if (!targetConversation) throw new AppError("NOT_FOUND", "This contact has no conversation to assign.");
+
+    await conversationRepository.assign(targetConversation.conversation.id, workspaceId, assignedUserId);
+    const assignedUser = await userRepository.findById(assignedUserId);
+    const assigneeLabel = assignedUser?.email ?? "a team member";
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "conversation_assigned",
+      actor: { type: "automation" },
+      summary: `Conversation assigned to ${assigneeLabel} by automation "${workflow.name}".`,
+      link: `/dashboard/inbox/${targetConversation.conversation.id}`,
+    });
+
+    return contact
+      ? `Assigned ${contact.fullName}'s conversation to ${assigneeLabel}`
+      : `Assigned the conversation to ${assigneeLabel}`;
+  }
+
+  if (workflow.actionType === "webhook_call") {
+    const url = workflow.actionConfig.webhookUrl;
+    if (!url) throw new AppError("VALIDATION_ERROR", "Workflow is missing a webhook URL.");
+
+    await safeWebhookPost(url, {
+      event: event.type,
+      workflow: { id: workflow.id, name: workflow.name },
+      contact: contact
+        ? { id: contact.id, fullName: contact.fullName, phone: contact.phone, email: contact.email }
+        : { id: event.contactId },
+      message: (workflow.actionConfig.message ?? "").replaceAll("{{contactName}}", contact?.fullName ?? ""),
+    });
+
+    return `Sent webhook to ${new URL(url).hostname}`;
+  }
+
+  if (workflow.actionType === "trigger_another_workflow") {
+    const targetWorkflowId = workflow.actionConfig.targetWorkflowId;
+    if (!targetWorkflowId) throw new AppError("VALIDATION_ERROR", "Workflow is missing a target workflow to trigger.");
+    if (targetWorkflowId === workflow.id) {
+      throw new AppError("VALIDATION_ERROR", "A workflow cannot trigger itself.");
+    }
+    if (chain.has(targetWorkflowId) || chain.size >= MAX_WORKFLOW_CHAIN_DEPTH) {
+      return "Skipped triggering another workflow — would create a loop or exceed the chain limit";
+    }
+
+    const targetWorkflow = await workflowRepository.findById(targetWorkflowId, workspaceId);
+    if (!targetWorkflow) throw new AppError("NOT_FOUND", "The target workflow no longer exists.");
+    if (targetWorkflow.status !== "active") {
+      return `Skipped triggering "${targetWorkflow.name}" — it is not active`;
+    }
+
+    await runAndLog(workspaceId, targetWorkflow, event, contact, new Set([...chain, targetWorkflowId]));
+    return `Triggered workflow "${targetWorkflow.name}"`;
+  }
+
   return null;
 }
 
@@ -280,12 +353,13 @@ async function runAndLog(
   workflow: Workflow,
   event: AutomationEvent,
   contact: Contact | null,
+  chain: ReadonlySet<string>,
 ): Promise<void> {
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= MAX_ACTION_ATTEMPTS; attempt++) {
     try {
-      const summary = await runAction(workspaceId, workflow, event, contact);
+      const summary = await runAction(workspaceId, workflow, event, contact, chain);
       await workflowRepository.logExecution({
         workspaceId,
         workflowId: workflow.id,
@@ -350,7 +424,7 @@ async function dispatch(workspaceId: string, event: AutomationEvent): Promise<vo
         continue;
       }
 
-      await runAndLog(workspaceId, workflow, event, contact);
+      await runAndLog(workspaceId, workflow, event, contact, new Set([workflow.id]));
     }
   } catch (error) {
     console.error("[automation] dispatch failed:", error);
@@ -378,7 +452,7 @@ async function processDueRuns(): Promise<void> {
           ...pendingRun.eventPayload,
         } as AutomationEvent;
         const contact = await contactRepository.findById(pendingRun.contactId, pendingRun.workspaceId);
-        await runAndLog(pendingRun.workspaceId, workflow, event, contact);
+        await runAndLog(pendingRun.workspaceId, workflow, event, contact, new Set([workflow.id]));
       }
     } catch (error) {
       console.error(`[automation] pending run ${pendingRun.id} failed:`, error);
@@ -420,6 +494,9 @@ async function createWorkflow(workspaceId: string, input: z.infer<typeof createW
       taskDueInDays: input.actionTaskDueInDays,
       noteContent: input.actionNoteContent,
       contactLanguage: input.actionContactLanguage,
+      assignedUserId: input.actionAssignedUserId,
+      webhookUrl: input.actionWebhookUrl,
+      targetWorkflowId: input.actionTargetWorkflowId,
     },
     conditions:
       input.conditions && input.conditions.length > 0

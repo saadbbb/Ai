@@ -656,3 +656,76 @@ correctly deferred per Decision 2). Canvas UI browser-verification is still outs
 slices — no browser-automation tool has been available in this session.
 
 Next: further Phase 6 scope (if picked up again) or Phase 7 (Channels/Meta OAuth) per the approved plan.
+
+**2026-08-06 — Phase 6, third slice.** Before starting, the user was asked to choose between finishing
+more of Phase 6 (fully testable in this project) vs. starting Phase 7 (Meta OAuth/webhooks — unverifiable
+against live Meta endpoints since no Meta Developer App has been created yet, per `DEFERRED_TASKS.md` item
+6). Chose to continue Phase 6. This slice covers the remaining 3 spec-listed actions that don't depend on
+Channels/Meta and don't need a product/service-catalog selection UI:
+
+- **`assign_agent`**: assigns the contact's most recent conversation (any status — `conversationRepository
+  .findByContactId`'s own `lastMessageAt`/`createdAt desc` ordering) to a specific team member, chosen from
+  a real dropdown of the workspace's current members (fetched server-side in `automations/new/page.tsx` via
+  `membershipRepository.findMembersByWorkspaceId`, passed into `WorkflowCanvas` as a prop — no client-side
+  fetching library exists in this project, so this follows the established server-props pattern). Verifies
+  at execution time (not just at workflow-creation time) that the configured user is still a workspace
+  member, so a workflow doesn't silently keep assigning to someone who's been removed. New
+  `conversationRepository.assign` (unconditional — overrides any existing assignment, unlike the
+  pre-existing `assignIfUnassigned` used by a human agent taking over) and a new `conversation_assigned`
+  activity-timeline type.
+- **`webhook_call`**: the spec's "Webhook/API Call" action. POSTs a JSON payload (event type, workflow
+  name, contact info, an optional `{{contactName}}`-substituted message) to a workspace-owner-supplied URL.
+  Built a dedicated `safe-webhook-fetch.ts` helper with real SSRF defenses, since the spec explicitly lists
+  SSRF prevention as a requirement and this is the first place user-supplied URLs are fetched server-side
+  in this codebase: https-only, rejects `localhost` outright, resolves DNS and blocks private/loopback/
+  link-local ranges (including the AWS/GCP/Azure metadata address `169.254.169.254`) for both IPv4 and
+  IPv6, never follows redirects (a redirect response is treated as a failure rather than followed, since a
+  redirect to an internal address would bypass the upfront IP check), and enforces a 5-second timeout.
+  **Documented limitation, not hidden**: this checks DNS resolution *before* connecting, not the IP `fetch`
+  actually connects to — a DNS-rebinding attacker controlling their own DNS server could in theory swap the
+  answer in between. Closing that fully needs a custom connect-to-pinned-IP fetch agent, flagged as a
+  follow-up rather than silently claimed as complete. 13 unit tests cover the IP-range logic (v4 and v6,
+  including the IPv4-mapped-IPv6 case) and the fetch wrapper's behavior (rejects non-https, rejects
+  localhost without even doing a DNS lookup, rejects on a resolved private IP, treats 3xx and non-2xx as
+  failures, cancels the response body).
+- **`trigger_another_workflow`**: runs a different workflow's action against the same event/contact,
+  skipping that target's own trigger/condition matching (per the spec's "Trigger Another Workflow" —
+  chaining, not re-triggering). Required real loop-prevention, since the spec explicitly calls for
+  "prevent recursive workflows": a `chain: ReadonlySet<string>` of workflow ids threaded through
+  `runAction`/`runAndLog` (seeded with the originating workflow's own id at every top-level dispatch/
+  processDueRuns call site), checked before recursing — a workflow already in the chain is skipped
+  (logged as a successful no-op, not an error) rather than re-run, plus a hard `MAX_WORKFLOW_CHAIN_DEPTH =
+  5` cap independent of the id check. A workflow targeting itself is rejected outright as a validation
+  error. Verified with a dedicated two-workflow-cycle test (A triggers B, B's attempt to trigger A back is
+  caught and skipped — `findById` is asked to resolve B exactly once, never re-resolves A) and a
+  paused-target-is-skipped test.
+- Migration `0028_daily_kinsey_walden.sql` (3 workflow_action enum values + 1 activity_type enum value)
+  applied live to production Supabase, same as every prior slice.
+- i18n: en/ar/ku all updated, re-verified in sync (774 keys each, up from 763).
+- 21 new tests (11 in `automation.service.test.ts` for the 3 new actions, including the cycle/depth/
+  paused-target cases; 4 in `schemas.test.ts`; a new 13-test file for `safe-webhook-fetch.ts`, though 3 of
+  those 21 are net-new files' worth so the exact split isn't 1:1 with earlier phases' counts). Full suite:
+  typecheck clean, lint clean, **198/198 tests passing** (up from 156), production build clean. Caught and
+  fixed two real test bugs during this pass (not app bugs): a missing `vi.clearAllMocks()` in the new
+  webhook-fetch test file let a `dns.lookup` call from one test leak into the next test's assertion, and
+  two hand-written fake UUIDs in `schemas.test.ts` used an invalid variant nibble that Zod's `.uuid()`
+  correctly rejected — fixed to proper RFC 4122 v4 UUIDs.
+- Same standing gap as the prior two slices: canvas UI still not browser-verified (no browser-automation
+  tool available this session) — the new `assign_agent`/`webhook_call`/`trigger_another_workflow` fields in
+  `action-node.tsx` reuse the same Input/Select/Textarea/enum-driven-options pattern already proven for
+  earlier fields, and the member/workflow dropdowns are populated from real server-fetched data (not
+  mocked), but this hasn't been rendered in an actual browser this session.
+
+**PART 6 status after three slices**: all spec-listed actions now have handlers except Send AI Reply,
+Create Order, and Book Appointment (all three need a product/service/date selection UI, deliberately not
+rushed) and Send WhatsApp Template (blocked on Channels/Phase 7). Remaining triggers not yet covered:
+Channel Connected, Subscription Renewed, Payment Failed (all three depend on other unbuilt/external
+systems — Meta OAuth, billing gateway); Workspace Created and User Invited were evaluated and deliberately
+rejected as incompatible with this engine's per-contact event model (see the second-slice entry above).
+Deeper condition fields, nested AND/OR groups, Branches, general Variables, Workflow Versioning, the AI
+Workflow Generator, Human Approval, and Draft/Disabled/Archived workflow statuses remain open — all
+net-new subsystems or UI work, not incremental patches. Async/queued execution via BullMQ remains
+correctly deferred per Decision 2.
+
+Next: Phase 7 (Channels/Meta OAuth) once the user has a Meta Developer App to build/verify against, or
+Phase 8 (Business Operations depth) as a fully-testable alternative in the meantime.

@@ -75,6 +75,14 @@ export const conversationRepository = {
       .where(and(eq(conversations.id, id), eq(conversations.workspaceId, workspaceId), isNull(conversations.assignedUserId)));
   },
 
+  /** Unconditional — overrides any existing assignment, unlike assignIfUnassigned. */
+  async assign(id: string, workspaceId: string, userId: string): Promise<void> {
+    await db
+      .update(conversations)
+      .set({ assignedUserId: userId, updatedAt: new Date() })
+      .where(and(eq(conversations.id, id), eq(conversations.workspaceId, workspaceId)));
+  },
+
   async updateAiStatus(id: string, workspaceId: string, aiStatus: ConversationAiStatus): Promise<void> {
     await db
       .update(conversations)

@@ -55,6 +55,7 @@ vi.mock("@/features/inbox/repository/conversation.repository", () => ({
   conversationRepository: {
     findByContactId: vi.fn(),
     updateStatus: vi.fn(),
+    assign: vi.fn(),
   },
 }));
 
@@ -67,6 +68,7 @@ vi.mock("@/features/notifications/repository/notification.repository", () => ({
 vi.mock("@/features/workspace/repository/membership.repository", () => ({
   membershipRepository: {
     findOwnerUserId: vi.fn(),
+    findByUserAndWorkspace: vi.fn(),
   },
 }));
 
@@ -82,6 +84,10 @@ vi.mock("@/lib/email", () => ({
   },
 }));
 
+vi.mock("../lib/safe-webhook-fetch", () => ({
+  safeWebhookPost: vi.fn(),
+}));
+
 const { workflowRepository } = await import("../repository/workflow.repository");
 const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
 const { activityRepository } = await import("@/features/crm/repository/activity.repository");
@@ -93,6 +99,7 @@ const { notificationRepository } = await import("@/features/notifications/reposi
 const { membershipRepository } = await import("@/features/workspace/repository/membership.repository");
 const { userRepository } = await import("@/features/auth/repository/user.repository");
 const { emailService } = await import("@/lib/email");
+const { safeWebhookPost } = await import("../lib/safe-webhook-fetch");
 const { automationService } = await import("./automation.service");
 
 const WORKSPACE_ID = "workspace-1";
@@ -143,6 +150,9 @@ beforeEach(() => {
   vi.mocked(leadRepository.findByContactId).mockResolvedValue([]);
   vi.mocked(leadRepository.create).mockResolvedValue({ id: "lead-1", contactId: CONTACT_ID, stage: "new" } as never);
   vi.mocked(conversationRepository.findByContactId).mockResolvedValue([]);
+  vi.mocked(membershipRepository.findByUserAndWorkspace).mockResolvedValue({ id: "member-1" } as never);
+  vi.mocked(userRepository.findById).mockResolvedValue({ id: "user-1", email: "agent@example.com" } as never);
+  vi.mocked(safeWebhookPost).mockResolvedValue(undefined);
 });
 
 describe("automationService.dispatch — matching", () => {
@@ -428,6 +438,169 @@ describe("automationService.dispatch — close_conversation", () => {
 
     expect(conversationRepository.updateStatus).not.toHaveBeenCalled();
     expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+});
+
+describe("automationService.dispatch — assign_agent", () => {
+  it("assigns the contact's most recent conversation to the configured team member", async () => {
+    const workflow = makeWorkflow({ actionType: "assign_agent", actionConfig: { assignedUserId: "user-1" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(conversationRepository.findByContactId).mockResolvedValue([
+      { conversation: { id: "conv-1" } } as never,
+      { conversation: { id: "conv-older" } } as never,
+    ]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(conversationRepository.assign).toHaveBeenCalledWith("conv-1", WORKSPACE_ID, "user-1");
+    expect(activityRepository.log).toHaveBeenCalledWith(expect.objectContaining({ type: "conversation_assigned" }));
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("fails when the assigned user is no longer a member of the workspace", async () => {
+    const workflow = makeWorkflow({ actionType: "assign_agent", actionConfig: { assignedUserId: "user-1" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(membershipRepository.findByUserAndWorkspace).mockResolvedValue(null);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(conversationRepository.assign).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+
+  it("fails when the contact has no conversation at all", async () => {
+    const workflow = makeWorkflow({ actionType: "assign_agent", actionConfig: { assignedUserId: "user-1" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(conversationRepository.findByContactId).mockResolvedValue([]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(conversationRepository.assign).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+});
+
+describe("automationService.dispatch — webhook_call", () => {
+  it("posts the event, workflow, and contact info to the configured URL", async () => {
+    const workflow = makeWorkflow({
+      actionType: "webhook_call",
+      actionConfig: { webhookUrl: "https://example.com/hook", message: "Hi {{contactName}}" },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(safeWebhookPost).toHaveBeenCalledWith(
+      "https://example.com/hook",
+      expect.objectContaining({
+        event: "lead_created",
+        contact: expect.objectContaining({ id: CONTACT_ID, fullName: "Jane Customer" }),
+        message: "Hi Jane Customer",
+      }),
+    );
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("fails (and is retried) when the webhook post rejects", async () => {
+    const workflow = makeWorkflow({ actionType: "webhook_call", actionConfig: { webhookUrl: "https://example.com/hook" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(safeWebhookPost).mockRejectedValue(new Error("blocked address"));
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(safeWebhookPost).toHaveBeenCalledTimes(2); // MAX_ACTION_ATTEMPTS
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+
+  it("fails when no webhook URL is configured", async () => {
+    const workflow = makeWorkflow({ actionType: "webhook_call", actionConfig: {} });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(safeWebhookPost).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+});
+
+describe("automationService.dispatch — trigger_another_workflow", () => {
+  it("runs the target workflow's action for the same contact", async () => {
+    const source = makeWorkflow({
+      id: "workflow-source",
+      actionType: "trigger_another_workflow",
+      actionConfig: { targetWorkflowId: "workflow-target" },
+    });
+    const target = makeWorkflow({
+      id: "workflow-target",
+      actionType: "add_contact_tag",
+      actionConfig: { tag: "Chained" },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([source]);
+    vi.mocked(workflowRepository.findById).mockResolvedValue(target);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(contactRepository.addTag).toHaveBeenCalledWith(CONTACT_ID, WORKSPACE_ID, "Chained");
+    // Both the source run and the chained target run get their own execution log row.
+    expect(workflowRepository.logExecution).toHaveBeenCalledTimes(2);
+  });
+
+  it("refuses to trigger itself", async () => {
+    const workflow = makeWorkflow({
+      id: "workflow-1",
+      actionType: "trigger_another_workflow",
+      actionConfig: { targetWorkflowId: "workflow-1" },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.findById).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+
+  it("breaks a two-workflow cycle instead of recursing forever", async () => {
+    const a = makeWorkflow({
+      id: "workflow-a",
+      actionType: "trigger_another_workflow",
+      actionConfig: { targetWorkflowId: "workflow-b" },
+    });
+    const b = makeWorkflow({
+      id: "workflow-b",
+      actionType: "trigger_another_workflow",
+      actionConfig: { targetWorkflowId: "workflow-a" },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([a]);
+    vi.mocked(workflowRepository.findById).mockResolvedValue(b);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    // a -> b succeeds; b's attempt to trigger a again is caught by the chain check and skipped,
+    // not run again — so findById is only ever asked to resolve "b", never re-resolves "a".
+    expect(workflowRepository.findById).toHaveBeenCalledTimes(1);
+    expect(workflowRepository.findById).toHaveBeenCalledWith("workflow-b", WORKSPACE_ID);
+    expect(workflowRepository.logExecution).toHaveBeenCalledTimes(2);
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, summary: expect.stringContaining("Skipped") }),
+    );
+  });
+
+  it("skips triggering a target workflow that is paused", async () => {
+    const source = makeWorkflow({
+      id: "workflow-source",
+      actionType: "trigger_another_workflow",
+      actionConfig: { targetWorkflowId: "workflow-target" },
+    });
+    const target = makeWorkflow({ id: "workflow-target", status: "paused" });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([source]);
+    vi.mocked(workflowRepository.findById).mockResolvedValue(target);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).toHaveBeenCalledTimes(1);
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, summary: expect.stringContaining("not active") }),
+    );
   });
 });
 

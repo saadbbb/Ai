@@ -21,7 +21,14 @@ import { createWorkflowAction } from "../../actions/create-workflow.action";
 import { ActionNode } from "./action-node";
 import { ConditionsNode } from "./conditions-node";
 import { TriggerNode } from "./trigger-node";
-import type { ActionNodeData, ConditionRow, ConditionsNodeData, TriggerNodeData } from "./types";
+import type {
+  ActionNodeData,
+  ConditionRow,
+  ConditionsNodeData,
+  MemberOption,
+  TriggerNodeData,
+  WorkflowOption,
+} from "./types";
 
 const NODE_TYPES = { trigger: TriggerNode, conditions: ConditionsNode, action: ActionNode };
 
@@ -64,7 +71,12 @@ const INITIAL_NODES: Node[] = [
       actionTaskDueInDays: "",
       actionNoteContent: "",
       actionContactLanguage: "",
+      actionAssignedUserId: "",
+      actionWebhookUrl: "",
+      actionTargetWorkflowId: "",
       delayDays: "",
+      memberOptions: [],
+      workflowOptions: [],
       onChange: NOOP,
     } satisfies ActionNodeData,
   },
@@ -116,7 +128,12 @@ const TEMPLATES: WorkflowTemplate[] = [
  * useNodesState's setNodes preserves the full node object (measured
  * included) when only `data` is patched below.
  */
-export function WorkflowCanvas() {
+interface WorkflowCanvasProps {
+  memberOptions: MemberOption[];
+  workflowOptions: WorkflowOption[];
+}
+
+export function WorkflowCanvas({ memberOptions, workflowOptions }: WorkflowCanvasProps) {
   const router = useRouter();
   const t = useTranslations("automations.new");
 
@@ -135,6 +152,9 @@ export function WorkflowCanvas() {
   const [actionTaskDueInDays, setActionTaskDueInDays] = useState("");
   const [actionNoteContent, setActionNoteContent] = useState("");
   const [actionContactLanguage, setActionContactLanguage] = useState("");
+  const [actionAssignedUserId, setActionAssignedUserId] = useState("");
+  const [actionWebhookUrl, setActionWebhookUrl] = useState("");
+  const [actionTargetWorkflowId, setActionTargetWorkflowId] = useState("");
   const [delayDays, setDelayDays] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
@@ -153,6 +173,9 @@ export function WorkflowCanvas() {
     setActionTaskDueInDays("");
     setActionNoteContent("");
     setActionContactLanguage("");
+    setActionAssignedUserId("");
+    setActionWebhookUrl("");
+    setActionTargetWorkflowId("");
     setDelayDays("");
     setConditions([]);
     setConditionsMatchType("all");
@@ -190,7 +213,12 @@ export function WorkflowCanvas() {
       actionTaskDueInDays,
       actionNoteContent,
       actionContactLanguage,
+      actionAssignedUserId,
+      actionWebhookUrl,
+      actionTargetWorkflowId,
       delayDays,
+      memberOptions,
+      workflowOptions,
       onChange: (patch) => {
         if (patch.actionType !== undefined) setActionType(patch.actionType);
         if (patch.actionTag !== undefined) setActionTag(patch.actionTag);
@@ -201,6 +229,9 @@ export function WorkflowCanvas() {
         if (patch.actionTaskDueInDays !== undefined) setActionTaskDueInDays(patch.actionTaskDueInDays);
         if (patch.actionNoteContent !== undefined) setActionNoteContent(patch.actionNoteContent);
         if (patch.actionContactLanguage !== undefined) setActionContactLanguage(patch.actionContactLanguage);
+        if (patch.actionAssignedUserId !== undefined) setActionAssignedUserId(patch.actionAssignedUserId);
+        if (patch.actionWebhookUrl !== undefined) setActionWebhookUrl(patch.actionWebhookUrl);
+        if (patch.actionTargetWorkflowId !== undefined) setActionTargetWorkflowId(patch.actionTargetWorkflowId);
         if (patch.delayDays !== undefined) setDelayDays(patch.delayDays);
       },
     };
@@ -231,7 +262,12 @@ export function WorkflowCanvas() {
     actionTaskDueInDays,
     actionNoteContent,
     actionContactLanguage,
+    actionAssignedUserId,
+    actionWebhookUrl,
+    actionTargetWorkflowId,
     delayDays,
+    memberOptions,
+    workflowOptions,
   ]);
 
   async function handleSubmit() {
@@ -249,12 +285,17 @@ export function WorkflowCanvas() {
       actionType,
       actionTag: actionType === "add_contact_tag" || actionType === "remove_contact_tag" ? actionTag || undefined : undefined,
       actionSubject: actionType === "notify_owner_email" ? actionSubject || undefined : undefined,
-      actionMessage: actionType === "notify_owner_email" ? actionMessage || undefined : undefined,
       actionTaskTitle: actionType === "create_task" ? actionTaskTitle || undefined : undefined,
       actionTaskPriority: actionType === "create_task" ? actionTaskPriority : undefined,
       actionTaskDueInDays: actionType === "create_task" ? actionTaskDueInDays || undefined : undefined,
       actionNoteContent: actionType === "create_note" ? actionNoteContent || undefined : undefined,
       actionContactLanguage: actionType === "update_contact_language" ? actionContactLanguage || undefined : undefined,
+      actionAssignedUserId: actionType === "assign_agent" ? actionAssignedUserId || undefined : undefined,
+      actionWebhookUrl: actionType === "webhook_call" ? actionWebhookUrl || undefined : undefined,
+      actionMessage:
+        actionType === "notify_owner_email" || actionType === "webhook_call" ? actionMessage || undefined : undefined,
+      actionTargetWorkflowId:
+        actionType === "trigger_another_workflow" ? actionTargetWorkflowId || undefined : undefined,
       conditions: filledConditions.length > 0 ? filledConditions : undefined,
       conditionsMatchType: filledConditions.length > 1 ? conditionsMatchType : undefined,
       delayDays: delayDays || undefined,

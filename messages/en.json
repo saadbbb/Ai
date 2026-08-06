@@ -643,6 +643,9 @@
     "actionUpdateContactLanguage": "Set the contact's language to {language}",
     "actionCreateLead": "Create a lead for the contact",
     "actionCloseConversation": "Close the conversation",
+    "actionAssignAgent": "Assign the conversation to a team member",
+    "actionWebhookCall": "Send data to a webhook URL",
+    "actionTriggerAnotherWorkflow": "Trigger another automation",
     "delaySummary": "after {days} days",
     "new": {
       "title": "New automation",
@@ -681,7 +684,10 @@
         "create_note": "Add a note",
         "update_contact_language": "Set the customer's language",
         "create_lead": "Create a lead",
-        "close_conversation": "Close the conversation"
+        "close_conversation": "Close the conversation",
+        "assign_agent": "Assign to a team member",
+        "webhook_call": "Send to a webhook",
+        "trigger_another_workflow": "Trigger another automation"
       },
       "tagPlaceholder": "Tag, e.g. customer",
       "subjectPlaceholder": "Subject (optional)",
@@ -702,6 +708,11 @@
         "en": "English",
         "ku": "Kurdish"
       },
+      "assignedUserPlaceholder": "Select a team member",
+      "webhookUrlPlaceholder": "https://example.com/webhook",
+      "webhookMessagePlaceholder": "Extra note to include (optional) — use '{{contactName}}' for the customer's name",
+      "targetWorkflowPlaceholder": "Select an automation to trigger",
+      "noOtherWorkflows": "You don't have any other automations to trigger yet.",
       "delayLabel": "Wait before running (optional)",
       "delayPlaceholder": "Days, e.g. 3 — leave empty to run immediately",
       "submit": "Create automation",

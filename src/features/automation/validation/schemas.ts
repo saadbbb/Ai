@@ -34,6 +34,9 @@ export const createWorkflowSchema = z
     actionTaskDueInDays: z.coerce.number().int().min(0).max(365).optional(),
     actionNoteContent: z.string().trim().max(2000).optional(),
     actionContactLanguage: z.enum(languageEnum.enumValues).optional(),
+    actionAssignedUserId: z.string().uuid().optional(),
+    actionWebhookUrl: z.string().trim().url().max(2000).startsWith("https://", "Must be a secure (https) URL.").optional(),
+    actionTargetWorkflowId: z.string().uuid().optional(),
     conditions: z.array(conditionRuleSchema).max(5).optional(),
     conditionsMatchType: z.enum(["all", "any"]).optional(),
     delayDays: z.coerce.number().int().min(0).max(365).optional(),
@@ -62,6 +65,17 @@ export const createWorkflowSchema = z
     }
     if (data.actionType === "update_contact_language" && !data.actionContactLanguage) {
       ctx.addIssue({ code: "custom", path: ["actionContactLanguage"], message: "Pick a language." });
+    }
+    if (data.actionType === "assign_agent" && !data.actionAssignedUserId) {
+      ctx.addIssue({ code: "custom", path: ["actionAssignedUserId"], message: "Pick a team member." });
+    }
+    if (data.actionType === "webhook_call" && !data.actionWebhookUrl) {
+      ctx.addIssue({ code: "custom", path: ["actionWebhookUrl"], message: "Enter a webhook URL." });
+    }
+    if (data.actionType === "trigger_another_workflow") {
+      if (!data.actionTargetWorkflowId) {
+        ctx.addIssue({ code: "custom", path: ["actionTargetWorkflowId"], message: "Pick a workflow to trigger." });
+      }
     }
   });
 

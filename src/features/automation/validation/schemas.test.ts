@@ -104,6 +104,82 @@ describe("createWorkflowSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("requires actionAssignedUserId for assign_agent", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "assign_agent",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toEqual(["actionAssignedUserId"]);
+    }
+  });
+
+  it("accepts assign_agent with a valid user id", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "assign_agent",
+      actionAssignedUserId: "11111111-1111-4111-8111-111111111111",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("requires actionWebhookUrl for webhook_call", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "webhook_call",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toEqual(["actionWebhookUrl"]);
+    }
+  });
+
+  it("rejects a non-https webhook URL", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "webhook_call",
+      actionWebhookUrl: "http://example.com/hook",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts webhook_call with a valid https URL", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "webhook_call",
+      actionWebhookUrl: "https://example.com/hook",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("requires actionTargetWorkflowId for trigger_another_workflow", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "trigger_another_workflow",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toEqual(["actionTargetWorkflowId"]);
+    }
+  });
+
+  it("accepts trigger_another_workflow with a valid target workflow id", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "trigger_another_workflow",
+      actionTargetWorkflowId: "11111111-1111-4111-8111-111111111111",
+    });
+    expect(result.success).toBe(true);
+  });
+
   it("requires actionTaskTitle for create_task", () => {
     const result = createWorkflowSchema.safeParse({
       name: "Test",
