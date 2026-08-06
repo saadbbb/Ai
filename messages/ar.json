@@ -546,6 +546,7 @@
     "workspacesLink": "المساحات",
     "plansLink": "الباقات",
     "aiUsageLink": "استخدام الذكاء الاصطناعي",
+    "aiOperationsLink": "عمليات الذكاء الاصطناعي",
     "ticketsLink": "التذاكر",
     "settingsLink": "الإعدادات",
     "home": {
@@ -580,6 +581,19 @@
       "emptyState": "لا توجد طلبات ذكاء اصطناعي مسجّلة بعد.",
       "workspaceRequests": "{count} طلب",
       "tokens": "رمز"
+    },
+    "aiOperations": {
+      "title": "عمليات الذكاء الاصطناعي",
+      "description": "تحكّم بمحرك الردود الذكية على مستوى المنصة بأكملها، وشاهد الموثوقية مفصّلة حسب النموذج.",
+      "killSwitchLabel": "الردود الذكية مفعّلة",
+      "killSwitchOnHint": "الذكاء الاصطناعي يولّد الردود بشكل طبيعي في جميع مساحات العمل.",
+      "killSwitchOffHint": "الردود الذكية معطّلة — يتم تحويل محادثات جميع مساحات العمل إلى موظف بشري تلقائياً.",
+      "enabledToast": "تم إعادة تفعيل الردود الذكية.",
+      "disabledToast": "تم تعطيل الردود الذكية على مستوى المنصة.",
+      "byModelHeading": "حسب النموذج",
+      "emptyState": "لا توجد طلبات ذكاء اصطناعي مسجّلة بعد.",
+      "modelRequests": "{count} طلب",
+      "msValue": "{ms} مللي ثانية"
     },
     "adminsLink": "المسؤولون",
     "workspaces": {

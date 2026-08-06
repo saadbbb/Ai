@@ -546,6 +546,7 @@
     "workspacesLink": "Workspaces",
     "plansLink": "Plans",
     "aiUsageLink": "AI Usage",
+    "aiOperationsLink": "AI Operations",
     "ticketsLink": "Tickets",
     "settingsLink": "Settings",
     "adminsLink": "Admins",
@@ -581,6 +582,19 @@
       "emptyState": "No AI requests logged yet.",
       "workspaceRequests": "{count} requests",
       "tokens": "tokens"
+    },
+    "aiOperations": {
+      "title": "AI Operations",
+      "description": "Control the AI reply engine platform-wide and see reliability broken down by model.",
+      "killSwitchLabel": "AI replies enabled",
+      "killSwitchOnHint": "The AI is generating replies normally across all workspaces.",
+      "killSwitchOffHint": "AI replies are disabled — every workspace's conversations are handed to a human automatically.",
+      "enabledToast": "AI replies re-enabled.",
+      "disabledToast": "AI replies disabled platform-wide.",
+      "byModelHeading": "By model",
+      "emptyState": "No AI requests logged yet.",
+      "modelRequests": "{count} requests",
+      "msValue": "{ms} ms"
     },
     "workspaces": {
       "title": "Workspaces",

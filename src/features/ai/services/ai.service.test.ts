@@ -42,8 +42,19 @@ vi.mock("../tools/registry", () => ({
   createToolDispatcher: vi.fn(),
 }));
 
+vi.mock("@/features/platform-admin/repository/platform-settings.repository", () => ({
+  platformSettingsRepository: { get: vi.fn() },
+}));
+
 const { aiUsageRepository } = await import("../repository/ai-usage.repository");
 const { selectProvider } = await import("../router/ai-router");
+const { platformSettingsRepository } = await import("@/features/platform-admin/repository/platform-settings.repository");
+const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
+const { faqRepository } = await import("@/features/knowledge-base/repository/faq.repository");
+const { policyRepository } = await import("@/features/knowledge-base/repository/policy.repository");
+const { productRepository } = await import("@/features/knowledge-base/repository/product.repository");
+const { serviceRepository } = await import("@/features/knowledge-base/repository/service.repository");
+const { aiAgentRepository } = await import("../repository/ai-agent.repository");
 const { aiService } = await import("./ai.service");
 
 const WORKSPACE_ID = "workspace-1";
@@ -62,6 +73,13 @@ function mockProviderText(text: string) {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(aiUsageRepository.create).mockResolvedValue(undefined as never);
+  vi.mocked(platformSettingsRepository.get).mockResolvedValue(null);
+  vi.mocked(contactRepository.findById).mockResolvedValue(null);
+  vi.mocked(faqRepository.findByWorkspaceId).mockResolvedValue([]);
+  vi.mocked(policyRepository.findByWorkspaceId).mockResolvedValue(null);
+  vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([]);
+  vi.mocked(serviceRepository.findByWorkspaceId).mockResolvedValue([]);
+  vi.mocked(aiAgentRepository.findByWorkspaceId).mockResolvedValue({ id: "agent-1" } as never);
 });
 
 describe("aiService.generateWorkflowFromDescription", () => {
@@ -111,5 +129,34 @@ describe("aiService.generateWorkflowFromDescription", () => {
     expect(aiUsageRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({ workspaceId: WORKSPACE_ID, success: false, errorMessage: "provider down" }),
     );
+  });
+});
+
+describe("aiService.generateReply — platform-wide kill switch", () => {
+  it("throws SERVICE_UNAVAILABLE without calling the provider when AI is disabled platform-wide", async () => {
+    vi.mocked(platformSettingsRepository.get).mockResolvedValue({ aiEnabled: false } as never);
+    const generateReply = mockProviderText("should never be called");
+
+    await expect(aiService.generateReply(WORKSPACE_ID, [])).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
+    expect(generateReply).not.toHaveBeenCalled();
+  });
+
+  it("calls the provider normally when no platform settings row exists yet (defaults enabled)", async () => {
+    vi.mocked(platformSettingsRepository.get).mockResolvedValue(null);
+    const generateReply = mockProviderText("Hello!");
+
+    const result = await aiService.generateReply(WORKSPACE_ID, []);
+
+    expect(result.text).toBe("Hello!");
+    expect(generateReply).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls the provider normally when AI is explicitly enabled", async () => {
+    vi.mocked(platformSettingsRepository.get).mockResolvedValue({ aiEnabled: true } as never);
+    const generateReply = mockProviderText("Hello!");
+
+    await aiService.generateReply(WORKSPACE_ID, []);
+
+    expect(generateReply).toHaveBeenCalledTimes(1);
   });
 });

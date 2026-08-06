@@ -18,6 +18,7 @@ export const auditActionEnum = pgEnum("audit_action", [
   "impersonation_started",
   "support_ticket_replied",
   "support_ticket_status_changed",
+  "ai_enabled_changed",
 ]);
 
 export const auditLogs = pgTable(

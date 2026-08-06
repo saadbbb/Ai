@@ -225,6 +225,13 @@
       "when": 1786056179323,
       "tag": "0031_complex_sinister_six",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1786057014858,
+      "tag": "0032_typical_captain_universe",
+      "breakpoints": true
     }
   ]
 }

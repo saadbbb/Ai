@@ -9,6 +9,7 @@ export type AppErrorCode =
   | "VALIDATION_ERROR"
   | "NOT_FOUND"
   | "RATE_LIMITED"
+  | "SERVICE_UNAVAILABLE"
   | "INTERNAL_ERROR";
 
 export class AppError extends Error {

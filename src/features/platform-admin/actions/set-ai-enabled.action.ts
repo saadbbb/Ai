@@ -1,0 +1,35 @@
+"use server";
+
+import { z } from "zod";
+import type { PlatformSettings } from "@/db/schema";
+import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
+import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
+import { auditLogRepository } from "../repository/audit-log.repository";
+import { platformSettingsRepository } from "../repository/platform-settings.repository";
+
+const schema = z.object({ enabled: z.boolean() });
+
+export async function setAiEnabledAction(input: unknown): Promise<ActionResult<PlatformSettings>> {
+  const parsed = schema.safeParse(input);
+  if (!parsed.success) {
+    return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
+  }
+
+  const admin = await requirePlatformAdmin();
+
+  try {
+    const settings = await platformSettingsRepository.setAiEnabled(parsed.data.enabled);
+
+    await auditLogRepository.log({
+      actorUserId: admin.id,
+      actorEmail: admin.email,
+      action: "ai_enabled_changed",
+      targetType: "platform_settings",
+      summary: parsed.data.enabled ? "Re-enabled AI replies platform-wide." : "Disabled AI replies platform-wide.",
+    });
+
+    return actionOk(settings);
+  } catch (error) {
+    return actionFail(error);
+  }
+}

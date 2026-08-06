@@ -23,4 +23,20 @@ export const platformSettingsRepository = {
       .returning();
     return row;
   },
+
+  async setAiEnabled(enabled: boolean): Promise<PlatformSettings> {
+    const existing = await platformSettingsRepository.get();
+
+    if (!existing) {
+      const [row] = await db.insert(platformSettings).values({ aiEnabled: enabled }).returning();
+      return row;
+    }
+
+    const [row] = await db
+      .update(platformSettings)
+      .set({ aiEnabled: enabled, updatedAt: new Date() })
+      .where(eq(platformSettings.id, existing.id))
+      .returning();
+    return row;
+  },
 };

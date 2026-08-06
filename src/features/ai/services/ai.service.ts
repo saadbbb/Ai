@@ -4,6 +4,7 @@ import { faqRepository } from "@/features/knowledge-base/repository/faq.reposito
 import { policyRepository } from "@/features/knowledge-base/repository/policy.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
+import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
 import { AppError } from "@/lib/errors/app-error";
 import { aiAgentRepository } from "../repository/ai-agent.repository";
 import { aiUsageRepository } from "../repository/ai-usage.repository";
@@ -91,6 +92,14 @@ async function generateReply(
   history: ChatMessage[],
   context?: ConversationContext,
 ): Promise<GenerateReplyResult> {
+  const platformSettings = await platformSettingsRepository.get();
+  if (platformSettings && !platformSettings.aiEnabled) {
+    // Caught by inboxService.triggerAiReply, which hands the conversation to a
+    // human instead of crashing — see that function's own doc comment. This is
+    // the AI Operations console's platform-wide kill switch (src/app/admin/ai-operations).
+    throw new AppError("SERVICE_UNAVAILABLE", "AI replies are temporarily disabled by the platform administrator.");
+  }
+
   const [agent, faqs, products, services, policy, contact] = await Promise.all([
     aiAgentRepository.findByWorkspaceId(workspaceId),
     faqRepository.findByWorkspaceId(workspaceId),
