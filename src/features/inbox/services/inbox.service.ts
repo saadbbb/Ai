@@ -26,6 +26,21 @@ function toChatHistory(history: Message[]): ChatMessage[] {
     }));
 }
 
+const SENDER_LABEL: Partial<Record<Message["senderType"], string>> = {
+  customer: "Customer",
+  ai: "Employee",
+  agent: "Employee",
+};
+
+/** Flattened plain-text transcript for summarization — see aiService.generateSummary. */
+function toTranscript(history: Message[]): string {
+  return history
+    .filter((message) => message.senderType !== "system")
+    .slice(-AI_HISTORY_LIMIT)
+    .map((message) => `${SENDER_LABEL[message.senderType] ?? message.senderType}: ${message.content}`)
+    .join("\n");
+}
+
 /**
  * Runs after any customer message on a conversation whose AI is still active.
  * Never lets an AI failure block the customer's message from being saved —
@@ -58,6 +73,11 @@ async function triggerAiReply(workspaceId: string, conversationId: string, conta
         summary: "AI handed the conversation to a human.",
         link: `/dashboard/inbox/${conversationId}`,
       });
+
+      const summary = await aiService.generateSummary(workspaceId, toTranscript([...history, message]));
+      if (summary) {
+        await contactRepository.updateAiSummary(contactId, workspaceId, summary);
+      }
     }
 
     return message;

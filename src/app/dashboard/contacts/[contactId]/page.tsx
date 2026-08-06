@@ -77,6 +77,9 @@ export default async function ContactDetailPage({ params }: PageProps) {
               ))}
             </div>
           )}
+          {contact.aiSummary && (
+            <p className="mt-2 max-w-md rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">{contact.aiSummary}</p>
+          )}
         </div>
         <div className="flex shrink-0 gap-2">
           <Button asChild variant="outline" size="sm">

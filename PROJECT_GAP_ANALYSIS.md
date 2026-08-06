@@ -474,3 +474,11 @@ authorization reasons:
 - Verified end-to-end in a real headless-Chromium session: grouped sidebar renders correctly, all 3 Home bands render, account dropdown shows exactly the 5 expected items, all touched routes load without console errors, and the mobile viewport now stacks correctly.
 
 Next: Phase 4 (AI Engine depth) — proceeding per the approved plan.
+
+**2026-08-06 — Phase 4 substantially complete.** The two PART 4 gaps still actionable without an
+external dependency:
+- **Long-term memory (Layer 4)**: `aiService.generateSummary()` condenses a conversation transcript (reusing the existing `AIProvider`/`generateReply` abstraction — no new provider code, no SDK access outside `claude.provider.ts`) into 1-3 sentences, best-effort (never throws, logs and returns `null` on failure). Wired into `inboxService.triggerAiReply`'s existing handover path — generates and stores a summary the moment a conversation hands over, written to the `contacts.aiSummary` column that already existed in schema but nothing ever populated (confirmed by grep before starting: zero read/write sites). Fed back into `buildSystemPrompt` as a new `customerSummary` field so returning customers get continuity without replaying the full conversation, with an explicit instruction never to mention it's a summary. Surfaced on the contact detail page, which also never rendered this field before.
+- Confirmed the other two PART 4 recommendations (drop `ai_agents.workspaceId` unique constraint, anti-disclosure system-prompt line) were already completed in Phase 1.
+- Left as correctly deferred, not done now: lead-temperature persistence (re-scoped to Phase 5 — it's a PART 5/CRM concern, not PART 4/AI engine, despite living in the same gap-report paragraph originally), real AI-router fallback (no second provider exists yet to fail over to), and knowledge-base file uploads (blocked on Cloudflare R2 credentials, already tracked in `DEFERRED_TASKS.md`).
+
+Verified with the same typecheck/lint/125-tests/build pass. Next: Phase 5 (CRM enrichment).

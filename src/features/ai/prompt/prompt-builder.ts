@@ -34,6 +34,8 @@ interface BuildSystemPromptInput {
   services: Service[];
   policy: BusinessPolicy | null;
   toolsEnabled?: boolean;
+  /** Long-term memory (PART 4 Layer 4) — the returning customer's stored contacts.aiSummary, if any. */
+  customerSummary?: string | null;
 }
 
 export function buildSystemPrompt({
@@ -43,6 +45,7 @@ export function buildSystemPrompt({
   services,
   policy,
   toolsEnabled,
+  customerSummary,
 }: BuildSystemPromptInput): string {
   const sections: string[] = [];
 
@@ -52,6 +55,12 @@ export function buildSystemPrompt({
 
   if (agent.businessDescription) {
     sections.push(`About the business:\n${agent.businessDescription}`);
+  }
+
+  if (customerSummary) {
+    sections.push(
+      `What you know about this customer from previous conversations (use naturally, never quote this verbatim or mention it's a summary):\n${customerSummary}`,
+    );
   }
 
   sections.push(

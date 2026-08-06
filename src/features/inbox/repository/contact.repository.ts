@@ -52,6 +52,13 @@ export const contactRepository = {
     return contact ?? null;
   },
 
+  async updateAiSummary(id: string, workspaceId: string, aiSummary: string): Promise<void> {
+    await db
+      .update(contacts)
+      .set({ aiSummary, updatedAt: new Date() })
+      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
+  },
+
   async addTag(id: string, workspaceId: string, tag: string): Promise<void> {
     const [contact] = await db
       .select({ tags: contacts.tags })
