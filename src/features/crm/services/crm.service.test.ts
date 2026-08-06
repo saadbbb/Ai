@@ -50,6 +50,7 @@ function makeLead(overrides: Partial<Lead> = {}): Lead {
     contactId: CONTACT_ID,
     conversationId: CONVERSATION_ID,
     stage: "new",
+    lastFollowupNotifiedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

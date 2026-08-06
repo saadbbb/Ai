@@ -36,6 +36,9 @@ export const leads = pgTable(
     // created without one (a walk-in, a phone call logged directly as a lead).
     conversationId: uuid("conversation_id").references(() => conversations.id, { onDelete: "set null" }),
     stage: leadStageEnum("stage").notNull().default("new"),
+    // Set by the crm-followups cron when it notifies the owner this lead's contact has
+    // gone stale — lets the cron re-notify periodically instead of once-ever or every day.
+    lastFollowupNotifiedAt: timestamp("last_followup_notified_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

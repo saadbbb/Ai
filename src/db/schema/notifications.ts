@@ -7,12 +7,15 @@ import { workspaces } from "./workspaces";
  * "automation" = created by the automation engine's notify_owner_email
  * action (src/features/automation/services/automation.service.ts) — the
  * in-app copy is unconditional even if the paired email fails, same pattern
- * as the subscription ones below.
+ * as the subscription ones below. "crm_followup" = the crm-followups cron
+ * flagging a stale open lead (see subscription-check.service.ts for the
+ * daily-cron pattern this follows).
  */
 export const notificationTypeEnum = pgEnum("notification_type", [
   "subscription_expiring",
   "subscription_suspended",
   "automation",
+  "crm_followup",
 ]);
 
 export const notifications = pgTable(

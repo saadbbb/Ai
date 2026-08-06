@@ -482,3 +482,24 @@ external dependency:
 - Left as correctly deferred, not done now: lead-temperature persistence (re-scoped to Phase 5 — it's a PART 5/CRM concern, not PART 4/AI engine, despite living in the same gap-report paragraph originally), real AI-router fallback (no second provider exists yet to fail over to), and knowledge-base file uploads (blocked on Cloudflare R2 credentials, already tracked in `DEFERRED_TASKS.md`).
 
 Verified with the same typecheck/lint/125-tests/build pass. Next: Phase 5 (CRM enrichment).
+
+**2026-08-06 — Phase 5 (partial, scoped tightly).** Picked the single highest-value, best-contained
+item from PART 5's gap list: the Follow-up Engine's literal spec example — "Customer inactive for 7
+days -> Suggest follow-up" — which the CRM audit confirmed had zero implementation (only
+`automation-delays`/`subscription-check` crons existed, nothing CRM-specific).
+
+- New `/api/cron/crm-followups` (daily, same `requireCronAuth`/`vercel.json` pattern as the other two crons): finds open leads (not won/lost/cancelled) whose contact hasn't been touched in 7+ days, creates an in-app notification linking to the contact, and records `leads.lastFollowupNotifiedAt` so it re-notifies periodically (every 7 days while still stale) instead of once-ever or every single day.
+- New `leads.lastFollowupNotifiedAt` column and a `crm_followup` notification type — both additive migrations.
+- `leadRepository.findStaleOpenLeads()` is intentionally cross-tenant (no `workspaceId` param) since only the cron calls it — documented inline with the same justification `workspaceAdminRepository`'s cron-only queries already established, so it doesn't read as a violation of the "always filter by workspaceId" rule.
+- 3 new unit tests covering the notify/mark path, per-lead failure isolation, and the empty case.
+
+**Deliberately left for a later pass, not done now** (would each be their own contained piece of work,
+and this session already covered a lot of ground): persisted lead score/temperature (the live
+computed-on-read approach in `lead-score.ts` is arguably more correct than a naively-cached one and
+wasn't clearly worth the staleness risk this pass), full filter UI beyond the name search added in
+Phase 1, contact schema expansion (avatar/country/lifetime-value/etc.), timeline consolidation into one
+interleaved feed, and PDF/Excel export. These remain accurately reflected as open items in this Part's
+"Missing" section above — this Phase 5 entry does not claim them done.
+
+Verified with the same typecheck/lint/test/build pass (128 tests now, +3). Next: Phase 6 (Automation
+expansion — the permission fix already landed in Phase 1; remaining scope is action/trigger coverage).
