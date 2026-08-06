@@ -33,3 +33,4 @@ export * from "./notes";
 export * from "./audit-logs";
 export * from "./ai-insights";
 export * from "./workspace-audit-logs";
+export * from "./support-tickets";

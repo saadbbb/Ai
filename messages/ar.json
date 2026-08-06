@@ -256,6 +256,7 @@
     "billingLink": "الفوترة",
     "teamLink": "الفريق",
     "auditLogLink": "سجل التدقيق",
+    "supportLink": "الدعم",
     "platformAdminLink": "لوحة الإدارة",
     "bands": {
       "today": {
@@ -341,7 +342,20 @@
       "ordersByStatus": "الطلبات حسب الحالة",
       "appointmentsByStatus": "المواعيد حسب الحالة",
       "conversationsByChannel": "المحادثات حسب القناة",
+      "revenueByProduct": "الإيرادات حسب المنتج",
       "empty": "لا توجد بيانات بعد لهذا المدى."
+    },
+    "teamPerformance": {
+      "title": "أداء الفريق",
+      "revenueReport": "تقرير الإيرادات:",
+      "empty": "لا يوجد نشاط للفريق بعد في هذا المدى.",
+      "minutes": "{count} دقيقة",
+      "columns": {
+        "agent": "عضو الفريق",
+        "conversations": "المحادثات",
+        "tasksCompleted": "المهام المكتملة",
+        "avgResponseTime": "متوسط زمن الرد"
+      }
     }
   },
   "team": {
@@ -369,6 +383,44 @@
         "expired": "انتهت صلاحية هذه الدعوة. اطلب واحدة جديدة.",
         "already_used": "تم استخدام هذه الدعوة أو إلغاؤها مسبقاً."
       }
+    }
+  },
+  "support": {
+    "title": "الدعم",
+    "description": "احصل على مساعدة من فريق المنصة.",
+    "newTicket": "تذكرة جديدة",
+    "emptyState": "لا توجد تذاكر دعم بعد.",
+    "backLink": "← العودة إلى الدعم",
+    "statuses": {
+      "open": "مفتوحة",
+      "in_progress": "قيد المعالجة",
+      "resolved": "تم الحل",
+      "closed": "مغلقة"
+    },
+    "thread": {
+      "you": "أنت",
+      "supportTeam": "فريق الدعم",
+      "replyPlaceholder": "اكتب رداً...",
+      "submit": "إرسال الرد",
+      "submitting": "جارٍ الإرسال..."
+    },
+    "new": {
+      "title": "تذكرة دعم جديدة",
+      "description": "أخبرنا بما يحدث وسنعاود التواصل معك.",
+      "subjectLabel": "الموضوع",
+      "subjectPlaceholder": "بماذا تحتاج المساعدة؟",
+      "priorityLabel": "الأولوية",
+      "priorities": {
+        "low": "منخفضة",
+        "medium": "متوسطة",
+        "high": "عالية",
+        "urgent": "عاجلة"
+      },
+      "messageLabel": "الرسالة",
+      "messagePlaceholder": "صف المشكلة بالتفصيل...",
+      "requiredHint": "الموضوع والرسالة مطلوبان.",
+      "submit": "إرسال التذكرة",
+      "submitting": "جارٍ الإرسال..."
     }
   },
   "notifications": {
@@ -494,6 +546,7 @@
     "workspacesLink": "المساحات",
     "plansLink": "الباقات",
     "aiUsageLink": "استخدام الذكاء الاصطناعي",
+    "ticketsLink": "التذاكر",
     "settingsLink": "الإعدادات",
     "home": {
       "title": "نظرة عامة",
@@ -611,6 +664,30 @@
       "title": "سجل التدقيق",
       "description": "كل إجراء حساس قام به أحد مسؤولي المنصة — الخطط، الاشتراكات، صلاحيات المسؤولين، الإعدادات.",
       "emptyState": "لا توجد أحداث مسجلة بعد."
+    },
+    "tickets": {
+      "title": "تذاكر الدعم",
+      "description": "كل تذكرة دعم أنشأتها أي مساحة عمل، عبر المنصة بأكملها.",
+      "emptyState": "لا توجد تذاكر دعم بعد.",
+      "backLink": "← العودة إلى التذاكر",
+      "statuses": {
+        "open": "مفتوحة",
+        "in_progress": "قيد المعالجة",
+        "resolved": "تم الحل",
+        "closed": "مغلقة"
+      },
+      "priorities": {
+        "low": "منخفضة",
+        "medium": "متوسطة",
+        "high": "عالية",
+        "urgent": "عاجلة"
+      },
+      "thread": {
+        "supportTeam": "فريق الدعم",
+        "replyPlaceholder": "اكتب رداً...",
+        "submit": "إرسال الرد",
+        "submitting": "جارٍ الإرسال..."
+      }
     },
     "revenueLink": "الإيرادات",
     "revenue": {

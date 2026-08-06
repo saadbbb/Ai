@@ -218,6 +218,13 @@
       "when": 1786053892159,
       "tag": "0030_perfect_doctor_faustus",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1786056179323,
+      "tag": "0031_complex_sinister_six",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { ExportButtons } from "@/components/export-buttons";
 import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { BarChartCard } from "@/features/analytics/components/bar-chart-card";
 import { DateRangeSelect } from "@/features/analytics/components/date-range-select";
@@ -20,14 +21,19 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
   await requireWorkspacePermission(user.id, workspace.id, "analytics.view");
 
   const range = resolveAnalyticsRange(rangeParam);
-  const summary = await analyticsService.getSummary(workspace.id, range);
+  const [summary, teamPerformance] = await Promise.all([
+    analyticsService.getSummary(workspace.id, range),
+    analyticsService.getTeamPerformance(workspace.id, range),
+  ]);
 
-  const [t, tOrders, tAppointments, tChannel] = await Promise.all([
+  const [t, tOrders, tAppointments, tChannel, tCommon] = await Promise.all([
     getTranslations("analytics"),
     getTranslations("orders"),
     getTranslations("appointments"),
     getTranslations("inbox.thread.channel"),
+    getTranslations("common"),
   ]);
+  const exportLabels = { csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") };
 
   const rangeLabels: Record<AnalyticsRangeKey, string> = {
     "7d": t("range.7d"),
@@ -108,6 +114,52 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           data={summary.conversationsByChannel.map((row) => ({ label: tChannel(row.status), value: row.count }))}
           emptyMessage={t("charts.empty")}
         />
+        <BarChartCard
+          title={t("charts.revenueByProduct")}
+          data={summary.revenueByProduct.map((row) => ({ label: row.productName, value: row.revenue }))}
+          emptyMessage={t("charts.empty")}
+          format="currency"
+        />
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-sm font-medium">{t("teamPerformance.title")}</h2>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">{t("teamPerformance.revenueReport")}</span>
+              <ExportButtons reportPath={`/api/reports/revenue?range=${range.key}`} labels={exportLabels} />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">{t("teamPerformance.title")}</span>
+              <ExportButtons reportPath={`/api/reports/team-performance?range=${range.key}`} labels={exportLabels} />
+            </div>
+          </div>
+        </div>
+        {teamPerformance.length === 0 ? (
+          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+            {t("teamPerformance.empty")}
+          </p>
+        ) : (
+          <div className="divide-y rounded-lg border">
+            <div className="flex items-center justify-between gap-4 p-3 text-xs font-medium text-muted-foreground">
+              <span className="flex-1">{t("teamPerformance.columns.agent")}</span>
+              <span className="w-32 text-right">{t("teamPerformance.columns.conversations")}</span>
+              <span className="w-32 text-right">{t("teamPerformance.columns.tasksCompleted")}</span>
+              <span className="w-40 text-right">{t("teamPerformance.columns.avgResponseTime")}</span>
+            </div>
+            {teamPerformance.map((row) => (
+              <div key={row.userId} className="flex items-center justify-between gap-4 p-3 text-sm">
+                <span className="flex-1 truncate">{row.email}</span>
+                <span className="w-32 text-right">{row.conversationsHandled}</span>
+                <span className="w-32 text-right">{row.tasksCompleted}</span>
+                <span className="w-40 text-right text-muted-foreground">
+                  {row.avgResponseMinutes === null ? "—" : t("teamPerformance.minutes", { count: row.avgResponseMinutes })}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -256,6 +256,7 @@
     "billingLink": "پارەدان",
     "teamLink": "تیم",
     "auditLogLink": "تۆماری پشکنین",
+    "supportLink": "پشتگیری",
     "platformAdminLink": "پانێڵی بەڕێوەبردن",
     "bands": {
       "today": {
@@ -341,7 +342,20 @@
       "ordersByStatus": "داواکاری بەپێی دۆخ",
       "appointmentsByStatus": "چاوپێکەوتن بەپێی دۆخ",
       "conversationsByChannel": "گفتوگۆ بەپێی کەناڵ",
+      "revenueByProduct": "داهات بەپێی بەرهەم",
       "empty": "هێشتا زانیاری نییە بۆ ئەم ماوەیە."
+    },
+    "teamPerformance": {
+      "title": "کارایی تیم",
+      "revenueReport": "ڕاپۆرتی داهات:",
+      "empty": "هێشتا چالاکی تیم نییە بۆ ئەم ماوەیە.",
+      "minutes": "{count} خولەک",
+      "columns": {
+        "agent": "ئەندامی تیم",
+        "conversations": "گفتوگۆکان",
+        "tasksCompleted": "ئەرکە تەواوبووەکان",
+        "avgResponseTime": "ناوەندی کاتی وەڵام"
+      }
     }
   },
   "team": {
@@ -369,6 +383,44 @@
         "expired": "ماوەی ئەم بانگهێشتە بەسەرچووە. داوای یەکێکی نوێ بکە.",
         "already_used": "ئەم بانگهێشتە پێشتر بەکارهێنراوە یان هەڵوەشێنراوەتەوە."
       }
+    }
+  },
+  "support": {
+    "title": "پشتگیری",
+    "description": "یارمەتی وەربگرە لە تیمی پلاتفۆرم.",
+    "newTicket": "تیکێتی نوێ",
+    "emptyState": "هێشتا هیچ تیکێتی پشتگیری نییە.",
+    "backLink": "← گەڕانەوە بۆ پشتگیری",
+    "statuses": {
+      "open": "کراوەیە",
+      "in_progress": "لە پرۆسەدایە",
+      "resolved": "چارەسەرکراوە",
+      "closed": "داخراوە"
+    },
+    "thread": {
+      "you": "تۆ",
+      "supportTeam": "تیمی پشتگیری",
+      "replyPlaceholder": "وەڵامێک بنووسە...",
+      "submit": "ناردنی وەڵام",
+      "submitting": "لە ناردندایە..."
+    },
+    "new": {
+      "title": "تیکێتی پشتگیری نوێ",
+      "description": "پێمان بڵێ چی ڕوودەدات و پەیوەندیت پێوە دەکەینەوە.",
+      "subjectLabel": "بابەت",
+      "subjectPlaceholder": "پێویستیت بە یارمەتی چییە؟",
+      "priorityLabel": "گرنگی",
+      "priorities": {
+        "low": "کەم",
+        "medium": "ناوەند",
+        "high": "بەرز",
+        "urgent": "پەلە"
+      },
+      "messageLabel": "پەیام",
+      "messagePlaceholder": "کێشەکە بە وردی باس بکە...",
+      "requiredHint": "بابەت و پەیام پێویستن.",
+      "submit": "ناردنی تیکێت",
+      "submitting": "لە ناردندایە..."
     }
   },
   "notifications": {
@@ -494,6 +546,7 @@
     "workspacesLink": "بازنەکان",
     "plansLink": "پاکێجەکان",
     "aiUsageLink": "بەکارهێنانی کارمەندە زیرەکە",
+    "ticketsLink": "تیکێتەکان",
     "settingsLink": "ڕێکخستنەکان",
     "home": {
       "title": "گشتی",
@@ -611,6 +664,30 @@
       "title": "تۆماری پشکنین",
       "description": "هەموو کردارێکی هەستیار کە بەڕێوەبەرێکی پلاتفۆرم ئەنجامی داوە — پلانەکان، بەشداربوونەکان، دەستپێگەیشتنی بەڕێوەبەران، ڕێکخستنەکان.",
       "emptyState": "هیچ ڕووداوێک تۆمار نەکراوە."
+    },
+    "tickets": {
+      "title": "تیکێتەکانی پشتگیری",
+      "description": "هەموو تیکێتێکی پشتگیری کە هەر مکانی کارێک داواي کردووە، لە سەرانسەری پلاتفۆرمدا.",
+      "emptyState": "هێشتا هیچ تیکێتی پشتگیری نییە.",
+      "backLink": "← گەڕانەوە بۆ تیکێتەکان",
+      "statuses": {
+        "open": "کراوەیە",
+        "in_progress": "لە پرۆسەدایە",
+        "resolved": "چارەسەرکراوە",
+        "closed": "داخراوە"
+      },
+      "priorities": {
+        "low": "کەم",
+        "medium": "ناوەند",
+        "high": "بەرز",
+        "urgent": "پەلە"
+      },
+      "thread": {
+        "supportTeam": "تیمی پشتگیری",
+        "replyPlaceholder": "وەڵامێک بنووسە...",
+        "submit": "ناردنی وەڵام",
+        "submitting": "لە ناردندایە..."
+      }
     },
     "revenueLink": "داهات",
     "revenue": {

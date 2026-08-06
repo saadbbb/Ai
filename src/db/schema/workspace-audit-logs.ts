@@ -17,6 +17,8 @@ export const workspaceAuditActionEnum = pgEnum("workspace_audit_action", [
   "member_removed",
   "workflow_ai_generated",
   "workflow_approval_decided",
+  "support_ticket_created",
+  "support_ticket_replied",
 ]);
 
 export const workspaceAuditLogs = pgTable(

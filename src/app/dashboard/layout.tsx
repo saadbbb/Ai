@@ -35,16 +35,25 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/onboarding/business");
   }
 
-  const [t, isPlatformAdmin, { notifications, unreadCount }, memberships, canViewTeam, canViewAnalytics, canViewAutomations] =
-    await Promise.all([
-      getTranslations("dashboard"),
-      platformAdminService.isPlatformAdmin(user.email),
-      notificationService.getForWorkspace(workspace.id),
-      membershipRepository.findWorkspacesForUser(user.id),
-      permissionService.hasPermission(user.id, workspace.id, "workspace.members.view"),
-      permissionService.hasPermission(user.id, workspace.id, "analytics.view"),
-      permissionService.hasPermission(user.id, workspace.id, "automation.workflows.view"),
-    ]);
+  const [
+    t,
+    isPlatformAdmin,
+    { notifications, unreadCount },
+    memberships,
+    canViewTeam,
+    canViewAnalytics,
+    canViewAutomations,
+    canViewSupport,
+  ] = await Promise.all([
+    getTranslations("dashboard"),
+    platformAdminService.isPlatformAdmin(user.email),
+    notificationService.getForWorkspace(workspace.id),
+    membershipRepository.findWorkspacesForUser(user.id),
+    permissionService.hasPermission(user.id, workspace.id, "workspace.members.view"),
+    permissionService.hasPermission(user.id, workspace.id, "analytics.view"),
+    permissionService.hasPermission(user.id, workspace.id, "automation.workflows.view"),
+    permissionService.hasPermission(user.id, workspace.id, "support.tickets.view"),
+  ]);
   const isSuspended = workspace.subscriptionStatus === "suspended";
   const [settings, enabledFeatures] = await Promise.all([
     isSuspended ? platformSettingsRepository.get() : Promise.resolve(null),
@@ -129,6 +138,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
               {canViewTeam && (
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/audit-log">{t("auditLogLink")}</Link>
+                </DropdownMenuItem>
+              )}
+              {canViewSupport && (
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/support">{t("supportLink")}</Link>
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />

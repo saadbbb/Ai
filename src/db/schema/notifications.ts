@@ -16,6 +16,7 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "subscription_suspended",
   "automation",
   "crm_followup",
+  "support_ticket_reply",
 ]);
 
 export const notifications = pgTable(

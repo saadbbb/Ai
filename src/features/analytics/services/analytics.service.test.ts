@@ -10,10 +10,21 @@ vi.mock("../repository/analytics.repository", () => ({
     leadsByStage: vi.fn(),
     conversationsByChannel: vi.fn(),
     aiUsageInRange: vi.fn(),
+    revenueByProduct: vi.fn(),
+    conversationsByAgent: vi.fn(),
+    tasksCompletedByAgent: vi.fn(),
+    avgFirstResponseSecondsByAgent: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/workspace/repository/membership.repository", () => ({
+  membershipRepository: {
+    findMembersByWorkspaceId: vi.fn(),
   },
 }));
 
 const { analyticsRepository } = await import("../repository/analytics.repository");
+const { membershipRepository } = await import("@/features/workspace/repository/membership.repository");
 const { analyticsService } = await import("./analytics.service");
 
 const RANGE: AnalyticsRange = {
@@ -31,6 +42,10 @@ function mockAllEmpty() {
   vi.mocked(analyticsRepository.leadsByStage).mockResolvedValue([]);
   vi.mocked(analyticsRepository.conversationsByChannel).mockResolvedValue([]);
   vi.mocked(analyticsRepository.aiUsageInRange).mockResolvedValue({ totalRequests: 0, successCount: 0 });
+  vi.mocked(analyticsRepository.revenueByProduct).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.conversationsByAgent).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.tasksCompletedByAgent).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.avgFirstResponseSecondsByAgent).mockResolvedValue([]);
 }
 
 beforeEach(() => {
@@ -115,5 +130,45 @@ describe("analyticsService.getSummary — kpis", () => {
       { day: "2026-03-14", value: 0 },
       { day: "2026-03-15", value: 4 },
     ]);
+  });
+});
+
+describe("analyticsService.getTeamPerformance", () => {
+  function member(userId: string, email: string) {
+    return { member: { userId } as never, user: { id: userId, email } as never, role: {} as never };
+  }
+
+  it("includes every workspace member, defaulting missing metrics to zero/null", async () => {
+    vi.mocked(membershipRepository.findMembersByWorkspaceId).mockResolvedValue([
+      member("user-1", "agent1@example.com"),
+      member("user-2", "agent2@example.com"),
+    ]);
+    vi.mocked(analyticsRepository.conversationsByAgent).mockResolvedValue([{ userId: "user-1", count: 5 }]);
+    vi.mocked(analyticsRepository.tasksCompletedByAgent).mockResolvedValue([{ userId: "user-1", count: 2 }]);
+    vi.mocked(analyticsRepository.avgFirstResponseSecondsByAgent).mockResolvedValue([
+      { userId: "user-1", avgSeconds: 180, replyCount: 5 },
+    ]);
+
+    const rows = await analyticsService.getTeamPerformance("workspace-1", RANGE);
+
+    expect(rows).toEqual([
+      { userId: "user-1", email: "agent1@example.com", conversationsHandled: 5, tasksCompleted: 2, avgResponseMinutes: 3 },
+      { userId: "user-2", email: "agent2@example.com", conversationsHandled: 0, tasksCompleted: 0, avgResponseMinutes: null },
+    ]);
+  });
+
+  it("sorts members by conversations handled, descending", async () => {
+    vi.mocked(membershipRepository.findMembersByWorkspaceId).mockResolvedValue([
+      member("user-1", "low@example.com"),
+      member("user-2", "high@example.com"),
+    ]);
+    vi.mocked(analyticsRepository.conversationsByAgent).mockResolvedValue([
+      { userId: "user-1", count: 1 },
+      { userId: "user-2", count: 9 },
+    ]);
+
+    const rows = await analyticsService.getTeamPerformance("workspace-1", RANGE);
+
+    expect(rows.map((row) => row.userId)).toEqual(["user-2", "user-1"]);
   });
 });

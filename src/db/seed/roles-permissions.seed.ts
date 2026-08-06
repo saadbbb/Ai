@@ -13,6 +13,7 @@ const PERMISSIONS = [
   { key: "analytics.view", description: "View the Analytics & Business Intelligence dashboard" },
   { key: "automation.workflows.view", description: "View automation workflows and their execution history" },
   { key: "automation.workflows.manage", description: "Create, edit, delete, and change the status of automation workflows" },
+  { key: "support.tickets.view", description: "View and open support tickets with the platform team" },
 ] as const;
 
 const ROLES: Array<{ key: string; name: string; description: string; permissionKeys: string[] }> = [
@@ -35,6 +36,7 @@ const ROLES: Array<{ key: string; name: string; description: string; permissionK
       "analytics.view",
       "automation.workflows.view",
       "automation.workflows.manage",
+      "support.tickets.view",
     ],
   },
   {
@@ -48,19 +50,25 @@ const ROLES: Array<{ key: string; name: string; description: string; permissionK
       "analytics.view",
       "automation.workflows.view",
       "automation.workflows.manage",
+      "support.tickets.view",
     ],
   },
   {
     key: "agent",
     name: "Agent",
     description: "Handles conversations and daily work",
-    permissionKeys: ["workspace.settings.view", "workspace.members.view", "automation.workflows.view"],
+    permissionKeys: [
+      "workspace.settings.view",
+      "workspace.members.view",
+      "automation.workflows.view",
+      "support.tickets.view",
+    ],
   },
   {
     key: "viewer",
     name: "Viewer",
     description: "Read-only access",
-    permissionKeys: ["workspace.settings.view", "automation.workflows.view"],
+    permissionKeys: ["workspace.settings.view", "automation.workflows.view", "support.tickets.view"],
   },
 ];
 

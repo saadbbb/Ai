@@ -256,6 +256,7 @@
     "billingLink": "Billing",
     "teamLink": "Team",
     "auditLogLink": "Audit log",
+    "supportLink": "Support",
     "platformAdminLink": "Admin Panel",
     "bands": {
       "today": {
@@ -341,7 +342,20 @@
       "ordersByStatus": "Orders by status",
       "appointmentsByStatus": "Appointments by status",
       "conversationsByChannel": "Conversations by channel",
+      "revenueByProduct": "Revenue by product",
       "empty": "No data yet for this range."
+    },
+    "teamPerformance": {
+      "title": "Team performance",
+      "revenueReport": "Revenue report:",
+      "empty": "No team activity yet in this range.",
+      "minutes": "{count} min",
+      "columns": {
+        "agent": "Team member",
+        "conversations": "Conversations",
+        "tasksCompleted": "Tasks completed",
+        "avgResponseTime": "Avg. response time"
+      }
     }
   },
   "team": {
@@ -369,6 +383,44 @@
         "expired": "This invitation has expired. Ask for a new one.",
         "already_used": "This invitation was already used or revoked."
       }
+    }
+  },
+  "support": {
+    "title": "Support",
+    "description": "Get help from the platform team.",
+    "newTicket": "New ticket",
+    "emptyState": "No support tickets yet.",
+    "backLink": "← Back to Support",
+    "statuses": {
+      "open": "Open",
+      "in_progress": "In progress",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "thread": {
+      "you": "You",
+      "supportTeam": "Support team",
+      "replyPlaceholder": "Write a reply...",
+      "submit": "Send reply",
+      "submitting": "Sending..."
+    },
+    "new": {
+      "title": "New support ticket",
+      "description": "Tell us what's going on and we'll get back to you.",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "What do you need help with?",
+      "priorityLabel": "Priority",
+      "priorities": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+      },
+      "messageLabel": "Message",
+      "messagePlaceholder": "Describe the issue in detail...",
+      "requiredHint": "Subject and message are required.",
+      "submit": "Submit ticket",
+      "submitting": "Submitting..."
     }
   },
   "notifications": {
@@ -494,6 +546,7 @@
     "workspacesLink": "Workspaces",
     "plansLink": "Plans",
     "aiUsageLink": "AI Usage",
+    "ticketsLink": "Tickets",
     "settingsLink": "Settings",
     "adminsLink": "Admins",
     "home": {
@@ -611,6 +664,30 @@
       "title": "Audit Log",
       "description": "Every sensitive action taken by a platform admin — plans, subscriptions, admin access, settings.",
       "emptyState": "No audit events recorded yet."
+    },
+    "tickets": {
+      "title": "Support Tickets",
+      "description": "Every support ticket raised by a workspace, across the whole platform.",
+      "emptyState": "No support tickets yet.",
+      "backLink": "← Back to Tickets",
+      "statuses": {
+        "open": "Open",
+        "in_progress": "In progress",
+        "resolved": "Resolved",
+        "closed": "Closed"
+      },
+      "priorities": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+      },
+      "thread": {
+        "supportTeam": "Support team",
+        "replyPlaceholder": "Write a reply...",
+        "submit": "Send reply",
+        "submitting": "Sending..."
+      }
     },
     "revenueLink": "Revenue",
     "revenue": {

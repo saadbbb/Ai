@@ -7,7 +7,8 @@ import {
   type ChannelType,
   type OrderStatus,
 } from "@/db/schema";
-import { analyticsRepository, type DayBucket } from "../repository/analytics.repository";
+import { membershipRepository } from "@/features/workspace/repository/membership.repository";
+import { analyticsRepository, type DayBucket, type ProductRevenue } from "../repository/analytics.repository";
 import type { AnalyticsRange } from "../lib/date-range";
 
 const COMPLETED_ORDER_STATUSES: OrderStatus[] = ["delivered", "completed"];
@@ -43,7 +44,16 @@ export interface AnalyticsSummary {
   ordersByStatus: { status: OrderStatus; count: number }[];
   appointmentsByStatus: { status: AppointmentStatus; count: number }[];
   conversationsByChannel: { status: ChannelType; count: number }[];
+  revenueByProduct: ProductRevenue[];
   healthScore: HealthScore;
+}
+
+export interface TeamPerformanceRow {
+  userId: string;
+  email: string;
+  conversationsHandled: number;
+  tasksCompleted: number;
+  avgResponseMinutes: number | null;
 }
 
 function fillDayGaps(days: string[], values: DayBucket[]): DayBucket[] {
@@ -88,16 +98,25 @@ function computeHealthScore(
 
 async function getSummary(workspaceId: string, range: AnalyticsRange): Promise<AnalyticsSummary> {
   const { from, to } = range;
-  const [leadsByDayRaw, revenueByDayRaw, ordersByStatusRaw, appointmentsByStatusRaw, leadsByStage, channelRows, aiUsage] =
-    await Promise.all([
-      analyticsRepository.leadsCreatedByDay(workspaceId, from, to),
-      analyticsRepository.revenueByDay(workspaceId, from, to),
-      analyticsRepository.ordersByStatus(workspaceId, from, to),
-      analyticsRepository.appointmentsByStatus(workspaceId, from, to),
-      analyticsRepository.leadsByStage(workspaceId, from, to),
-      analyticsRepository.conversationsByChannel(workspaceId, from, to),
-      analyticsRepository.aiUsageInRange(workspaceId, from, to),
-    ]);
+  const [
+    leadsByDayRaw,
+    revenueByDayRaw,
+    ordersByStatusRaw,
+    appointmentsByStatusRaw,
+    leadsByStage,
+    channelRows,
+    aiUsage,
+    revenueByProduct,
+  ] = await Promise.all([
+    analyticsRepository.leadsCreatedByDay(workspaceId, from, to),
+    analyticsRepository.revenueByDay(workspaceId, from, to),
+    analyticsRepository.ordersByStatus(workspaceId, from, to),
+    analyticsRepository.appointmentsByStatus(workspaceId, from, to),
+    analyticsRepository.leadsByStage(workspaceId, from, to),
+    analyticsRepository.conversationsByChannel(workspaceId, from, to),
+    analyticsRepository.aiUsageInRange(workspaceId, from, to),
+    analyticsRepository.revenueByProduct(workspaceId, from, to),
+  ]);
 
   const ordersByStatus = orderStatusEnum.enumValues.map((status) => ({
     status,
@@ -152,10 +171,41 @@ async function getSummary(workspaceId: string, range: AnalyticsRange): Promise<A
     ordersByStatus,
     appointmentsByStatus,
     conversationsByChannel,
+    revenueByProduct,
     healthScore: computeHealthScore(leadConversion, orderCompletion, appointmentCompletion, aiSuccessRate),
   };
 }
 
+/**
+ * One row per current workspace member (not just members with activity) so the
+ * report reads as a full team roster — a member with zero conversations/tasks
+ * in range still shows up with zeros rather than silently disappearing.
+ */
+async function getTeamPerformance(workspaceId: string, range: AnalyticsRange): Promise<TeamPerformanceRow[]> {
+  const { from, to } = range;
+  const [members, conversationCounts, taskCounts, responseTimes] = await Promise.all([
+    membershipRepository.findMembersByWorkspaceId(workspaceId),
+    analyticsRepository.conversationsByAgent(workspaceId, from, to),
+    analyticsRepository.tasksCompletedByAgent(workspaceId, from, to),
+    analyticsRepository.avgFirstResponseSecondsByAgent(workspaceId, from, to),
+  ]);
+
+  const conversationsByUser = new Map(conversationCounts.map((row) => [row.userId, row.count]));
+  const tasksByUser = new Map(taskCounts.map((row) => [row.userId, row.count]));
+  const responseByUser = new Map(responseTimes.map((row) => [row.userId, row.avgSeconds]));
+
+  return members
+    .map(({ user }) => ({
+      userId: user.id,
+      email: user.email,
+      conversationsHandled: conversationsByUser.get(user.id) ?? 0,
+      tasksCompleted: tasksByUser.get(user.id) ?? 0,
+      avgResponseMinutes: responseByUser.has(user.id) ? Math.round((responseByUser.get(user.id) ?? 0) / 60) : null,
+    }))
+    .sort((a, b) => b.conversationsHandled - a.conversationsHandled);
+}
+
 export const analyticsService = {
   getSummary,
+  getTeamPerformance,
 };
