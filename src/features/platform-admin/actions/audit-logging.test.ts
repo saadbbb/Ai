@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Plan, PlatformAdmin, User, Workspace } from "@/db/schema";
+import type { FeatureFlag, Plan, PlatformAdmin, User, Workspace } from "@/db/schema";
 
 vi.mock("@/lib/auth/auth-guard", () => ({
   requirePlatformAdmin: vi.fn(),
@@ -21,14 +21,21 @@ vi.mock("../repository/plan.repository", () => ({
   planRepository: { findById: vi.fn(), delete: vi.fn() },
 }));
 
+vi.mock("../repository/feature-flag.repository", () => ({
+  featureFlagRepository: { findByKey: vi.fn(), create: vi.fn(), setEnabled: vi.fn() },
+}));
+
 const { requirePlatformAdmin } = await import("@/lib/auth/auth-guard");
 const { auditLogRepository } = await import("../repository/audit-log.repository");
 const { workspaceAdminRepository } = await import("../repository/workspace-admin.repository");
 const { platformAdminRepository } = await import("../repository/platform-admin.repository");
 const { planRepository } = await import("../repository/plan.repository");
+const { featureFlagRepository } = await import("../repository/feature-flag.repository");
 const { activateSubscriptionAction } = await import("./activate-subscription.action");
 const { removePlatformAdminAction } = await import("./remove-platform-admin.action");
 const { deletePlanAction } = await import("./delete-plan.action");
+const { createFeatureFlagAction } = await import("./create-feature-flag.action");
+const { setFeatureFlagEnabledAction } = await import("./set-feature-flag-enabled.action");
 
 const ADMIN = { id: "11111111-1111-4111-8111-111111111111", email: "admin@example.com" } as User;
 const WORKSPACE_ID = "22222222-2222-4222-8222-222222222222";
@@ -119,6 +126,67 @@ describe("deletePlanAction", () => {
 
     expect(result.success).toBe(false);
     expect(planRepository.delete).not.toHaveBeenCalled();
+    expect(auditLogRepository.log).not.toHaveBeenCalled();
+  });
+});
+
+describe("createFeatureFlagAction", () => {
+  it("creates the flag and logs a feature_flag_created audit event", async () => {
+    vi.mocked(featureFlagRepository.findByKey).mockResolvedValue(null);
+    vi.mocked(featureFlagRepository.create).mockResolvedValue({
+      id: "flag-1",
+      key: "automation.ai_workflow_generator",
+      name: "AI Workflow Generator",
+      description: null,
+      enabled: true,
+    } as FeatureFlag);
+
+    const result = await createFeatureFlagAction({ key: "automation.ai_workflow_generator", name: "AI Workflow Generator", enabled: true });
+
+    expect(result.success).toBe(true);
+    expect(auditLogRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ action: "feature_flag_created", targetId: "flag-1" }),
+    );
+  });
+
+  it("rejects a duplicate key without creating or logging anything", async () => {
+    vi.mocked(featureFlagRepository.findByKey).mockResolvedValue({ id: "flag-1", key: "dupe" } as FeatureFlag);
+
+    const result = await createFeatureFlagAction({ key: "dupe", name: "Dupe", enabled: true });
+
+    expect(result.success).toBe(false);
+    expect(featureFlagRepository.create).not.toHaveBeenCalled();
+    expect(auditLogRepository.log).not.toHaveBeenCalled();
+  });
+});
+
+const FLAG_ID = "55555555-5555-4555-8555-555555555555";
+
+describe("setFeatureFlagEnabledAction", () => {
+  it("toggles the flag and logs its key in the summary", async () => {
+    vi.mocked(featureFlagRepository.setEnabled).mockResolvedValue({
+      id: FLAG_ID,
+      key: "automation.ai_workflow_generator",
+      enabled: false,
+    } as FeatureFlag);
+
+    const result = await setFeatureFlagEnabledAction({ id: FLAG_ID, enabled: false });
+
+    expect(result.success).toBe(true);
+    expect(auditLogRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: "feature_flag_toggled",
+        summary: expect.stringContaining("automation.ai_workflow_generator"),
+      }),
+    );
+  });
+
+  it("never logs when the flag doesn't exist", async () => {
+    vi.mocked(featureFlagRepository.setEnabled).mockResolvedValue(null);
+
+    const result = await setFeatureFlagEnabledAction({ id: MISSING_ID, enabled: false });
+
+    expect(result.success).toBe(false);
     expect(auditLogRepository.log).not.toHaveBeenCalled();
   });
 });

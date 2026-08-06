@@ -548,6 +548,7 @@
     "aiUsageLink": "بەکارهێنانی کارمەندە زیرەکە",
     "aiOperationsLink": "کردارەکانی کارمەندە زیرەکە",
     "ticketsLink": "تیکێتەکان",
+    "featureFlagsLink": "ئاڵاکانی تایبەتمەندی",
     "settingsLink": "ڕێکخستنەکان",
     "home": {
       "title": "گشتی",
@@ -702,6 +703,18 @@
         "submit": "ناردنی وەڵام",
         "submitting": "لە ناردندایە..."
       }
+    },
+    "featureFlags": {
+      "title": "ئاڵاکانی تایبەتمەندی",
+      "description": "کلیلی ڕاگرتن بۆ ڕێڕەوی تایبەتی کۆد — جیاواز لە پاکێجەکان و کلیلی ڕاگرتنی کارمەندە زیرەکە.",
+      "newHeading": "ئاڵای نوێ",
+      "keyPlaceholder": "کلیل، بۆ نموونە: automation.ai_workflow_generator",
+      "namePlaceholder": "ناوی پیشاندان",
+      "descriptionPlaceholder": "ئەم ئاڵایە کۆنترۆڵی چی دەکات؟ (ئارەزوومەندانە)",
+      "requiredHint": "کلیل و ناو پێویستن.",
+      "create": "دروستکردنی ئاڵا",
+      "creating": "لە دروستکردندایە...",
+      "emptyState": "هێشتا هیچ ئاڵایەکی تایبەتمەندی نییە."
     },
     "revenueLink": "داهات",
     "revenue": {

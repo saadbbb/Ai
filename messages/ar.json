@@ -548,6 +548,7 @@
     "aiUsageLink": "استخدام الذكاء الاصطناعي",
     "aiOperationsLink": "عمليات الذكاء الاصطناعي",
     "ticketsLink": "التذاكر",
+    "featureFlagsLink": "أعلام الميزات",
     "settingsLink": "الإعدادات",
     "home": {
       "title": "نظرة عامة",
@@ -702,6 +703,18 @@
         "submit": "إرسال الرد",
         "submitting": "جارٍ الإرسال..."
       }
+    },
+    "featureFlags": {
+      "title": "أعلام الميزات",
+      "description": "مفاتيح إيقاف لمسارات برمجية محددة — منفصلة عن الباقات ومفتاح إيقاف الذكاء الاصطناعي.",
+      "newHeading": "علم جديد",
+      "keyPlaceholder": "المفتاح، مثال: automation.ai_workflow_generator",
+      "namePlaceholder": "الاسم المعروض",
+      "descriptionPlaceholder": "ما الذي يتحكم به هذا العلم؟ (اختياري)",
+      "requiredHint": "المفتاح والاسم مطلوبان.",
+      "create": "إنشاء العلم",
+      "creating": "جارٍ الإنشاء...",
+      "emptyState": "لا توجد أعلام ميزات بعد."
     },
     "revenueLink": "الإيرادات",
     "revenue": {

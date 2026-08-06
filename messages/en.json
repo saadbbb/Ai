@@ -548,6 +548,7 @@
     "aiUsageLink": "AI Usage",
     "aiOperationsLink": "AI Operations",
     "ticketsLink": "Tickets",
+    "featureFlagsLink": "Feature Flags",
     "settingsLink": "Settings",
     "adminsLink": "Admins",
     "home": {
@@ -702,6 +703,18 @@
         "submit": "Send reply",
         "submitting": "Sending..."
       }
+    },
+    "featureFlags": {
+      "title": "Feature Flags",
+      "description": "Kill switches for individual code paths — separate from plans and the AI Operations kill switch.",
+      "newHeading": "New flag",
+      "keyPlaceholder": "key, e.g. automation.ai_workflow_generator",
+      "namePlaceholder": "Display name",
+      "descriptionPlaceholder": "What does this flag control? (optional)",
+      "requiredHint": "Key and name are required.",
+      "create": "Create flag",
+      "creating": "Creating...",
+      "emptyState": "No feature flags yet."
     },
     "revenueLink": "Revenue",
     "revenue": {

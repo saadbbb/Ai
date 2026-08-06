@@ -13,3 +13,20 @@ export const addPlatformAdminSchema = z.object({
 export const removePlatformAdminSchema = z.object({
   id: z.string().uuid(),
 });
+
+export const createFeatureFlagSchema = z.object({
+  key: z
+    .string()
+    .trim()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9_.]+$/, "Key may only contain lowercase letters, numbers, dots, and underscores."),
+  name: z.string().trim().min(1).max(100),
+  description: z.string().trim().max(500).optional(),
+  enabled: z.boolean(),
+});
+
+export const setFeatureFlagEnabledSchema = z.object({
+  id: z.string().uuid(),
+  enabled: z.boolean(),
+});
