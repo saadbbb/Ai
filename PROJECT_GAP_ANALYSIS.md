@@ -855,3 +855,34 @@ approved plan.
 
 Next: further Phase 8 scope (remaining report types, Super Admin support tickets/AI Ops console/feature
 flags), Phase 7 once a Meta Developer App exists, or Phase 9 (Growth Modules) per the approved plan.
+
+**2026-08-06 — Phase 8, fourth slice.** Two more of PART 7's 6 missing report types:
+
+- **Automation report**: `/api/reports/automations` — every execution across every workflow in the
+  workspace (workflow name, success/failure, summary, error, retry count, timestamp), not just the
+  per-workflow 20-row list the workflow detail page already shows. New `workflowRepository
+  .findAllExecutionsByWorkspaceId` (joins `workflows` for the name). Export button added next to "New
+  automation" on `/dashboard/automations`.
+- **AI Usage report**: `/api/reports/ai-usage` — deliberately **excludes `provider`/`model`** even though
+  both columns exist on the underlying `ai_usage` row and the Super Admin AI Usage report already shows
+  them platform-wide. PART 13B's "No AI Terminology" rule is explicit that provider/model internals are
+  never surfaced anywhere in the tenant app, and a downloaded CSV is still a tenant-facing surface — this
+  export only ever includes Result/Input Tokens/Output Tokens/Response Time/Date. New `aiUsageRepository
+  .findByWorkspaceId` with an inline comment warning future callers not to add provider/model to a
+  tenant-facing read. Export button added to `/dashboard/ai-employee` (the only sensible existing home for
+  it — this codebase doesn't have a dedicated tenant AI Activity Log page yet, still an open PART 13B gap).
+- No migration, no new i18n keys (both reuse `common.exportCsv`).
+- No new tests, consistent with every other report route in this codebase having none (thin wrappers over
+  already-tested `toCsv`/`csvResponse` and straightforward repository queries). Full suite: typecheck
+  clean, lint clean, **210/210 tests passing** (unchanged), production build clean — both new routes show
+  up in the build output.
+
+**PART 7 report types after this slice**: Contacts, Leads, Orders, Appointments (pre-existing) +
+Conversations, Automations, AI Usage (added this session) = 7 of the spec's 11 named report types now
+exist. Still missing: Channels (low value while WhatsApp/Instagram remain Meta-blocked stubs — would
+mostly export empty rows), Team performance, Revenue (tenant-scoped; the platform-wide MRR/ARR version
+already exists in Super Admin).
+
+Next: further Phase 8 scope (Team performance / Revenue reports, Super Admin support tickets/AI Ops
+console/feature flags), Phase 7 once a Meta Developer App exists, or Phase 9 (Growth Modules) per the
+approved plan.

@@ -13,11 +13,12 @@ export default async function AutomationsPage() {
   const workspace = await requireWorkspaceForUser(user.id);
   await requireFeature(workspace, "automations");
   await requireWorkspacePermission(user.id, workspace.id, "automation.workflows.view");
-  const [t, tLeads, tOrders, tAppointments, canManage] = await Promise.all([
+  const [t, tLeads, tOrders, tAppointments, tCommon, canManage] = await Promise.all([
     getTranslations("automations"),
     getTranslations("leads"),
     getTranslations("orders"),
     getTranslations("appointments"),
+    getTranslations("common"),
     permissionService.hasPermission(user.id, workspace.id, "automation.workflows.manage"),
   ]);
   const translators = { automations: t, leads: tLeads, orders: tOrders, appointments: tAppointments };
@@ -31,11 +32,16 @@ export default async function AutomationsPage() {
           <h1 className="text-xl font-semibold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        {canManage && (
-          <Button asChild>
-            <Link href="/dashboard/automations/new">{t("newWorkflow")}</Link>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <a href="/api/reports/automations">{tCommon("exportCsv")}</a>
           </Button>
-        )}
+          {canManage && (
+            <Button asChild>
+              <Link href="/dashboard/automations/new">{t("newWorkflow")}</Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       {workflows.length === 0 ? (

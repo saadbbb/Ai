@@ -73,6 +73,17 @@ export const workflowRepository = {
       .limit(20);
   },
 
+  /** Every execution across every workflow in the workspace — feeds the Automation CSV report. */
+  async findAllExecutionsByWorkspaceId(workspaceId: string): Promise<{ execution: WorkflowExecution; workflowName: string }[]> {
+    const rows = await db
+      .select({ execution: workflowExecutions, workflowName: workflows.name })
+      .from(workflowExecutions)
+      .innerJoin(workflows, eq(workflows.id, workflowExecutions.workflowId))
+      .where(eq(workflowExecutions.workspaceId, workspaceId))
+      .orderBy(desc(workflowExecutions.triggeredAt));
+    return rows;
+  },
+
   async createPendingRun(data: NewWorkflowPendingRun): Promise<WorkflowPendingRun> {
     const [pendingRun] = await db.insert(workflowPendingRuns).values(data).returning();
     return pendingRun;

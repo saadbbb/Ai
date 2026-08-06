@@ -1,6 +1,6 @@
-import { and, count, eq, gte } from "drizzle-orm";
+import { and, count, desc, eq, gte } from "drizzle-orm";
 import { db } from "@/db/client";
-import { aiUsage, type NewAiUsage } from "@/db/schema";
+import { aiUsage, type AiUsage, type NewAiUsage } from "@/db/schema";
 
 function startOfToday(): Date {
   const now = new Date();
@@ -18,5 +18,14 @@ export const aiUsageRepository = {
       .from(aiUsage)
       .where(and(eq(aiUsage.workspaceId, workspaceId), gte(aiUsage.createdAt, startOfToday())));
     return row?.count ?? 0;
+  },
+
+  /**
+   * Feeds the tenant-facing AI Usage CSV report. Callers must never surface
+   * `provider`/`model` from the returned rows to the tenant — see PART 13B's
+   * "No AI Terminology" rule; those two columns exist for Super Admin only.
+   */
+  async findByWorkspaceId(workspaceId: string): Promise<AiUsage[]> {
+    return db.select().from(aiUsage).where(eq(aiUsage.workspaceId, workspaceId)).orderBy(desc(aiUsage.createdAt));
   },
 };

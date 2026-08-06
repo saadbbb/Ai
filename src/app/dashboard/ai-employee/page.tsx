@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { AgentProfileSettingsForm } from "@/features/ai/components/agent-profile-settings-form";
 import { HandoverSettingsForm } from "@/features/ai/components/handover-settings-form";
 import { PersonalitySettingsForm } from "@/features/ai/components/personality-settings-form";
@@ -12,7 +13,7 @@ export default async function AiEmployeePage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
   const agent = await aiAgentRepository.findByWorkspaceId(workspace.id);
-  const t = await getTranslations("settings");
+  const [t, tCommon] = await Promise.all([getTranslations("settings"), getTranslations("common")]);
 
   if (!agent) {
     redirect("/onboarding/business");
@@ -20,9 +21,14 @@ export default async function AiEmployeePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
-        <p className="text-sm text-muted-foreground">{t("pageDescription")}</p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
+          <p className="text-sm text-muted-foreground">{t("pageDescription")}</p>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <a href="/api/reports/ai-usage">{tCommon("exportCsv")}</a>
+        </Button>
       </div>
 
       <AgentProfileSettingsForm
