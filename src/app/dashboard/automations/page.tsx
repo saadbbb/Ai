@@ -33,6 +33,11 @@ export default async function AutomationsPage() {
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
         <div className="flex items-center gap-2">
+          {canManage && (
+            <Button asChild variant="outline" size="sm">
+              <Link href="/dashboard/automations/approvals">{t("approvals.navLink")}</Link>
+            </Button>
+          )}
           <Button asChild variant="outline" size="sm">
             <a href="/api/reports/automations">{tCommon("exportCsv")}</a>
           </Button>

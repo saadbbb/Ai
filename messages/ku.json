@@ -14,6 +14,8 @@
     "skip": "پەڕاندن",
     "confirmDelete": "دڵنیایت لە سڕینەوەی ئەمە؟",
     "exportCsv": "هەناردەکردنی CSV",
+    "exportExcel": "هەناردەکردنی Excel",
+    "exportPdf": "هەناردەکردنی PDF",
     "search": "گەڕان",
     "searchPlaceholder": "بە ناو بگەڕێ..."
   },
@@ -649,6 +651,23 @@
     "backLink": "← گەڕانەوە بۆ خۆکارکردن",
     "pause": "وەستاندن",
     "resume": "دووبارە چالاککردنەوە",
+    "approvals": {
+      "navLink": "ڕەزامەندییە چاوەڕوانکراوەکان",
+      "title": "ڕەزامەندییە چاوەڕوانکراوەکان",
+      "description": "خۆکارکردنەکان چاوەڕوانی ڕەزامەندی یان ڕەتکردنەوەن لەلایەن بەڕێوەبەرێکەوە.",
+      "backLink": "← گەڕانەوە بۆ خۆکارکردن",
+      "emptyState": "هیچ شتێک ئێستا پێویستی بە ڕەزامەندیت نییە.",
+      "requestedFor": "\"{workflow}\" — {contact}",
+      "approve": "ڕەزامەندی",
+      "reject": "ڕەتکردنەوە"
+    },
+    "statuses": {
+      "draft": "ڕەشنووس",
+      "active": "چالاک",
+      "paused": "وەستاوە",
+      "disabled": "ناچالاک",
+      "archived": "ئەرشیفکراو"
+    },
     "executionsHeading": "جێبەجێکردنە دواییەکان",
     "noExecutions": "ئەم خۆکارکردنە هێشتا جێبەجێ نەکراوە.",
     "succeeded": "بە سەرکەوتوویی جێبەجێ کرا",
@@ -675,10 +694,20 @@
     "actionAssignAgent": "دیاریکردنی گفتوگۆکە بۆ ئەندامێکی تیم",
     "actionWebhookCall": "ناردنی داتا بۆ بەستەرێکی webhook",
     "actionTriggerAnotherWorkflow": "کارپێکردنی خۆکارکردنێکی تر",
+    "actionCreateOrder": "دروستکردنی داواکاری",
+    "actionBookAppointment": "حیجزکردنی چاوپێکەوتن",
+    "actionSendAiReply": "ناردنی وەڵامی کارمەندە زیرەکە",
+    "actionRequestApproval": "داواکردنی ڕەزامەندی",
     "delaySummary": "دوای {days} ڕۆژ",
     "new": {
       "title": "خۆکارکردنی نوێ",
       "description": "شتێک هەڵبژێرە کە لە بزنسەکەت ڕوودەدات، و شتێک کە دەبێت خۆکارانە وەک وەڵام ڕوو بدات.",
+      "generatorHeading": "بە وشەکانی خۆت باسی بکە",
+      "generatorHint": "بۆ نموونە: \"نامەیەکی وەاتسئاپی دوایکەوتن بنێرە ئەگەر داواکارییەک بۆ 24 کاتژمێر بێ پارە بمێنێتەوە\" — خۆکارکردنەکە لە خوارەوە پڕدەکەینەوە بۆ پێداچوونەوەت.",
+      "generatorPlaceholder": "خۆکارکردنەکەت باس بکە...",
+      "generateButton": "دروستکردن",
+      "generating": "دروستدەکرێت...",
+      "generatorSuccess": "لە خوارەوە پڕکرایەوە — پێش هەڵگرتن پێداچوونەوەی بکە.",
       "templatesHeading": "دەستپێکردنی خێرا",
       "templates": {
         "tagNewLeads": "نیشانکردنی کڕیارە ئەگەرییە نوێیەکان",
@@ -716,8 +745,21 @@
         "close_conversation": "داخستنی گفتوگۆکە",
         "assign_agent": "دیاریکردن بۆ ئەندامێکی تیم",
         "webhook_call": "ناردن بۆ webhook",
-        "trigger_another_workflow": "کارپێکردنی خۆکارکردنێکی تر"
+        "trigger_another_workflow": "کارپێکردنی خۆکارکردنێکی تر",
+        "create_order": "دروستکردنی داواکاری",
+        "book_appointment": "حیجزکردنی چاوپێکەوتن",
+        "send_ai_reply": "ناردنی وەڵامی کارمەندە زیرەکە",
+        "request_approval": "داواکردنی ڕەزامەندی"
       },
+      "productPlaceholder": "بەرهەمێک هەڵبژێرە",
+      "quantityPlaceholder": "ڕەگەز، بۆ نموونە: 1",
+      "noProducts": "هێشتا هیچ بەرهەمێکی نرخدارت نییە.",
+      "servicePlaceholder": "خزمەتگوزارییەک هەڵبژێرە",
+      "daysFromNowPlaceholder": "ڕۆژ لە ئێستاوە، بۆ نموونە: 1",
+      "noServices": "هێشتا هیچ خزمەتگوزارییەکت نییە.",
+      "sendAiReplyHint": "کارمەندە زیرەکەت وەڵام دەداتەوە لە کۆتا گفتوگۆی کراوەی کڕیار.",
+      "approvalInstructionsPlaceholder": "پشتڕاستکەرەوە پێویستە چی بپشکنێت؟ (ئارەزوومەندانە)",
+      "approvalWorkflowPlaceholder": "ئەم خۆکارکردنە کاری پێبکە دوای ڕەزامەندی (ئارەزوومەندانە)",
       "tagPlaceholder": "نیشانە، بۆ نموونە: کڕیار",
       "subjectPlaceholder": "ناونیشان (ئارەزوومەندانە)",
       "messagePlaceholder": "نامە — '{{contactName}}' بەکاربێنە بۆ ناوی کڕیار",
@@ -754,16 +796,25 @@
       "matchAny": "یەک مەرج ڕاست بێت بەسە",
       "conditionFields": {
         "tag": "تاگ",
-        "language": "زمان"
+        "language": "زمان",
+        "lead_score": "خاڵی کڕیاری ئەگەری",
+        "order_value": "بەهای داواکاری",
+        "working_hours": "کاتەکانی کار"
       },
       "conditionTagPlaceholder": "تاگ، بۆ نموونە VIP",
-      "conditionLanguagePlaceholder": "بۆ نموونە ar، en، ku"
+      "conditionLanguagePlaceholder": "بۆ نموونە ar، en، ku",
+      "conditionLeadScorePlaceholder": "کەمترین خاڵ، بۆ نموونە 70",
+      "conditionOrderValuePlaceholder": "کەمترین بەها، بۆ نموونە 100",
+      "conditionWorkingHoursHint": "تەنها لە کاتەکانی کاری دیاریکراودا کاردەکات"
     },
     "conditionsPrefix": "تەنها ئەگەر",
     "conditionAnd": "و",
     "conditionOr": "یان",
     "conditionTag": "تاگی \"{value}\"ی هەبێت",
-    "conditionLanguage": "زمان {value} بێت"
+    "conditionLanguage": "زمان {value} بێت",
+    "conditionLeadScore": "خاڵی کڕیاری ئەگەری ≥ {value}",
+    "conditionOrderValue": "بەهای داواکاری ≥ {value}",
+    "conditionWorkingHours": "لە کاتەکانی کاردا"
   },
   "appointments": {
     "title": "کاتە دیاریکراوەکان",
@@ -806,12 +857,30 @@
     "leadsHeading": "کڕیارە ئەگەرییەکان",
     "noLeads": "هێشتا هیچ کڕیارێکی ئەگەری بۆ ئەم پەیوەندییە نییە.",
     "conversationsHeading": "گفتوگۆکان",
-    "noConversations": "هێشتا هیچ گفتوگۆیەک نییە."
+    "noConversations": "هێشتا هیچ گفتوگۆیەک نییە.",
+    "lifecycle": {
+      "lead": "کڕیارێکی ئەگەری",
+      "customer": "کڕیار",
+      "repeat_customer": "کڕیاری دووبارە",
+      "vip": "VIP",
+      "loyal_customer": "کڕیاری دڵسۆز"
+    },
+    "filters": {
+      "lifecycleAll": "هەموو قۆناغەکان",
+      "tagPlaceholder": "پاڵاوتن بە نیشانە",
+      "clear": "سڕینەوەی پاڵاوتنەکان"
+    },
+    "timelineHeading": "هێڵی کات"
   },
   "leads": {
     "title": "کڕیارە ئەگەرییەکان",
     "description": "هەموو کڕیارێکی ئەگەری، پۆلێن کراوە بەپێی قۆناغ. هێشتا ڕاکێشان نییە — تەنها قۆناغەکە لە کارتەکە بگۆڕە.",
     "emptyBoard": "هێشتا هیچ کڕیارێکی ئەگەری نییە. گفتوگۆیەک لە سندوقی گفتوگۆکان بکەرەوە و کڕیارێکی ئەگەری لێی دروست بکە.",
+    "filters": {
+      "tagPlaceholder": "پاڵاوتن بە نیشانە",
+      "languagePlaceholder": "زمان، بۆ نموونە: ar",
+      "clear": "سڕینەوەی پاڵاوتنەکان"
+    },
     "emptyStage": "هیچ شتێک لێرە نییە.",
     "viewConversation": "بینینی گفتوگۆ ←",
     "stages": {
@@ -894,6 +963,7 @@
   },
   "activity": {
     "title": "چالاکی",
-    "empty": "هیچ چالاکییەک بۆ ئەم کڕیارە تۆمار نەکراوە."
+    "empty": "هیچ چالاکییەک بۆ ئەم کڕیارە تۆمار نەکراوە.",
+    "channelActivity": "گفتوگۆ"
   }
 }

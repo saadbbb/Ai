@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ExportButtons } from "@/components/export-buttons";
 import { Input } from "@/components/ui/input";
 import { OrderStatusSelect } from "@/features/orders/components/order-status-select";
 import { orderTotal } from "@/features/orders/lib/order-total";
@@ -28,10 +29,11 @@ export default async function OrdersPage({ searchParams }: PageProps) {
           <h1 className="text-xl font-semibold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        <div className="flex shrink-0 gap-2">
-          <Button asChild variant="outline" size="sm">
-            <a href="/api/reports/orders">{tCommon("exportCsv")}</a>
-          </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <ExportButtons
+            reportPath="/api/reports/orders"
+            labels={{ csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") }}
+          />
           <Button asChild>
             <Link href="/dashboard/orders/new">{t("newOrder")}</Link>
           </Button>

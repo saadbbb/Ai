@@ -15,7 +15,9 @@ const triggerStatusValues = [...new Set([...orderStatusEnum.enumValues, ...appoi
 ];
 
 const conditionRuleSchema = z.object({
-  field: z.enum(["tag", "language"]),
+  field: z.enum(["tag", "language", "lead_score", "order_value", "working_hours"]),
+  // "working_hours" ignores this value entirely (see evaluateConditions) — still required
+  // here so a row always round-trips the same shape; the UI sends a placeholder for it.
   value: z.string().trim().min(1).max(100),
 });
 
@@ -37,6 +39,10 @@ export const createWorkflowSchema = z
     actionAssignedUserId: z.string().uuid().optional(),
     actionWebhookUrl: z.string().trim().url().max(2000).startsWith("https://", "Must be a secure (https) URL.").optional(),
     actionTargetWorkflowId: z.string().uuid().optional(),
+    actionProductId: z.string().uuid().optional(),
+    actionQuantity: z.coerce.number().int().min(1).max(999).optional(),
+    actionServiceId: z.string().uuid().optional(),
+    actionDaysFromNow: z.coerce.number().int().min(0).max(365).optional(),
     conditions: z.array(conditionRuleSchema).max(5).optional(),
     conditionsMatchType: z.enum(["all", "any"]).optional(),
     delayDays: z.coerce.number().int().min(0).max(365).optional(),
@@ -76,6 +82,12 @@ export const createWorkflowSchema = z
       if (!data.actionTargetWorkflowId) {
         ctx.addIssue({ code: "custom", path: ["actionTargetWorkflowId"], message: "Pick a workflow to trigger." });
       }
+    }
+    if (data.actionType === "create_order" && !data.actionProductId) {
+      ctx.addIssue({ code: "custom", path: ["actionProductId"], message: "Pick a product." });
+    }
+    if (data.actionType === "book_appointment" && !data.actionServiceId) {
+      ctx.addIssue({ code: "custom", path: ["actionServiceId"], message: "Pick a service." });
     }
   });
 

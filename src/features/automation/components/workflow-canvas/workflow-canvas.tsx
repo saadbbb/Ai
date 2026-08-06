@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import type {
   AppointmentStatus,
   LeadStage,
@@ -18,11 +19,13 @@ import type {
   WorkflowTrigger,
 } from "@/db/schema";
 import { createWorkflowAction } from "../../actions/create-workflow.action";
+import { generateWorkflowAction } from "../../actions/generate-workflow.action";
 import { ActionNode } from "./action-node";
 import { ConditionsNode } from "./conditions-node";
 import { TriggerNode } from "./trigger-node";
 import type {
   ActionNodeData,
+  CatalogOption,
   ConditionRow,
   ConditionsNodeData,
   MemberOption,
@@ -74,9 +77,15 @@ const INITIAL_NODES: Node[] = [
       actionAssignedUserId: "",
       actionWebhookUrl: "",
       actionTargetWorkflowId: "",
+      actionProductId: "",
+      actionQuantity: "",
+      actionServiceId: "",
+      actionDaysFromNow: "",
       delayDays: "",
       memberOptions: [],
       workflowOptions: [],
+      productOptions: [],
+      serviceOptions: [],
       onChange: NOOP,
     } satisfies ActionNodeData,
   },
@@ -131,9 +140,11 @@ const TEMPLATES: WorkflowTemplate[] = [
 interface WorkflowCanvasProps {
   memberOptions: MemberOption[];
   workflowOptions: WorkflowOption[];
+  productOptions: CatalogOption[];
+  serviceOptions: CatalogOption[];
 }
 
-export function WorkflowCanvas({ memberOptions, workflowOptions }: WorkflowCanvasProps) {
+export function WorkflowCanvas({ memberOptions, workflowOptions, productOptions, serviceOptions }: WorkflowCanvasProps) {
   const router = useRouter();
   const t = useTranslations("automations.new");
 
@@ -155,9 +166,15 @@ export function WorkflowCanvas({ memberOptions, workflowOptions }: WorkflowCanva
   const [actionAssignedUserId, setActionAssignedUserId] = useState("");
   const [actionWebhookUrl, setActionWebhookUrl] = useState("");
   const [actionTargetWorkflowId, setActionTargetWorkflowId] = useState("");
+  const [actionProductId, setActionProductId] = useState("");
+  const [actionQuantity, setActionQuantity] = useState("");
+  const [actionServiceId, setActionServiceId] = useState("");
+  const [actionDaysFromNow, setActionDaysFromNow] = useState("");
   const [delayDays, setDelayDays] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
+  const [generatorDescription, setGeneratorDescription] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   function applyTemplate(template: WorkflowTemplate) {
     setName(t(`templates.${template.key}`));
@@ -176,9 +193,50 @@ export function WorkflowCanvas({ memberOptions, workflowOptions }: WorkflowCanva
     setActionAssignedUserId("");
     setActionWebhookUrl("");
     setActionTargetWorkflowId("");
+    setActionProductId("");
+    setActionQuantity("");
+    setActionServiceId("");
+    setActionDaysFromNow("");
     setDelayDays("");
     setConditions([]);
     setConditionsMatchType("all");
+  }
+
+  /**
+   * PART 6's AI Workflow Generator — populates the exact same form state
+   * `applyTemplate` does, so the result is reviewable/editable on the canvas
+   * before submitting through the same createWorkflowAction every manually-
+   * built workflow uses. No separate execution model.
+   */
+  async function handleGenerate() {
+    setIsGenerating(true);
+    const result = await generateWorkflowAction({ description: generatorDescription });
+    setIsGenerating(false);
+
+    if (!result.success) {
+      toast.error(result.error.message);
+      return;
+    }
+
+    const fields = result.data;
+    if (fields.name) setName(fields.name);
+    if (fields.triggerType) setTriggerType(fields.triggerType as WorkflowTrigger);
+    setTriggerStage((fields.triggerStage as LeadStage) ?? "");
+    setTriggerStatus((fields.triggerStatus as OrderStatus | AppointmentStatus) ?? "");
+    if (fields.actionType) setActionType(fields.actionType as WorkflowAction);
+    setActionTag(fields.actionTag ?? "");
+    setActionSubject(fields.actionSubject ?? "");
+    setActionMessage(fields.actionMessage ?? "");
+    setActionTaskTitle(fields.actionTaskTitle ?? "");
+    setActionTaskPriority((fields.actionTaskPriority as TaskPriority) || "medium");
+    setActionTaskDueInDays(fields.actionTaskDueInDays ? String(fields.actionTaskDueInDays) : "");
+    setActionNoteContent(fields.actionNoteContent ?? "");
+    setActionContactLanguage(fields.actionContactLanguage ?? "");
+    setActionWebhookUrl(fields.actionWebhookUrl ?? "");
+    setActionQuantity(fields.actionQuantity ? String(fields.actionQuantity) : "");
+    setActionDaysFromNow(fields.actionDaysFromNow ? String(fields.actionDaysFromNow) : "");
+    setDelayDays(fields.delayDays ? String(fields.delayDays) : "");
+    toast.success(t("generatorSuccess"));
   }
 
   useEffect(() => {
@@ -216,9 +274,15 @@ export function WorkflowCanvas({ memberOptions, workflowOptions }: WorkflowCanva
       actionAssignedUserId,
       actionWebhookUrl,
       actionTargetWorkflowId,
+      actionProductId,
+      actionQuantity,
+      actionServiceId,
+      actionDaysFromNow,
       delayDays,
       memberOptions,
       workflowOptions,
+      productOptions,
+      serviceOptions,
       onChange: (patch) => {
         if (patch.actionType !== undefined) setActionType(patch.actionType);
         if (patch.actionTag !== undefined) setActionTag(patch.actionTag);
@@ -232,6 +296,10 @@ export function WorkflowCanvas({ memberOptions, workflowOptions }: WorkflowCanva
         if (patch.actionAssignedUserId !== undefined) setActionAssignedUserId(patch.actionAssignedUserId);
         if (patch.actionWebhookUrl !== undefined) setActionWebhookUrl(patch.actionWebhookUrl);
         if (patch.actionTargetWorkflowId !== undefined) setActionTargetWorkflowId(patch.actionTargetWorkflowId);
+        if (patch.actionProductId !== undefined) setActionProductId(patch.actionProductId);
+        if (patch.actionQuantity !== undefined) setActionQuantity(patch.actionQuantity);
+        if (patch.actionServiceId !== undefined) setActionServiceId(patch.actionServiceId);
+        if (patch.actionDaysFromNow !== undefined) setActionDaysFromNow(patch.actionDaysFromNow);
         if (patch.delayDays !== undefined) setDelayDays(patch.delayDays);
       },
     };
@@ -265,9 +333,15 @@ export function WorkflowCanvas({ memberOptions, workflowOptions }: WorkflowCanva
     actionAssignedUserId,
     actionWebhookUrl,
     actionTargetWorkflowId,
+    actionProductId,
+    actionQuantity,
+    actionServiceId,
+    actionDaysFromNow,
     delayDays,
     memberOptions,
     workflowOptions,
+    productOptions,
+    serviceOptions,
   ]);
 
   async function handleSubmit() {
@@ -293,9 +367,17 @@ export function WorkflowCanvas({ memberOptions, workflowOptions }: WorkflowCanva
       actionAssignedUserId: actionType === "assign_agent" ? actionAssignedUserId || undefined : undefined,
       actionWebhookUrl: actionType === "webhook_call" ? actionWebhookUrl || undefined : undefined,
       actionMessage:
-        actionType === "notify_owner_email" || actionType === "webhook_call" ? actionMessage || undefined : undefined,
+        actionType === "notify_owner_email" || actionType === "webhook_call" || actionType === "request_approval"
+          ? actionMessage || undefined
+          : undefined,
       actionTargetWorkflowId:
-        actionType === "trigger_another_workflow" ? actionTargetWorkflowId || undefined : undefined,
+        actionType === "trigger_another_workflow" || actionType === "request_approval"
+          ? actionTargetWorkflowId || undefined
+          : undefined,
+      actionProductId: actionType === "create_order" ? actionProductId || undefined : undefined,
+      actionQuantity: actionType === "create_order" ? actionQuantity || undefined : undefined,
+      actionServiceId: actionType === "book_appointment" ? actionServiceId || undefined : undefined,
+      actionDaysFromNow: actionType === "book_appointment" ? actionDaysFromNow || undefined : undefined,
       conditions: filledConditions.length > 0 ? filledConditions : undefined,
       conditionsMatchType: filledConditions.length > 1 ? conditionsMatchType : undefined,
       delayDays: delayDays || undefined,
@@ -312,6 +394,28 @@ export function WorkflowCanvas({ memberOptions, workflowOptions }: WorkflowCanva
 
   return (
     <div className="space-y-4">
+      <div className="space-y-2 rounded-lg border border-dashed p-3">
+        <label className="text-sm font-medium">{t("generatorHeading")}</label>
+        <p className="text-xs text-muted-foreground">{t("generatorHint")}</p>
+        <Textarea
+          value={generatorDescription}
+          onChange={(event) => setGeneratorDescription(event.target.value)}
+          placeholder={t("generatorPlaceholder")}
+          rows={2}
+        />
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isGenerating || generatorDescription.trim().length < 5}
+            onClick={handleGenerate}
+          >
+            {isGenerating ? t("generating") : t("generateButton")}
+          </Button>
+        </div>
+      </div>
+
       <div className="space-y-2">
         <label className="text-sm font-medium">{t("templatesHeading")}</label>
         <div className="flex flex-wrap gap-2">

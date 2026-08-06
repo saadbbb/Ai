@@ -65,6 +65,18 @@ export function describeAction(workflow: Workflow, t: Pick<DescribeWorkflowTrans
   if (workflow.actionType === "trigger_another_workflow") {
     return t.automations("actionTriggerAnotherWorkflow");
   }
+  if (workflow.actionType === "create_order") {
+    return t.automations("actionCreateOrder");
+  }
+  if (workflow.actionType === "book_appointment") {
+    return t.automations("actionBookAppointment");
+  }
+  if (workflow.actionType === "send_ai_reply") {
+    return t.automations("actionSendAiReply");
+  }
+  if (workflow.actionType === "request_approval") {
+    return t.automations("actionRequestApproval");
+  }
   return t.automations("actionNotifyOwner");
 }
 
@@ -83,10 +95,12 @@ export function describeConditions(
   if (!conditions || conditions.rules.length === 0) return null;
 
   const joiner = conditions.matchType === "any" ? t.automations("conditionOr") : t.automations("conditionAnd");
-  const parts = conditions.rules.map((rule) =>
-    rule.field === "tag"
-      ? t.automations("conditionTag", { value: rule.value })
-      : t.automations("conditionLanguage", { value: rule.value }),
-  );
+  const parts = conditions.rules.map((rule) => {
+    if (rule.field === "tag") return t.automations("conditionTag", { value: rule.value });
+    if (rule.field === "language") return t.automations("conditionLanguage", { value: rule.value });
+    if (rule.field === "lead_score") return t.automations("conditionLeadScore", { value: rule.value });
+    if (rule.field === "order_value") return t.automations("conditionOrderValue", { value: rule.value });
+    return t.automations("conditionWorkingHours");
+  });
   return `${t.automations("conditionsPrefix")} ${parts.join(` ${joiner} `)}`;
 }

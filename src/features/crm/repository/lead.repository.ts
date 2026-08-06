@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, isNull, lt, notInArray, or } from "drizzle-orm";
+import { and, desc, eq, ilike, isNull, lt, notInArray, or, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { type Contact, contacts, type Lead, leads, type LeadStage, type NewLead } from "@/db/schema";
 
@@ -7,17 +7,30 @@ export interface LeadListItem {
   contact: Contact;
 }
 
+export interface LeadFilters {
+  search?: string;
+  tag?: string;
+  language?: string;
+}
+
 const listSelection = { lead: leads, contact: contacts };
 const CLOSED_LEAD_STAGES: LeadStage[] = ["won", "lost", "cancelled"];
 
 export const leadRepository = {
-  async findByWorkspaceId(workspaceId: string, search?: string): Promise<LeadListItem[]> {
-    const trimmed = search?.trim();
+  async findByWorkspaceId(workspaceId: string, filters?: LeadFilters): Promise<LeadListItem[]> {
+    const trimmed = filters?.search?.trim();
     return db
       .select(listSelection)
       .from(leads)
       .innerJoin(contacts, eq(leads.contactId, contacts.id))
-      .where(and(eq(leads.workspaceId, workspaceId), trimmed ? ilike(contacts.fullName, `%${trimmed}%`) : undefined))
+      .where(
+        and(
+          eq(leads.workspaceId, workspaceId),
+          trimmed ? ilike(contacts.fullName, `%${trimmed}%`) : undefined,
+          filters?.tag ? sql`${contacts.tags} @> ${JSON.stringify([filters.tag])}` : undefined,
+          filters?.language ? eq(contacts.language, filters.language as never) : undefined,
+        ),
+      )
       .orderBy(desc(leads.createdAt));
   },
 

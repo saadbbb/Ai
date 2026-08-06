@@ -176,6 +176,95 @@ export function ActionNode({ data }: NodeProps<Node<ActionNodeData>>) {
           <p className="text-xs text-muted-foreground">{t("noOtherWorkflows")}</p>
         ))}
 
+      {data.actionType === "create_order" &&
+        (data.productOptions.length > 0 ? (
+          <>
+            <Select value={data.actionProductId} onValueChange={(value) => data.onChange({ actionProductId: value })}>
+              <SelectTrigger className="w-full nodrag">
+                <SelectValue placeholder={t("productPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {data.productOptions.map((option) => (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              className="nodrag"
+              type="number"
+              min="1"
+              max="999"
+              value={data.actionQuantity}
+              onChange={(event) => data.onChange({ actionQuantity: event.target.value })}
+              placeholder={t("quantityPlaceholder")}
+            />
+          </>
+        ) : (
+          <p className="text-xs text-muted-foreground">{t("noProducts")}</p>
+        ))}
+
+      {data.actionType === "book_appointment" &&
+        (data.serviceOptions.length > 0 ? (
+          <>
+            <Select value={data.actionServiceId} onValueChange={(value) => data.onChange({ actionServiceId: value })}>
+              <SelectTrigger className="w-full nodrag">
+                <SelectValue placeholder={t("servicePlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {data.serviceOptions.map((option) => (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              className="nodrag"
+              type="number"
+              min="0"
+              max="365"
+              value={data.actionDaysFromNow}
+              onChange={(event) => data.onChange({ actionDaysFromNow: event.target.value })}
+              placeholder={t("daysFromNowPlaceholder")}
+            />
+          </>
+        ) : (
+          <p className="text-xs text-muted-foreground">{t("noServices")}</p>
+        ))}
+
+      {data.actionType === "send_ai_reply" && <p className="text-xs text-muted-foreground">{t("sendAiReplyHint")}</p>}
+
+      {data.actionType === "request_approval" && (
+        <>
+          <Textarea
+            className="nodrag"
+            value={data.actionMessage}
+            onChange={(event) => data.onChange({ actionMessage: event.target.value })}
+            placeholder={t("approvalInstructionsPlaceholder")}
+            rows={2}
+          />
+          {data.workflowOptions.length > 0 && (
+            <Select
+              value={data.actionTargetWorkflowId}
+              onValueChange={(value) => data.onChange({ actionTargetWorkflowId: value })}
+            >
+              <SelectTrigger className="w-full nodrag">
+                <SelectValue placeholder={t("approvalWorkflowPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {data.workflowOptions.map((option) => (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </>
+      )}
+
       <div className="space-y-1">
         <label className="text-xs text-muted-foreground">{t("delayLabel")}</label>
         <Input

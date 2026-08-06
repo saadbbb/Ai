@@ -1,9 +1,12 @@
 import "server-only";
 import type { Order, OrderStatus } from "@/db/schema";
 import { activityRepository, type ActivityActor } from "@/features/crm/repository/activity.repository";
+import { crmService } from "@/features/crm/services/crm.service";
 import { automationService } from "@/features/automation/services/automation.service";
 import { AppError } from "@/lib/errors/app-error";
 import { orderRepository, type OrderListItem } from "../repository/order.repository";
+
+const REVENUE_ORDER_STATUSES: OrderStatus[] = ["delivered", "completed"];
 
 interface OrderItemInput {
   productId?: string;
@@ -83,6 +86,10 @@ async function updateOrderStatus(workspaceId: string, orderId: string, status: O
     summary: `Order status changed to "${status}".`,
     link: `/dashboard/orders/${order.id}`,
   });
+
+  if (REVENUE_ORDER_STATUSES.includes(status)) {
+    await crmService.advanceLifecycleStage(workspaceId, order.contactId);
+  }
 
   return order;
 }

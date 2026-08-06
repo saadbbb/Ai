@@ -5,23 +5,34 @@ import type {
   LeadStage,
   OrderStatus,
   Workflow,
+  WorkflowApprovalStatus,
   WorkflowConditions,
   WorkflowExecution,
   WorkflowStatus,
   WorkflowTriggerConfig,
 } from "@/db/schema";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
+import { calculateLeadScore } from "@/features/crm/lib/lead-score";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { noteRepository } from "@/features/crm/repository/note.repository";
 import { taskRepository } from "@/features/crm/repository/task.repository";
+import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
+import { isWithinWorkingHours } from "@/features/ai/lib/working-hours";
+import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
+import { messageRepository } from "@/features/inbox/repository/message.repository";
 import { notificationRepository } from "@/features/notifications/repository/notification.repository";
+import { orderTotal } from "@/features/orders/lib/order-total";
+import { orderRepository } from "@/features/orders/repository/order.repository";
+import { productRepository } from "@/features/knowledge-base/repository/product.repository";
+import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { userRepository } from "@/features/auth/repository/user.repository";
 import { emailService } from "@/lib/email";
 import { AppError } from "@/lib/errors/app-error";
 import { safeWebhookPost } from "../lib/safe-webhook-fetch";
+import { workflowApprovalRepository } from "../repository/workflow-approval.repository";
 import { workflowRepository } from "../repository/workflow.repository";
 import type { createWorkflowSchema } from "../validation/schemas";
 import type { z } from "zod";
@@ -92,19 +103,80 @@ function eventToPayload(event: AutomationEvent): WorkflowTriggerConfig {
 }
 
 /**
+ * Recomputes the same deterministic score crmService.listLeads/lead-score.ts
+ * use, but for a single contact's most relevant lead (the first non-terminal
+ * one, falling back to the most recent) — condition evaluation only ever
+ * runs for workflows that already matched a trigger, so this stays bounded
+ * regardless of workspace size, unlike a workspace-wide recompute.
+ */
+async function getContactLeadScore(workspaceId: string, contact: Contact): Promise<number> {
+  const contactLeads = await leadRepository.findByContactId(contact.id, workspaceId);
+  if (contactLeads.length === 0) return 0;
+  const relevantLead = contactLeads.find((lead) => !TERMINAL_LEAD_STAGES.includes(lead.stage)) ?? contactLeads[0];
+
+  const [messageCounts, orders, appointments] = await Promise.all([
+    relevantLead.conversationId
+      ? messageRepository.countByConversationIds([relevantLead.conversationId])
+      : Promise.resolve(new Map<string, number>()),
+    orderRepository.findByContactId(contact.id, workspaceId),
+    appointmentRepository.findByContactId(contact.id, workspaceId),
+  ]);
+
+  return calculateLeadScore({
+    messageCount: relevantLead.conversationId ? (messageCounts.get(relevantLead.conversationId) ?? 0) : 0,
+    hasOrder: orders.length > 0,
+    hasAppointment: appointments.length > 0,
+    tags: contact.tags,
+    stage: relevantLead.stage,
+    lastContactAt: contact.lastContactAt,
+  });
+}
+
+/** The contact's most recent order total — 0 if they have none. */
+async function getContactLatestOrderValue(workspaceId: string, contact: Contact): Promise<number> {
+  const orders = await orderRepository.findByContactId(contact.id, workspaceId);
+  if (orders.length === 0) return 0;
+  return orderTotal(orders[0].items);
+}
+
+/**
  * No rules = unconditional (every workflow before conditions existed keeps
  * working unchanged). A missing contact fails closed rather than matching
  * everything — a workflow with conditions set should never fire blind.
+ * `lead_score`/`order_value` rule values are parsed as "greater than or equal
+ * to" thresholds (matching the spec's own examples: "Lead Score > 80", "Order
+ * Value > 100"); `working_hours` ignores its `value` field entirely — it's a
+ * pure boolean check against the workspace's configured hours.
  */
-function evaluateConditions(conditions: WorkflowConditions | null, contact: Contact | null): boolean {
+async function evaluateConditions(
+  workspaceId: string,
+  conditions: WorkflowConditions | null,
+  contact: Contact | null,
+): Promise<boolean> {
   if (!conditions || conditions.rules.length === 0) return true;
   if (!contact) return false;
 
-  const results = conditions.rules.map((rule) => {
-    if (rule.field === "tag") return contact.tags.includes(rule.value);
-    if (rule.field === "language") return contact.language === rule.value;
-    return false;
-  });
+  const results = await Promise.all(
+    conditions.rules.map(async (rule) => {
+      if (rule.field === "tag") return contact.tags.includes(rule.value);
+      if (rule.field === "language") return contact.language === rule.value;
+      if (rule.field === "lead_score") {
+        const threshold = Number(rule.value);
+        if (Number.isNaN(threshold)) return false;
+        return (await getContactLeadScore(workspaceId, contact)) >= threshold;
+      }
+      if (rule.field === "order_value") {
+        const threshold = Number(rule.value);
+        if (Number.isNaN(threshold)) return false;
+        return (await getContactLatestOrderValue(workspaceId, contact)) >= threshold;
+      }
+      if (rule.field === "working_hours") {
+        const agent = await aiAgentRepository.findByWorkspaceId(workspaceId);
+        return isWithinWorkingHours(agent?.workingHours);
+      }
+      return false;
+    }),
+  );
 
   return conditions.matchType === "any" ? results.some(Boolean) : results.every(Boolean);
 }
@@ -345,6 +417,129 @@ async function runAction(
     return `Triggered workflow "${targetWorkflow.name}"`;
   }
 
+  if (workflow.actionType === "create_order") {
+    const { productId, quantity } = workflow.actionConfig;
+    if (!productId) throw new AppError("VALIDATION_ERROR", "Workflow is missing a product to order.");
+
+    const products = await productRepository.findByWorkspaceId(workspaceId);
+    const product = products.find((item) => item.id === productId);
+    if (!product) throw new AppError("NOT_FOUND", "The configured product no longer exists.");
+    if (!product.price) throw new AppError("VALIDATION_ERROR", `Product "${product.name}" has no price set.`);
+
+    const created = await orderRepository.create(
+      { workspaceId, contactId: event.contactId, conversationId: null, notes: `Created by automation "${workflow.name}".` },
+      [{ productId: product.id, name: product.name, unitPrice: product.price, quantity: quantity && quantity > 0 ? quantity : 1 }],
+    );
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "order_created",
+      actor: { type: "automation" },
+      summary: `Order created by automation "${workflow.name}".`,
+      link: `/dashboard/orders/${created.order.id}`,
+    });
+    await dispatch(workspaceId, { type: "order_created", contactId: event.contactId });
+
+    return contact ? `Created an order for ${contact.fullName}` : "Created an order";
+  }
+
+  if (workflow.actionType === "book_appointment") {
+    const { serviceId, daysFromNow } = workflow.actionConfig;
+    if (!serviceId) throw new AppError("VALIDATION_ERROR", "Workflow is missing a service to book.");
+
+    const services = await serviceRepository.findByWorkspaceId(workspaceId);
+    const service = services.find((item) => item.id === serviceId);
+    if (!service) throw new AppError("NOT_FOUND", "The configured service no longer exists.");
+
+    const scheduledAt = new Date();
+    scheduledAt.setUTCDate(scheduledAt.getUTCDate() + (daysFromNow && daysFromNow > 0 ? daysFromNow : 1));
+
+    await appointmentRepository.create({
+      workspaceId,
+      contactId: event.contactId,
+      serviceId: service.id,
+      serviceName: service.name,
+      conversationId: null,
+      scheduledAt,
+      durationMinutes: service.durationMinutes ?? 30,
+      notes: `Booked by automation "${workflow.name}".`,
+    });
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "appointment_created",
+      actor: { type: "automation" },
+      summary: `Appointment booked by automation "${workflow.name}": ${service.name}.`,
+    });
+    await dispatch(workspaceId, { type: "appointment_created", contactId: event.contactId });
+
+    return contact ? `Booked ${service.name} for ${contact.fullName}` : `Booked ${service.name}`;
+  }
+
+  if (workflow.actionType === "send_ai_reply") {
+    const conversations = await conversationRepository.findByContactId(event.contactId, workspaceId);
+    const openConversation = conversations.find((item) => item.conversation.status === "open");
+    if (!openConversation) throw new AppError("NOT_FOUND", "This contact has no open conversation to reply in.");
+
+    // Dynamic import, deliberately: ai.service.ts statically imports the tool
+    // registry, which (via add-tag.tool.ts) imports this module — a static
+    // top-level import here would create a circular module graph. Dynamic
+    // import resolves after both modules have finished initializing.
+    const { aiService } = await import("@/features/ai/services/ai.service");
+    const history = await messageRepository.findByConversationId(openConversation.conversation.id, workspaceId);
+    const chatHistory = history
+      .filter((message) => message.senderType !== "system")
+      .slice(-30)
+      .map((message) => ({
+        role: (message.senderType === "customer" ? "user" : "assistant") as "user" | "assistant",
+        content: message.content,
+      }));
+
+    // No `context` passed — deliberately skips tool-calling for a workflow-triggered
+    // proactive message (see the dynamic-import note above for why that matters).
+    const result = await aiService.generateReply(workspaceId, chatHistory);
+    const preview = result.text.length > 140 ? `${result.text.slice(0, 140)}…` : result.text;
+
+    await messageRepository.create({
+      workspaceId,
+      conversationId: openConversation.conversation.id,
+      senderType: "ai",
+      content: result.text,
+    });
+    await conversationRepository.touchLastMessage(openConversation.conversation.id, workspaceId, preview);
+
+    if (result.needsHumanHandover) {
+      await conversationRepository.updateAiStatus(openConversation.conversation.id, workspaceId, "handed_over");
+      await dispatch(workspaceId, { type: "conversation_handed_over", contactId: event.contactId });
+    }
+
+    return contact ? `Sent an AI reply to ${contact.fullName}` : "Sent an AI reply";
+  }
+
+  if (workflow.actionType === "request_approval") {
+    await workflowApprovalRepository.create({
+      workspaceId,
+      workflowId: workflow.id,
+      contactId: event.contactId,
+      eventType: event.type,
+      eventPayload: eventToPayload(event),
+      instructions: workflow.actionConfig.message ?? null,
+      onApproveWorkflowId: workflow.actionConfig.targetWorkflowId ?? null,
+    });
+
+    await notificationRepository.create({
+      workspaceId,
+      type: "automation",
+      title: `Approval needed: "${workflow.name}"`,
+      message:
+        workflow.actionConfig.message ??
+        (contact ? `Automation "${workflow.name}" needs your approval for ${contact.fullName}.` : `Automation "${workflow.name}" needs your approval.`),
+      link: "/dashboard/automations",
+    });
+
+    return contact ? `Requested approval for ${contact.fullName}` : "Requested approval";
+  }
+
   return null;
 }
 
@@ -407,7 +602,10 @@ async function dispatch(workspaceId: string, event: AutomationEvent): Promise<vo
     if (triggerMatches.length === 0) return;
 
     const contact = await contactRepository.findById(event.contactId, workspaceId);
-    const matching = triggerMatches.filter((workflow) => evaluateConditions(workflow.conditions, contact));
+    const conditionResults = await Promise.all(
+      triggerMatches.map((workflow) => evaluateConditions(workspaceId, workflow.conditions, contact)),
+    );
+    const matching = triggerMatches.filter((_, index) => conditionResults[index]);
 
     for (const workflow of matching) {
       if (workflow.delayDays && workflow.delayDays > 0) {
@@ -497,6 +695,10 @@ async function createWorkflow(workspaceId: string, input: z.infer<typeof createW
       assignedUserId: input.actionAssignedUserId,
       webhookUrl: input.actionWebhookUrl,
       targetWorkflowId: input.actionTargetWorkflowId,
+      productId: input.actionProductId,
+      quantity: input.actionQuantity,
+      serviceId: input.actionServiceId,
+      daysFromNow: input.actionDaysFromNow,
     },
     conditions:
       input.conditions && input.conditions.length > 0
@@ -518,6 +720,38 @@ async function deleteWorkflow(workspaceId: string, workflowId: string): Promise<
   await workflowRepository.delete(workflowId, workspaceId);
 }
 
+async function listPendingApprovals(workspaceId: string) {
+  return workflowApprovalRepository.findPendingByWorkspaceId(workspaceId);
+}
+
+/**
+ * Approving runs `onApproveWorkflowId`'s action for the same contact/event
+ * (see the workflowApprovals table comment) via the same runAndLog path
+ * trigger_another_workflow uses, seeded with its own fresh chain so it still
+ * gets loop protection. Rejecting — or an approval with no linked
+ * workflow — just records the decision.
+ */
+async function decideApproval(
+  workspaceId: string,
+  approvalId: string,
+  decision: Extract<WorkflowApprovalStatus, "approved" | "rejected">,
+  userId: string,
+): Promise<void> {
+  const approval = await workflowApprovalRepository.decide(approvalId, workspaceId, decision, userId);
+  if (!approval) {
+    throw new AppError("NOT_FOUND", "This approval was not found or has already been decided.");
+  }
+
+  if (decision === "approved" && approval.onApproveWorkflowId) {
+    const targetWorkflow = await workflowRepository.findById(approval.onApproveWorkflowId, workspaceId);
+    if (targetWorkflow && targetWorkflow.status === "active") {
+      const contact = await contactRepository.findById(approval.contactId, workspaceId);
+      const event = { type: approval.eventType, contactId: approval.contactId, ...approval.eventPayload } as AutomationEvent;
+      await runAndLog(workspaceId, targetWorkflow, event, contact, new Set([targetWorkflow.id]));
+    }
+  }
+}
+
 export const automationService = {
   dispatch,
   processDueRuns,
@@ -526,4 +760,6 @@ export const automationService = {
   createWorkflow,
   setWorkflowStatus,
   deleteWorkflow,
+  listPendingApprovals,
+  decideApproval,
 };

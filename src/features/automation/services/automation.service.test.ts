@@ -56,6 +56,8 @@ vi.mock("@/features/inbox/repository/conversation.repository", () => ({
     findByContactId: vi.fn(),
     updateStatus: vi.fn(),
     assign: vi.fn(),
+    touchLastMessage: vi.fn(),
+    updateAiStatus: vi.fn(),
   },
 }));
 
@@ -88,6 +90,59 @@ vi.mock("../lib/safe-webhook-fetch", () => ({
   safeWebhookPost: vi.fn(),
 }));
 
+vi.mock("@/features/orders/repository/order.repository", () => ({
+  orderRepository: {
+    findByContactId: vi.fn(),
+    create: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/appointments/repository/appointment.repository", () => ({
+  appointmentRepository: {
+    findByContactId: vi.fn(),
+    create: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/inbox/repository/message.repository", () => ({
+  messageRepository: {
+    countByConversationIds: vi.fn(),
+    findByConversationId: vi.fn(),
+    create: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/ai/repository/ai-agent.repository", () => ({
+  aiAgentRepository: {
+    findByWorkspaceId: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/knowledge-base/repository/product.repository", () => ({
+  productRepository: {
+    findByWorkspaceId: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/knowledge-base/repository/service.repository", () => ({
+  serviceRepository: {
+    findByWorkspaceId: vi.fn(),
+  },
+}));
+
+vi.mock("../repository/workflow-approval.repository", () => ({
+  workflowApprovalRepository: {
+    create: vi.fn(),
+    decide: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/ai/services/ai.service", () => ({
+  aiService: {
+    generateReply: vi.fn(),
+  },
+}));
+
 const { workflowRepository } = await import("../repository/workflow.repository");
 const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
 const { activityRepository } = await import("@/features/crm/repository/activity.repository");
@@ -98,6 +153,14 @@ const { conversationRepository } = await import("@/features/inbox/repository/con
 const { notificationRepository } = await import("@/features/notifications/repository/notification.repository");
 const { membershipRepository } = await import("@/features/workspace/repository/membership.repository");
 const { userRepository } = await import("@/features/auth/repository/user.repository");
+const { orderRepository } = await import("@/features/orders/repository/order.repository");
+const { appointmentRepository } = await import("@/features/appointments/repository/appointment.repository");
+const { messageRepository } = await import("@/features/inbox/repository/message.repository");
+const { aiAgentRepository } = await import("@/features/ai/repository/ai-agent.repository");
+const { productRepository } = await import("@/features/knowledge-base/repository/product.repository");
+const { serviceRepository } = await import("@/features/knowledge-base/repository/service.repository");
+const { workflowApprovalRepository } = await import("../repository/workflow-approval.repository");
+const { aiService } = await import("@/features/ai/services/ai.service");
 const { emailService } = await import("@/lib/email");
 const { safeWebhookPost } = await import("../lib/safe-webhook-fetch");
 const { automationService } = await import("./automation.service");
@@ -135,6 +198,12 @@ const CONTACT: Contact = {
   tags: [],
   notes: null,
   aiSummary: null,
+  avatarUrl: null,
+  country: null,
+  city: null,
+  source: null,
+  lifecycleStage: "lead",
+  assignedAgentId: null,
   lastContactAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -153,6 +222,16 @@ beforeEach(() => {
   vi.mocked(membershipRepository.findByUserAndWorkspace).mockResolvedValue({ id: "member-1" } as never);
   vi.mocked(userRepository.findById).mockResolvedValue({ id: "user-1", email: "agent@example.com" } as never);
   vi.mocked(safeWebhookPost).mockResolvedValue(undefined);
+  vi.mocked(orderRepository.findByContactId).mockResolvedValue([]);
+  vi.mocked(appointmentRepository.findByContactId).mockResolvedValue([]);
+  vi.mocked(messageRepository.countByConversationIds).mockResolvedValue(new Map());
+  vi.mocked(aiAgentRepository.findByWorkspaceId).mockResolvedValue(null);
+  vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([]);
+  vi.mocked(serviceRepository.findByWorkspaceId).mockResolvedValue([]);
+  vi.mocked(messageRepository.findByConversationId).mockResolvedValue([]);
+  vi.mocked(messageRepository.create).mockResolvedValue({ id: "message-1" } as never);
+  vi.mocked(conversationRepository.touchLastMessage).mockResolvedValue(undefined);
+  vi.mocked(conversationRepository.updateAiStatus).mockResolvedValue(undefined);
 });
 
 describe("automationService.dispatch — matching", () => {
@@ -825,5 +904,358 @@ describe("automationService.dispatch — conditions", () => {
     await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
 
     expect(workflowRepository.createPendingRun).not.toHaveBeenCalled();
+  });
+
+  it("lead_score condition passes once the contact's computed score meets the threshold", async () => {
+    const workflow = makeWorkflow({
+      actionConfig: { tag: "Hot" },
+      conditions: { matchType: "all", rules: [{ field: "lead_score", value: "20" }] },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(leadRepository.findByContactId).mockResolvedValue([
+      { id: "lead-1", stage: "negotiation", conversationId: null } as never,
+    ]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("lead_score condition fails when the contact has no leads at all (score 0)", async () => {
+    const workflow = makeWorkflow({ conditions: { matchType: "all", rules: [{ field: "lead_score", value: "10" }] } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(leadRepository.findByContactId).mockResolvedValue([]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).not.toHaveBeenCalled();
+  });
+
+  it("order_value condition passes when the contact's most recent order meets the threshold", async () => {
+    const workflow = makeWorkflow({
+      actionConfig: { tag: "BigSpender" },
+      conditions: { matchType: "all", rules: [{ field: "order_value", value: "50" }] },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(orderRepository.findByContactId).mockResolvedValue([
+      { items: [{ unitPrice: "100.00", quantity: 1 }] } as never,
+    ]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("order_value condition fails when the contact has no orders", async () => {
+    const workflow = makeWorkflow({ conditions: { matchType: "all", rules: [{ field: "order_value", value: "1" }] } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(orderRepository.findByContactId).mockResolvedValue([]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).not.toHaveBeenCalled();
+  });
+
+  it("working_hours condition passes when no working hours are configured (fail open)", async () => {
+    const workflow = makeWorkflow({
+      actionConfig: { tag: "OpenNow" },
+      conditions: { matchType: "all", rules: [{ field: "working_hours", value: "true" }] },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(aiAgentRepository.findByWorkspaceId).mockResolvedValue(null);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+});
+
+describe("automationService.dispatch — create_order", () => {
+  it("creates an order for the configured product/quantity and cascades an order_created dispatch", async () => {
+    const workflow = makeWorkflow({
+      actionType: "create_order",
+      actionConfig: { productId: "product-1", quantity: 2 },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([
+      { id: "product-1", name: "Widget", price: "25.00" } as never,
+    ]);
+    vi.mocked(orderRepository.create).mockResolvedValue({ order: { id: "order-1" } } as never);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(orderRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, contactId: CONTACT_ID }),
+      [{ productId: "product-1", name: "Widget", unitPrice: "25.00", quantity: 2 }],
+    );
+    expect(activityRepository.log).toHaveBeenCalledWith(expect.objectContaining({ type: "order_created" }));
+    // The order_created cascade re-queries findActiveByTrigger but finds no matching workflow, so only 1 execution logs.
+    expect(workflowRepository.logExecution).toHaveBeenCalledTimes(1);
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("defaults quantity to 1 when not configured or non-positive", async () => {
+    const workflow = makeWorkflow({ actionType: "create_order", actionConfig: { productId: "product-1", quantity: 0 } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([
+      { id: "product-1", name: "Widget", price: "25.00" } as never,
+    ]);
+    vi.mocked(orderRepository.create).mockResolvedValue({ order: { id: "order-1" } } as never);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(orderRepository.create).toHaveBeenCalledWith(expect.anything(), [expect.objectContaining({ quantity: 1 })]);
+  });
+
+  it("fails when no product is configured", async () => {
+    const workflow = makeWorkflow({ actionType: "create_order", actionConfig: {} });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(orderRepository.create).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+
+  it("fails when the configured product has no price set", async () => {
+    const workflow = makeWorkflow({ actionType: "create_order", actionConfig: { productId: "product-1" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([
+      { id: "product-1", name: "Widget", price: null } as never,
+    ]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(orderRepository.create).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+
+  it("fails when the configured product no longer exists", async () => {
+    const workflow = makeWorkflow({ actionType: "create_order", actionConfig: { productId: "gone" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(orderRepository.create).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+});
+
+describe("automationService.dispatch — book_appointment", () => {
+  it("books the configured service and cascades an appointment_created dispatch", async () => {
+    const workflow = makeWorkflow({
+      actionType: "book_appointment",
+      actionConfig: { serviceId: "service-1", daysFromNow: 3 },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(serviceRepository.findByWorkspaceId).mockResolvedValue([
+      { id: "service-1", name: "Consultation", durationMinutes: 45 } as never,
+    ]);
+    vi.mocked(appointmentRepository.create).mockResolvedValue({ id: "appointment-1" } as never);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(appointmentRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: WORKSPACE_ID,
+        contactId: CONTACT_ID,
+        serviceId: "service-1",
+        serviceName: "Consultation",
+        durationMinutes: 45,
+        scheduledAt: expect.any(Date),
+      }),
+    );
+    expect(activityRepository.log).toHaveBeenCalledWith(expect.objectContaining({ type: "appointment_created" }));
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("falls back to a 30-minute duration when the service has none set", async () => {
+    const workflow = makeWorkflow({ actionType: "book_appointment", actionConfig: { serviceId: "service-1" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(serviceRepository.findByWorkspaceId).mockResolvedValue([
+      { id: "service-1", name: "Consultation", durationMinutes: null } as never,
+    ]);
+    vi.mocked(appointmentRepository.create).mockResolvedValue({ id: "appointment-1" } as never);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(appointmentRepository.create).toHaveBeenCalledWith(expect.objectContaining({ durationMinutes: 30 }));
+  });
+
+  it("fails when no service is configured", async () => {
+    const workflow = makeWorkflow({ actionType: "book_appointment", actionConfig: {} });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(appointmentRepository.create).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+
+  it("fails when the configured service no longer exists", async () => {
+    const workflow = makeWorkflow({ actionType: "book_appointment", actionConfig: { serviceId: "gone" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(serviceRepository.findByWorkspaceId).mockResolvedValue([]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(appointmentRepository.create).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+});
+
+describe("automationService.dispatch — send_ai_reply", () => {
+  it("generates an AI reply, posts it, and touches the conversation", async () => {
+    const workflow = makeWorkflow({ actionType: "send_ai_reply" });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(conversationRepository.findByContactId).mockResolvedValue([
+      { conversation: { id: "conv-1", status: "open" } } as never,
+    ]);
+    vi.mocked(messageRepository.findByConversationId).mockResolvedValue([
+      { senderType: "customer", content: "Hi" } as never,
+      { senderType: "system", content: "internal note" } as never,
+    ]);
+    vi.mocked(aiService.generateReply).mockResolvedValue({
+      text: "Hello! How can I help?",
+      stopReason: "end_turn",
+      needsHumanHandover: false,
+      usage: { inputTokens: 5, outputTokens: 5 },
+    });
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(aiService.generateReply).toHaveBeenCalledWith(WORKSPACE_ID, [{ role: "user", content: "Hi" }]);
+    expect(messageRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, conversationId: "conv-1", senderType: "ai", content: "Hello! How can I help?" }),
+    );
+    expect(conversationRepository.touchLastMessage).toHaveBeenCalledWith("conv-1", WORKSPACE_ID, "Hello! How can I help?");
+    expect(conversationRepository.updateAiStatus).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("hands the conversation over to a human when the AI reply needs it", async () => {
+    const workflow = makeWorkflow({ actionType: "send_ai_reply" });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(conversationRepository.findByContactId).mockResolvedValue([
+      { conversation: { id: "conv-1", status: "open" } } as never,
+    ]);
+    vi.mocked(aiService.generateReply).mockResolvedValue({
+      text: "Let me get a human for you.",
+      stopReason: "end_turn",
+      needsHumanHandover: true,
+      usage: { inputTokens: 5, outputTokens: 5 },
+    });
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(conversationRepository.updateAiStatus).toHaveBeenCalledWith("conv-1", WORKSPACE_ID, "handed_over");
+  });
+
+  it("fails when the contact has no open conversation", async () => {
+    const workflow = makeWorkflow({ actionType: "send_ai_reply" });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(conversationRepository.findByContactId).mockResolvedValue([]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(aiService.generateReply).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+});
+
+describe("automationService.dispatch — request_approval", () => {
+  it("creates a pending approval and an in-app notification", async () => {
+    const workflow = makeWorkflow({
+      actionType: "request_approval",
+      actionConfig: { message: "Please review this", targetWorkflowId: "workflow-target" },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(workflowApprovalRepository.create).mockResolvedValue({ id: "approval-1" } as never);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowApprovalRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: WORKSPACE_ID,
+        workflowId: workflow.id,
+        contactId: CONTACT_ID,
+        eventType: "lead_created",
+        instructions: "Please review this",
+        onApproveWorkflowId: "workflow-target",
+      }),
+    );
+    expect(notificationRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, type: "automation" }),
+    );
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+});
+
+describe("automationService.decideApproval", () => {
+  it("throws when the approval doesn't exist or was already decided", async () => {
+    vi.mocked(workflowApprovalRepository.decide).mockResolvedValue(null);
+
+    await expect(automationService.decideApproval(WORKSPACE_ID, "approval-1", "approved", "user-1")).rejects.toThrow(
+      /not found|already been decided/,
+    );
+  });
+
+  it("just records a rejection without running any workflow", async () => {
+    vi.mocked(workflowApprovalRepository.decide).mockResolvedValue({
+      id: "approval-1",
+      onApproveWorkflowId: "workflow-target",
+    } as never);
+
+    await automationService.decideApproval(WORKSPACE_ID, "approval-1", "rejected", "user-1");
+
+    expect(workflowRepository.findById).not.toHaveBeenCalled();
+  });
+
+  it("runs the linked workflow's action for the same contact/event when approved", async () => {
+    vi.mocked(workflowApprovalRepository.decide).mockResolvedValue({
+      id: "approval-1",
+      contactId: CONTACT_ID,
+      onApproveWorkflowId: "workflow-target",
+      eventType: "lead_created",
+      eventPayload: {},
+    } as never);
+    const target = makeWorkflow({ id: "workflow-target", actionType: "add_contact_tag", actionConfig: { tag: "Approved" } });
+    vi.mocked(workflowRepository.findById).mockResolvedValue(target);
+
+    await automationService.decideApproval(WORKSPACE_ID, "approval-1", "approved", "user-1");
+
+    expect(contactRepository.addTag).toHaveBeenCalledWith(CONTACT_ID, WORKSPACE_ID, "Approved");
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("does not run the linked workflow if it is no longer active", async () => {
+    vi.mocked(workflowApprovalRepository.decide).mockResolvedValue({
+      id: "approval-1",
+      contactId: CONTACT_ID,
+      onApproveWorkflowId: "workflow-target",
+      eventType: "lead_created",
+      eventPayload: {},
+    } as never);
+    const target = makeWorkflow({ id: "workflow-target", status: "paused" });
+    vi.mocked(workflowRepository.findById).mockResolvedValue(target);
+
+    await automationService.decideApproval(WORKSPACE_ID, "approval-1", "approved", "user-1");
+
+    expect(contactRepository.addTag).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).not.toHaveBeenCalled();
+  });
+
+  it("approving with no linked workflow just records the decision", async () => {
+    vi.mocked(workflowApprovalRepository.decide).mockResolvedValue({
+      id: "approval-1",
+      contactId: CONTACT_ID,
+      onApproveWorkflowId: null,
+      eventType: "lead_created",
+      eventPayload: {},
+    } as never);
+
+    await expect(automationService.decideApproval(WORKSPACE_ID, "approval-1", "approved", "user-1")).resolves.toBeUndefined();
+    expect(workflowRepository.findById).not.toHaveBeenCalled();
   });
 });

@@ -1,10 +1,17 @@
-import { and, desc, eq, ilike, or } from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "@/db/client";
-import { type Contact, contacts, type NewContact } from "@/db/schema";
+import { type Contact, type ContactLifecycleStage, contacts, type NewContact } from "@/db/schema";
+
+export interface ContactFilters {
+  search?: string;
+  lifecycleStage?: ContactLifecycleStage;
+  source?: string;
+  tag?: string;
+}
 
 export const contactRepository = {
-  async findByWorkspaceId(workspaceId: string, search?: string): Promise<Contact[]> {
-    const trimmed = search?.trim();
+  async findByWorkspaceId(workspaceId: string, filters?: ContactFilters): Promise<Contact[]> {
+    const trimmed = filters?.search?.trim();
     const pattern = trimmed ? `%${trimmed}%` : undefined;
     return db
       .select()
@@ -13,6 +20,9 @@ export const contactRepository = {
         and(
           eq(contacts.workspaceId, workspaceId),
           pattern ? or(ilike(contacts.fullName, pattern), ilike(contacts.phone, pattern), ilike(contacts.email, pattern)) : undefined,
+          filters?.lifecycleStage ? eq(contacts.lifecycleStage, filters.lifecycleStage) : undefined,
+          filters?.source ? eq(contacts.source, filters.source) : undefined,
+          filters?.tag ? sql`${contacts.tags} @> ${JSON.stringify([filters.tag])}` : undefined,
         ),
       )
       .orderBy(desc(contacts.createdAt));
@@ -42,7 +52,20 @@ export const contactRepository = {
   async update(
     id: string,
     workspaceId: string,
-    data: Partial<Pick<NewContact, "fullName" | "phone" | "email" | "language">>,
+    data: Partial<
+      Pick<
+        NewContact,
+        | "fullName"
+        | "phone"
+        | "email"
+        | "language"
+        | "avatarUrl"
+        | "country"
+        | "city"
+        | "source"
+        | "assignedAgentId"
+      >
+    >,
   ): Promise<Contact | null> {
     const [contact] = await db
       .update(contacts)
@@ -50,6 +73,13 @@ export const contactRepository = {
       .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)))
       .returning();
     return contact ?? null;
+  },
+
+  async updateLifecycleStage(id: string, workspaceId: string, lifecycleStage: ContactLifecycleStage): Promise<void> {
+    await db
+      .update(contacts)
+      .set({ lifecycleStage, updatedAt: new Date() })
+      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
   },
 
   async updateAiSummary(id: string, workspaceId: string, aiSummary: string): Promise<void> {

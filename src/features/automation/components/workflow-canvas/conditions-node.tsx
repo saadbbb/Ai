@@ -5,7 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { WorkflowConditionField, WorkflowConditionMatchType } from "@/db/schema";
 import type { ConditionsNodeData } from "./types";
 
-const CONDITION_FIELDS: WorkflowConditionField[] = ["tag", "language"];
+const CONDITION_FIELDS: WorkflowConditionField[] = ["tag", "language", "lead_score", "order_value", "working_hours"];
+const NUMERIC_FIELDS = new Set<WorkflowConditionField>(["lead_score", "order_value"]);
 const MAX_CONDITIONS = 5;
 
 export function ConditionsNode({ data }: NodeProps<Node<ConditionsNodeData>>) {
@@ -39,8 +40,16 @@ export function ConditionsNode({ data }: NodeProps<Node<ConditionsNodeData>>) {
 
       {data.conditions.map((row, index) => (
         <div key={index} className="flex items-center gap-1">
-          <Select value={row.field} onValueChange={(value) => data.onUpdate(index, { field: value as WorkflowConditionField })}>
-            <SelectTrigger className="nodrag w-24 shrink-0">
+          <Select
+            value={row.field}
+            onValueChange={(value) =>
+              data.onUpdate(index, {
+                field: value as WorkflowConditionField,
+                value: value === "working_hours" ? "true" : "",
+              })
+            }
+          >
+            <SelectTrigger className="nodrag w-28 shrink-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -51,12 +60,25 @@ export function ConditionsNode({ data }: NodeProps<Node<ConditionsNodeData>>) {
               ))}
             </SelectContent>
           </Select>
-          <Input
-            className="nodrag flex-1"
-            value={row.value}
-            onChange={(event) => data.onUpdate(index, { value: event.target.value })}
-            placeholder={row.field === "tag" ? t("conditionTagPlaceholder") : t("conditionLanguagePlaceholder")}
-          />
+          {row.field === "working_hours" ? (
+            <p className="flex-1 text-xs text-muted-foreground">{t("conditionWorkingHoursHint")}</p>
+          ) : (
+            <Input
+              className="nodrag flex-1"
+              type={NUMERIC_FIELDS.has(row.field) ? "number" : "text"}
+              value={row.value}
+              onChange={(event) => data.onUpdate(index, { value: event.target.value })}
+              placeholder={
+                row.field === "tag"
+                  ? t("conditionTagPlaceholder")
+                  : row.field === "language"
+                    ? t("conditionLanguagePlaceholder")
+                    : row.field === "lead_score"
+                      ? t("conditionLeadScorePlaceholder")
+                      : t("conditionOrderValuePlaceholder")
+              }
+            />
+          )}
           <button type="button" className="nodrag shrink-0 text-xs text-muted-foreground hover:text-destructive" onClick={() => data.onRemove(index)}>
             {t("removeCondition")}
           </button>

@@ -42,6 +42,11 @@ export interface MemberOption {
   label: string;
 }
 
+export interface CatalogOption {
+  id: string;
+  label: string;
+}
+
 export interface ActionNodeData {
   [key: string]: unknown;
   actionType: WorkflowAction;
@@ -56,9 +61,15 @@ export interface ActionNodeData {
   actionAssignedUserId: string;
   actionWebhookUrl: string;
   actionTargetWorkflowId: string;
+  actionProductId: string;
+  actionQuantity: string;
+  actionServiceId: string;
+  actionDaysFromNow: string;
   delayDays: string;
   memberOptions: MemberOption[];
   workflowOptions: WorkflowOption[];
+  productOptions: CatalogOption[];
+  serviceOptions: CatalogOption[];
   onChange: (
     patch: Partial<
       Pick<
@@ -75,6 +86,10 @@ export interface ActionNodeData {
         | "actionAssignedUserId"
         | "actionWebhookUrl"
         | "actionTargetWorkflowId"
+        | "actionProductId"
+        | "actionQuantity"
+        | "actionServiceId"
+        | "actionDaysFromNow"
         | "delayDays"
       >
     >,

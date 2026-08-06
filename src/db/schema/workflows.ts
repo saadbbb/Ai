@@ -1,5 +1,6 @@
 import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { contacts } from "./contacts";
+import { users } from "./users";
 import { workspaces } from "./workspaces";
 
 export const workflowTriggerEnum = pgEnum("workflow_trigger", [
@@ -28,9 +29,15 @@ export const workflowActionEnum = pgEnum("workflow_action", [
   "assign_agent",
   "webhook_call",
   "trigger_another_workflow",
+  "create_order",
+  "book_appointment",
+  "send_ai_reply",
+  "request_approval",
 ]);
 
-export const workflowStatusEnum = pgEnum("workflow_status", ["active", "paused"]);
+export const workflowApprovalStatusEnum = pgEnum("workflow_approval_status", ["pending", "approved", "rejected"]);
+
+export const workflowStatusEnum = pgEnum("workflow_status", ["draft", "active", "paused", "disabled", "archived"]);
 
 /**
  * Shape depends on triggerType: only `stage` is set for lead_stage_changed,
@@ -51,7 +58,11 @@ export interface WorkflowTriggerConfig {
  * `taskPriority`/`taskDueInDays` for create_task, `noteContent` for
  * create_note, `contactLanguage` for update_contact_language,
  * `assignedUserId` for assign_agent, `webhookUrl` for webhook_call,
- * `targetWorkflowId` for trigger_another_workflow.
+ * `targetWorkflowId` for trigger_another_workflow (also reused by
+ * request_approval as "which workflow to run once approved"), `productId`/
+ * `quantity` for create_order, `serviceId`/`daysFromNow` for
+ * book_appointment, `message` again for request_approval's instructions
+ * shown to the approver.
  */
 export interface WorkflowActionConfig {
   tag?: string;
@@ -65,6 +76,10 @@ export interface WorkflowActionConfig {
   assignedUserId?: string;
   webhookUrl?: string;
   targetWorkflowId?: string;
+  productId?: string;
+  quantity?: number;
+  serviceId?: string;
+  daysFromNow?: number;
 }
 
 /**
@@ -73,7 +88,7 @@ export interface WorkflowActionConfig {
  * covers every example in the spec ("Tag contains VIP", "Language = Arabic")
  * without a boolean-tree UI. null/no rules = unconditional (original behavior).
  */
-export type WorkflowConditionField = "tag" | "language";
+export type WorkflowConditionField = "tag" | "language" | "lead_score" | "order_value" | "working_hours";
 export type WorkflowConditionMatchType = "all" | "any";
 
 export interface WorkflowConditionRule {
@@ -161,6 +176,44 @@ export const workflowExecutions = pgTable(
   (table) => [index("workflow_executions_workflow_id_idx").on(table.workflowId)],
 );
 
+/**
+ * PART 6's Human Approval extension. This engine has no multi-step node
+ * chain to "pause and resume" (Trigger -> Conditions -> one Action), so
+ * approval works by gating a *second* workflow: request_approval creates a
+ * row here instead of running its own action; approving it runs
+ * `onApproveWorkflowId`'s action for the same contact/event (reusing the
+ * same runAndLog path trigger_another_workflow uses), rejecting it does
+ * nothing further. This is the same one-hop chaining primitive, just
+ * human-gated instead of immediate.
+ */
+export const workflowApprovals = pgTable(
+  "workflow_approvals",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    workflowId: uuid("workflow_id")
+      .notNull()
+      .references(() => workflows.id, { onDelete: "cascade" }),
+    contactId: uuid("contact_id")
+      .notNull()
+      .references(() => contacts.id, { onDelete: "cascade" }),
+    eventType: workflowTriggerEnum("event_type").notNull(),
+    eventPayload: jsonb("event_payload").$type<WorkflowTriggerConfig>().notNull().default({}),
+    instructions: text("instructions"),
+    onApproveWorkflowId: uuid("on_approve_workflow_id").references(() => workflows.id, { onDelete: "set null" }),
+    status: workflowApprovalStatusEnum("status").notNull().default("pending"),
+    decidedByUserId: uuid("decided_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("workflow_approvals_workspace_id_idx").on(table.workspaceId),
+    index("workflow_approvals_status_idx").on(table.status),
+  ],
+);
+
 export type Workflow = typeof workflows.$inferSelect;
 export type NewWorkflow = typeof workflows.$inferInsert;
 export type WorkflowTrigger = (typeof workflowTriggerEnum.enumValues)[number];
@@ -170,3 +223,6 @@ export type WorkflowExecution = typeof workflowExecutions.$inferSelect;
 export type NewWorkflowExecution = typeof workflowExecutions.$inferInsert;
 export type WorkflowPendingRun = typeof workflowPendingRuns.$inferSelect;
 export type NewWorkflowPendingRun = typeof workflowPendingRuns.$inferInsert;
+export type WorkflowApproval = typeof workflowApprovals.$inferSelect;
+export type NewWorkflowApproval = typeof workflowApprovals.$inferInsert;
+export type WorkflowApprovalStatus = (typeof workflowApprovalStatusEnum.enumValues)[number];

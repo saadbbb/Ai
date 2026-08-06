@@ -277,10 +277,22 @@ describe("createWorkflowSchema", () => {
     const result = createWorkflowSchema.safeParse({
       ...BASE,
       triggerType: "lead_created",
-      conditions: [{ field: "lead_score", value: "80" }],
+      conditions: [{ field: "sentiment", value: "positive" }],
     });
     expect(result.success).toBe(false);
   });
+
+  it.each(["lead_score", "order_value", "working_hours"] as const)(
+    "accepts the %s condition field",
+    (field) => {
+      const result = createWorkflowSchema.safeParse({
+        ...BASE,
+        triggerType: "lead_created",
+        conditions: [{ field, value: field === "working_hours" ? "true" : "70" }],
+      });
+      expect(result.success).toBe(true);
+    },
+  );
 
   it("rejects a condition with an empty value", () => {
     const result = createWorkflowSchema.safeParse({

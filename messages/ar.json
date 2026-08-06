@@ -14,6 +14,8 @@
     "skip": "تخطي",
     "confirmDelete": "هل أنت متأكد من حذف هذا؟",
     "exportCsv": "تصدير CSV",
+    "exportExcel": "تصدير Excel",
+    "exportPdf": "تصدير PDF",
     "search": "بحث",
     "searchPlaceholder": "ابحث بالاسم..."
   },
@@ -649,6 +651,23 @@
     "backLink": "← الرجوع إلى الأتمتة",
     "pause": "إيقاف مؤقت",
     "resume": "استئناف",
+    "approvals": {
+      "navLink": "الموافقات المعلّقة",
+      "title": "الموافقات المعلّقة",
+      "description": "أتمتة بانتظار موافقة أو رفض من مدير.",
+      "backLink": "← الرجوع إلى الأتمتة",
+      "emptyState": "ما فيه شي يحتاج موافقتك الحين.",
+      "requestedFor": "\"{workflow}\" — {contact}",
+      "approve": "موافقة",
+      "reject": "رفض"
+    },
+    "statuses": {
+      "draft": "مسودة",
+      "active": "نشط",
+      "paused": "متوقف مؤقتاً",
+      "disabled": "معطّل",
+      "archived": "مؤرشف"
+    },
     "executionsHeading": "التشغيلات الأخيرة",
     "noExecutions": "هذه الأتمتة لم تُشغَّل بعد.",
     "succeeded": "اكتملت بنجاح",
@@ -675,10 +694,20 @@
     "actionAssignAgent": "تعيين المحادثة لعضو فريق",
     "actionWebhookCall": "إرسال بيانات إلى رابط webhook",
     "actionTriggerAnotherWorkflow": "تشغيل أتمتة أخرى",
+    "actionCreateOrder": "إنشاء طلب",
+    "actionBookAppointment": "حجز موعد",
+    "actionSendAiReply": "إرسال رد من الذكاء الاصطناعي",
+    "actionRequestApproval": "طلب موافقة",
     "delaySummary": "بعد {days} يوم",
     "new": {
       "title": "أتمتة جديدة",
       "description": "اختر شيئاً يحدث في نشاطك التجاري، وشيئاً يجب أن يحدث تلقائياً كردّ فعل.",
+      "generatorHeading": "وصفها بكلماتك",
+      "generatorHint": "مثال: \"أرسل رسالة واتساب متابعة إذا ضل الطلب غير مدفوع لمدة 24 ساعة\" — راح نعبّي الأتمتة تحت وتراجعها قبل الحفظ.",
+      "generatorPlaceholder": "وصف الأتمتة اللي تبيها...",
+      "generateButton": "توليد",
+      "generating": "جاري التوليد...",
+      "generatorSuccess": "اتعبّت تحت — راجعها قبل الحفظ.",
       "templatesHeading": "بداية سريعة",
       "templates": {
         "tagNewLeads": "وسم العملاء المحتملين الجدد",
@@ -716,8 +745,21 @@
         "close_conversation": "إغلاق المحادثة",
         "assign_agent": "تعيين لعضو فريق",
         "webhook_call": "إرسال إلى webhook",
-        "trigger_another_workflow": "تشغيل أتمتة أخرى"
+        "trigger_another_workflow": "تشغيل أتمتة أخرى",
+        "create_order": "إنشاء طلب",
+        "book_appointment": "حجز موعد",
+        "send_ai_reply": "إرسال رد من الذكاء الاصطناعي",
+        "request_approval": "طلب موافقة"
       },
+      "productPlaceholder": "اختر منتج",
+      "quantityPlaceholder": "الكمية، مثال: 1",
+      "noProducts": "ما عندك منتجات مسعّرة بعد.",
+      "servicePlaceholder": "اختر خدمة",
+      "daysFromNowPlaceholder": "عدد الأيام من الآن، مثال: 1",
+      "noServices": "ما عندك خدمات بعد.",
+      "sendAiReplyHint": "موظفك الذكي راح يرد بآخر محادثة مفتوحة مع العميل.",
+      "approvalInstructionsPlaceholder": "شنو يحتاج يتأكد منه الموافق؟ (اختياري)",
+      "approvalWorkflowPlaceholder": "شغّل هالأتمتة بعد الموافقة (اختياري)",
       "tagPlaceholder": "الوسم، مثال: عميل",
       "subjectPlaceholder": "العنوان (اختياري)",
       "messagePlaceholder": "النص — استخدم '{{contactName}}' لاسم العميل",
@@ -754,16 +796,25 @@
       "matchAny": "أي شرط يتحقق كافي",
       "conditionFields": {
         "tag": "تاغ",
-        "language": "اللغة"
+        "language": "اللغة",
+        "lead_score": "نقاط العميل المحتمل",
+        "order_value": "قيمة الطلب",
+        "working_hours": "ساعات العمل"
       },
       "conditionTagPlaceholder": "تاغ، مثلاً VIP",
-      "conditionLanguagePlaceholder": "مثلاً ar أو en أو ku"
+      "conditionLanguagePlaceholder": "مثلاً ar أو en أو ku",
+      "conditionLeadScorePlaceholder": "أقل نقاط، مثلاً 70",
+      "conditionOrderValuePlaceholder": "أقل قيمة، مثلاً 100",
+      "conditionWorkingHoursHint": "يعمل فقط خلال ساعات العمل المحددة"
     },
     "conditionsPrefix": "فقط إذا",
     "conditionAnd": "و",
     "conditionOr": "أو",
     "conditionTag": "موسوم بـ\"{value}\"",
-    "conditionLanguage": "اللغة {value}"
+    "conditionLanguage": "اللغة {value}",
+    "conditionLeadScore": "نقاط العميل المحتمل ≥ {value}",
+    "conditionOrderValue": "قيمة الطلب ≥ {value}",
+    "conditionWorkingHours": "ضمن ساعات العمل"
   },
   "appointments": {
     "title": "المواعيد",
@@ -806,12 +857,30 @@
     "leadsHeading": "العملاء المحتملون",
     "noLeads": "لا يوجد عملاء محتملون لهذه الجهة بعد.",
     "conversationsHeading": "المحادثات",
-    "noConversations": "لا توجد محادثات بعد."
+    "noConversations": "لا توجد محادثات بعد.",
+    "lifecycle": {
+      "lead": "عميل محتمل",
+      "customer": "عميل",
+      "repeat_customer": "عميل متكرر",
+      "vip": "VIP",
+      "loyal_customer": "عميل مخلص"
+    },
+    "filters": {
+      "lifecycleAll": "كل المراحل",
+      "tagPlaceholder": "فلترة بالوسم",
+      "clear": "إزالة الفلاتر"
+    },
+    "timelineHeading": "الخط الزمني"
   },
   "leads": {
     "title": "العملاء المحتملون",
     "description": "كل عميل محتمل لديك، مجمّع حسب المرحلة. لا سحب وإفلات بعد — فقط غيّر المرحلة من البطاقة.",
     "emptyBoard": "لا يوجد عملاء محتملون بعد. افتح محادثة من صندوق المحادثات وأنشئ عميلاً محتملاً منها.",
+    "filters": {
+      "tagPlaceholder": "فلترة بالوسم",
+      "languagePlaceholder": "اللغة، مثال: ar",
+      "clear": "إزالة الفلاتر"
+    },
     "emptyStage": "لا يوجد شيء هنا.",
     "viewConversation": "عرض المحادثة ←",
     "stages": {
@@ -894,6 +963,7 @@
   },
   "activity": {
     "title": "النشاط",
-    "empty": "لا يوجد نشاط مسجل لهذا العميل بعد."
+    "empty": "لا يوجد نشاط مسجل لهذا العميل بعد.",
+    "channelActivity": "محادثة"
   }
 }

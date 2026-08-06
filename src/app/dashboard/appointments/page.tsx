@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AppointmentStatusSelect } from "@/features/appointments/components/appointment-status-select";
 import { appointmentService } from "@/features/appointments/services/appointment.service";
 import { Button } from "@/components/ui/button";
+import { ExportButtons } from "@/components/export-buttons";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function AppointmentsPage() {
@@ -26,10 +27,11 @@ export default async function AppointmentsPage() {
           <h1 className="text-xl font-semibold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        <div className="flex shrink-0 gap-2">
-          <Button asChild variant="outline" size="sm">
-            <a href="/api/reports/appointments">{tCommon("exportCsv")}</a>
-          </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <ExportButtons
+            reportPath="/api/reports/appointments"
+            labels={{ csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") }}
+          />
           <Button asChild>
             <Link href="/dashboard/appointments/new">{t("newAppointment")}</Link>
           </Button>

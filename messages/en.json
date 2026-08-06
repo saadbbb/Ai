@@ -14,6 +14,8 @@
     "skip": "Skip",
     "confirmDelete": "Are you sure you want to delete this?",
     "exportCsv": "Export CSV",
+    "exportExcel": "Export Excel",
+    "exportPdf": "Export PDF",
     "search": "Search",
     "searchPlaceholder": "Search by name..."
   },
@@ -649,6 +651,23 @@
     "backLink": "← Back to Automations",
     "pause": "Pause",
     "resume": "Resume",
+    "approvals": {
+      "navLink": "Pending approvals",
+      "title": "Pending approvals",
+      "description": "Automations waiting for a manager to approve or reject them.",
+      "backLink": "← Back to Automations",
+      "emptyState": "Nothing needs your approval right now.",
+      "requestedFor": "\"{workflow}\" — {contact}",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "active": "Active",
+      "paused": "Paused",
+      "disabled": "Disabled",
+      "archived": "Archived"
+    },
     "executionsHeading": "Recent runs",
     "noExecutions": "This automation hasn't run yet.",
     "succeeded": "Ran successfully",
@@ -675,10 +694,20 @@
     "actionAssignAgent": "Assign the conversation to a team member",
     "actionWebhookCall": "Send data to a webhook URL",
     "actionTriggerAnotherWorkflow": "Trigger another automation",
+    "actionCreateOrder": "Create an order",
+    "actionBookAppointment": "Book an appointment",
+    "actionSendAiReply": "Send an AI reply",
+    "actionRequestApproval": "Request approval",
     "delaySummary": "after {days} days",
     "new": {
       "title": "New automation",
       "description": "Pick something that happens in your business, and something that should happen automatically in response.",
+      "generatorHeading": "Describe it in your own words",
+      "generatorHint": "e.g. \"Send a follow-up WhatsApp message if an order stays unpaid for 24 hours\" — we'll fill in the automation below for you to review.",
+      "generatorPlaceholder": "Describe the automation you want...",
+      "generateButton": "Generate",
+      "generating": "Generating...",
+      "generatorSuccess": "Filled in below — review before saving.",
       "templatesHeading": "Quick start",
       "templates": {
         "tagNewLeads": "Tag new leads",
@@ -716,8 +745,21 @@
         "close_conversation": "Close the conversation",
         "assign_agent": "Assign to a team member",
         "webhook_call": "Send to a webhook",
-        "trigger_another_workflow": "Trigger another automation"
+        "trigger_another_workflow": "Trigger another automation",
+        "create_order": "Create an order",
+        "book_appointment": "Book an appointment",
+        "send_ai_reply": "Send an AI reply",
+        "request_approval": "Request approval"
       },
+      "productPlaceholder": "Select a product",
+      "quantityPlaceholder": "Quantity, e.g. 1",
+      "noProducts": "You don't have any priced products yet.",
+      "servicePlaceholder": "Select a service",
+      "daysFromNowPlaceholder": "Days from now, e.g. 1",
+      "noServices": "You don't have any services yet.",
+      "sendAiReplyHint": "Your AI employee will reply in the customer's most recent open conversation.",
+      "approvalInstructionsPlaceholder": "What should the approver check? (optional)",
+      "approvalWorkflowPlaceholder": "Run this automation once approved (optional)",
       "tagPlaceholder": "Tag, e.g. customer",
       "subjectPlaceholder": "Subject (optional)",
       "messagePlaceholder": "Message — use '{{contactName}}' for the customer's name",
@@ -754,16 +796,25 @@
       "matchAny": "Any condition matches",
       "conditionFields": {
         "tag": "Tag",
-        "language": "Language"
+        "language": "Language",
+        "lead_score": "Lead Score",
+        "order_value": "Order Value",
+        "working_hours": "Working Hours"
       },
       "conditionTagPlaceholder": "Tag, e.g. VIP",
-      "conditionLanguagePlaceholder": "e.g. ar, en, ku"
+      "conditionLanguagePlaceholder": "e.g. ar, en, ku",
+      "conditionLeadScorePlaceholder": "Minimum score, e.g. 70",
+      "conditionOrderValuePlaceholder": "Minimum value, e.g. 100",
+      "conditionWorkingHoursHint": "Only runs during your configured working hours"
     },
     "conditionsPrefix": "Only if",
     "conditionAnd": "and",
     "conditionOr": "or",
     "conditionTag": "tagged \"{value}\"",
-    "conditionLanguage": "language is {value}"
+    "conditionLanguage": "language is {value}",
+    "conditionLeadScore": "lead score is at least {value}",
+    "conditionOrderValue": "order value is at least {value}",
+    "conditionWorkingHours": "it's within working hours"
   },
   "appointments": {
     "title": "Appointments",
@@ -806,12 +857,30 @@
     "leadsHeading": "Leads",
     "noLeads": "No leads for this contact yet.",
     "conversationsHeading": "Conversations",
-    "noConversations": "No conversations yet."
+    "noConversations": "No conversations yet.",
+    "lifecycle": {
+      "lead": "Lead",
+      "customer": "Customer",
+      "repeat_customer": "Repeat Customer",
+      "vip": "VIP",
+      "loyal_customer": "Loyal Customer"
+    },
+    "filters": {
+      "lifecycleAll": "All stages",
+      "tagPlaceholder": "Filter by tag",
+      "clear": "Clear filters"
+    },
+    "timelineHeading": "Timeline"
   },
   "leads": {
     "title": "Leads",
     "description": "Every lead your business has, grouped by stage. Drag nowhere yet — just change the stage on a card.",
     "emptyBoard": "No leads yet. Open a conversation in the Inbox and create a lead from it.",
+    "filters": {
+      "tagPlaceholder": "Filter by tag",
+      "languagePlaceholder": "Language, e.g. ar",
+      "clear": "Clear filters"
+    },
     "emptyStage": "Nothing here.",
     "viewConversation": "View conversation →",
     "stages": {
@@ -894,6 +963,7 @@
   },
   "activity": {
     "title": "Activity",
-    "empty": "No activity recorded for this contact yet."
+    "empty": "No activity recorded for this contact yet.",
+    "channelActivity": "Conversation"
   }
 }
