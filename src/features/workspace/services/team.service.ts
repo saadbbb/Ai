@@ -2,6 +2,7 @@ import "server-only";
 import { createHash, randomBytes } from "crypto";
 import type { Invitation, Role, User, Workspace } from "@/db/schema";
 import { emailService } from "@/lib/email";
+import { getAppUrl } from "@/lib/env";
 import { AppError } from "@/lib/errors/app-error";
 import { type InvitationListItem, invitationRepository } from "../repository/invitation.repository";
 import { type MemberListItem, membershipRepository } from "../repository/membership.repository";
@@ -23,13 +24,6 @@ function hashToken(token: string): string {
 
 function generateToken(): string {
   return randomBytes(32).toString("hex");
-}
-
-/** Falls back to Vercel's auto-provided VERCEL_URL so this works with zero setup in production. */
-function getAppUrl(): string {
-  if (process.env.APP_URL) return process.env.APP_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
 }
 
 async function getTeam(

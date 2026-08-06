@@ -20,36 +20,33 @@
   "auth": {
     "register": {
       "title": "أنشئ حسابك",
-      "description": "سنرسل رمز تحقق إلى بريدك الإلكتروني.",
+      "description": "أنشئ بيانات الدخول للبدء.",
       "emailLabel": "البريد الإلكتروني",
-      "submit": "متابعة",
-      "submitting": "جارٍ إرسال الرمز...",
+      "passwordLabel": "كلمة المرور",
+      "acceptTerms": "أوافق على شروط الخدمة وسياسة الخصوصية.",
+      "orDivider": "أو",
+      "submit": "إنشاء الحساب",
+      "submitting": "جارٍ إنشاء الحساب...",
       "haveAccount": "لديك حساب بالفعل؟",
       "login": "تسجيل الدخول"
     },
+    "google": {
+      "continueWithGoogle": "المتابعة باستخدام Google",
+      "redirecting": "جارٍ التحويل..."
+    },
     "verify": {
-      "missingEmailTitle": "البريد الإلكتروني مفقود",
-      "missingEmailDescription": "ابدأ عملية التسجيل من جديد من صفحة إنشاء الحساب.",
-      "otpTitle": "تحقق من بريدك الإلكتروني",
-      "otpDescription": "أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى {email}.",
-      "codeLabel": "رمز التحقق",
-      "verify": "تحقق",
-      "verifying": "جارٍ التحقق...",
-      "passwordTitle": "أنشئ كلمة مرور",
-      "passwordDescription": "اختر كلمة مرور لحساب {email}.",
-      "passwordLabel": "كلمة المرور",
-      "acceptTerms": "أوافق على شروط الخدمة وسياسة الخصوصية.",
-      "submit": "إنشاء الحساب",
-      "submitting": "جارٍ إنشاء الحساب...",
-      "success": "تم إنشاء الحساب!"
+      "checkEmailTitle": "تحقق من بريدك الإلكتروني",
+      "checkEmailDescription": "أرسلنا رابط تأكيد إلى {email}. اضغط عليه لإكمال إنشاء حسابك.",
+      "checkEmailDescriptionGeneric": "أرسلنا لك رابط تأكيد. اضغط عليه لإكمال إنشاء حسابك.",
+      "backToLogin": "الرجوع لتسجيل الدخول"
     },
     "login": {
       "title": "تسجيل الدخول",
       "description": "مرحباً بعودتك.",
       "emailLabel": "البريد الإلكتروني",
       "passwordLabel": "كلمة المرور",
-      "rememberMe": "تذكرني",
       "forgotPassword": "نسيت كلمة المرور؟",
+      "orDivider": "أو",
       "submit": "تسجيل الدخول",
       "submitting": "جارٍ تسجيل الدخول...",
       "noAccount": "ليس لديك حساب؟",
@@ -57,32 +54,28 @@
     },
     "forgotPassword": {
       "title": "نسيت كلمة المرور",
-      "description": "سنرسل لك رمزاً لإعادة تعيين كلمة المرور.",
+      "description": "سنرسل لك رابطاً لإعادة تعيين كلمة المرور.",
       "emailLabel": "البريد الإلكتروني",
-      "submit": "إرسال الرمز",
-      "submitting": "جارٍ إرسال الرمز...",
-      "backToLogin": "الرجوع لتسجيل الدخول"
+      "submit": "إرسال رابط إعادة التعيين",
+      "submitting": "جارٍ الإرسال...",
+      "backToLogin": "الرجوع لتسجيل الدخول",
+      "sentTitle": "تحقق من بريدك الإلكتروني",
+      "sentDescription": "إذا كان هناك حساب بهذا البريد الإلكتروني، فقد أرسلنا رابطاً لإعادة تعيين كلمة المرور."
     },
     "resetPassword": {
-      "missingEmailTitle": "البريد الإلكتروني مفقود",
-      "missingEmailDescription": "ابدأ من جديد من صفحة نسيت كلمة المرور.",
-      "otpTitle": "تحقق من بريدك الإلكتروني",
-      "otpDescription": "أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى {email}.",
-      "codeLabel": "رمز التحقق",
-      "verify": "تحقق",
-      "verifying": "جارٍ التحقق...",
-      "passwordTitle": "عيّن كلمة مرور جديدة",
-      "passwordDescription": "اختر كلمة مرور جديدة لحساب {email}.",
+      "title": "عيّن كلمة مرور جديدة",
+      "description": "اختر كلمة مرور جديدة لحسابك.",
       "passwordLabel": "كلمة المرور الجديدة",
       "submit": "تحديث كلمة المرور",
       "submitting": "جارٍ التحديث...",
-      "success": "تم تحديث كلمة المرور. الرجاء تسجيل الدخول."
+      "success": "تم تحديث كلمة المرور.",
+      "invalidLinkTitle": "هذا الرابط غير صالح أو منتهي الصلاحية",
+      "invalidLinkDescription": "اطلب رابط إعادة تعيين جديداً وحاول مرة أخرى."
     },
     "logout": "تسجيل الخروج"
   },
   "validation": {
     "emailInvalid": "أدخل بريداً إلكترونياً صحيحاً.",
-    "codeLength": "أدخل الرمز المكوّن من 6 أرقام.",
     "passwordMin": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
     "acceptTermsRequired": "يجب الموافقة على الشروط للمتابعة.",
     "passwordRequired": "كلمة المرور مطلوبة.",

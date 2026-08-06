@@ -7,4 +7,4 @@ import { resendEmailProvider } from "./resend-email-provider";
 // app depends only on the EmailService interface.
 export const emailService: EmailService = process.env.RESEND_API_KEY ? resendEmailProvider : consoleEmailProvider;
 
-export type { EmailService, OtpEmailPurpose } from "./email-service";
+export type { EmailService } from "./email-service";

@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { profileSyncService } from "@/features/auth/services/profile-sync.service";
 import { userRepository } from "@/features/auth/repository/user.repository";
 import type { FeatureKey } from "@/features/platform-admin/lib/features";
 import { featureAccessService } from "@/features/platform-admin/services/feature-access.service";
@@ -9,18 +10,25 @@ import { platformAdminService } from "@/features/platform-admin/services/platfor
 import { permissionService } from "@/features/workspace/services/permission.service";
 import { workspaceService } from "@/features/workspace/services/workspace.service";
 import type { User, Workspace } from "@/db/schema";
-import { getCurrentSession } from "./session";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
  * Wrapped in React's request-scoped cache so the layout and page calling this for the
- * same request share one session/user lookup instead of hitting Redis/Postgres twice.
+ * same request share one session/user lookup instead of hitting Supabase/Postgres twice.
+ * Supabase owns the session/JWT; this only maps that identity onto our own
+ * public.users row (creating or re-keying it on first sight — see
+ * profileSyncService for why a lazy, centralized sync here is simpler than
+ * having every sign-in path — password, OAuth, email confirmation — do it
+ * separately).
  */
 export const requireUser = cache(async (): Promise<User> => {
-  const session = await getCurrentSession();
-  if (!session) redirect("/login");
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user: supabaseUser },
+  } = await supabase.auth.getUser();
+  if (!supabaseUser || !supabaseUser.email) redirect("/login");
 
-  const user = await userRepository.findById(session.userId);
-  if (!user) redirect("/login");
+  const user = (await userRepository.findById(supabaseUser.id)) ?? (await profileSyncService.ensureLocalUser(supabaseUser.id, supabaseUser.email));
 
   return user;
 });

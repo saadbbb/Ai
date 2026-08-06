@@ -3,18 +3,18 @@
 import { getTranslations } from "next-intl/server";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { authService } from "../services/auth.service";
-import { createRegisterSchema } from "../validation/schemas";
+import { createSignUpSchema } from "../validation/schemas";
 
-export async function registerAction(input: unknown): Promise<ActionResult> {
+export async function registerAction(input: unknown): Promise<ActionResult<{ needsEmailConfirmation: boolean }>> {
   const t = await getTranslations("validation");
-  const parsed = createRegisterSchema(t).safeParse(input);
+  const parsed = createSignUpSchema(t).safeParse(input);
   if (!parsed.success) {
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
 
   try {
-    await authService.startRegistration(parsed.data.email);
-    return actionOk(undefined);
+    const result = await authService.signUp(parsed.data.email, parsed.data.password);
+    return actionOk(result);
   } catch (error) {
     return actionFail(error);
   }

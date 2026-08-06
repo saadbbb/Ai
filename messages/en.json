@@ -20,36 +20,33 @@
   "auth": {
     "register": {
       "title": "Create your account",
-      "description": "We'll send a verification code to your email.",
+      "description": "Set up your login to get started.",
       "emailLabel": "Email",
-      "submit": "Continue",
-      "submitting": "Sending code...",
+      "passwordLabel": "Password",
+      "acceptTerms": "I agree to the Terms of Service and Privacy Policy.",
+      "orDivider": "or",
+      "submit": "Create account",
+      "submitting": "Creating account...",
       "haveAccount": "Already have an account?",
       "login": "Log in"
     },
+    "google": {
+      "continueWithGoogle": "Continue with Google",
+      "redirecting": "Redirecting..."
+    },
     "verify": {
-      "missingEmailTitle": "Missing email",
-      "missingEmailDescription": "Start the registration process again from the sign-up page.",
-      "otpTitle": "Check your email",
-      "otpDescription": "Enter the 6-digit code we sent to {email}.",
-      "codeLabel": "Verification code",
-      "verify": "Verify",
-      "verifying": "Verifying...",
-      "passwordTitle": "Create a password",
-      "passwordDescription": "Choose a password for {email}.",
-      "passwordLabel": "Password",
-      "acceptTerms": "I agree to the Terms of Service and Privacy Policy.",
-      "submit": "Create account",
-      "submitting": "Creating account...",
-      "success": "Account created!"
+      "checkEmailTitle": "Check your email",
+      "checkEmailDescription": "We sent a confirmation link to {email}. Click it to finish creating your account.",
+      "checkEmailDescriptionGeneric": "We sent you a confirmation link. Click it to finish creating your account.",
+      "backToLogin": "Back to log in"
     },
     "login": {
       "title": "Log in",
       "description": "Welcome back.",
       "emailLabel": "Email",
       "passwordLabel": "Password",
-      "rememberMe": "Remember me",
       "forgotPassword": "Forgot password?",
+      "orDivider": "or",
       "submit": "Log in",
       "submitting": "Logging in...",
       "noAccount": "Don't have an account?",
@@ -57,26 +54,23 @@
     },
     "forgotPassword": {
       "title": "Forgot password",
-      "description": "We'll send a code to reset your password.",
+      "description": "We'll email you a link to reset your password.",
       "emailLabel": "Email",
-      "submit": "Send code",
-      "submitting": "Sending code...",
-      "backToLogin": "Back to log in"
+      "submit": "Send reset link",
+      "submitting": "Sending...",
+      "backToLogin": "Back to log in",
+      "sentTitle": "Check your email",
+      "sentDescription": "If an account exists for that email, we've sent a link to reset the password."
     },
     "resetPassword": {
-      "missingEmailTitle": "Missing email",
-      "missingEmailDescription": "Start again from the forgot password page.",
-      "otpTitle": "Check your email",
-      "otpDescription": "Enter the 6-digit code we sent to {email}.",
-      "codeLabel": "Verification code",
-      "verify": "Verify",
-      "verifying": "Verifying...",
-      "passwordTitle": "Set a new password",
-      "passwordDescription": "Choose a new password for {email}.",
+      "title": "Set a new password",
+      "description": "Choose a new password for your account.",
       "passwordLabel": "New password",
       "submit": "Update password",
       "submitting": "Updating...",
-      "success": "Password updated. Please log in."
+      "success": "Password updated.",
+      "invalidLinkTitle": "This link is invalid or has expired",
+      "invalidLinkDescription": "Request a new password reset link and try again."
     },
     "logout": "Log out"
   },

@@ -7,13 +7,6 @@ import type { EmailService } from "./email-service";
  * requires changing the export in `./index.ts`, not any of its callers.
  */
 export const consoleEmailProvider: EmailService = {
-  async sendOtpEmail({ to, code, purpose }) {
-    const subject = purpose === "registration" ? "Verify your email" : "Reset your password";
-    console.log(
-      `\n[email:mock] To: ${to}\nSubject: ${subject}\nYour verification code is: ${code}\n(Expires in 10 minutes.)\n`,
-    );
-  },
-
   async sendNotificationEmail({ to, subject, text }) {
     console.log(`\n[email:mock] To: ${to}\nSubject: ${subject}\n${text}\n`);
   },

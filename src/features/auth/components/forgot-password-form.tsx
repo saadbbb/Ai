@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -18,10 +17,10 @@ import { createRequestPasswordResetSchema } from "../validation/schemas";
 type RequestResetInput = z.infer<ReturnType<typeof createRequestPasswordResetSchema>>;
 
 export function ForgotPasswordForm() {
-  const router = useRouter();
   const t = useTranslations("auth.forgotPassword");
   const tValidation = useTranslations("validation");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
   const {
     register,
     handleSubmit,
@@ -38,8 +37,24 @@ export function ForgotPasswordForm() {
       return;
     }
 
-    router.push(`/reset-password?email=${encodeURIComponent(values.email)}`);
+    setSent(true);
   });
+
+  if (sent) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("sentTitle")}</CardTitle>
+          <CardDescription>{t("sentDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Link href="/login" className="text-sm font-medium text-foreground underline underline-offset-4">
+            {t("backToLogin")}
+          </Link>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

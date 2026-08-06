@@ -13,9 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { registerAction } from "../actions/register.action";
-import { createRegisterSchema } from "../validation/schemas";
+import { createSignUpSchema } from "../validation/schemas";
+import { GoogleSignInButton } from "./google-signin-button";
 
-type RegisterInput = z.infer<ReturnType<typeof createRegisterSchema>>;
+type SignUpInput = z.infer<ReturnType<typeof createSignUpSchema>>;
 
 export function RegisterForm() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export function RegisterForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterInput>({ resolver: zodResolver(createRegisterSchema(tValidation)) });
+  } = useForm<SignUpInput>({ resolver: zodResolver(createSignUpSchema(tValidation)) });
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -38,7 +39,12 @@ export function RegisterForm() {
       return;
     }
 
-    router.push(`/verify?email=${encodeURIComponent(values.email)}`);
+    if (result.data.needsEmailConfirmation) {
+      router.push(`/verify?email=${encodeURIComponent(values.email)}`);
+    } else {
+      router.push("/dashboard");
+      router.refresh();
+    }
   });
 
   return (
@@ -47,11 +53,27 @@ export function RegisterForm() {
         <CardTitle>{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <GoogleSignInButton />
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="h-px flex-1 bg-border" />
+          {t("orDivider")}
+          <span className="h-px flex-1 bg-border" />
+        </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <Field label={t("emailLabel")} htmlFor="email" error={errors.email}>
             <Input id="email" type="email" autoComplete="email" {...register("email")} />
           </Field>
+          <Field label={t("passwordLabel")} htmlFor="password" error={errors.password}>
+            <Input id="password" type="password" autoComplete="new-password" {...register("password")} />
+          </Field>
+          <div className="space-y-2">
+            <label className="flex items-start gap-2 text-sm text-muted-foreground">
+              <input type="checkbox" className="mt-1" {...register("acceptTerms")} />
+              <span>{t("acceptTerms")}</span>
+            </label>
+            {errors.acceptTerms && <p className="text-sm text-destructive">{errors.acceptTerms.message}</p>}
+          </div>
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? t("submitting") : t("submit")}
           </Button>

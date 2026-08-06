@@ -1,4 +1,4 @@
-import { VerifyRegistrationForm } from "@/features/auth/components/verify-registration-form";
+import { CheckEmailNotice } from "@/features/auth/components/check-email-notice";
 
 export default async function VerifyPage({
   searchParams,
@@ -6,5 +6,5 @@ export default async function VerifyPage({
   searchParams: Promise<{ email?: string }>;
 }) {
   const { email } = await searchParams;
-  return <VerifyRegistrationForm email={email ?? ""} />;
+  return <CheckEmailNotice email={email ?? ""} />;
 }

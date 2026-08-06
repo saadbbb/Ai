@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { loginAction } from "../actions/login.action";
 import { createLoginSchema } from "../validation/schemas";
+import { GoogleSignInButton } from "./google-signin-button";
 
 type LoginInput = z.infer<ReturnType<typeof createLoginSchema>>;
 
@@ -26,10 +27,7 @@ export function LoginForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginInput>({
-    resolver: zodResolver(createLoginSchema(tValidation)),
-    defaultValues: { rememberMe: false },
-  });
+  } = useForm<LoginInput>({ resolver: zodResolver(createLoginSchema(tValidation)) });
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -51,7 +49,13 @@ export function LoginForm() {
         <CardTitle>{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <GoogleSignInButton />
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="h-px flex-1 bg-border" />
+          {t("orDivider")}
+          <span className="h-px flex-1 bg-border" />
+        </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <Field label={t("emailLabel")} htmlFor="email" error={errors.email}>
             <Input id="email" type="email" autoComplete="email" {...register("email")} />
@@ -59,11 +63,7 @@ export function LoginForm() {
           <Field label={t("passwordLabel")} htmlFor="password" error={errors.password}>
             <Input id="password" type="password" autoComplete="current-password" {...register("password")} />
           </Field>
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 text-muted-foreground">
-              <input type="checkbox" {...register("rememberMe")} />
-              {t("rememberMe")}
-            </label>
+          <div className="flex items-center justify-end text-sm">
             <Link href="/forgot-password" className="font-medium text-foreground underline underline-offset-4">
               {t("forgotPassword")}
             </Link>
