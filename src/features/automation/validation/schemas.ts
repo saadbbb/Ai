@@ -1,5 +1,13 @@
 import { z } from "zod";
-import { appointmentStatusEnum, leadStageEnum, orderStatusEnum, workflowActionEnum, workflowTriggerEnum } from "@/db/schema";
+import {
+  appointmentStatusEnum,
+  languageEnum,
+  leadStageEnum,
+  orderStatusEnum,
+  taskPriorityEnum,
+  workflowActionEnum,
+  workflowTriggerEnum,
+} from "@/db/schema";
 
 const triggerStatusValues = [...new Set([...orderStatusEnum.enumValues, ...appointmentStatusEnum.enumValues])] as [
   string,
@@ -21,6 +29,11 @@ export const createWorkflowSchema = z
     actionTag: z.string().trim().max(60).optional(),
     actionSubject: z.string().trim().max(200).optional(),
     actionMessage: z.string().trim().max(2000).optional(),
+    actionTaskTitle: z.string().trim().max(200).optional(),
+    actionTaskPriority: z.enum(taskPriorityEnum.enumValues).optional(),
+    actionTaskDueInDays: z.coerce.number().int().min(0).max(365).optional(),
+    actionNoteContent: z.string().trim().max(2000).optional(),
+    actionContactLanguage: z.enum(languageEnum.enumValues).optional(),
     conditions: z.array(conditionRuleSchema).max(5).optional(),
     conditionsMatchType: z.enum(["all", "any"]).optional(),
     delayDays: z.coerce.number().int().min(0).max(365).optional(),
@@ -40,6 +53,15 @@ export const createWorkflowSchema = z
     }
     if (data.actionType === "notify_owner_email" && !data.actionMessage) {
       ctx.addIssue({ code: "custom", path: ["actionMessage"], message: "Enter a message to send." });
+    }
+    if (data.actionType === "create_task" && !data.actionTaskTitle) {
+      ctx.addIssue({ code: "custom", path: ["actionTaskTitle"], message: "Enter a task title." });
+    }
+    if (data.actionType === "create_note" && !data.actionNoteContent) {
+      ctx.addIssue({ code: "custom", path: ["actionNoteContent"], message: "Enter note content." });
+    }
+    if (data.actionType === "update_contact_language" && !data.actionContactLanguage) {
+      ctx.addIssue({ code: "custom", path: ["actionContactLanguage"], message: "Pick a language." });
     }
   });
 

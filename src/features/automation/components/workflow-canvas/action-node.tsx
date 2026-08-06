@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { workflowActionEnum, type WorkflowAction } from "@/db/schema";
+import { languageEnum, taskPriorityEnum, workflowActionEnum, type WorkflowAction } from "@/db/schema";
 import type { ActionNodeData } from "./types";
 
 const TAG_ACTIONS = new Set<WorkflowAction>(["add_contact_tag", "remove_contact_tag"]);
@@ -54,6 +54,69 @@ export function ActionNode({ data }: NodeProps<Node<ActionNodeData>>) {
             rows={2}
           />
         </>
+      )}
+
+      {data.actionType === "create_task" && (
+        <>
+          <Input
+            className="nodrag"
+            value={data.actionTaskTitle}
+            onChange={(event) => data.onChange({ actionTaskTitle: event.target.value })}
+            placeholder={t("taskTitlePlaceholder")}
+          />
+          <Select
+            value={data.actionTaskPriority}
+            onValueChange={(value) => data.onChange({ actionTaskPriority: value as ActionNodeData["actionTaskPriority"] })}
+          >
+            <SelectTrigger className="w-full nodrag">
+              <SelectValue placeholder={t("taskPriorityPlaceholder")} />
+            </SelectTrigger>
+            <SelectContent>
+              {taskPriorityEnum.enumValues.map((priority) => (
+                <SelectItem key={priority} value={priority}>
+                  {t(`taskPriorities.${priority}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            className="nodrag"
+            type="number"
+            min="0"
+            max="365"
+            value={data.actionTaskDueInDays}
+            onChange={(event) => data.onChange({ actionTaskDueInDays: event.target.value })}
+            placeholder={t("taskDueInDaysPlaceholder")}
+          />
+        </>
+      )}
+
+      {data.actionType === "create_note" && (
+        <Textarea
+          className="nodrag"
+          value={data.actionNoteContent}
+          onChange={(event) => data.onChange({ actionNoteContent: event.target.value })}
+          placeholder={t("noteContentPlaceholder")}
+          rows={2}
+        />
+      )}
+
+      {data.actionType === "update_contact_language" && (
+        <Select
+          value={data.actionContactLanguage}
+          onValueChange={(value) => data.onChange({ actionContactLanguage: value })}
+        >
+          <SelectTrigger className="w-full nodrag">
+            <SelectValue placeholder={t("contactLanguagePlaceholder")} />
+          </SelectTrigger>
+          <SelectContent>
+            {languageEnum.enumValues.map((language) => (
+              <SelectItem key={language} value={language}>
+                {t(`contactLanguages.${language}`)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       )}
 
       <div className="space-y-1">

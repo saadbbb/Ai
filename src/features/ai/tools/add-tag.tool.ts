@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { automationService } from "@/features/automation/services/automation.service";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import type { AiTool, ToolContext } from "./types";
@@ -16,6 +17,11 @@ async function execute(context: ToolContext, input: z.infer<typeof schema>): Pro
     type: "contact_tagged",
     actor: { type: "ai" },
     summary: `AI tagged the customer with "${input.tag}".`,
+  });
+  await automationService.dispatch(context.workspaceId, {
+    type: "tag_added",
+    contactId: context.contactId,
+    tag: input.tag,
   });
   return `Tagged the customer with "${input.tag}".`;
 }

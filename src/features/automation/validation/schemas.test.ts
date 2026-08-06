@@ -87,6 +87,79 @@ describe("createWorkflowSchema", () => {
     }
   });
 
+  it("requires no extra config for the tag_added trigger", () => {
+    const result = createWorkflowSchema.safeParse({ ...BASE, triggerType: "tag_added" });
+    expect(result.success).toBe(true);
+  });
+
+  it("requires actionTaskTitle for create_task", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "create_task",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toEqual(["actionTaskTitle"]);
+    }
+  });
+
+  it("accepts create_task with a title, priority, and due-in-days", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "create_task",
+      actionTaskTitle: "Call back",
+      actionTaskPriority: "high",
+      actionTaskDueInDays: 3,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("requires actionNoteContent for create_note", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "create_note",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toEqual(["actionNoteContent"]);
+    }
+  });
+
+  it("requires actionContactLanguage for update_contact_language", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "update_contact_language",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toEqual(["actionContactLanguage"]);
+    }
+  });
+
+  it("rejects an invalid language for update_contact_language", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "update_contact_language",
+      actionContactLanguage: "fr",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts update_contact_language with a valid language", () => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType: "update_contact_language",
+      actionContactLanguage: "ar",
+    });
+    expect(result.success).toBe(true);
+  });
+
   it.each([0, 1, 365])("accepts delayDays = %i", (delayDays) => {
     const result = createWorkflowSchema.safeParse({ ...BASE, triggerType: "lead_created", delayDays });
     expect(result.success).toBe(true);

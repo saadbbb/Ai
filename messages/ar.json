@@ -631,9 +631,13 @@
     "triggerOrderCreated": "عند إنشاء طلب جديد",
     "triggerLeadCreated": "عند إنشاء عميل محتمل جديد",
     "triggerAppointmentCreated": "عند حجز موعد جديد",
+    "triggerTagAdded": "عند إضافة وسم لجهة اتصال",
     "actionAddTag": "إضافة وسم \"{tag}\" لجهة الاتصال",
     "actionRemoveTag": "إزالة الوسم \"{tag}\" من جهة الاتصال",
     "actionNotifyOwner": "إشعاري",
+    "actionCreateTask": "إنشاء مهمة: \"{title}\"",
+    "actionCreateNote": "إضافة ملاحظة لجهة الاتصال",
+    "actionUpdateContactLanguage": "تعيين لغة جهة الاتصال إلى {language}",
     "delaySummary": "بعد {days} يوم",
     "new": {
       "title": "أتمتة جديدة",
@@ -655,7 +659,8 @@
         "order_created": "يتم إنشاء طلب جديد",
         "lead_created": "يتم إنشاء عميل محتمل جديد",
         "appointment_created": "يتم حجز موعد جديد",
-        "appointment_status_changed": "تتغيّر حالة موعد"
+        "appointment_status_changed": "تتغيّر حالة موعد",
+        "tag_added": "يُضاف وسم لجهة اتصال"
       },
       "stagePlaceholder": "اختر مرحلة",
       "statusPlaceholder": "اختر حالة",
@@ -663,12 +668,30 @@
       "actions": {
         "add_contact_tag": "وسم العميل",
         "remove_contact_tag": "إزالة وسم من العميل",
-        "notify_owner_email": "إشعاري"
+        "notify_owner_email": "إشعاري",
+        "create_task": "إنشاء مهمة",
+        "create_note": "إضافة ملاحظة",
+        "update_contact_language": "تعيين لغة العميل"
       },
       "tagPlaceholder": "الوسم، مثال: عميل",
       "subjectPlaceholder": "العنوان (اختياري)",
       "messagePlaceholder": "النص — استخدم '{{contactName}}' لاسم العميل",
       "messageHint": "يصلك كإشعار داخل النظام وكبريد إلكتروني معاً — '{{contactName}}' سيُستبدَل باسم العميل.",
+      "taskTitlePlaceholder": "عنوان المهمة، مثال: الاتصال بالعميل",
+      "taskPriorityPlaceholder": "الأولوية",
+      "taskPriorities": {
+        "low": "منخفضة",
+        "medium": "متوسطة",
+        "high": "عالية"
+      },
+      "taskDueInDaysPlaceholder": "الاستحقاق خلال أيام، مثال: 3 (اختياري)",
+      "noteContentPlaceholder": "ملاحظة — استخدم '{{contactName}}' لاسم العميل",
+      "contactLanguagePlaceholder": "اختر لغة",
+      "contactLanguages": {
+        "ar": "العربية",
+        "en": "الإنجليزية",
+        "ku": "الكردية"
+      },
       "delayLabel": "الانتظار قبل التنفيذ (اختياري)",
       "delayPlaceholder": "عدد الأيام، مثال: 3 — اتركه فارغاً للتنفيذ الفوري",
       "submit": "إنشاء الأتمتة",

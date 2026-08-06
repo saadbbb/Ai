@@ -2,6 +2,7 @@ import type {
   AppointmentStatus,
   LeadStage,
   OrderStatus,
+  TaskPriority,
   WorkflowAction,
   WorkflowConditionField,
   WorkflowConditionMatchType,
@@ -37,8 +38,27 @@ export interface ActionNodeData {
   actionTag: string;
   actionSubject: string;
   actionMessage: string;
+  actionTaskTitle: string;
+  actionTaskPriority: TaskPriority;
+  actionTaskDueInDays: string;
+  actionNoteContent: string;
+  actionContactLanguage: string;
   delayDays: string;
   onChange: (
-    patch: Partial<Pick<ActionNodeData, "actionType" | "actionTag" | "actionSubject" | "actionMessage" | "delayDays">>,
+    patch: Partial<
+      Pick<
+        ActionNodeData,
+        | "actionType"
+        | "actionTag"
+        | "actionSubject"
+        | "actionMessage"
+        | "actionTaskTitle"
+        | "actionTaskPriority"
+        | "actionTaskDueInDays"
+        | "actionNoteContent"
+        | "actionContactLanguage"
+        | "delayDays"
+      >
+    >,
   ) => void;
 }

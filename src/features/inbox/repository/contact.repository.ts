@@ -42,7 +42,7 @@ export const contactRepository = {
   async update(
     id: string,
     workspaceId: string,
-    data: Partial<Pick<NewContact, "fullName" | "phone" | "email">>,
+    data: Partial<Pick<NewContact, "fullName" | "phone" | "email" | "language">>,
   ): Promise<Contact | null> {
     const [contact] = await db
       .update(contacts)

@@ -11,6 +11,8 @@ import type {
   WorkflowTriggerConfig,
 } from "@/db/schema";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
+import { noteRepository } from "@/features/crm/repository/note.repository";
+import { taskRepository } from "@/features/crm/repository/task.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { notificationRepository } from "@/features/notifications/repository/notification.repository";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
@@ -28,7 +30,16 @@ export type AutomationEvent =
   | { type: "order_created"; contactId: string }
   | { type: "lead_created"; contactId: string }
   | { type: "appointment_created"; contactId: string }
-  | { type: "appointment_status_changed"; contactId: string; status: AppointmentStatus };
+  | { type: "appointment_status_changed"; contactId: string; status: AppointmentStatus }
+  | { type: "tag_added"; contactId: string; tag: string };
+
+/** An action is retried this many times total before the run is logged as a failure. */
+const MAX_ACTION_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 250;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function matchesTrigger(workflow: Workflow, event: AutomationEvent): boolean {
   if (workflow.triggerType === "lead_stage_changed" && event.type === "lead_stage_changed") {
@@ -43,7 +54,8 @@ function matchesTrigger(workflow: Workflow, event: AutomationEvent): boolean {
   if (
     workflow.triggerType === "order_created" ||
     workflow.triggerType === "lead_created" ||
-    workflow.triggerType === "appointment_created"
+    workflow.triggerType === "appointment_created" ||
+    workflow.triggerType === "tag_added"
   ) {
     return workflow.triggerType === event.type;
   }
@@ -56,6 +68,7 @@ function eventToPayload(event: AutomationEvent): WorkflowTriggerConfig {
   if (event.type === "order_status_changed" || event.type === "appointment_status_changed") {
     return { status: event.status };
   }
+  if (event.type === "tag_added") return { tag: event.tag };
   return {};
 }
 
@@ -142,6 +155,72 @@ async function runAction(
     }
   }
 
+  if (workflow.actionType === "create_task") {
+    const title = workflow.actionConfig.taskTitle;
+    if (!title) throw new AppError("VALIDATION_ERROR", "Workflow is missing a task title.");
+
+    let dueAt: Date | null = null;
+    if (workflow.actionConfig.taskDueInDays) {
+      dueAt = new Date();
+      dueAt.setUTCDate(dueAt.getUTCDate() + workflow.actionConfig.taskDueInDays);
+    }
+
+    const task = await taskRepository.create({
+      workspaceId,
+      contactId: event.contactId,
+      title,
+      dueAt,
+      priority: workflow.actionConfig.taskPriority ?? "medium",
+      createdByUserId: null,
+    });
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "task_created",
+      actor: { type: "automation" },
+      summary: `Task "${task.title}" created by automation "${workflow.name}".`,
+    });
+    return contact ? `Created task "${task.title}" for ${contact.fullName}` : `Created task "${task.title}"`;
+  }
+
+  if (workflow.actionType === "create_note") {
+    const content = workflow.actionConfig.noteContent;
+    if (!content) throw new AppError("VALIDATION_ERROR", "Workflow is missing note content.");
+
+    await noteRepository.create({
+      workspaceId,
+      contactId: event.contactId,
+      content: content.replaceAll("{{contactName}}", contact?.fullName ?? ""),
+      pinned: false,
+      authorUserId: null,
+    });
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "note_added",
+      actor: { type: "automation" },
+      summary: `Note added by automation "${workflow.name}".`,
+    });
+    return contact ? `Added a note to ${contact.fullName}` : "Added a note";
+  }
+
+  if (workflow.actionType === "update_contact_language") {
+    const language = workflow.actionConfig.contactLanguage as Contact["language"];
+    if (!language) throw new AppError("VALIDATION_ERROR", "Workflow is missing a language to set.");
+
+    const updated = await contactRepository.update(event.contactId, workspaceId, { language });
+    if (!updated) throw new AppError("NOT_FOUND", "Contact not found.");
+
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "contact_updated",
+      actor: { type: "automation" },
+      summary: `Language set to "${language}" by automation "${workflow.name}".`,
+    });
+    return contact ? `Set ${contact.fullName}'s language to "${language}"` : `Set language to "${language}"`;
+  }
+
   return null;
 }
 
@@ -151,18 +230,36 @@ async function runAndLog(
   event: AutomationEvent,
   contact: Contact | null,
 ): Promise<void> {
-  try {
-    const summary = await runAction(workspaceId, workflow, event, contact);
-    await workflowRepository.logExecution({ workspaceId, workflowId: workflow.id, success: true, summary });
-  } catch (error) {
-    console.error(`[automation] workflow "${workflow.name}" (${workflow.id}) failed:`, error);
-    await workflowRepository.logExecution({
-      workspaceId,
-      workflowId: workflow.id,
-      success: false,
-      errorMessage: error instanceof Error ? error.message : "Unknown error",
-    });
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= MAX_ACTION_ATTEMPTS; attempt++) {
+    try {
+      const summary = await runAction(workspaceId, workflow, event, contact);
+      await workflowRepository.logExecution({
+        workspaceId,
+        workflowId: workflow.id,
+        success: true,
+        summary,
+        retryCount: attempt - 1,
+      });
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt < MAX_ACTION_ATTEMPTS) {
+        console.warn(`[automation] workflow "${workflow.name}" (${workflow.id}) attempt ${attempt} failed, retrying:`, error);
+        await sleep(RETRY_DELAY_MS);
+      }
+    }
   }
+
+  console.error(`[automation] workflow "${workflow.name}" (${workflow.id}) failed after ${MAX_ACTION_ATTEMPTS} attempts:`, lastError);
+  await workflowRepository.logExecution({
+    workspaceId,
+    workflowId: workflow.id,
+    success: false,
+    errorMessage: lastError instanceof Error ? lastError.message : "Unknown error",
+    retryCount: MAX_ACTION_ATTEMPTS - 1,
+  });
 }
 
 /**
@@ -263,7 +360,16 @@ async function createWorkflow(workspaceId: string, input: z.infer<typeof createW
     triggerType: input.triggerType,
     triggerConfig: { stage: input.triggerStage, status: input.triggerStatus },
     actionType: input.actionType,
-    actionConfig: { tag: input.actionTag, subject: input.actionSubject, message: input.actionMessage },
+    actionConfig: {
+      tag: input.actionTag,
+      subject: input.actionSubject,
+      message: input.actionMessage,
+      taskTitle: input.actionTaskTitle,
+      taskPriority: input.actionTaskPriority,
+      taskDueInDays: input.actionTaskDueInDays,
+      noteContent: input.actionNoteContent,
+      contactLanguage: input.actionContactLanguage,
+    },
     conditions:
       input.conditions && input.conditions.length > 0
         ? { matchType: input.conditionsMatchType ?? "all", rules: input.conditions }

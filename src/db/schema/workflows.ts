@@ -10,30 +10,47 @@ export const workflowTriggerEnum = pgEnum("workflow_trigger", [
   "lead_created",
   "appointment_created",
   "appointment_status_changed",
+  "tag_added",
 ]);
 
 export const workflowActionEnum = pgEnum("workflow_action", [
   "add_contact_tag",
   "notify_owner_email",
   "remove_contact_tag",
+  "create_task",
+  "create_note",
+  "update_contact_language",
 ]);
 
 export const workflowStatusEnum = pgEnum("workflow_status", ["active", "paused"]);
 
 /**
  * Shape depends on triggerType: only `stage` is set for lead_stage_changed,
- * only `status` for order_status_changed, neither for conversation_handed_over.
+ * only `status` for order_status_changed, `tag` for tag_added (informational —
+ * matching a specific tag is done via Conditions, not here), neither for
+ * conversation_handed_over.
  */
 export interface WorkflowTriggerConfig {
   stage?: string;
   status?: string;
+  tag?: string;
 }
 
-/** Shape depends on actionType: `tag` for add_contact_tag, `subject`/`message` for notify_owner_email. */
+/**
+ * Shape depends on actionType: `tag` for add_contact_tag/remove_contact_tag,
+ * `subject`/`message` for notify_owner_email, `taskTitle`/`taskPriority`/
+ * `taskDueInDays` for create_task, `noteContent` for create_note,
+ * `contactLanguage` for update_contact_language.
+ */
 export interface WorkflowActionConfig {
   tag?: string;
   subject?: string;
   message?: string;
+  taskTitle?: string;
+  taskPriority?: "low" | "medium" | "high";
+  taskDueInDays?: number;
+  noteContent?: string;
+  contactLanguage?: string;
 }
 
 /**
@@ -123,6 +140,8 @@ export const workflowExecutions = pgTable(
     success: boolean("success").notNull(),
     summary: text("summary"),
     errorMessage: text("error_message"),
+    /** How many retries happened before this result — 0 means it succeeded/failed on the first attempt. */
+    retryCount: integer("retry_count").notNull().default(0),
     triggeredAt: timestamp("triggered_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index("workflow_executions_workflow_id_idx").on(table.workflowId)],

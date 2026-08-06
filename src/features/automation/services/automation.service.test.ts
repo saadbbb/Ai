@@ -22,12 +22,25 @@ vi.mock("@/features/inbox/repository/contact.repository", () => ({
     findById: vi.fn(),
     addTag: vi.fn(),
     removeTag: vi.fn(),
+    update: vi.fn(),
   },
 }));
 
 vi.mock("@/features/crm/repository/activity.repository", () => ({
   activityRepository: {
     log: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/crm/repository/task.repository", () => ({
+  taskRepository: {
+    create: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/crm/repository/note.repository", () => ({
+  noteRepository: {
+    create: vi.fn(),
   },
 }));
 
@@ -58,6 +71,8 @@ vi.mock("@/lib/email", () => ({
 const { workflowRepository } = await import("../repository/workflow.repository");
 const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
 const { activityRepository } = await import("@/features/crm/repository/activity.repository");
+const { taskRepository } = await import("@/features/crm/repository/task.repository");
+const { noteRepository } = await import("@/features/crm/repository/note.repository");
 const { notificationRepository } = await import("@/features/notifications/repository/notification.repository");
 const { membershipRepository } = await import("@/features/workspace/repository/membership.repository");
 const { userRepository } = await import("@/features/auth/repository/user.repository");
@@ -106,6 +121,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(contactRepository.findById).mockResolvedValue(CONTACT);
   vi.mocked(workflowRepository.logExecution).mockResolvedValue({} as never);
+  vi.mocked(taskRepository.create).mockResolvedValue({ id: "task-1", title: "Follow up" } as never);
+  vi.mocked(noteRepository.create).mockResolvedValue({ id: "note-1" } as never);
+  vi.mocked(contactRepository.update).mockResolvedValue(CONTACT);
 });
 
 describe("automationService.dispatch — matching", () => {
@@ -147,13 +165,18 @@ describe("automationService.dispatch — matching", () => {
     expect(workflowRepository.logExecution).toHaveBeenCalledTimes(1);
   });
 
-  it.each(["order_created", "lead_created", "appointment_created"] as const)(
+  it.each(["order_created", "lead_created", "appointment_created", "tag_added"] as const)(
     "matches the %s trigger on type alone (no config)",
     async (triggerType) => {
       const workflow = makeWorkflow({ triggerType });
       vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
 
-      await automationService.dispatch(WORKSPACE_ID, { type: triggerType, contactId: CONTACT_ID });
+      await automationService.dispatch(
+        WORKSPACE_ID,
+        triggerType === "tag_added"
+          ? { type: triggerType, contactId: CONTACT_ID, tag: "VIP" }
+          : { type: triggerType, contactId: CONTACT_ID },
+      );
       expect(workflowRepository.logExecution).toHaveBeenCalledTimes(1);
     },
   );
@@ -228,6 +251,114 @@ describe("automationService.dispatch — tag actions", () => {
     await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
 
     expect(contactRepository.removeTag).toHaveBeenCalledWith(CONTACT_ID, WORKSPACE_ID, "Cold");
+  });
+});
+
+describe("automationService.dispatch — create_task", () => {
+  it("creates a task with the configured title/priority/due date and logs activity", async () => {
+    const workflow = makeWorkflow({
+      actionType: "create_task",
+      actionConfig: { taskTitle: "Call back", taskPriority: "high", taskDueInDays: 2 },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(taskRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: WORKSPACE_ID,
+        contactId: CONTACT_ID,
+        title: "Call back",
+        priority: "high",
+        dueAt: expect.any(Date),
+        createdByUserId: null,
+      }),
+    );
+    expect(activityRepository.log).toHaveBeenCalledWith(expect.objectContaining({ type: "task_created" }));
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("fails when no task title is configured", async () => {
+    const workflow = makeWorkflow({ actionType: "create_task", actionConfig: {} });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(taskRepository.create).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+});
+
+describe("automationService.dispatch — create_note", () => {
+  it("creates a note with {{contactName}} substituted", async () => {
+    const workflow = makeWorkflow({
+      actionType: "create_note",
+      actionConfig: { noteContent: "Reach out to {{contactName}}" },
+    });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(noteRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: WORKSPACE_ID,
+        contactId: CONTACT_ID,
+        content: "Reach out to Jane Customer",
+        pinned: false,
+        authorUserId: null,
+      }),
+    );
+    expect(activityRepository.log).toHaveBeenCalledWith(expect.objectContaining({ type: "note_added" }));
+  });
+});
+
+describe("automationService.dispatch — update_contact_language", () => {
+  it("sets the contact's language and logs activity", async () => {
+    const workflow = makeWorkflow({ actionType: "update_contact_language", actionConfig: { contactLanguage: "ar" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(contactRepository.update).toHaveBeenCalledWith(CONTACT_ID, WORKSPACE_ID, { language: "ar" });
+    expect(activityRepository.log).toHaveBeenCalledWith(expect.objectContaining({ type: "contact_updated" }));
+  });
+
+  it("fails when no language is configured", async () => {
+    const workflow = makeWorkflow({ actionType: "update_contact_language", actionConfig: {} });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(contactRepository.update).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+});
+
+describe("automationService.dispatch — retry", () => {
+  it("retries once and succeeds, recording retryCount: 1", async () => {
+    const workflow = makeWorkflow({ actionType: "add_contact_tag", actionConfig: { tag: "VIP" } });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(contactRepository.addTag)
+      .mockRejectedValueOnce(new Error("transient failure"))
+      .mockResolvedValueOnce(undefined);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(contactRepository.addTag).toHaveBeenCalledTimes(2);
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, retryCount: 1 }),
+    );
+  });
+
+  it("gives up after exhausting retries and records retryCount on the failure", async () => {
+    const workflow = makeWorkflow({ actionType: "add_contact_tag", actionConfig: {} }); // missing tag -> always throws
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false, retryCount: 1 }),
+    );
   });
 });
 

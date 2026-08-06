@@ -6,6 +6,10 @@ vi.mock("../repository/tool-execution.repository", () => ({
   toolExecutionRepository: { create: vi.fn() },
 }));
 
+vi.mock("@/features/automation/services/automation.service", () => ({
+  automationService: { dispatch: vi.fn() },
+}));
+
 vi.mock("@/features/crm/repository/activity.repository", () => ({
   activityRepository: { log: vi.fn() },
 }));
@@ -35,6 +39,7 @@ vi.mock("@/features/orders/services/order.service", () => ({
 }));
 
 const { toolExecutionRepository } = await import("../repository/tool-execution.repository");
+const { automationService } = await import("@/features/automation/services/automation.service");
 const { crmService } = await import("@/features/crm/services/crm.service");
 const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
 const { appointmentService } = await import("@/features/appointments/services/appointment.service");
@@ -102,6 +107,11 @@ describe("createToolDispatcher", () => {
 
     expect(result.isError).toBe(false);
     expect(contactRepository.addTag).toHaveBeenCalledWith("contact-1", "workspace-1", "VIP");
+    expect(automationService.dispatch).toHaveBeenCalledWith("workspace-1", {
+      type: "tag_added",
+      contactId: "contact-1",
+      tag: "VIP",
+    });
     expect(toolExecutionRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({ toolName: "add_tag", success: true }),
     );

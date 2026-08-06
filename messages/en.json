@@ -631,9 +631,13 @@
     "triggerOrderCreated": "When a new order is created",
     "triggerLeadCreated": "When a new lead is created",
     "triggerAppointmentCreated": "When a new appointment is booked",
+    "triggerTagAdded": "When a tag is added to a contact",
     "actionAddTag": "Tag the contact \"{tag}\"",
     "actionRemoveTag": "Remove the tag \"{tag}\" from the contact",
     "actionNotifyOwner": "Notify me",
+    "actionCreateTask": "Create a task: \"{title}\"",
+    "actionCreateNote": "Add a note to the contact",
+    "actionUpdateContactLanguage": "Set the contact's language to {language}",
     "delaySummary": "after {days} days",
     "new": {
       "title": "New automation",
@@ -655,7 +659,8 @@
         "order_created": "A new order is created",
         "lead_created": "A new lead is created",
         "appointment_created": "A new appointment is booked",
-        "appointment_status_changed": "An appointment's status changes"
+        "appointment_status_changed": "An appointment's status changes",
+        "tag_added": "A tag is added to a contact"
       },
       "stagePlaceholder": "Select a stage",
       "statusPlaceholder": "Select a status",
@@ -663,12 +668,30 @@
       "actions": {
         "add_contact_tag": "Tag the customer",
         "remove_contact_tag": "Remove a tag from the customer",
-        "notify_owner_email": "Notify me"
+        "notify_owner_email": "Notify me",
+        "create_task": "Create a task",
+        "create_note": "Add a note",
+        "update_contact_language": "Set the customer's language"
       },
       "tagPlaceholder": "Tag, e.g. customer",
       "subjectPlaceholder": "Subject (optional)",
       "messagePlaceholder": "Message — use '{{contactName}}' for the customer's name",
       "messageHint": "Sent to you as an in-app notification and an email — '{{contactName}}' will be replaced with the customer's name.",
+      "taskTitlePlaceholder": "Task title, e.g. Call the customer back",
+      "taskPriorityPlaceholder": "Priority",
+      "taskPriorities": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "taskDueInDaysPlaceholder": "Due in days, e.g. 3 (optional)",
+      "noteContentPlaceholder": "Note — use '{{contactName}}' for the customer's name",
+      "contactLanguagePlaceholder": "Select a language",
+      "contactLanguages": {
+        "ar": "Arabic",
+        "en": "English",
+        "ku": "Kurdish"
+      },
       "delayLabel": "Wait before running (optional)",
       "delayPlaceholder": "Days, e.g. 3 — leave empty to run immediately",
       "submit": "Create automation",

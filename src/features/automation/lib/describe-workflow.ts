@@ -27,6 +27,7 @@ export function describeTrigger(workflow: Workflow, t: DescribeWorkflowTranslato
   if (workflow.triggerType === "order_created") return t.automations("triggerOrderCreated");
   if (workflow.triggerType === "lead_created") return t.automations("triggerLeadCreated");
   if (workflow.triggerType === "appointment_created") return t.automations("triggerAppointmentCreated");
+  if (workflow.triggerType === "tag_added") return t.automations("triggerTagAdded");
   return t.automations("triggerHandedOver");
 }
 
@@ -36,6 +37,15 @@ export function describeAction(workflow: Workflow, t: Pick<DescribeWorkflowTrans
   }
   if (workflow.actionType === "remove_contact_tag") {
     return t.automations("actionRemoveTag", { tag: workflow.actionConfig.tag ?? "" });
+  }
+  if (workflow.actionType === "create_task") {
+    return t.automations("actionCreateTask", { title: workflow.actionConfig.taskTitle ?? "" });
+  }
+  if (workflow.actionType === "create_note") {
+    return t.automations("actionCreateNote");
+  }
+  if (workflow.actionType === "update_contact_language") {
+    return t.automations("actionUpdateContactLanguage", { language: workflow.actionConfig.contactLanguage ?? "" });
   }
   return t.automations("actionNotifyOwner");
 }

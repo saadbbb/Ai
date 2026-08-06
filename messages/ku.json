@@ -631,9 +631,13 @@
     "triggerOrderCreated": "کاتێک داواکارییەکی نوێ دروست دەبێت",
     "triggerLeadCreated": "کاتێک کڕیارێکی ئەگەری نوێ دروست دەبێت",
     "triggerAppointmentCreated": "کاتێک چاوپێکەوتنێکی نوێ حیجز دەکرێت",
+    "triggerTagAdded": "کاتێک نیشانەیەک زیاد دەکرێت بۆ پەیوەندییەک",
     "actionAddTag": "نیشانکردنی پەیوەندییەکە بە \"{tag}\"",
     "actionRemoveTag": "لابردنی نیشانەی \"{tag}\" لە پەیوەندییەکە",
     "actionNotifyOwner": "ئاگادارم بکەرەوە",
+    "actionCreateTask": "دروستکردنی ئەرک: \"{title}\"",
+    "actionCreateNote": "زیادکردنی تێبینی بۆ پەیوەندییەکە",
+    "actionUpdateContactLanguage": "دانانی زمانی پەیوەندییەکە بۆ {language}",
     "delaySummary": "دوای {days} ڕۆژ",
     "new": {
       "title": "خۆکارکردنی نوێ",
@@ -655,7 +659,8 @@
         "order_created": "داواکارییەکی نوێ دروست دەبێت",
         "lead_created": "کڕیارێکی ئەگەری نوێ دروست دەبێت",
         "appointment_created": "چاوپێکەوتنێکی نوێ حیجز دەکرێت",
-        "appointment_status_changed": "دۆخی چاوپێکەوتنێک دەگۆڕدرێت"
+        "appointment_status_changed": "دۆخی چاوپێکەوتنێک دەگۆڕدرێت",
+        "tag_added": "نیشانەیەک زیاد دەکرێت بۆ پەیوەندییەک"
       },
       "stagePlaceholder": "قۆناغێک هەڵبژێرە",
       "statusPlaceholder": "دۆخێک هەڵبژێرە",
@@ -663,12 +668,30 @@
       "actions": {
         "add_contact_tag": "نیشانکردنی کڕیار",
         "remove_contact_tag": "لابردنی نیشانە لە کڕیار",
-        "notify_owner_email": "ئاگادارم بکەرەوە"
+        "notify_owner_email": "ئاگادارم بکەرەوە",
+        "create_task": "دروستکردنی ئەرک",
+        "create_note": "زیادکردنی تێبینی",
+        "update_contact_language": "دانانی زمانی کڕیار"
       },
       "tagPlaceholder": "نیشانە، بۆ نموونە: کڕیار",
       "subjectPlaceholder": "ناونیشان (ئارەزوومەندانە)",
       "messagePlaceholder": "نامە — '{{contactName}}' بەکاربێنە بۆ ناوی کڕیار",
       "messageHint": "وەک ئاگاداریی ناو سیستەم و ئیمەیل پێکەوە دەگاتێ — '{{contactName}}' دەگۆڕدرێت بە ناوی کڕیار.",
+      "taskTitlePlaceholder": "ناونیشانی ئەرک، بۆ نموونە: پەیوەندی بکەرەوە بە کڕیار",
+      "taskPriorityPlaceholder": "پێشینایەتی",
+      "taskPriorities": {
+        "low": "نزم",
+        "medium": "مامناوەند",
+        "high": "بەرز"
+      },
+      "taskDueInDaysPlaceholder": "کۆتایی بە ڕۆژ، بۆ نموونە: 3 (ئارەزوومەندانە)",
+      "noteContentPlaceholder": "تێبینی — '{{contactName}}' بەکاربێنە بۆ ناوی کڕیار",
+      "contactLanguagePlaceholder": "زمانێک هەڵبژێرە",
+      "contactLanguages": {
+        "ar": "عەرەبی",
+        "en": "ئینگلیزی",
+        "ku": "کوردی"
+      },
       "delayLabel": "چاوەڕوانبوون پێش جێبەجێکردن (ئارەزوومەندانە)",
       "delayPlaceholder": "ژمارەی ڕۆژ، بۆ نموونە: 3 — بەتاڵی بهێڵەرەوە بۆ جێبەجێکردنی خێرا",
       "submit": "دروستکردنی خۆکارکردن",

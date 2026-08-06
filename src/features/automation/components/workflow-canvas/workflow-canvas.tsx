@@ -12,6 +12,7 @@ import type {
   AppointmentStatus,
   LeadStage,
   OrderStatus,
+  TaskPriority,
   WorkflowAction,
   WorkflowConditionMatchType,
   WorkflowTrigger,
@@ -58,6 +59,11 @@ const INITIAL_NODES: Node[] = [
       actionTag: "",
       actionSubject: "",
       actionMessage: "",
+      actionTaskTitle: "",
+      actionTaskPriority: "medium",
+      actionTaskDueInDays: "",
+      actionNoteContent: "",
+      actionContactLanguage: "",
       delayDays: "",
       onChange: NOOP,
     } satisfies ActionNodeData,
@@ -124,6 +130,11 @@ export function WorkflowCanvas() {
   const [actionTag, setActionTag] = useState("");
   const [actionSubject, setActionSubject] = useState("");
   const [actionMessage, setActionMessage] = useState("");
+  const [actionTaskTitle, setActionTaskTitle] = useState("");
+  const [actionTaskPriority, setActionTaskPriority] = useState<TaskPriority>("medium");
+  const [actionTaskDueInDays, setActionTaskDueInDays] = useState("");
+  const [actionNoteContent, setActionNoteContent] = useState("");
+  const [actionContactLanguage, setActionContactLanguage] = useState("");
   const [delayDays, setDelayDays] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
@@ -137,6 +148,11 @@ export function WorkflowCanvas() {
     setActionTag(template.actionTag ?? "");
     setActionSubject("");
     setActionMessage("");
+    setActionTaskTitle("");
+    setActionTaskPriority("medium");
+    setActionTaskDueInDays("");
+    setActionNoteContent("");
+    setActionContactLanguage("");
     setDelayDays("");
     setConditions([]);
     setConditionsMatchType("all");
@@ -169,12 +185,22 @@ export function WorkflowCanvas() {
       actionTag,
       actionSubject,
       actionMessage,
+      actionTaskTitle,
+      actionTaskPriority,
+      actionTaskDueInDays,
+      actionNoteContent,
+      actionContactLanguage,
       delayDays,
       onChange: (patch) => {
         if (patch.actionType !== undefined) setActionType(patch.actionType);
         if (patch.actionTag !== undefined) setActionTag(patch.actionTag);
         if (patch.actionSubject !== undefined) setActionSubject(patch.actionSubject);
         if (patch.actionMessage !== undefined) setActionMessage(patch.actionMessage);
+        if (patch.actionTaskTitle !== undefined) setActionTaskTitle(patch.actionTaskTitle);
+        if (patch.actionTaskPriority !== undefined) setActionTaskPriority(patch.actionTaskPriority);
+        if (patch.actionTaskDueInDays !== undefined) setActionTaskDueInDays(patch.actionTaskDueInDays);
+        if (patch.actionNoteContent !== undefined) setActionNoteContent(patch.actionNoteContent);
+        if (patch.actionContactLanguage !== undefined) setActionContactLanguage(patch.actionContactLanguage);
         if (patch.delayDays !== undefined) setDelayDays(patch.delayDays);
       },
     };
@@ -200,6 +226,11 @@ export function WorkflowCanvas() {
     actionTag,
     actionSubject,
     actionMessage,
+    actionTaskTitle,
+    actionTaskPriority,
+    actionTaskDueInDays,
+    actionNoteContent,
+    actionContactLanguage,
     delayDays,
   ]);
 
@@ -219,6 +250,11 @@ export function WorkflowCanvas() {
       actionTag: actionType === "add_contact_tag" || actionType === "remove_contact_tag" ? actionTag || undefined : undefined,
       actionSubject: actionType === "notify_owner_email" ? actionSubject || undefined : undefined,
       actionMessage: actionType === "notify_owner_email" ? actionMessage || undefined : undefined,
+      actionTaskTitle: actionType === "create_task" ? actionTaskTitle || undefined : undefined,
+      actionTaskPriority: actionType === "create_task" ? actionTaskPriority : undefined,
+      actionTaskDueInDays: actionType === "create_task" ? actionTaskDueInDays || undefined : undefined,
+      actionNoteContent: actionType === "create_note" ? actionNoteContent || undefined : undefined,
+      actionContactLanguage: actionType === "update_contact_language" ? actionContactLanguage || undefined : undefined,
       conditions: filledConditions.length > 0 ? filledConditions : undefined,
       conditionsMatchType: filledConditions.length > 1 ? conditionsMatchType : undefined,
       delayDays: delayDays || undefined,

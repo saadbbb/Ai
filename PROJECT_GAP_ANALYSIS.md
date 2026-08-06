@@ -539,3 +539,62 @@ without needing inbox access) — and this test caught two real things a guess w
 One remaining step needs the user: the Supabase email templates ("Confirm signup", "Reset Password")
 still need to display `{{ .Token }}` as visible text in the actual email — otherwise a real user has no
 way to read the code even though the whole verification pipeline is confirmed working.
+
+**2026-08-06 — Phase 6 (partial, scoped tightly).** Per the plan's own guidance ("expand actions/triggers
+incrementally, prioritizing ones with existing service-layer equivalents... add a retryCount/maxRetries
+column and retry loop"), picked the highest-value, best-contained slice rather than all 12 missing
+actions/14 missing triggers at once (the permission-enforcement gap this Part also listed was already
+fixed in Phase 1):
+
+- **3 new actions**, each with a real handler wired to the existing CRM services' repositories (not a
+  stub): `create_task` (title/priority/optional due-in-days), `create_note` (content, with the same
+  `{{contactName}}` substitution `notify_owner_email` already uses), `update_contact_language` (sets
+  `contacts.language`, which required widening `contactRepository.update`'s allowed field set — it only
+  accepted fullName/phone/email before). All three log to the same `activities` timeline as
+  `actor: { type: "automation" }`, matching the existing tag actions' pattern exactly.
+- **1 new trigger**, `tag_added`, wired into the one real non-recursive source: the AI's `add_tag` tool
+  (`src/features/ai/tools/add-tag.tool.ts`). Deliberately **not** dispatched from automation's own
+  `add_contact_tag` action handler — doing so would let two workflows tag each other in a cycle; skipping
+  it there was judged simpler and safer than building loop detection, and `contactRepository.addTag` is
+  already idempotent (no-ops on a duplicate tag) so the only real trigger source (the AI) is enough to
+  make this a genuine, usable trigger. Matching a specific tag (vs. any tag) is left to the existing
+  Conditions engine ("tag = VIP") rather than adding a second filtering mechanism.
+- **Retry logic** (the plan's explicit ask): `runAndLog` now attempts an action up to 2 times total with a
+  250ms backoff before logging a failure, and records how many retries happened in a new
+  `workflow_executions.retry_count` column. Applies uniformly to every action type, immediate or delayed.
+- Extended `WorkflowTriggerConfig`/`WorkflowActionConfig`, the create-workflow Zod schema (with
+  `superRefine` rules requiring the new per-action fields), `describe-workflow.ts`'s human-readable
+  summaries, and the React Flow visual canvas (`action-node.tsx` gained task/note/language fields,
+  `trigger-node.tsx` picked up `tag_added` for free since its Select is enum-driven) — the same UI a user
+  builds workflows in today, not a separate admin-only path.
+- Migration `0026_needy_veda.sql` (2 enum additions + 1 new column) generated via `drizzle-kit generate`
+  and applied live via `drizzle-kit migrate` against the production Supabase Postgres instance.
+- i18n: added matching keys to all three locale files (en/ar/ku), verified programmatically that all
+  three still have identical key counts (753 each, up from 622) after the edit — this project's own
+  established check for i18n drift.
+- 18 new/updated unit tests (automation.service.test.ts: tag_added matching, all 3 new actions incl.
+  their missing-required-field failure paths, retry-success and retry-exhausted paths; schemas.test.ts:
+  required-field validation for all 3 new actions plus language-enum rejection; registry.test.ts: asserted
+  `add_tag` now also dispatches `tag_added`). Full suite: typecheck clean, lint clean, **143/143 tests
+  passing** (up from 128), production build clean.
+
+**Deliberately left for a later pass** (would each be their own contained piece of work): the remaining
+~9 missing actions (Send AI Reply, Assign Agent, Create Lead/Order, Book Appointment, Archive/Close
+Conversation, Trigger Another Workflow, Webhook/API Call — several depend on Channels/Meta OAuth landing
+first) and ~13 missing triggers (Message Received/Replied, Lead Won/Lost, Order Paid/Delivered, Customer
+VIP, AI Failed, Channel Connected, Workspace Created, Subscription Renewed, Payment Failed, User
+Invited — note Lead Won/Lost and Order Paid/Delivered are arguably already covered today via
+`lead_stage_changed`/`order_status_changed` with a specific stage/status configured, so the real gap is
+narrower than the raw count suggests); nested AND/OR condition groups, Branches, general Variables,
+Workflow Versioning; AI Workflow Generator and Human Approval extensions (net-new subsystems, not
+patches); async/queued execution via BullMQ (still correctly deferred per Decision 2 — nothing in this
+pass changed that); Workflow status enum's missing Draft/Disabled/Archived states. These remain accurately
+reflected as open items in PART 6's "Missing" section above — this entry does not claim them done. **Did
+not independently browser-verify the canvas UI this round** (no browser-automation tool was available in
+this session, unlike the Phase 3 mobile-layout bug and the Phase 1 workflow-canvas bug, both of which were
+only caught by actually rendering the page) — typecheck/lint/build all passed, and the new fields reuse
+the exact same Input/Select/Textarea/enum-driven-options pattern already proven working for the existing
+tag/email actions, but this is a real gap in verification depth compared to earlier phases and should be
+spot-checked in a browser before being fully trusted.
+
+Next: remaining Phase 6 scope (if picked up again) or Phase 7 (Channels/Meta OAuth) per the approved plan.
