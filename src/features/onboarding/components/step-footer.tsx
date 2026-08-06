@@ -6,9 +6,11 @@ interface StepFooterProps {
   backHref?: string;
   isSubmitting: boolean;
   continueLabel?: string;
+  /** Set only on steps the spec marks skippable (business description, knowledge base) — renders a plain-text "Skip" link that moves on without saving. */
+  skipHref?: string;
 }
 
-export function StepFooter({ backHref, isSubmitting, continueLabel }: StepFooterProps) {
+export function StepFooter({ backHref, isSubmitting, continueLabel, skipHref }: StepFooterProps) {
   const t = useTranslations("common");
 
   return (
@@ -20,9 +22,16 @@ export function StepFooter({ backHref, isSubmitting, continueLabel }: StepFooter
       ) : (
         <span />
       )}
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? t("saving") : (continueLabel ?? t("continue"))}
-      </Button>
+      <div className="flex items-center gap-3">
+        {skipHref && (
+          <Link href={skipHref} className="text-sm text-muted-foreground hover:text-foreground">
+            {t("skip")}
+          </Link>
+        )}
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? t("saving") : (continueLabel ?? t("continue"))}
+        </Button>
+      </div>
     </div>
   );
 }

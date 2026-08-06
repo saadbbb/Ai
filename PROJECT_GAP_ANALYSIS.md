@@ -454,3 +454,23 @@ automation permission fix pulled forward ahead of everything else.
 
 No new external-account blockers surfaced during Phase 1 — nothing added to `DEFERRED_TASKS.md` this
 round. Next: Phase 2 (Supabase Auth migration).
+
+**2026-08-06 — Phase 2 blocked, moved to Phase 3.** Supabase Auth migration cannot proceed without live
+credentials (project API keys, Google OAuth client) that only the account owner can obtain — documented
+precisely in `DEFERRED_TASKS.md` item 7, including the exact Supabase dashboard screens to visit. Did
+not touch the working custom auth system without being able to test a replacement against real
+credentials. Per the "don't stop, keep going" instruction, moved on to Phase 3 (no dependency on Phase 2).
+
+**2026-08-06 — Phase 3 complete.** PART 13B's 5-section IA implemented as pure route/presentation
+restructuring — no schema/service-logic changes beyond splitting one dashboard-summary query for
+authorization reasons:
+- Replaced the flat 12-link nav (`src/app/dashboard/layout.tsx`) with a real grouped sidebar: HOME, INBOX standalone; CUSTOMERS (Contacts/Leads/Orders/Appointments), AI EMPLOYEE (Settings/Knowledge Base/Test AI), GROWTH (Automations/Analytics) as headed groups. Falls back to a horizontal scroll strip below `md` breakpoint.
+- Added a "Workspace settings" account-menu dropdown (new `src/components/ui/dropdown-menu.tsx`, hand-built on the existing `radix-ui` package since no shadcn dropdown existed yet) holding Workspace Profile, Team, Billing, Audit Log, and Logout — moved out of the main sidebar per spec.
+- Split `/dashboard/settings` (which mixed AI-agent settings with workspace/business info) into `/dashboard/ai-employee` (agent-only) and a new `/dashboard/workspace-profile` (business info) — resolves the AI EMPLOYEE vs WORKSPACE SETTINGS naming collision the spec implies.
+- Added `/dashboard/audit-log` — a minimal read-only page surfacing the `workspace_audit_logs` table built in Phase 1 (previously had no UI).
+- Restructured Home (`src/app/dashboard/page.tsx`) into the mandated 3 bands: Today (conversations/leads/orders/appointments/revenue counters, new `dashboardService.getTodayAndAttentionBands`), Needs Your Attention (handover-pending conversations + cold leads inactive 7+ days, both linkable), How Your Business Is Growing (Business Health Score + 30-day KPIs, reusing `analyticsService.getSummary` — deliberately gated behind its own `analytics.view` permission check, independent of the base workspace check, so growth data isn't "inherited" access per the spec's aggregation-endpoint requirement). Removed the `aiRequestsToday` tile that was leaking an AI-usage internal onto the tenant-facing Home page. Dropped the old flat "recent activity" feed as a deliberate simplification (not spec-required, redundant with per-module pages).
+- Added Skip links to the description and knowledge-base onboarding steps (the channels step already had an equivalent "Finish setup" escape hatch via disabled Meta OAuth buttons, so it didn't need a separate Skip).
+- **Caught and fixed a real bug via actual browser testing** (crafted a session cookie directly rather than going through OTP, per this project's own established local-testing pattern — see DEFERRED_TASKS.md's workflow-canvas item): the mobile layout nested the flat nav and `<main>` as siblings in a row-flex container instead of a column wrapper, squeezing content into a narrow strip at 375px width. Fixed by wrapping nav+main in their own `flex-col` div, separate from the `<aside>`. Typecheck/lint/build all passed on the broken version — this was only visible by actually rendering the page.
+- Verified end-to-end in a real headless-Chromium session: grouped sidebar renders correctly, all 3 Home bands render, account dropdown shows exactly the 5 expected items, all touched routes load without console errors, and the mobile viewport now stacks correctly.
+
+Next: Phase 4 (AI Engine depth) — proceeding per the approved plan.

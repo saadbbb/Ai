@@ -157,7 +157,7 @@ export function KnowledgeBaseForm({ existing }: KnowledgeBaseFormProps) {
           <Textarea placeholder={t("paymentsPlaceholder")} {...register("paymentsPolicy")} />
         </section>
 
-        <StepFooter backHref="/onboarding/handover" isSubmitting={isSubmitting} />
+        <StepFooter backHref="/onboarding/handover" isSubmitting={isSubmitting} skipHref="/onboarding/channels" />
       </form>
     </StepShell>
   );

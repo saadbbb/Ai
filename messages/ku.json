@@ -11,6 +11,7 @@
     "edit": "دەستکاریکردن",
     "delete": "سڕینەوە",
     "cancel": "پاشگەزبوونەوە",
+    "skip": "پەڕاندن",
     "confirmDelete": "دڵنیایت لە سڕینەوەی ئەمە؟",
     "exportCsv": "هەناردەکردنی CSV",
     "search": "گەڕان",
@@ -230,37 +231,51 @@
   "dashboard": {
     "welcomeBack": "بەخێربێیتەوە",
     "signedInAs": "چوویتەژوورەوە وەک {email}.",
-    "homeLink": "داشبۆرد",
+    "homeLink": "سەرەکی",
     "inboxLink": "سندوقی گفتوگۆکان",
+    "customersSection": "کڕیارەکان",
     "contactsLink": "پەیوەندییەکان",
     "leadsLink": "کڕیارە ئەگەرییەکان",
     "ordersLink": "داواکارییەکان",
     "appointmentsLink": "کاتە دیاریکراوەکان",
-    "automationsLink": "خۆکارکردن",
-    "analyticsLink": "شیکاری",
-    "billingLink": "پارەدان",
-    "platformAdminLink": "پانێڵی بەڕێوەبردن",
-    "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
+    "aiEmployeeSection": "کارمەندە زیرەکە",
     "settingsLink": "ڕێکخستنەکان",
     "knowledgeBaseLink": "بنکەی زانیاری",
+    "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
+    "growthSection": "گەشەکردن",
+    "automationsLink": "خۆکارکردن",
+    "analyticsLink": "شیکاری",
+    "accountMenuLabel": "ڕێکخستنەکانی مکان‌ی کار",
+    "workspaceProfileLink": "پرۆفایلی مکانی کار",
+    "billingLink": "پارەدان",
     "teamLink": "تیم",
-    "stats": {
-      "conversationsToday": "گفتوگۆکانی ئەمڕۆ",
-      "newLeadsToday": "کڕیارە ئەگەرییە نوێیەکانی ئەمڕۆ",
-      "activePipeline": "کڕیارە ئەگەرییە چالاکەکان",
-      "activeOrders": "داواکارییە چالاکەکان",
-      "revenue": "داهات (گەیشتووەکان)",
-      "aiActive": "کارمەندە زیرەکە ئێستا وەڵام دەداتەوە",
-      "needsHuman": "پێویستی بە کەسێکی مرۆڤە",
-      "aiRequestsToday": "داواکاری کارمەندە زیرەکە ئەمڕۆ",
-      "totalContacts": "کۆی گشتی پەیوەندییەکان"
+    "auditLogLink": "تۆماری پشکنین",
+    "platformAdminLink": "پانێڵی بەڕێوەبردن",
+    "bands": {
+      "today": {
+        "heading": "ئەمڕۆ",
+        "conversations": "گفتوگۆی نوێ",
+        "newLeads": "کڕیارە ئەگەرییە نوێیەکان",
+        "orders": "داواکارییەکان",
+        "appointments": "کاتە دیاریکراوەکان",
+        "revenue": "داهات"
+      },
+      "attention": {
+        "heading": "پێویستی بە سەرنجت هەیە",
+        "empty": "هیچ شتێک ئێستا پێویستی بە سەرنجت نییە.",
+        "handover": "چاوەڕوانی وەڵامی مرۆڤە — {name}",
+        "coldLead": "زیاتر لە هەفتەیەکە پەیوەندی نەکراوە — {name}"
+      },
+      "growing": {
+        "heading": "کارەکەت چۆن گەشە دەکات",
+        "subheading": "٣٠ ڕۆژی ڕابردوو",
+        "revenue": "داهات",
+        "ordersCompleted": "داواکارییە تەواوبووەکان",
+        "appointmentsCompleted": "کاتە تەواوبووەکان",
+        "pipelineHeading": "هێڵی فرۆشتن",
+        "pipelineEmpty": "هێشتا هیچ کڕیارێکی ئەگەری لە هێڵەکەدا نییە."
+      }
     },
-    "pipelineHeading": "دابەشکردنی هێڵی فرۆشتن",
-    "recentActivityHeading": "چالاکی نوێ",
-    "noActivity": "هێشتا هیچ شتێک نییە.",
-    "activityNewConversation": "گفتوگۆی نوێ — {name}",
-    "activityNewLead": "کڕیاری ئەگەری نوێ — {name}",
-    "activityNewOrder": "داواکاری نوێ — {name}",
     "suspended": {
       "title": "هەژمارەکەت وەستێنراوە",
       "description": "پەیوەندیمان پێوە بکە بۆ چارەسەرکردنی ئەمە و گەڕانەوە بۆ کار.",
@@ -751,8 +766,8 @@
     "humanHandoverBadge": "ئەم دۆخە دەگوازرێتەوە بۆ کەسێکی مرۆڤ."
   },
   "settings": {
-    "pageTitle": "ڕێکخستنەکان",
-    "pageDescription": "کارمەندە زیرەکەکەت و زانیاری بزنسەکەت بەڕێوە ببە.",
+    "pageTitle": "کارمەندە زیرەکە",
+    "pageDescription": "بەڕێوەبردنی چۆنیەتی هەڵسوکەوت و وەڵامدانەوەی کارمەندە زیرەکەکەت بۆ کڕیاران.",
     "businessInfoTitle": "زانیاری بزنس",
     "businessInfoDescription": "زانیاری بزنسەکەت و زمانی داشبۆرد.",
     "agentProfileTitle": "کارمەندە زیرەکە",
@@ -763,6 +778,15 @@
     "workingHoursDescription": "کارمەندە زیرەکەکەت ئاگادار بکەوە کە تیمەکەت کەی بەردەستە.",
     "handoverTitle": "گواستنەوە بۆ کەسی مرۆڤ",
     "handoverDescription": "کۆنترۆڵی ئەوە بکە کە کارمەندە زیرەکەکەت کەی گفتوگۆکە دەگوازێتەوە بۆ تیمەکەت."
+  },
+  "workspaceProfile": {
+    "pageTitle": "پرۆفایلی مکانی کار",
+    "pageDescription": "زانیاری بزنسەکەت و زمانی داشبۆرد."
+  },
+  "auditLog": {
+    "pageTitle": "تۆماری پشکنین",
+    "pageDescription": "هەموو کردارێکی بەڕێوەبردنی تیم لەم مکانی کارەدا — بانگهێشتەکان، گۆڕینی ڕۆڵ، لابردنی ئەندام.",
+    "emptyState": "هێشتا هیچ ڕووداوێک تۆمار نەکراوە."
   },
   "knowledgeBasePage": {
     "pageTitle": "بنکەی زانیاری",

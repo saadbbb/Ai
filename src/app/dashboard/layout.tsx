@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { NotificationBell } from "@/features/notifications/components/notification-bell";
 import { notificationService } from "@/features/notifications/services/notification.service";
@@ -13,6 +15,17 @@ import { WorkspaceSwitcher } from "@/features/workspace/components/workspace-swi
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { permissionService } from "@/features/workspace/services/permission.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+
+interface NavLink {
+  href: string;
+  label: string;
+  feature?: FeatureKey;
+}
+
+interface NavGroup {
+  heading?: string;
+  links: NavLink[];
+}
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
@@ -37,22 +50,43 @@ export default async function DashboardLayout({ children }: { children: React.Re
     isSuspended ? platformSettingsRepository.get() : Promise.resolve(null),
     isSuspended ? Promise.resolve([]) : featureAccessService.getEnabledFeatures(workspace),
   ]);
-  const allNavLinks: { href: string; label: string; feature?: FeatureKey }[] = [
-    { href: "/dashboard", label: t("homeLink") },
-    { href: "/dashboard/inbox", label: t("inboxLink"), feature: "inbox" },
-    { href: "/dashboard/contacts", label: t("contactsLink"), feature: "contacts" },
-    { href: "/dashboard/leads", label: t("leadsLink"), feature: "leads" },
-    { href: "/dashboard/orders", label: t("ordersLink"), feature: "orders" },
-    { href: "/dashboard/appointments", label: t("appointmentsLink"), feature: "appointments" },
-    ...(canViewAutomations ? [{ href: "/dashboard/automations", label: t("automationsLink"), feature: "automations" as const }] : []),
-    { href: "/dashboard/billing", label: t("billingLink") },
-    { href: "/dashboard/test-ai", label: t("testAiLink") },
-    { href: "/dashboard/settings", label: t("settingsLink") },
-    { href: "/dashboard/knowledge-base", label: t("knowledgeBaseLink"), feature: "knowledge_base" },
-    ...(canViewAnalytics ? [{ href: "/dashboard/analytics", label: t("analyticsLink"), feature: "analytics" as const }] : []),
-    ...(canViewTeam ? [{ href: "/dashboard/team", label: t("teamLink") }] : []),
+
+  // PART 13B's 5-section IA: HOME and INBOX stand alone; CUSTOMERS, AI EMPLOYEE, and GROWTH
+  // are groups. Team/Billing/Workspace Profile/Audit Log move to the account menu below,
+  // not the main sidebar — that's WORKSPACE SETTINGS, reached less often than daily work.
+  const rawGroups: NavGroup[] = [
+    { links: [{ href: "/dashboard", label: t("homeLink") }] },
+    { links: [{ href: "/dashboard/inbox", label: t("inboxLink"), feature: "inbox" }] },
+    {
+      heading: t("customersSection"),
+      links: [
+        { href: "/dashboard/contacts", label: t("contactsLink"), feature: "contacts" },
+        { href: "/dashboard/leads", label: t("leadsLink"), feature: "leads" },
+        { href: "/dashboard/orders", label: t("ordersLink"), feature: "orders" },
+        { href: "/dashboard/appointments", label: t("appointmentsLink"), feature: "appointments" },
+      ],
+    },
+    {
+      heading: t("aiEmployeeSection"),
+      links: [
+        { href: "/dashboard/ai-employee", label: t("settingsLink") },
+        { href: "/dashboard/knowledge-base", label: t("knowledgeBaseLink"), feature: "knowledge_base" },
+        { href: "/dashboard/test-ai", label: t("testAiLink") },
+      ],
+    },
+    {
+      heading: t("growthSection"),
+      links: [
+        ...(canViewAutomations ? [{ href: "/dashboard/automations", label: t("automationsLink"), feature: "automations" as const }] : []),
+        ...(canViewAnalytics ? [{ href: "/dashboard/analytics", label: t("analyticsLink"), feature: "analytics" as const }] : []),
+      ],
+    },
   ];
-  const navLinks = allNavLinks.filter((link) => !link.feature || enabledFeatures.includes(link.feature));
+
+  const groups = rawGroups
+    .map((group) => ({ ...group, links: group.links.filter((link) => !link.feature || enabledFeatures.includes(link.feature)) }))
+    .filter((group) => group.links.length > 0);
+  const flatLinks = groups.flatMap((group) => group.links);
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -74,7 +108,35 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </Link>
           )}
           <LocaleSwitcher />
-          <LogoutButton />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="outline" size="sm">
+                {t("accountMenuLabel")}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/workspace-profile">{t("workspaceProfileLink")}</Link>
+              </DropdownMenuItem>
+              {canViewTeam && (
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/team">{t("teamLink")}</Link>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/billing">{t("billingLink")}</Link>
+              </DropdownMenuItem>
+              {canViewTeam && (
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/audit-log">{t("auditLogLink")}</Link>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
+              <div className="px-1 py-1">
+                <LogoutButton />
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
       {isSuspended ? (
@@ -95,16 +157,38 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </main>
       ) : (
-        <>
-          <nav className="flex items-center gap-4 overflow-x-auto border-b px-6 py-2 text-sm">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="shrink-0 text-muted-foreground hover:text-foreground">
-                {link.label}
-              </Link>
+        <div className="flex flex-1">
+          <aside className="hidden w-56 shrink-0 space-y-6 overflow-y-auto border-e px-4 py-6 md:block">
+            {groups.map((group) => (
+              <div key={group.heading ?? group.links[0]?.href} className="space-y-1">
+                {group.heading && (
+                  <p className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">{group.heading}</p>
+                )}
+                {group.links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="block rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
             ))}
-          </nav>
-          <main className="flex-1 p-6">{children}</main>
-        </>
+          </aside>
+
+          <div className="flex min-w-0 flex-1 flex-col">
+            <nav className="flex items-center gap-4 overflow-x-auto border-b px-6 py-2 text-sm md:hidden">
+              {flatLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="shrink-0 text-muted-foreground hover:text-foreground">
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            <main className="flex-1 p-6">{children}</main>
+          </div>
+        </div>
       )}
     </div>
   );

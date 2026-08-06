@@ -49,7 +49,7 @@ export function BusinessDescriptionForm({ defaultValues }: { defaultValues: Part
         <Field label={t("label")} htmlFor="businessDescription" error={errors.businessDescription}>
           <Textarea id="businessDescription" rows={8} {...register("businessDescription")} />
         </Field>
-        <StepFooter backHref="/onboarding/agent-name" isSubmitting={isSubmitting} />
+        <StepFooter backHref="/onboarding/agent-name" isSubmitting={isSubmitting} skipHref="/onboarding/language" />
       </form>
     </StepShell>
   );

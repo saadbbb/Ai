@@ -11,6 +11,7 @@
     "edit": "تعديل",
     "delete": "حذف",
     "cancel": "إلغاء",
+    "skip": "تخطي",
     "confirmDelete": "هل أنت متأكد من حذف هذا؟",
     "exportCsv": "تصدير CSV",
     "search": "بحث",
@@ -232,35 +233,49 @@
     "signedInAs": "مسجّل الدخول باسم {email}.",
     "homeLink": "الرئيسية",
     "inboxLink": "صندوق المحادثات",
+    "customersSection": "العملاء",
     "contactsLink": "جهات الاتصال",
     "leadsLink": "العملاء المحتملون",
     "ordersLink": "الطلبات",
     "appointmentsLink": "المواعيد",
-    "automationsLink": "الأتمتة",
-    "analyticsLink": "التحليلات",
-    "billingLink": "الفوترة",
-    "platformAdminLink": "لوحة الإدارة",
-    "testAiLink": "جرّب موظفك الذكي",
+    "aiEmployeeSection": "الموظف الذكي",
     "settingsLink": "الإعدادات",
     "knowledgeBaseLink": "قاعدة المعرفة",
+    "testAiLink": "جرّب موظفك الذكي",
+    "growthSection": "النمو",
+    "automationsLink": "الأتمتة",
+    "analyticsLink": "التحليلات",
+    "accountMenuLabel": "إعدادات مساحة العمل",
+    "workspaceProfileLink": "ملف مساحة العمل",
+    "billingLink": "الفوترة",
     "teamLink": "الفريق",
-    "stats": {
-      "conversationsToday": "محادثات اليوم",
-      "newLeadsToday": "عملاء محتملون جدد اليوم",
-      "activePipeline": "عملاء محتملون نشطون",
-      "activeOrders": "طلبات نشطة",
-      "revenue": "الإيرادات (المُسلَّمة)",
-      "aiActive": "الذكاء الاصطناعي يرد الآن",
-      "needsHuman": "بحاجة إلى موظف بشري",
-      "aiRequestsToday": "طلبات الذكاء الاصطناعي اليوم",
-      "totalContacts": "إجمالي جهات الاتصال"
+    "auditLogLink": "سجل التدقيق",
+    "platformAdminLink": "لوحة الإدارة",
+    "bands": {
+      "today": {
+        "heading": "اليوم",
+        "conversations": "محادثات جديدة",
+        "newLeads": "عملاء محتملون جدد",
+        "orders": "الطلبات",
+        "appointments": "المواعيد",
+        "revenue": "الإيرادات"
+      },
+      "attention": {
+        "heading": "بحاجة إلى انتباهك",
+        "empty": "لا شيء يحتاج انتباهك الآن.",
+        "handover": "بانتظار رد بشري — {name}",
+        "coldLead": "لا تواصل منذ أكثر من أسبوع — {name}"
+      },
+      "growing": {
+        "heading": "كيف ينمو عملك",
+        "subheading": "آخر 30 يوماً",
+        "revenue": "الإيرادات",
+        "ordersCompleted": "طلبات مكتملة",
+        "appointmentsCompleted": "مواعيد مكتملة",
+        "pipelineHeading": "مسار المبيعات",
+        "pipelineEmpty": "لا يوجد عملاء محتملون في المسار بعد."
+      }
     },
-    "pipelineHeading": "توزيع مسار المبيعات",
-    "recentActivityHeading": "النشاط الأخير",
-    "noActivity": "لا يوجد شيء بعد.",
-    "activityNewConversation": "محادثة جديدة — {name}",
-    "activityNewLead": "عميل محتمل جديد — {name}",
-    "activityNewOrder": "طلب جديد — {name}",
     "suspended": {
       "title": "حسابك موقوف",
       "description": "تواصل معنا لحل الموضوع والرجوع للعمل.",
@@ -751,8 +766,8 @@
     "humanHandoverBadge": "هذه الحالة ستُحوَّل إلى موظف بشري."
   },
   "settings": {
-    "pageTitle": "الإعدادات",
-    "pageDescription": "أدر موظفك الذكي وتفاصيل نشاطك التجاري.",
+    "pageTitle": "الموظف الذكي",
+    "pageDescription": "أدر كيف يتصرف موظفك الذكي ويرد على العملاء.",
     "businessInfoTitle": "معلومات النشاط التجاري",
     "businessInfoDescription": "تفاصيل نشاطك التجاري ولغة لوحة التحكم.",
     "agentProfileTitle": "الموظف الذكي",
@@ -763,6 +778,15 @@
     "workingHoursDescription": "أخبر موظفك الذكي بأوقات توفر فريقك.",
     "handoverTitle": "التحويل إلى موظف بشري",
     "handoverDescription": "تحكّم بمتى يحوّل موظفك الذكي المحادثة إلى فريقك."
+  },
+  "workspaceProfile": {
+    "pageTitle": "ملف مساحة العمل",
+    "pageDescription": "تفاصيل نشاطك التجاري ولغة لوحة التحكم."
+  },
+  "auditLog": {
+    "pageTitle": "سجل التدقيق",
+    "pageDescription": "كل إجراء إداري متعلق بالفريق تم تنفيذه في مساحة العمل هذه — دعوات، تغييرات أدوار، إزالة أعضاء.",
+    "emptyState": "لا توجد أحداث مسجلة بعد."
   },
   "knowledgeBasePage": {
     "pageTitle": "قاعدة المعرفة",

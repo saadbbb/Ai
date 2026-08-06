@@ -1,6 +1,7 @@
 import "server-only";
 import { leadStageEnum, type LeadStage } from "@/db/schema";
 import { aiUsageRepository } from "@/features/ai/repository/ai-usage.repository";
+import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
@@ -10,6 +11,9 @@ import { orderRepository } from "@/features/orders/repository/order.repository";
 const CLOSED_LEAD_STAGES: LeadStage[] = ["won", "lost", "cancelled"];
 const REVENUE_ORDER_STATUSES = ["delivered", "completed"];
 const ACTIVE_ORDER_STATUSES = ["draft", "pending", "confirmed", "preparing", "ready"];
+/** A lead's contact hasn't been touched in this many days — see PART 5's Follow-up Engine example. */
+const COLD_LEAD_THRESHOLD_DAYS = 7;
+const ATTENTION_ITEM_LIMIT = 5;
 
 export type ActivityItem =
   | { type: "conversation"; id: string; label: string; timestamp: Date; href: string }
@@ -109,6 +113,93 @@ async function getSummary(workspaceId: string): Promise<DashboardSummary> {
   };
 }
 
+/** PART 13B Band 1 — "what happened today," glanceable counters only. */
+export interface TodayBand {
+  conversationsToday: number;
+  newLeadsToday: number;
+  ordersToday: number;
+  appointmentsToday: number;
+  revenueToday: number;
+}
+
+/** PART 13B Band 2 — "what needs my attention," AI/rule-curated, capped and linkable. */
+export type AttentionItemType = "handover" | "cold_lead";
+
+export interface AttentionItem {
+  type: AttentionItemType;
+  id: string;
+  label: string;
+  href: string;
+}
+
+export interface AttentionBand {
+  items: AttentionItem[];
+}
+
+function daysSince(date: Date | null): number {
+  if (!date) return Infinity;
+  return (Date.now() - date.getTime()) / (1000 * 60 * 60 * 24);
+}
+
+/**
+ * Bands 1 and 2 share the same authorization requirement (base workspace
+ * membership, already verified by the caller) and mostly the same source
+ * rows, so they're fetched together — unlike the Growth band (see the
+ * analytics page/service), which needs its own extra `analytics.view`
+ * permission check and is deliberately kept as a separate call so that
+ * check isn't inherited from this one.
+ */
+async function getTodayAndAttentionBands(
+  workspaceId: string,
+): Promise<{ today: TodayBand; attention: AttentionBand; pipelineByStage: { stage: LeadStage; count: number }[] }> {
+  const [conversations, leads, orders, appointments] = await Promise.all([
+    conversationRepository.findByWorkspaceId(workspaceId),
+    leadRepository.findByWorkspaceId(workspaceId),
+    orderRepository.findByWorkspaceId(workspaceId),
+    appointmentRepository.findByWorkspaceId(workspaceId),
+  ]);
+
+  const today: TodayBand = {
+    conversationsToday: conversations.filter((item) => isToday(item.conversation.createdAt)).length,
+    newLeadsToday: leads.filter((item) => isToday(item.lead.createdAt)).length,
+    ordersToday: orders.filter((item) => isToday(item.order.createdAt)).length,
+    appointmentsToday: appointments.filter((item) => isToday(item.appointment.scheduledAt)).length,
+    revenueToday: orders
+      .filter((item) => REVENUE_ORDER_STATUSES.includes(item.order.status) && isToday(item.order.createdAt))
+      .reduce((sum, item) => sum + orderTotal(item.items), 0),
+  };
+
+  const handoverItems: AttentionItem[] = conversations
+    .filter((item) => item.conversation.aiStatus === "handed_over")
+    .slice(0, ATTENTION_ITEM_LIMIT)
+    .map((item) => ({
+      type: "handover",
+      id: item.conversation.id,
+      label: item.contact.fullName,
+      href: `/dashboard/inbox/${item.conversation.id}`,
+    }));
+
+  const coldLeadItems: AttentionItem[] = leads
+    .filter(
+      (item) => !CLOSED_LEAD_STAGES.includes(item.lead.stage) && daysSince(item.contact.lastContactAt) >= COLD_LEAD_THRESHOLD_DAYS,
+    )
+    .slice(0, ATTENTION_ITEM_LIMIT)
+    .map((item) => ({
+      type: "cold_lead",
+      id: item.lead.id,
+      label: item.contact.fullName,
+      href: `/dashboard/contacts/${item.contact.id}`,
+    }));
+
+  const pipelineByStage = leadStageEnum.enumValues.map((stage) => ({
+    stage,
+    count: leads.filter((item) => item.lead.stage === stage).length,
+  }));
+
+  return { today, attention: { items: [...handoverItems, ...coldLeadItems] }, pipelineByStage };
+}
+
 export const dashboardService = {
   getSummary,
+  getTodayAndAttentionBands,
 };
