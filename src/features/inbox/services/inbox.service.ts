@@ -61,6 +61,7 @@ async function triggerAiReply(workspaceId: string, conversationId: string, conta
       content: result.text,
     });
     await conversationRepository.touchLastMessage(conversationId, workspaceId, previewOf(result.text));
+    await automationService.dispatch(workspaceId, { type: "message_replied", contactId });
 
     if (result.needsHumanHandover) {
       await conversationRepository.updateAiStatus(conversationId, workspaceId, "handed_over");
@@ -90,6 +91,7 @@ async function triggerAiReply(workspaceId: string, conversationId: string, conta
       content: "The AI employee couldn't generate a reply. This conversation needs a human.",
     });
     await conversationRepository.updateAiStatus(conversationId, workspaceId, "handed_over");
+    await automationService.dispatch(workspaceId, { type: "ai_failed", contactId });
     await automationService.dispatch(workspaceId, { type: "conversation_handed_over", contactId });
     await activityRepository.log({
       workspaceId,
@@ -155,6 +157,7 @@ async function startConversation(workspaceId: string, input: StartConversationIn
     content: input.initialMessage,
   });
   await conversationRepository.touchLastMessage(conversation.id, workspaceId, previewOf(input.initialMessage));
+  await automationService.dispatch(workspaceId, { type: "message_received", contactId: contact.id });
 
   await triggerAiReply(workspaceId, conversation.id, contact.id);
 
@@ -177,6 +180,7 @@ async function logCustomerMessage(workspaceId: string, conversationId: string, c
   });
   await conversationRepository.touchLastMessage(conversationId, workspaceId, previewOf(content));
   await contactRepository.touchLastContact(item.contact.id, workspaceId);
+  await automationService.dispatch(workspaceId, { type: "message_received", contactId: item.contact.id });
 
   if (item.conversation.aiStatus === "active") {
     const replyMessage = await triggerAiReply(workspaceId, conversationId, item.contact.id);
@@ -208,6 +212,7 @@ async function sendAgentReply(
   });
   await conversationRepository.touchLastMessage(conversationId, workspaceId, previewOf(content));
   await conversationRepository.assignIfUnassigned(conversationId, workspaceId, userId);
+  await automationService.dispatch(workspaceId, { type: "message_replied", contactId: item.contact.id });
 
   if (item.conversation.aiStatus === "active") {
     await conversationRepository.updateAiStatus(conversationId, workspaceId, "paused");

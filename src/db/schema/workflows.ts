@@ -11,6 +11,9 @@ export const workflowTriggerEnum = pgEnum("workflow_trigger", [
   "appointment_created",
   "appointment_status_changed",
   "tag_added",
+  "message_received",
+  "message_replied",
+  "ai_failed",
 ]);
 
 export const workflowActionEnum = pgEnum("workflow_action", [
@@ -20,6 +23,8 @@ export const workflowActionEnum = pgEnum("workflow_action", [
   "create_task",
   "create_note",
   "update_contact_language",
+  "create_lead",
+  "close_conversation",
 ]);
 
 export const workflowStatusEnum = pgEnum("workflow_status", ["active", "paused"]);

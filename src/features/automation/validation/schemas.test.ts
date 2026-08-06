@@ -87,8 +87,20 @@ describe("createWorkflowSchema", () => {
     }
   });
 
-  it("requires no extra config for the tag_added trigger", () => {
-    const result = createWorkflowSchema.safeParse({ ...BASE, triggerType: "tag_added" });
+  it.each(["tag_added", "message_received", "message_replied", "ai_failed"] as const)(
+    "requires no extra config for the %s trigger",
+    (triggerType) => {
+      const result = createWorkflowSchema.safeParse({ ...BASE, triggerType });
+      expect(result.success).toBe(true);
+    },
+  );
+
+  it.each(["create_lead", "close_conversation"] as const)("requires no extra config for the %s action", (actionType) => {
+    const result = createWorkflowSchema.safeParse({
+      name: "Test",
+      triggerType: "lead_created",
+      actionType,
+    });
     expect(result.success).toBe(true);
   });
 

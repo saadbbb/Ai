@@ -28,6 +28,9 @@ export function describeTrigger(workflow: Workflow, t: DescribeWorkflowTranslato
   if (workflow.triggerType === "lead_created") return t.automations("triggerLeadCreated");
   if (workflow.triggerType === "appointment_created") return t.automations("triggerAppointmentCreated");
   if (workflow.triggerType === "tag_added") return t.automations("triggerTagAdded");
+  if (workflow.triggerType === "message_received") return t.automations("triggerMessageReceived");
+  if (workflow.triggerType === "message_replied") return t.automations("triggerMessageReplied");
+  if (workflow.triggerType === "ai_failed") return t.automations("triggerAiFailed");
   return t.automations("triggerHandedOver");
 }
 
@@ -46,6 +49,12 @@ export function describeAction(workflow: Workflow, t: Pick<DescribeWorkflowTrans
   }
   if (workflow.actionType === "update_contact_language") {
     return t.automations("actionUpdateContactLanguage", { language: workflow.actionConfig.contactLanguage ?? "" });
+  }
+  if (workflow.actionType === "create_lead") {
+    return t.automations("actionCreateLead");
+  }
+  if (workflow.actionType === "close_conversation") {
+    return t.automations("actionCloseConversation");
   }
   return t.automations("actionNotifyOwner");
 }

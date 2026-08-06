@@ -20,6 +20,7 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "contact_untagged",
   "contact_updated",
   "conversation_handed_over",
+  "conversation_closed",
   "note_added",
   "task_created",
   "task_completed",

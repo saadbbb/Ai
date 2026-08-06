@@ -11,9 +11,11 @@ import type {
   WorkflowTriggerConfig,
 } from "@/db/schema";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
+import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { noteRepository } from "@/features/crm/repository/note.repository";
 import { taskRepository } from "@/features/crm/repository/task.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
+import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { notificationRepository } from "@/features/notifications/repository/notification.repository";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { userRepository } from "@/features/auth/repository/user.repository";
@@ -31,7 +33,13 @@ export type AutomationEvent =
   | { type: "lead_created"; contactId: string }
   | { type: "appointment_created"; contactId: string }
   | { type: "appointment_status_changed"; contactId: string; status: AppointmentStatus }
-  | { type: "tag_added"; contactId: string; tag: string };
+  | { type: "tag_added"; contactId: string; tag: string }
+  | { type: "message_received"; contactId: string }
+  | { type: "message_replied"; contactId: string }
+  | { type: "ai_failed"; contactId: string };
+
+/** Lead stages that mean "this lead is no longer actionable" — see the create_lead action's dedup check. */
+const TERMINAL_LEAD_STAGES: readonly LeadStage[] = ["won", "lost", "cancelled"];
 
 /** An action is retried this many times total before the run is logged as a failure. */
 const MAX_ACTION_ATTEMPTS = 2;
@@ -55,7 +63,10 @@ function matchesTrigger(workflow: Workflow, event: AutomationEvent): boolean {
     workflow.triggerType === "order_created" ||
     workflow.triggerType === "lead_created" ||
     workflow.triggerType === "appointment_created" ||
-    workflow.triggerType === "tag_added"
+    workflow.triggerType === "tag_added" ||
+    workflow.triggerType === "message_received" ||
+    workflow.triggerType === "message_replied" ||
+    workflow.triggerType === "ai_failed"
   ) {
     return workflow.triggerType === event.type;
   }
@@ -219,6 +230,46 @@ async function runAction(
       summary: `Language set to "${language}" by automation "${workflow.name}".`,
     });
     return contact ? `Set ${contact.fullName}'s language to "${language}"` : `Set language to "${language}"`;
+  }
+
+  if (workflow.actionType === "create_lead") {
+    const existingLeads = await leadRepository.findByContactId(event.contactId, workspaceId);
+    const hasOpenLead = existingLeads.some((lead) => !TERMINAL_LEAD_STAGES.includes(lead.stage));
+    if (hasOpenLead) {
+      return contact ? `${contact.fullName} already has an open lead — skipped` : "Contact already has an open lead — skipped";
+    }
+
+    await leadRepository.create({ workspaceId, contactId: event.contactId, conversationId: null });
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "lead_created",
+      actor: { type: "automation" },
+      summary: `Lead created by automation "${workflow.name}".`,
+    });
+    await dispatch(workspaceId, { type: "lead_created", contactId: event.contactId });
+
+    return contact ? `Created a lead for ${contact.fullName}` : "Created a lead";
+  }
+
+  if (workflow.actionType === "close_conversation") {
+    const conversations = await conversationRepository.findByContactId(event.contactId, workspaceId);
+    const openConversation = conversations.find((item) => item.conversation.status === "open");
+    if (!openConversation) {
+      throw new AppError("NOT_FOUND", "This contact has no open conversation to close.");
+    }
+
+    await conversationRepository.updateStatus(openConversation.conversation.id, workspaceId, "closed");
+    await activityRepository.log({
+      workspaceId,
+      contactId: event.contactId,
+      type: "conversation_closed",
+      actor: { type: "automation" },
+      summary: `Conversation closed by automation "${workflow.name}".`,
+      link: `/dashboard/inbox/${openConversation.conversation.id}`,
+    });
+
+    return contact ? `Closed the conversation with ${contact.fullName}` : "Closed the conversation";
   }
 
   return null;

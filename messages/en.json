@@ -632,12 +632,17 @@
     "triggerLeadCreated": "When a new lead is created",
     "triggerAppointmentCreated": "When a new appointment is booked",
     "triggerTagAdded": "When a tag is added to a contact",
+    "triggerMessageReceived": "When a customer sends a message",
+    "triggerMessageReplied": "When a message is replied to",
+    "triggerAiFailed": "When the AI employee fails to reply",
     "actionAddTag": "Tag the contact \"{tag}\"",
     "actionRemoveTag": "Remove the tag \"{tag}\" from the contact",
     "actionNotifyOwner": "Notify me",
     "actionCreateTask": "Create a task: \"{title}\"",
     "actionCreateNote": "Add a note to the contact",
     "actionUpdateContactLanguage": "Set the contact's language to {language}",
+    "actionCreateLead": "Create a lead for the contact",
+    "actionCloseConversation": "Close the conversation",
     "delaySummary": "after {days} days",
     "new": {
       "title": "New automation",
@@ -660,7 +665,10 @@
         "lead_created": "A new lead is created",
         "appointment_created": "A new appointment is booked",
         "appointment_status_changed": "An appointment's status changes",
-        "tag_added": "A tag is added to a contact"
+        "tag_added": "A tag is added to a contact",
+        "message_received": "A customer sends a message",
+        "message_replied": "A message is replied to",
+        "ai_failed": "The AI employee fails to reply"
       },
       "stagePlaceholder": "Select a stage",
       "statusPlaceholder": "Select a status",
@@ -671,7 +679,9 @@
         "notify_owner_email": "Notify me",
         "create_task": "Create a task",
         "create_note": "Add a note",
-        "update_contact_language": "Set the customer's language"
+        "update_contact_language": "Set the customer's language",
+        "create_lead": "Create a lead",
+        "close_conversation": "Close the conversation"
       },
       "tagPlaceholder": "Tag, e.g. customer",
       "subjectPlaceholder": "Subject (optional)",

@@ -632,12 +632,17 @@
     "triggerLeadCreated": "کاتێک کڕیارێکی ئەگەری نوێ دروست دەبێت",
     "triggerAppointmentCreated": "کاتێک چاوپێکەوتنێکی نوێ حیجز دەکرێت",
     "triggerTagAdded": "کاتێک نیشانەیەک زیاد دەکرێت بۆ پەیوەندییەک",
+    "triggerMessageReceived": "کاتێک کڕیار نامەیەک دەنێرێت",
+    "triggerMessageReplied": "کاتێک وەڵامی نامەیەک دەدرێتەوە",
+    "triggerAiFailed": "کاتێک کارمەندە زیرەکە سەرکەوتوو نابێت لە وەڵامدانەوە",
     "actionAddTag": "نیشانکردنی پەیوەندییەکە بە \"{tag}\"",
     "actionRemoveTag": "لابردنی نیشانەی \"{tag}\" لە پەیوەندییەکە",
     "actionNotifyOwner": "ئاگادارم بکەرەوە",
     "actionCreateTask": "دروستکردنی ئەرک: \"{title}\"",
     "actionCreateNote": "زیادکردنی تێبینی بۆ پەیوەندییەکە",
     "actionUpdateContactLanguage": "دانانی زمانی پەیوەندییەکە بۆ {language}",
+    "actionCreateLead": "دروستکردنی کڕیارێکی ئەگەری بۆ پەیوەندییەکە",
+    "actionCloseConversation": "داخستنی گفتوگۆکە",
     "delaySummary": "دوای {days} ڕۆژ",
     "new": {
       "title": "خۆکارکردنی نوێ",
@@ -660,7 +665,10 @@
         "lead_created": "کڕیارێکی ئەگەری نوێ دروست دەبێت",
         "appointment_created": "چاوپێکەوتنێکی نوێ حیجز دەکرێت",
         "appointment_status_changed": "دۆخی چاوپێکەوتنێک دەگۆڕدرێت",
-        "tag_added": "نیشانەیەک زیاد دەکرێت بۆ پەیوەندییەک"
+        "tag_added": "نیشانەیەک زیاد دەکرێت بۆ پەیوەندییەک",
+        "message_received": "کڕیار نامەیەک دەنێرێت",
+        "message_replied": "وەڵامی نامەیەک دەدرێتەوە",
+        "ai_failed": "کارمەندە زیرەکە سەرکەوتوو نابێت لە وەڵامدانەوە"
       },
       "stagePlaceholder": "قۆناغێک هەڵبژێرە",
       "statusPlaceholder": "دۆخێک هەڵبژێرە",
@@ -671,7 +679,9 @@
         "notify_owner_email": "ئاگادارم بکەرەوە",
         "create_task": "دروستکردنی ئەرک",
         "create_note": "زیادکردنی تێبینی",
-        "update_contact_language": "دانانی زمانی کڕیار"
+        "update_contact_language": "دانانی زمانی کڕیار",
+        "create_lead": "دروستکردنی کڕیارێکی ئەگەری",
+        "close_conversation": "داخستنی گفتوگۆکە"
       },
       "tagPlaceholder": "نیشانە، بۆ نموونە: کڕیار",
       "subjectPlaceholder": "ناونیشان (ئارەزوومەندانە)",

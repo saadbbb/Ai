@@ -632,12 +632,17 @@
     "triggerLeadCreated": "عند إنشاء عميل محتمل جديد",
     "triggerAppointmentCreated": "عند حجز موعد جديد",
     "triggerTagAdded": "عند إضافة وسم لجهة اتصال",
+    "triggerMessageReceived": "عندما يرسل العميل رسالة",
+    "triggerMessageReplied": "عندما يتم الرد على رسالة",
+    "triggerAiFailed": "عندما يفشل الموظف الذكي بالرد",
     "actionAddTag": "إضافة وسم \"{tag}\" لجهة الاتصال",
     "actionRemoveTag": "إزالة الوسم \"{tag}\" من جهة الاتصال",
     "actionNotifyOwner": "إشعاري",
     "actionCreateTask": "إنشاء مهمة: \"{title}\"",
     "actionCreateNote": "إضافة ملاحظة لجهة الاتصال",
     "actionUpdateContactLanguage": "تعيين لغة جهة الاتصال إلى {language}",
+    "actionCreateLead": "إنشاء عميل محتمل لجهة الاتصال",
+    "actionCloseConversation": "إغلاق المحادثة",
     "delaySummary": "بعد {days} يوم",
     "new": {
       "title": "أتمتة جديدة",
@@ -660,7 +665,10 @@
         "lead_created": "يتم إنشاء عميل محتمل جديد",
         "appointment_created": "يتم حجز موعد جديد",
         "appointment_status_changed": "تتغيّر حالة موعد",
-        "tag_added": "يُضاف وسم لجهة اتصال"
+        "tag_added": "يُضاف وسم لجهة اتصال",
+        "message_received": "يرسل العميل رسالة",
+        "message_replied": "يتم الرد على رسالة",
+        "ai_failed": "يفشل الموظف الذكي بالرد"
       },
       "stagePlaceholder": "اختر مرحلة",
       "statusPlaceholder": "اختر حالة",
@@ -671,7 +679,9 @@
         "notify_owner_email": "إشعاري",
         "create_task": "إنشاء مهمة",
         "create_note": "إضافة ملاحظة",
-        "update_contact_language": "تعيين لغة العميل"
+        "update_contact_language": "تعيين لغة العميل",
+        "create_lead": "إنشاء عميل محتمل",
+        "close_conversation": "إغلاق المحادثة"
       },
       "tagPlaceholder": "الوسم، مثال: عميل",
       "subjectPlaceholder": "العنوان (اختياري)",

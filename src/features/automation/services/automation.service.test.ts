@@ -44,6 +44,20 @@ vi.mock("@/features/crm/repository/note.repository", () => ({
   },
 }));
 
+vi.mock("@/features/crm/repository/lead.repository", () => ({
+  leadRepository: {
+    findByContactId: vi.fn(),
+    create: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/inbox/repository/conversation.repository", () => ({
+  conversationRepository: {
+    findByContactId: vi.fn(),
+    updateStatus: vi.fn(),
+  },
+}));
+
 vi.mock("@/features/notifications/repository/notification.repository", () => ({
   notificationRepository: {
     create: vi.fn(),
@@ -73,6 +87,8 @@ const { contactRepository } = await import("@/features/inbox/repository/contact.
 const { activityRepository } = await import("@/features/crm/repository/activity.repository");
 const { taskRepository } = await import("@/features/crm/repository/task.repository");
 const { noteRepository } = await import("@/features/crm/repository/note.repository");
+const { leadRepository } = await import("@/features/crm/repository/lead.repository");
+const { conversationRepository } = await import("@/features/inbox/repository/conversation.repository");
 const { notificationRepository } = await import("@/features/notifications/repository/notification.repository");
 const { membershipRepository } = await import("@/features/workspace/repository/membership.repository");
 const { userRepository } = await import("@/features/auth/repository/user.repository");
@@ -124,6 +140,9 @@ beforeEach(() => {
   vi.mocked(taskRepository.create).mockResolvedValue({ id: "task-1", title: "Follow up" } as never);
   vi.mocked(noteRepository.create).mockResolvedValue({ id: "note-1" } as never);
   vi.mocked(contactRepository.update).mockResolvedValue(CONTACT);
+  vi.mocked(leadRepository.findByContactId).mockResolvedValue([]);
+  vi.mocked(leadRepository.create).mockResolvedValue({ id: "lead-1", contactId: CONTACT_ID, stage: "new" } as never);
+  vi.mocked(conversationRepository.findByContactId).mockResolvedValue([]);
 });
 
 describe("automationService.dispatch — matching", () => {
@@ -165,21 +184,26 @@ describe("automationService.dispatch — matching", () => {
     expect(workflowRepository.logExecution).toHaveBeenCalledTimes(1);
   });
 
-  it.each(["order_created", "lead_created", "appointment_created", "tag_added"] as const)(
-    "matches the %s trigger on type alone (no config)",
-    async (triggerType) => {
-      const workflow = makeWorkflow({ triggerType });
-      vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+  it.each([
+    "order_created",
+    "lead_created",
+    "appointment_created",
+    "tag_added",
+    "message_received",
+    "message_replied",
+    "ai_failed",
+  ] as const)("matches the %s trigger on type alone (no config)", async (triggerType) => {
+    const workflow = makeWorkflow({ triggerType });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
 
-      await automationService.dispatch(
-        WORKSPACE_ID,
-        triggerType === "tag_added"
-          ? { type: triggerType, contactId: CONTACT_ID, tag: "VIP" }
-          : { type: triggerType, contactId: CONTACT_ID },
-      );
-      expect(workflowRepository.logExecution).toHaveBeenCalledTimes(1);
-    },
-  );
+    await automationService.dispatch(
+      WORKSPACE_ID,
+      triggerType === "tag_added"
+        ? { type: triggerType, contactId: CONTACT_ID, tag: "VIP" }
+        : { type: triggerType, contactId: CONTACT_ID },
+    );
+    expect(workflowRepository.logExecution).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("automationService.dispatch — notify_owner_email", () => {
@@ -330,6 +354,79 @@ describe("automationService.dispatch — update_contact_language", () => {
     await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
 
     expect(contactRepository.update).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+  });
+});
+
+describe("automationService.dispatch — create_lead", () => {
+  it("creates a lead when the contact has no open lead, and cascades a lead_created dispatch", async () => {
+    const workflow = makeWorkflow({ triggerType: "order_created", actionType: "create_lead" });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(leadRepository.findByContactId).mockResolvedValue([]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "order_created", contactId: CONTACT_ID });
+
+    expect(leadRepository.create).toHaveBeenCalledWith({
+      workspaceId: WORKSPACE_ID,
+      contactId: CONTACT_ID,
+      conversationId: null,
+    });
+    expect(activityRepository.log).toHaveBeenCalledWith(expect.objectContaining({ type: "lead_created" }));
+    // The nested lead_created dispatch re-queries findActiveByTrigger but finds no
+    // order_created-only workflow matching lead_created, so only one execution is logged.
+    expect(workflowRepository.logExecution).toHaveBeenCalledTimes(1);
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("skips creating a duplicate lead when the contact already has a non-terminal lead", async () => {
+    const workflow = makeWorkflow({ triggerType: "order_created", actionType: "create_lead" });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(leadRepository.findByContactId).mockResolvedValue([{ id: "lead-1", stage: "qualified" } as never]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "order_created", contactId: CONTACT_ID });
+
+    expect(leadRepository.create).not.toHaveBeenCalled();
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, summary: expect.stringContaining("already has an open lead") }),
+    );
+  });
+
+  it("creates a new lead when the contact's only existing leads are all terminal (won/lost/cancelled)", async () => {
+    const workflow = makeWorkflow({ triggerType: "order_created", actionType: "create_lead" });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(leadRepository.findByContactId).mockResolvedValue([{ id: "lead-1", stage: "lost" } as never]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "order_created", contactId: CONTACT_ID });
+
+    expect(leadRepository.create).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("automationService.dispatch — close_conversation", () => {
+  it("closes the contact's most recent open conversation", async () => {
+    const workflow = makeWorkflow({ actionType: "close_conversation" });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(conversationRepository.findByContactId).mockResolvedValue([
+      { conversation: { id: "conv-1", status: "open" } } as never,
+    ]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(conversationRepository.updateStatus).toHaveBeenCalledWith("conv-1", WORKSPACE_ID, "closed");
+    expect(activityRepository.log).toHaveBeenCalledWith(expect.objectContaining({ type: "conversation_closed" }));
+    expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it("fails when the contact has no open conversation", async () => {
+    const workflow = makeWorkflow({ actionType: "close_conversation" });
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
+    vi.mocked(conversationRepository.findByContactId).mockResolvedValue([
+      { conversation: { id: "conv-1", status: "closed" } } as never,
+    ]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(conversationRepository.updateStatus).not.toHaveBeenCalled();
     expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
   });
 });

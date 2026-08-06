@@ -598,3 +598,61 @@ tag/email actions, but this is a real gap in verification depth compared to earl
 spot-checked in a browser before being fully trusted.
 
 Next: remaining Phase 6 scope (if picked up again) or Phase 7 (Channels/Meta OAuth) per the approved plan.
+
+**2026-08-06 — Phase 6, second slice.** Continued the same "pick the highest-value, best-contained
+piece" approach for another round of PART 6's remaining gaps:
+
+- **3 new triggers**, all dispatched from real event sources rather than invented: `message_received`
+  (from `inboxService.logCustomerMessage` and `startConversation`, both places a customer message is
+  logged), `message_replied` (from the AI-reply success path and `sendAgentReply` — fires whenever the
+  business, human or AI, replies), `ai_failed` (from `triggerAiReply`'s existing catch block, alongside
+  the `conversation_handed_over` dispatch that already lived there).
+- **2 new actions**: `create_lead` (contact-scoped, works even without a conversationId since
+  `leads.conversationId` is nullable in schema — dedupes against any existing non-terminal-stage lead for
+  the same contact before creating a new one, so a workflow that fires repeatedly for the same contact
+  doesn't spam duplicate leads; on real creation it cascades an internal `dispatch(lead_created)` call so
+  other `lead_created`-triggered workflows still fire, matching the spec's own "Lead Won → Create Customer
+  → ..." chained-automation example — bounded by the dedup check, not by depth-limiting, since a second
+  `create_lead` attempt on the same contact always no-ops once the first lead exists), `close_conversation`
+  (closes the contact's most recently active *open* conversation via `conversationRepository`, since an
+  `AutomationEvent` only ever carries a `contactId`, not a `conversationId`; throws — and is retried, then
+  logged as a failure — if the contact has no open conversation to close).
+- New `conversation_closed` activity-timeline type (schema enum addition) so this action's effect shows up
+  on the contact's activity feed like every other action.
+- Migration `0027_gorgeous_otto_octavius.sql` (5 enum additions across `workflow_trigger`,
+  `workflow_action`, `activity_type`) generated and applied live to production Supabase, same as before.
+- i18n: en/ar/ku all updated and re-verified in sync (763 keys each, up from 753).
+- 13 new tests (trigger-matching for all 3 new triggers; create_lead's create/dedupe-skip/all-terminal
+  paths, explicitly testing the recursive `dispatch(lead_created)` call resolves to exactly one logged
+  execution rather than a runaway chain; close_conversation's success and no-open-conversation-failure
+  paths). Full suite: typecheck clean, lint clean (one real unused-variable warning caught and fixed —
+  `create_lead`'s handler assigned the created lead to a variable it never used), **156/156 tests passing**
+  (up from 143), production build clean.
+- **Did not add test coverage for the 5 new `inboxService` dispatch call sites themselves** —
+  `inbox.service.ts` had no existing test file before this change (confirmed by search), and building one
+  from scratch (mocking `aiService`/`messageRepository`/`conversationRepository`/`contactRepository`/
+  `channelRepository` together) was judged out of scope for this slice; the dispatch calls are one-line
+  additions to already-tested call sites, and `automation.service.ts`'s own trigger-matching is fully
+  covered, but this is a real, undyed coverage gap worth closing in a dedicated pass.
+- **Considered and deliberately rejected** a `workspace_created` trigger and a `user_invited` trigger from
+  PART 6's original gap list: both are structurally incompatible with this engine's current per-contact
+  event model (`AutomationEvent` always carries a `contactId`; `dispatch()` looks up workflows scoped to
+  the *target* workspace — but a workflow can only exist in a workspace that's already been created, so a
+  workspace-scoped `workspace_created` trigger can by definition never have a workflow to fire, and
+  `user_invited` has no natural contact to attach to). Not deferred as "not done yet" — flagged as a real
+  design mismatch against the spec's flat trigger list that would need either a platform-wide automation
+  scope or a schema change to fix, not a quick add.
+- **Considered and deliberately rejected** re-scoping `tag_added`-style "Customer VIP" as its own trigger:
+  it's already fully covered today by `tag_added` + a Condition rule (`tag = VIP`), which is exactly the
+  pattern the Phase 6 first-slice entry above chose deliberately to avoid a second filtering mechanism.
+
+**Still open in PART 6** after both slices: Send AI Reply, Assign Agent, Create Order, Book Appointment,
+Trigger Another Workflow, Webhook/API Call actions (each has real complexity — catalog/date selection UI,
+SSRF-safe outbound calls, loop-prevention for chained workflows — deliberately not rushed); deeper
+condition fields (Lead Score, Order Value, Working Hours, Sentiment, AI Confidence), nested AND/OR groups,
+Branches, general Variables, Workflow Versioning; AI Workflow Generator and Human Approval (net-new
+subsystems); Workflow status Draft/Disabled/Archived states; async/queued execution via BullMQ (still
+correctly deferred per Decision 2). Canvas UI browser-verification is still outstanding for both Phase 6
+slices — no browser-automation tool has been available in this session.
+
+Next: further Phase 6 scope (if picked up again) or Phase 7 (Channels/Meta OAuth) per the approved plan.
