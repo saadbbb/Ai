@@ -3,6 +3,7 @@ import { leadStageEnum, type LeadStage } from "@/db/schema";
 import { aiUsageRepository } from "@/features/ai/repository/ai-usage.repository";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
+import { taskRepository } from "@/features/crm/repository/task.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { orderTotal } from "@/features/orders/lib/order-total";
@@ -199,7 +200,49 @@ async function getTodayAndAttentionBands(
   return { today, attention: { items: [...handoverItems, ...coldLeadItems] }, pipelineByStage };
 }
 
+/**
+ * PART 7's Agent Dashboard ("Assigned Conversations, Assigned Tasks, Today's
+ * Appointments...") vs. the Owner Dashboard's workspace-wide revenue/pipeline
+ * view — this is the piece of "no role-based dashboards" (PART 7 gap) that's
+ * addressed here; the Growth band was already role-gated (analytics.view)
+ * before this. Appointments stay workspace-wide since there's no per-agent
+ * appointment assignment field in the schema yet — a real, smaller, separately
+ * flagged gap, not silently worked around here.
+ */
+export interface MyWorkItem {
+  id: string;
+  label: string;
+  href: string;
+}
+
+export interface MyWorkBand {
+  assignedConversationsCount: number;
+  assignedOpenTasksCount: number;
+  appointmentsToday: number;
+  assignedConversations: MyWorkItem[];
+}
+
+async function getMyWorkBand(workspaceId: string, userId: string): Promise<MyWorkBand> {
+  const [assignedConversations, assignedTasks, appointments] = await Promise.all([
+    conversationRepository.findOpenByAssignedUser(workspaceId, userId),
+    taskRepository.findOpenByAssignedUser(workspaceId, userId),
+    appointmentRepository.findByWorkspaceId(workspaceId),
+  ]);
+
+  return {
+    assignedConversationsCount: assignedConversations.length,
+    assignedOpenTasksCount: assignedTasks.length,
+    appointmentsToday: appointments.filter((item) => isToday(item.appointment.scheduledAt)).length,
+    assignedConversations: assignedConversations.slice(0, ATTENTION_ITEM_LIMIT).map((item) => ({
+      id: item.conversation.id,
+      label: item.contact.fullName,
+      href: `/dashboard/inbox/${item.conversation.id}`,
+    })),
+  };
+}
+
 export const dashboardService = {
   getSummary,
   getTodayAndAttentionBands,
+  getMyWorkBand,
 };

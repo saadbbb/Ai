@@ -11,6 +11,15 @@ export const taskRepository = {
       .orderBy(asc(tasks.status), asc(tasks.dueAt));
   },
 
+  /** Open tasks assigned to a specific team member — feeds the Agent Home dashboard's "My Work" band. */
+  async findOpenByAssignedUser(workspaceId: string, userId: string): Promise<Task[]> {
+    return db
+      .select()
+      .from(tasks)
+      .where(and(eq(tasks.workspaceId, workspaceId), eq(tasks.assignedToUserId, userId), eq(tasks.status, "open")))
+      .orderBy(asc(tasks.dueAt));
+  },
+
   async findById(id: string, workspaceId: string): Promise<Task | null> {
     const [task] = await db
       .select()

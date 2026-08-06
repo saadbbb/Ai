@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { WorkspaceRow } from "@/features/platform-admin/components/workspace-row";
+import { WorkspaceList } from "@/features/platform-admin/components/workspace-list";
 import { planRepository } from "@/features/platform-admin/repository/plan.repository";
 import { workspaceAdminRepository } from "@/features/platform-admin/repository/workspace-admin.repository";
 import { platformAdminService } from "@/features/platform-admin/services/platform-admin.service";
@@ -18,24 +18,7 @@ export default async function AdminWorkspacesPage() {
         <p className="text-sm text-muted-foreground">{t("description")}</p>
       </div>
 
-      {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-          {t("emptyState")}
-        </p>
-      ) : (
-        <div className="divide-y rounded-lg border">
-          {items.map(({ workspace, ownerEmail, plan }) => (
-            <WorkspaceRow
-              key={workspace.id}
-              workspace={workspace}
-              ownerEmail={ownerEmail}
-              initialPlan={plan}
-              allPlans={allPlans}
-              canImpersonate={canImpersonate}
-            />
-          ))}
-        </div>
-      )}
+      <WorkspaceList items={items} allPlans={allPlans} canImpersonate={canImpersonate} />
     </div>
   );
 }

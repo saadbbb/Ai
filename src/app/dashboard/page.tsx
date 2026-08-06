@@ -6,6 +6,7 @@ import { analyticsService } from "@/features/analytics/services/analytics.servic
 import { InsightsPanel } from "@/features/ai/components/insights-panel";
 import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { dashboardService, type AttentionItem } from "@/features/dashboard/services/dashboard.service";
+import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { permissionService } from "@/features/workspace/services/permission.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
@@ -13,6 +14,9 @@ const ATTENTION_LABEL_KEY: Record<AttentionItem["type"], "handover" | "coldLead"
   handover: "handover",
   cold_lead: "coldLead",
 };
+
+/** Roles that see the narrower "My Work" band instead of the workspace-wide Today band — see PART 7's Agent Dashboard. */
+const INDIVIDUAL_CONTRIBUTOR_ROLES = new Set(["agent", "viewer"]);
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -24,10 +28,14 @@ export default async function DashboardPage() {
   // Today and attention bands share the same authorization requirement (base workspace
   // membership, already verified above). Growth is independently re-verified below since
   // it needs the extra analytics.view permission — see dashboardService.getTodayAndAttentionBands.
-  const [{ today, attention, pipelineByStage }, canViewGrowth] = await Promise.all([
+  const [{ today, attention, pipelineByStage }, canViewGrowth, roleKey] = await Promise.all([
     dashboardService.getTodayAndAttentionBands(workspace.id),
     permissionService.hasPermission(user.id, workspace.id, "analytics.view"),
+    membershipRepository.findRoleKeyByUserAndWorkspace(user.id, workspace.id),
   ]);
+
+  const isIndividualContributor = roleKey !== null && INDIVIDUAL_CONTRIBUTOR_ROLES.has(roleKey);
+  const myWork = isIndividualContributor ? await dashboardService.getMyWorkBand(workspace.id, user.id) : null;
 
   const growth = canViewGrowth ? await analyticsService.getSummary(workspace.id, resolveAnalyticsRange(undefined)) : null;
 
@@ -40,16 +48,36 @@ export default async function DashboardPage() {
 
       <InsightsPanel />
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium">{t("bands.today.heading")}</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          <StatTile label={t("bands.today.conversations")} value={today.conversationsToday} />
-          <StatTile label={t("bands.today.newLeads")} value={today.newLeadsToday} />
-          <StatTile label={t("bands.today.orders")} value={today.ordersToday} />
-          <StatTile label={t("bands.today.appointments")} value={today.appointmentsToday} />
-          <StatTile label={t("bands.today.revenue")} value={today.revenueToday.toFixed(2)} />
-        </div>
-      </section>
+      {myWork ? (
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium">{t("bands.myWork.heading")}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <StatTile label={t("bands.myWork.assignedConversations")} value={myWork.assignedConversationsCount} />
+            <StatTile label={t("bands.myWork.assignedTasks")} value={myWork.assignedOpenTasksCount} />
+            <StatTile label={t("bands.today.appointments")} value={myWork.appointmentsToday} />
+          </div>
+          {myWork.assignedConversations.length > 0 && (
+            <div className="divide-y rounded-lg border">
+              {myWork.assignedConversations.map((item) => (
+                <Link key={item.id} href={item.href} className="flex items-center justify-between gap-4 p-3 text-sm hover:bg-muted">
+                  <span className="truncate">{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+      ) : (
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium">{t("bands.today.heading")}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+            <StatTile label={t("bands.today.conversations")} value={today.conversationsToday} />
+            <StatTile label={t("bands.today.newLeads")} value={today.newLeadsToday} />
+            <StatTile label={t("bands.today.orders")} value={today.ordersToday} />
+            <StatTile label={t("bands.today.appointments")} value={today.appointmentsToday} />
+            <StatTile label={t("bands.today.revenue")} value={today.revenueToday.toFixed(2)} />
+          </div>
+        </section>
+      )}
 
       <section className="space-y-3">
         <h2 className="text-sm font-medium">{t("bands.attention.heading")}</h2>

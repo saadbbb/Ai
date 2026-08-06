@@ -56,6 +56,23 @@ export const conversationRepository = {
       .orderBy(desc(conversations.lastMessageAt), desc(conversations.createdAt));
   },
 
+  /** Open conversations assigned to a specific team member — feeds the Agent Home dashboard's "My Work" band. */
+  async findOpenByAssignedUser(workspaceId: string, userId: string): Promise<ConversationListItem[]> {
+    return db
+      .select(listSelection)
+      .from(conversations)
+      .innerJoin(contacts, eq(conversations.contactId, contacts.id))
+      .innerJoin(channels, eq(conversations.channelId, channels.id))
+      .where(
+        and(
+          eq(conversations.workspaceId, workspaceId),
+          eq(conversations.assignedUserId, userId),
+          eq(conversations.status, "open"),
+        ),
+      )
+      .orderBy(desc(conversations.lastMessageAt), desc(conversations.createdAt));
+  },
+
   async create(data: NewConversation): Promise<Conversation> {
     const [conversation] = await db.insert(conversations).values(data).returning();
     return conversation;

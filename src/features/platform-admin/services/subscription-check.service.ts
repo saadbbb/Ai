@@ -18,12 +18,19 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  */
 async function sendExpiryReminder(workspace: Workspace, daysLeft: number): Promise<void> {
   const dayWord = daysLeft === 1 ? "day" : "days";
+  const isTrial = workspace.subscriptionStatus === "trial";
+  const subjectLine = isTrial
+    ? `Your free trial ends in ${daysLeft} ${dayWord}`
+    : `Your subscription expires in ${daysLeft} ${dayWord}`;
+  const bodyLine = isTrial
+    ? `Your free trial for "${workspace.name}" ends in ${daysLeft} ${dayWord}. Subscribe to a plan to keep using your AI employee without interruption.`
+    : `Your subscription for "${workspace.name}" expires in ${daysLeft} ${dayWord}. Renew to avoid any interruption.`;
 
   await notificationRepository.create({
     workspaceId: workspace.id,
     type: "subscription_expiring",
-    title: `Your subscription expires in ${daysLeft} ${dayWord}`,
-    message: `Your subscription for "${workspace.name}" expires in ${daysLeft} ${dayWord}. Renew to avoid any interruption.`,
+    title: subjectLine,
+    message: bodyLine,
     link: "/dashboard/billing",
   });
 
@@ -39,8 +46,8 @@ async function sendExpiryReminder(workspace: Workspace, daysLeft: number): Promi
 
     await emailService.sendNotificationEmail({
       to: owner.email,
-      subject: `Your subscription expires in ${daysLeft} ${dayWord}`,
-      text: `Hi,\n\nYour subscription for "${workspace.name}" expires in ${daysLeft} ${dayWord}. Get in touch to renew and avoid any interruption.${contactLine}`,
+      subject: subjectLine,
+      text: `Hi,\n\n${bodyLine}${contactLine}`,
     });
   } catch (error) {
     console.error(`[subscription-check] reminder email failed for workspace ${workspace.id}:`, error);
@@ -48,11 +55,14 @@ async function sendExpiryReminder(workspace: Workspace, daysLeft: number): Promi
 }
 
 async function notifySuspended(workspace: Workspace): Promise<void> {
+  const isTrial = workspace.subscriptionStatus === "trial";
   await notificationRepository.create({
     workspaceId: workspace.id,
     type: "subscription_suspended",
-    title: "Your subscription has been suspended",
-    message: `"${workspace.name}"'s subscription expired and wasn't renewed in time. Contact us to reactivate it.`,
+    title: isTrial ? "Your free trial has ended" : "Your subscription has been suspended",
+    message: isTrial
+      ? `"${workspace.name}"'s free trial has ended. Subscribe to a plan to keep using your AI employee.`
+      : `"${workspace.name}"'s subscription expired and wasn't renewed in time. Contact us to reactivate it.`,
     link: "/dashboard/billing",
   });
 }

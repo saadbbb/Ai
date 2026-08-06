@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   type BillingCycle,
@@ -66,11 +66,18 @@ export const workspaceAdminRepository = {
   },
 
   /** Active workspaces with a real expiry date — what the daily cron checks. */
+  /**
+   * "active" (a paid plan, admin-activated) and "trial" (the automatic 14-day
+   * clock — see workspaceService.createWorkspaceForNewUser) both count down
+   * toward the same subscriptionExpiresAt column and share one reminder/
+   * auto-suspend pipeline (subscriptionCheckService.runDailyCheck) — a trial
+   * expiring is handled identically to a paid subscription lapsing.
+   */
   async findActiveWithExpiry(): Promise<Workspace[]> {
     const rows = await db
       .select()
       .from(workspaces)
-      .where(eq(workspaces.subscriptionStatus, "active"));
+      .where(inArray(workspaces.subscriptionStatus, ["active", "trial"]));
     return rows.filter((workspace) => workspace.subscriptionExpiresAt !== null);
   },
 

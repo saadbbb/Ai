@@ -7,6 +7,9 @@ import { AppError } from "@/lib/errors/app-error";
 import { membershipRepository } from "../repository/membership.repository";
 import { roleRepository } from "../repository/role.repository";
 
+/** Spec's FREE TRIAL section: "14-day trial... Automatic expiration." */
+const TRIAL_DURATION_DAYS = 14;
+
 function slugify(input: string): string {
   return input
     .toLowerCase()
@@ -54,7 +57,11 @@ async function createWorkspaceForNewUser(userId: string, email: string): Promise
   return db.transaction(async (tx) => {
     const [workspace] = await tx
       .insert(workspaces)
-      .values({ name: defaultWorkspaceName(email), slug })
+      .values({
+        name: defaultWorkspaceName(email),
+        slug,
+        subscriptionExpiresAt: new Date(Date.now() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000),
+      })
       .returning();
 
     await tx.insert(workspaceMembers).values({

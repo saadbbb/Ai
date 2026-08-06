@@ -264,6 +264,11 @@
         "appointments": "Appointments",
         "revenue": "Revenue"
       },
+      "myWork": {
+        "heading": "My work today",
+        "assignedConversations": "Assigned conversations",
+        "assignedTasks": "Assigned tasks"
+      },
       "attention": {
         "heading": "Needs your attention",
         "empty": "Nothing needs your attention right now.",
@@ -504,6 +509,8 @@
       "title": "Workspaces",
       "description": "Every business on the platform. Activate a subscription by hand until real billing exists.",
       "emptyState": "No workspaces yet.",
+      "searchPlaceholder": "Search by name, slug, or owner email",
+      "noSearchResults": "No workspaces match your search.",
       "noOwner": "No owner",
       "statuses": {
         "trial": "Trial",

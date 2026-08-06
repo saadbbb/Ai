@@ -42,6 +42,17 @@ export const membershipRepository = {
       .orderBy(workspaceMembers.joinedAt);
   },
 
+  /** Used to branch the Home dashboard (see dashboardService.getMyWorkBand) between management and Agent/Viewer roles. */
+  async findRoleKeyByUserAndWorkspace(userId: string, workspaceId: string): Promise<string | null> {
+    const [row] = await db
+      .select({ key: roles.key })
+      .from(workspaceMembers)
+      .innerJoin(roles, eq(roles.id, workspaceMembers.roleId))
+      .where(and(eq(workspaceMembers.userId, userId), eq(workspaceMembers.workspaceId, workspaceId)))
+      .limit(1);
+    return row?.key ?? null;
+  },
+
   async findOwnerUserId(workspaceId: string): Promise<string | null> {
     const [row] = await db
       .select({ userId: workspaceMembers.userId })

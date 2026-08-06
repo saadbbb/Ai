@@ -729,3 +729,60 @@ correctly deferred per Decision 2.
 
 Next: Phase 7 (Channels/Meta OAuth) once the user has a Meta Developer App to build/verify against, or
 Phase 8 (Business Operations depth) as a fully-testable alternative in the meantime.
+
+**2026-08-06 — Phase 8, first slice.** Before starting, the user was asked again whether to keep pushing
+on Phase 6 (now mostly exhausted of items that don't need Meta or a catalog-selection UI), start Phase 7
+(still unverifiable — no Meta Developer App exists), or move to Phase 8 (fully testable). Chose Phase 8.
+Picked three of the plan's explicitly-recommended items — the two "cheapest near-term wins" from PART 9's
+own recommendation plus PART 7's most-cited concrete gap:
+
+- **Trial expiry timer** (PART 8 gap: "No trial-expiry timer... automatic expiration"). Discovered the
+  existing `subscriptionExpiresAt`/`lastReminderDaysSent`/reminder-cron machinery (built for paid-plan
+  expiry) was generic enough to reuse outright for trials — no new schema, no new cron, no new repository
+  method beyond widening one filter. `workspaceService.createWorkspaceForNewUser` now sets
+  `subscriptionExpiresAt` to 14 days out (the spec's own trial length) on every new signup;
+  `workspaceAdminRepository.findActiveWithExpiry` now includes `trial`-status workspaces alongside
+  `active` ones, so the daily `subscription-check` cron's existing 3/2/1-day-reminder and auto-suspend
+  logic now covers trials automatically, with trial-aware wording ("Your free trial ends in N days" vs.
+  "Your subscription expires..."). **Deliberately not backfilled**: existing workspaces created before this
+  change keep `subscriptionExpiresAt: null` (never auto-suspended) rather than retroactively assigning
+  them a trial deadline — a live/real account unexpectedly losing access because of a backfill would be a
+  bad way to discover a bug, so this only applies going forward to new signups.
+- **Role-based Home dashboard** (PART 7 gap: "No role-based dashboards — one getSummary() call serves
+  everyone regardless of role"). Agent/Viewer roles now see a "My work today" band (assigned open
+  conversations, assigned open tasks, a linkable list of up to 5 assigned conversations) instead of the
+  workspace-wide Today band (today's conversations/leads/orders/revenue) that Owner/Admin/Manager still
+  see unchanged. New `conversationRepository.findOpenByAssignedUser` / `taskRepository
+  .findOpenByAssignedUser` / `membershipRepository.findRoleKeyByUserAndWorkspace`. The Attention band
+  (handovers/cold leads) stays workspace-wide for every role — still relevant to an agent picking up work,
+  not just an owner. **Honest scope limit, not silently worked around**: appointments stay workspace-wide
+  in the Agent view too, because there's no per-agent appointment-assignment column in the schema yet
+  (PART 5's "Assigned Employee" field is a separate, already-tracked gap) — adding that column just to
+  serve this dashboard slice would have been scope creep into a different Part.
+- **Admin workspace list search/filter** (PART 9's own "cheapest near-term win" recommendation). New
+  client-side `WorkspaceList` component (search by name/slug/owner email) wrapping the existing
+  `WorkspaceRow` — deliberately client-side filtering over a server `?q=` param, matching the gap report's
+  own reasoning that the list is "currently small," with a code comment flagging server-side search as the
+  right call once that stops being true.
+- No migration this slice — every change reused existing columns.
+- i18n: en/ar/ku updated and re-verified in sync (780 keys each, up from 774).
+- 15 new tests (6 for `subscriptionCheckService`, including a dedicated trial-vs-active wording check and
+  a mixed-batch partial-failure check; 3 for `dashboardService.getMyWorkBand`). The `WorkspaceList`
+  filter component has no dedicated test, consistent with this codebase's existing pattern of not
+  unit-testing client components (`WorkspaceRow` itself, the dropdown-menu component, etc. don't have
+  tests either) — flagged rather than silently following the pattern without noting it. Full suite:
+  typecheck clean, lint clean, **207/207 tests passing** (up from 198), production build clean.
+
+**Still open in PART 7/8/9 after this slice**: chart variety (still bar-chart-only), additional report
+types (Conversations/AI usage/Channels/Team performance/Automation/Revenue — still CSV-only for the 4
+existing types), AI Recommendations feature; billing invoices/discounts/multi-currency (all still genuinely
+blocked on a real payment gateway, a business decision not an engineering one); Super Admin support
+tickets, AI Operations console, feature-flag system, infra/error monitoring (Sentry/PostHog, external
+accounts), delete/reset-trial/transfer-ownership workspace actions, broader audit event coverage
+(admin-login specifically was evaluated and deliberately deferred — `requirePlatformAdmin` runs on every
+admin page request via React's `cache()`, so logging there would flood the audit log with one row per page
+view rather than one per actual login session; doing this properly needs a session-boundary hook this
+codebase doesn't have yet, not a quick add), unified Super Admin home dashboard.
+
+Next: further Phase 8 scope, Phase 7 once a Meta Developer App exists, or Phase 9 (Growth Modules) per the
+approved plan.
