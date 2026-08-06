@@ -48,24 +48,23 @@ every time a new item like this comes up — don't let it go stale.
 
 ## Needs your decision — not blocked on an account, but shouldn't be built without your sign-off
 
-Added 2026-08-06 while working through the remaining gaps from the Aii.txt spec. These are all technically buildable right now with no external dependency, but each involves a product or security judgment call that's the user's to make, not an engineering default.
+Added 2026-08-06 while working through the remaining gaps from the Aii.txt spec. Items 1-3 below were approved by the user on 2026-08-06 and are now built (see resolution notes). Item 4 remains open.
 
-### 1. Visual drag-and-drop workflow builder (Part 6 of the spec)
-- **What exists today:** A fully functional form-based automation builder — trigger, conditions (AND/OR, added 2026-08-06), action, delay, templates, execution log. Every trigger/action the spec lists is wired up; only the *editing UI* is a form, not a canvas.
-- **What's missing:** The spec's canvas UI — drag & drop nodes, zoom, pan, undo/redo, a mini-map, node search. This is a multi-week feature on its own (typically means adopting a canvas library like React Flow, building a node-graph data model separate from the linear trigger→conditions→action shape workflows use today, persistence for node positions, etc.) — a real scope/investment decision, not a quick add.
-- **Ask:** Is the canvas builder worth building for MVP, given the form already covers every trigger/condition/action functionally? If yes, react-flow (MIT-licensed, no account needed) is the natural choice — say so and it can start.
+### 1. Visual drag-and-drop workflow builder — RESOLVED 2026-08-06
+- **What's built:** `/dashboard/automations/new` is now a React Flow (`@xyflow/react`) canvas — three connected, draggable nodes (Trigger / Conditions / Action, see `src/features/automation/components/workflow-canvas/`), zoom/pan/mini-map, editing every field inline inside each node. Submits the same `createWorkflowAction` payload the old form did, so the underlying data model and automation engine are unchanged.
+- **Deliberate scope cut, not an oversight:** node count is fixed at three (this is a visual editor for the engine's existing linear trigger→conditions→action→delay shape, not a general graph/branching editor); node positions are draggable within a session but not persisted (auto-laid-out fresh on each visit); no undo/redo.
+- **A real bug this caught:** the first implementation reconstructed a bare `{id, position}` object on every state change instead of using React Flow's `useNodesState`, which discarded the internal `measured` dimensions React Flow needs to ever mark a node visible — nodes (and the edges between them, which need both endpoints measured) stayed permanently invisible. Only caught by actually driving the page in a browser (Playwright, session cookie crafted for a local test) — typecheck/lint/build all passed on the broken version. Verified fixed end-to-end: node interaction, dropdown-without-drag, add-condition, and full submit → workflow appears in the list.
 
-### 2. Real MRR/ARR revenue dashboard (Part 8/9 of the spec)
-- **What exists today:** Plans have a feature set + duration, but **no price field at all** — `plans` table has no `price`/`currency` column. Billing is fully manual (WhatsApp → admin activates a plan for N days), so no monetary amount is ever recorded anywhere in the system today.
-- **What's missing:** A real MRR/ARR/LTV dashboard needs actual prices to sum. Building the dashboard is trivial once prices exist; the blocker is that there are no real prices to show.
-- **Ask:** What are the actual plan prices and currency (IQD/USD/other)? Once that's answered, a `price`/`currency` column can be added to `plans` and the revenue dashboard becomes straightforward — this doesn't need the payment gateway itself, just the *numbers*.
+### 2. Real MRR/ARR revenue dashboard — RESOLVED 2026-08-06 (dashboard), open (actual prices)
+- **What's built:** `plans.price`/`plans.currency` columns (currency fixed to IQD per user decision), a price field on the plan builder at `/admin/plans`, and `/admin/revenue` showing MRR/ARR/active-subscription-count/unpriced-count, broken down by plan (`calculateRevenue()`, unit tested).
+- **Still open:** no actual prices were invented or entered — every plan in the live database has `price: null` today (there were zero plans in the DB as of 2026-08-06, so nothing to backfill either). The dashboard will show 0/0 until real prices are set.
+- **Ask still standing:** go to `/admin/plans` and set a real IQD price on each plan whenever the pricing is decided — the revenue numbers pick it up immediately, no further engineering work needed.
 
-### 3. Super Admin impersonation ("log in as a customer")
-- **What exists today:** Nothing — not started.
-- **Why it's flagged, not just built:** Impersonation is explicitly listed in Part 9, but it's also one of the highest-risk features in the whole platform — whoever can use it can see and act inside any tenant's account. Building it needs at minimum: an explicit audit-logged event every time it's used (the new `audit_logs` table makes this easy), a visible "you are impersonating X" banner the whole time, and a decision on who besides the account owner is even allowed to trigger it.
-- **Ask:** Confirm you want this built, and who should be allowed to use it (all platform admins, or a narrower role).
+### 3. Super Admin impersonation — RESOLVED 2026-08-06
+- **What's built:** Read-only only, per the user's "highest security standards" instruction — not a session takeover. `/admin/workspaces/[id]/view` renders a snapshot (dashboard stats, contacts, leads, orders, appointments, conversations) with zero write path. Restricted to bootstrap (`PLATFORM_ADMIN_EMAILS`) admins only via a new `requirePrimaryPlatformAdmin()` guard — a database-managed admin (added through `/admin/admins`) cannot use it and doesn't see the link, since impersonation access can't be self-delegated. A persistent banner marks the mode; every view (not just the first) writes an `impersonation_started` row to `audit_logs` with the admin's identity and the target workspace.
+- **Not built (would need your sign-off separately if wanted later):** a write-capable "log in as" mode, MFA gating, IP allow-listing.
 
 ### 4. Global cross-entity search (Part 2/5 of the spec)
 - **What exists today:** Nothing — not started. Contacts/Leads/Orders/Appointments each have their own page but no single search box across all of them.
 - **Why it's flagged:** Not risky, just underspecified — "search everything" needs a decision on where it lives (a header search bar? a dedicated `/search` page?), what ranking/grouping looks like with mixed result types, and whether it's simple `ILIKE` matching (fine at current scale) or needs to be planned for Postgres full-text search from the start.
-- **Status:** Lower priority than the other three above — deprioritized this round for scope, not because it's harder.
+- **Status:** Still open, still lower priority — not part of the 2026-08-06 approval.
