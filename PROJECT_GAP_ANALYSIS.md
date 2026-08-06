@@ -822,3 +822,36 @@ remain accurately reflected as open items in PART 7/8/9's "Missing" sections abo
 
 Next: further Phase 8 scope, Phase 7 once a Meta Developer App exists, or Phase 9 (Growth Modules) per the
 approved plan.
+
+**2026-08-06 — Phase 8, third slice.** Two more items from PART 7's own recommendations:
+
+- **Chart variety** (PART 7: "Only one chart type exists — every chart in the app is a bar chart with
+  different data"). Loaded the `dataviz` skill before writing any chart code, per its own trigger rule.
+  Its "choosing a form" guidance is direct: a day-bucketed trend is a magnitude changing over time, which
+  reads as a line, not bars-by-category — `leadsByDay` and `revenueByDay` (both genuinely time-series) on
+  `/dashboard/analytics` now render with a new `LineChartCard` (2px line, monotone curve, crosshair
+  tooltip, single `--chart-1` hue matching `BarChartCard`'s existing single-series convention — no legend,
+  since a lone series' identity is the card title, not a swatch). `ordersByStatus`/`appointmentsByStatus`/
+  `conversationsByChannel` stay on `BarChartCard` since those are genuine category comparisons, not
+  time-series — this wasn't a blanket swap, only the two charts where the form was actually wrong for the
+  data.
+- **A new report type** (PART 7: "missing report types entirely — Conversations, AI usage, Channels, Team
+  performance, Automation, Revenue"). Added Conversations — picked first since Inbox had zero export
+  before and the underlying data (contact, channel, status, ai status, last message) was already sitting
+  in `conversationRepository.findByWorkspaceId`, no new query needed. New `/api/reports/conversations`
+  following the exact existing CSV-route pattern (`toCsv`/`csvResponse`), with an "Export CSV" button added
+  to `/dashboard/inbox` next to "New conversation" — same UI pattern the other 4 export buttons already
+  use. The other 5 report types (AI usage, Channels, Team performance, Automation, Revenue) remain open —
+  picked one at a time rather than batch-building all 6, consistent with this session's incremental
+  approach.
+- No migration, no new i18n keys this slice (both changes reuse existing translation keys —
+  `analytics.charts.*` for the chart swap, `common.exportCsv` for the new button).
+- No new tests this slice: `LineChartCard` is a client chart component (this codebase doesn't unit-test
+  UI components, `BarChartCard` has none either) and the new report route is a thin wrapper around
+  already-tested `toCsv`/`csvResponse` plus an existing, already-exercised repository method — consistent
+  with the fact that none of the other 4 report routes have dedicated tests either. Full suite: typecheck
+  clean, lint clean, **210/210 tests passing** (unchanged — nothing new to cover), production build clean,
+  `/api/reports/conversations` shows up as a real route in the build output.
+
+Next: further Phase 8 scope (remaining report types, Super Admin support tickets/AI Ops console/feature
+flags), Phase 7 once a Meta Developer App exists, or Phase 9 (Growth Modules) per the approved plan.

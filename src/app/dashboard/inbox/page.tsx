@@ -10,6 +10,7 @@ export default async function InboxPage() {
   const workspace = await requireWorkspaceForUser(user.id);
   await requireFeature(workspace, "inbox");
   const t = await getTranslations("inbox.list");
+  const tCommon = await getTranslations("common");
 
   const conversations = await inboxService.listConversations(workspace.id);
 
@@ -20,9 +21,14 @@ export default async function InboxPage() {
           <h1 className="text-xl font-semibold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/inbox/new">{t("newConversation")}</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <a href="/api/reports/conversations">{tCommon("exportCsv")}</a>
+          </Button>
+          <Button asChild>
+            <Link href="/dashboard/inbox/new">{t("newConversation")}</Link>
+          </Button>
+        </div>
       </div>
 
       <InboxList initialConversations={conversations} />

@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { BarChartCard } from "@/features/analytics/components/bar-chart-card";
 import { DateRangeSelect } from "@/features/analytics/components/date-range-select";
+import { LineChartCard } from "@/features/analytics/components/line-chart-card";
 import { HealthScoreCard } from "@/features/analytics/components/health-score-card";
 import { resolveAnalyticsRange, type AnalyticsRangeKey } from "@/features/analytics/lib/date-range";
 import { analyticsService } from "@/features/analytics/services/analytics.service";
@@ -78,12 +79,12 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <BarChartCard
+        <LineChartCard
           title={t("charts.leadsByDay")}
           data={summary.leadsByDay.map((row) => ({ label: row.day.slice(5), value: row.value }))}
           emptyMessage={t("charts.empty")}
         />
-        <BarChartCard
+        <LineChartCard
           title={t("charts.revenueByDay")}
           data={summary.revenueByDay.map((row) => ({ label: row.day.slice(5), value: row.value }))}
           emptyMessage={t("charts.empty")}
