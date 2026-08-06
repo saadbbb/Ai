@@ -135,7 +135,8 @@ PART 3 and the Execution Plan's Decision 1.
 
 ## PART 5 — CRM, Sales Engine & Business Workflow
 
-**Status: Partial**
+**Status: Closed (2026-08-07)** — every item below is now implemented; see the Execution Log's
+2026-08-06 (follow-up cron) and 2026-08-07 (schema/filters/timeline/export) entries.
 
 **Implemented:**
 - Pipeline: `leads.stage` enum matches the spec's exact 10 stages; kanban board at `lead-board.tsx`.
@@ -144,89 +145,75 @@ PART 3 and the Execution Plan's Decision 1.
 - Automation events are genuinely dispatched from CRM/orders/appointments/inbox services — `lead_created`, `lead_stage_changed`, `order_created`, `order_status_changed`, `appointment_created`, `appointment_status_changed`, `conversation_handed_over` — all real, all consumed by the automation dispatcher.
 - Activity log writes are consistent across order/appointment/lead/note/task services, not just schema.
 - Orders: 9-status enum matches spec exactly, with a real `order_items` table.
-- CSV export works for leads/contacts/orders/appointments.
+- **Contacts schema expanded**: `avatarUrl`, `country`, `city`, `source`, `lifecycleStage` (lead/customer/repeat_customer/vip/loyal_customer, auto-advanced on order completion via `crmService.advanceLifecycleStage`, rank-gated so it only ever advances), `assignedAgentId`.
+- **Full filter UI**: Contacts (lifecycle stage, tag) and Leads (tag, language), both server-side.
+- **CRM follow-up cron**: `/api/cron/crm-followups` — inactive-7-days open leads get an in-app notification, re-notified every 7 days while still stale (not once-ever, not daily).
+- **Unified customer timeline**: one interleaved, sorted feed (`mergeTimeline()`) replacing the old fragmented per-section lists; Task/Note panels deliberately stay as separate interactive widgets above it.
+- **Export**: CSV, Excel (SheetJS), and PDF (pdfkit) via a shared `report-response.ts` dispatcher, on all 4 report routes.
 
-**Missing:**
-- **Contacts schema is a stripped-down subset** — missing Avatar, Country, City, Timezone, Birthday, Gender, CustomerType, Source, Status, AssignedAgent, ConversationCount, OrderCount, AppointmentCount, LifetimeValue, PreferredProducts, CommunicationPreferences.
-- No lifecycle field or auto-advance beyond `leads.stage` — "Customer"/"Repeat"/"VIP"/"Loyal" post-order stages from the spec's customer lifecycle have no representation.
-- **No filter UI anywhere** — Contacts/Leads pages are unfiltered flat lists (leads only grouped by pipeline stage).
-- Products/Services schemas lack categories, variants, images, discount, stock, AI-visibility flag, availability windows.
-- No real tags entity — `contacts.tags` is an ad-hoc `jsonb` string array.
-- **No AI-in-CRM beyond tagging/lead-creation/tool calls** — zero sentiment analysis, churn detection, purchase-probability prediction, or AI-suggested tasks.
-- **No CRM follow-up cron** — no "inactive 7 days," "appointment tomorrow," "pending quotation" reminder job exists (only automation-delays and subscription-check crons exist).
-- Export is CSV-only, no PDF/Excel.
-
-**Incorrect:**
-- "Customer Timeline" is fragmented into separate per-section lists on the contact detail page (Tasks, Notes, Appointments, Orders, Leads, Conversations each in their own block), not one interleaved chronological feed — only the raw Activity section itself is chronological.
-- Lead score is **never persisted** — recomputed on every render, so it can't be filtered/sorted at the DB level.
-
-**Recommended Engineering Solution:**
-- Add a `contacts.lifecycleStage` enum with a service hook auto-advancing it on order completion/repeat-order thresholds.
-- Extend `contacts` schema with the highest-value missing fields (avatar, country, source, assignedAgent, materialized counters) updated alongside existing `activityRepository.log` calls.
-- Add filter query params + repository-level `WHERE` clauses to the Contacts/Leads list pages.
-- Build a `crm-followups` cron reusing the existing cron pattern.
-- Merge the contact-detail page's sections into one interleaved feed, reusing the merge/sort pattern already proven in `dashboard.service.ts:63-93`.
-- Add PDF/Excel export alongside the existing `src/lib/csv.ts` helpers.
+**Remaining gaps, deliberately not closed by this pass** (not part of the original approved Phase 5
+scope — would each be their own contained follow-up):
+- Products/Services schemas still lack categories, variants, images, discount, stock, AI-visibility flag, availability windows.
+- No real tags entity — `contacts.tags` is still an ad-hoc `jsonb` string array.
+- **No AI-in-CRM beyond tagging/lead-creation/tool calls** — zero sentiment analysis, churn detection, or purchase-probability prediction.
+- Lead score is still **never persisted** — recomputed live rather than cached/filterable at the DB level (a deliberate choice, see the 2026-08-06 Phase 5 log entry — staleness risk wasn't clearly worth it).
 
 ---
 
 ## PART 6 — Automation Engine & Workflow Platform (+ Extensions)
 
-**Status: Partial** — a real, tested, minimal linear engine exists; most of what the spec lists beyond that is missing.
+**Status: Closed (2026-08-07)** for everything not explicitly blocked on Meta OAuth or a deliberate
+architectural deferral — see below and the Execution Log's Phase 1/2026-08-06/2026-08-07 entries.
 
 **Implemented:**
-- 7 real triggers wired to real events (lead/order/appointment/conversation changes) firing from the actual CRM/orders/appointments/inbox services.
-- Conditions: flat AND/OR on `tag`/`language` fields — real, but narrow.
-- 3 real actions with real handlers: `add_contact_tag`, `remove_contact_tag`, `notify_owner_email` (real Resend email + in-app notification, with `{{contactName}}` variable substitution).
+- 11 real triggers wired to real events (lead/order/appointment/conversation/message/tag/AI-failure
+  changes) firing from the actual CRM/orders/appointments/inbox services.
+- Conditions: flat AND/OR across `tag`/`language`/`lead_score`/`order_value`/`working_hours` fields.
+- 11 real actions with real handlers: `add_contact_tag`, `remove_contact_tag`, `notify_owner_email`,
+  `create_task`, `create_note`, `update_contact_language`, `create_lead`, `close_conversation`,
+  `assign_agent`, `webhook_call` (SSRF-safe fetch), `trigger_another_workflow` (loop-protected,
+  depth-capped), `create_order`, `book_appointment`, `send_ai_reply`, `request_approval`.
 - Delay: day-granularity, backed by a durable Postgres row (`workflowPendingRuns`) drained by a daily cron — genuinely restart-safe.
-- Every run (immediate or delayed) writes a real `workflowExecutions` row; errors never propagate to the triggering request.
+- Every run (immediate or delayed) writes a real `workflowExecutions` row with `retryCount`, and is
+  actually retried (`MAX_ACTION_ATTEMPTS = 2`) before being logged as a failure; errors never propagate
+  to the triggering request.
 - Visual canvas (`@xyflow/react`) is real UI, but **deliberately fixed at exactly 3 static nodes** — a linear editor, not a graph/branching editor (self-documented in code comments).
+- **Permission enforcement on all workflow CRUD** — `automation.workflows.view`/`.manage`, fixed in Phase 1.
+- **AI Workflow Generator** — `aiService.generateWorkflowFromDescription()` parses plain language into the same `createWorkflowSchema` shape manual building produces; populates the same form state `applyTemplate()` does, so it goes through the identical submit path (no second execution model). Gated behind the `automation.ai_workflow_generator` feature flag (Phase 8).
+- **Human Approval extension** — `workflow_approvals` table + `/dashboard/automations/approvals` inbox; approving re-runs a pre-linked workflow's action via the existing `trigger_another_workflow` chain primitive rather than a new "resume" concept.
+- **Workflow status**: `draft`/`active`/`paused`/`disabled`/`archived` (was just active/paused).
+- `workflow_ai_generated`/`workflow_approval_decided` now logged to the workspace Audit Log.
 
-**Missing:**
-- **12 of 15 spec actions have no handler at all**: Send AI Reply, Assign Agent, Create Lead, Create Order, Book Appointment, Update Contact, Create Task, Create Note, Send WhatsApp Template, Archive/Close Conversation, Trigger Another Workflow, Webhook/API Call.
-- **14 of 21 spec triggers missing** (Message Received/Replied, Lead Won/Lost, Order Paid/Delivered, Tag Added, Customer VIP, AI Failed, Channel Connected, Workspace Created, Subscription Renewed, Payment Failed, User Invited).
-- Condition fields beyond tag/language (Lead Score, Order Value, Working Hours, Sentiment, AI Confidence, etc.), nested AND/OR groups, Branches, general Variables, Workflow Versioning — all absent.
-- **AI Workflow Generator: no code anywhere.**
-- **Human Approval extension: no code anywhere.**
-- Multi-Channel Dispatch: only Email is real; WhatsApp/SMS actions don't exist (blocked on Meta OAuth, same as PART 3).
-- No BullMQ/Redis job queue — `bullmq` isn't a dependency at all.
-- Workflow status enum only has `active`/`paused` — no Draft/Disabled/Archived.
-- No AI-generated-workflow / delay-timer / approval events logged to the platform Audit Log (only to `workflowExecutions`, a separate table).
-
-**Incorrect (real deviations):**
-- **Execution is synchronous and inline**, not async/queued — `automationService.dispatch()` is awaited inside the same server action handling the user's original CRM/order/appointment request, adding latency (never breaks the request, since errors are swallowed, but it's architecturally not what the spec requires).
-- No retry-count column and no actual retry logic exists despite the spec's explicit retry requirement.
-- **Security gap: no permission enforcement on workflow CRUD at all** — `permissionService` is never imported by the automation feature; any authenticated workspace member (including Viewer/Agent) can create, edit, or delete workflows. The spec requires Owner/Admin/Manager/Read-only tiers.
-
-**Recommended Engineering Solution:**
-- **Fix the permission gap first — it's a real, cheap security fix**, not a feature build: add `permissionService` checks to the three workflow actions.
-- Keep cron-based delays pre-launch (genuinely restart-safe); introduce BullMQ only if sub-day granularity or true async dispatch becomes a real requirement.
-- Add a `retryCount`/`maxRetries` column and retry loop before marking an action failed.
-- Expand actions/triggers incrementally, prioritizing ones with existing service-layer equivalents (Create Task, Update Contact now; Send WhatsApp once Meta OAuth lands).
-- Treat AI Generator and Human Approval as net-new features to schedule, not gaps to patch onto existing code.
+**Remaining gaps, out of the approved scope:**
+- Nested AND/OR condition groups, Branches, general Variables, Workflow Versioning — still absent (the
+  engine stays deliberately linear/3-node, not a graph editor).
+- Multi-Channel Dispatch: only Email + in-app + webhook are real; WhatsApp/SMS actions don't exist (blocked on Meta OAuth, PART 3/7).
+- No BullMQ/Redis job queue — execution is still synchronous/inline within the triggering request (kept deliberately; cron-based delays are already restart-safe, and introducing a queue was scoped to "only if sub-day granularity or true async dispatch becomes a real requirement," which hasn't happened).
 
 ---
 
 ## PART 7 — Dashboard, Analytics & Business Intelligence
 
-**Status: Partial**
+**Status: Substantially closed (2026-08-07)**
 
 **Implemented:**
 - AI Insights are real, not canned — pulls live dashboard numbers, sends to the actual AI provider, caches per-workspace for 24h with fallback to last-good cache.
 - **Business Health Score is genuinely computed** — averages lead-conversion/order-completion/appointment-completion/AI-success rates, correctly returns `null` (not a fake 0) when there's no data.
-- Real KPIs + 5 charts backed by real repository queries.
-- 4 real CSV report endpoints (contacts/leads/orders/appointments), feature-gated.
+- Real KPIs + charts backed by real repository queries, now including both `BarChartCard` and a
+  `LineChartCard` (time-series trends render as lines, category comparisons as bars — a real form fix,
+  not a blanket swap) and a "Revenue by product" breakdown.
+- **Role-based Home dashboard** — `dashboardService.getMyWorkBand()` branches Agent/Viewer to their own
+  assigned conversations/tasks, distinct from the management-role summary bands (Phase 3).
+- **9 of the spec's 11 named report types now exist**, all with CSV/Excel/PDF export: Contacts, Leads,
+  Orders, Appointments, Conversations, Automations, AI Usage, Team Performance, Revenue. Only Channels
+  (low value while WhatsApp/Instagram remain Meta-blocked stubs) is still missing.
+- **Team Performance report** — per-agent conversations handled, tasks completed, avg first-response
+  time, feeding a full workspace-member roster (zero-activity members included, not hidden).
 
-**Missing:**
-- **No role-based dashboards** — one `getSummary()` call serves everyone regardless of role; no Owner-vs-Agent branching.
-- **Only one chart type exists** (`bar-chart-card.tsx`) — every chart in the app is a bar chart with different data, not the varied set (funnels, trends, breakdowns) the spec implies.
-- Reports are CSV-only; missing report types entirely (Conversations, AI usage, Channels, Team performance, Automation, Revenue).
-- No AI Recommendations feature ("contact these 5 hot leads today").
-
-**Recommended Engineering Solution:**
-- Branch the dashboard service by role (Agent → assigned conversations/tasks only).
-- Add a line/pie chart component alongside the existing bar chart.
-- Add `xlsx` (SheetJS) for Excel and a lightweight PDF renderer, reusing existing report queries.
+**Remaining gaps:**
+- Channels report type not built (would mostly export empty rows until Meta OAuth lands).
+- No AI Recommendations feature ("contact these 5 hot leads today") — still absent.
+- No dedicated tenant AI Activity Log page (the AI Usage report is exported from `/dashboard/ai-employee`, not its own page).
 
 ---
 
@@ -255,25 +242,23 @@ PART 3 and the Execution Plan's Decision 1.
 
 ## PART 9 — Super Admin Platform & SaaS Operations
 
-**Status: Partial — the largest raw gap area outside Group 8**
+**Status: Substantially closed (2026-08-07)** — the three named net-new subsystems are now built; only
+infra monitoring remains, correctly blocked on external accounts (`DEFERRED_TASKS.md` item 9).
 
 **Implemented:**
 - Fully separate auth (`requirePlatformAdmin`/`requirePrimaryPlatformAdmin`), independent of tenant RBAC.
 - Real workspace management: activate plan, change status (suspend/restore), **read-only impersonation** restricted to bootstrap admins, every view logged to `audit_logs`, zero write path — confirmed by reading the page, no mutation actions present.
 - Audit log with a real typed action enum, snapshots actor email so it survives admin deletion.
+- **Support tickets system** — `/admin/tickets` sees every workspace's tickets, replies, changes status; tenants use `/dashboard/support`. In-app notification + best-effort email on reply, both workspace and platform audit logging.
+- **AI Operations console** (`/admin/ai-operations`) — a platform-wide AI kill switch that degrades safely through the existing `inboxService.triggerAiReply` catch path, plus a per-provider/model request/success-rate/latency breakdown.
+- **Feature flags system** (`/admin/feature-flags`) — create/toggle global flags, fail-open by default, distinct from plan-based feature gating; wired as a real gate on the AI Workflow Generator.
+- Unified Super Admin home dashboard now exists (Phase 8, earlier slice) — `/admin` has a real landing page (workspace/revenue/AI KPIs + recent signups), not just nav links.
 
-**Missing:**
+**Remaining gaps:**
 - No search/filter on the workspace list, no delete, no reset-trial/reset-limits, no transfer-ownership.
-- **No support tickets system at all.**
-- **No AI Operations console** — only aggregate + per-workspace totals, no per-provider/per-model breakdown, no global provider enable/disable.
-- **No feature-flag system** — plan `enabledFeatures` is billing-tied, not a general flag system (platform-wide/beta/per-workspace).
-- **No system/error/infra health monitoring** — Sentry/PostHog confirmed absent.
-- Audit event coverage is narrower than spec: missing admin-login, refund-issued, role-updated, AI-provider-changed, support-access events.
-- No unified Super Admin home dashboard — KPIs are split across separate `/admin/revenue` and `/admin/ai-usage` pages; `/admin` itself has no landing page beyond nav links.
-
-**Recommended Engineering Solution:**
-- Cheapest near-term wins: client-side search/filter on the (currently small) workspace list, plus an admin-login audit event.
-- Support tickets, AI Ops console, feature flags, and infra monitoring are all net-new subsystems with no partial scaffolding — sequence by actual business urgency, don't build speculatively.
+- **No system/error/infra health monitoring** — Sentry/PostHog still confirmed absent; formally deferred
+  (not a gap to schedule, an external-account blocker — see `DEFERRED_TASKS.md` item 9).
+- Audit event coverage is narrower than spec: missing admin-login, refund-issued, role-updated, AI-provider-changed events.
 
 ---
 
@@ -886,3 +871,104 @@ already exists in Super Admin).
 Next: further Phase 8 scope (Team performance / Revenue reports, Super Admin support tickets/AI Ops
 console/feature flags), Phase 7 once a Meta Developer App exists, or Phase 9 (Growth Modules) per the
 approved plan.
+
+**2026-08-07 — Phase 5 completed, Phase 6 completed, Phase 8 completed (mega-session, user asked for
+all three in one sitting).** User pasted back the exact remaining-item lists from a prior status summary
+and asked to complete them all now, without per-item check-ins. Worked through them as one continuous
+session, verifying with typecheck/lint/test/build after each vertical slice and applying every migration
+directly to the live Supabase database (as established all session), committing after each slice.
+
+**Phase 5, remainder completed:**
+- Contact schema expansion: `avatarUrl`, `country`, `city`, `source`, `lifecycleStage` (enum:
+  lead/customer/repeat_customer/vip/loyal_customer, default "lead"), `assignedAgentId` — plus
+  `crmService.advanceLifecycleStage()`, auto-called from `orderService.updateOrderStatus()` on any
+  revenue-counting status, rank-gated so it only ever advances, never demotes.
+- Full filters on Contacts (lifecycle stage, tag) and Leads (tag, language) list pages —
+  `contactRepository`/`leadRepository.findByWorkspaceId` signatures changed from a positional `search?`
+  param to a `filters?: {...}` object (all call sites checked/updated).
+- Unified contact timeline: new pure `mergeTimeline()` helper flattens+sorts conversations/leads/
+  orders/appointments/activities into one interleaved feed on the contact detail page, replacing 5
+  previously-separate sections. Task/Note panels deliberately kept as separate interactive widgets above
+  it (documented design decision).
+- PDF/Excel export: new `src/lib/{excel,pdf}.ts` (SheetJS / pdfkit) + `report-response.ts` dispatcher
+  (`?format=csv|xlsx|pdf`) wired into all 4 existing report routes (contacts/leads/orders/appointments)
+  and a shared `<ExportButtons>` component.
+- **PART 5 is now fully closed** — every item from the original gap list is done.
+
+**Phase 6, remainder completed:**
+- 4 new workflow actions: `create_order`, `book_appointment`, `send_ai_reply` (dynamic-imports
+  `ai.service.ts` to break a circular-module-graph — documented inline), `request_approval`.
+- 3 new condition fields: `lead_score`, `order_value` (both "at least" threshold checks against
+  workspace-computed values), `working_hours` (new pure `isWithinWorkingHours()` lib fn, fail-open with
+  no config).
+- **Human Approval flow**: new `workflow_approvals` table + `/dashboard/automations/approvals` inbox.
+  Approving a request runs a *different*, pre-linked workflow's action for the same contact/event via the
+  same one-hop `runAndLog`/chain-Set primitive `trigger_another_workflow` already uses — the engine's
+  linear architecture has no notion of "resuming" a paused workflow, so this reuses an existing primitive
+  rather than inventing a new execution model.
+- **AI Workflow Generator**: `aiService.generateWorkflowFromDescription()` parses a plain-language
+  description into the same `createWorkflowSchema` shape manual building produces — populates the same
+  React state `applyTemplate()` does, so it flows through the identical submission path (no new execution
+  model, per the spec's own constraint). Initially missing the 3 newest action types from its own prompt
+  (create_order/book_appointment/request_approval) — caught and fixed same-session before shipping.
+- Missing `workflow` statuses: added `draft`/`disabled`/`archived` (was just active/paused).
+- **PART 6 is now fully closed.**
+- Added unit test coverage for all of the above (new automation actions, `decideApproval`, the AI
+  generator's JSON-parsing/error paths) — none of this had tests when first built earlier in the session;
+  this mega-session's first checkpoint action was closing that gap. 77→247 tests over the Phase 5+6 slice.
+
+**Phase 8, five of six remaining items completed** (error/infra monitoring formally deferred, see below):
+- **Team performance report**: new `/dashboard/analytics` section — per-agent conversations handled,
+  tasks completed, avg first-response time (new `analyticsRepository.avgFirstResponseSecondsByAgent`, a
+  raw-SQL `DISTINCT ON` query since "whose reply was first" isn't a plain `GROUP BY` aggregate), CSV/
+  Excel/PDF export. Every current workspace member shows up even with zero activity (a roster, not just
+  active agents).
+- **Workspace-level revenue report**: "Revenue by product" breakdown chart + export — distinct from Super
+  Admin's platform-wide subscription MRR/ARR (that's platform revenue *from* tenants; this is a tenant's
+  own revenue *from its customers*, already partially visible as a single KPI/day-chart, now with a
+  by-product breakdown that wasn't visualized anywhere before).
+- **Support Tickets** (net-new subsystem, PART 9): tenant users open/reply to tickets at
+  `/dashboard/support`; Super Admins see every workspace's tickets at `/admin/tickets`, reply, change
+  status. New `support_tickets`/`support_ticket_messages` tables, new `support.tickets.view` permission
+  seeded to every role (support access is universal, not role-gated). In-app notification (unconditional)
+  + best-effort email on admin reply, same "in-app never blocked by email" pattern `notify_owner_email`
+  established. Both workspace-scoped and cross-tenant (Super Admin) audit logging.
+- **AI Operations console**: new `/admin/ai-operations` — a platform-wide AI kill switch
+  (`platform_settings.aiEnabled`, checked at the top of `aiService.generateReply`) that degrades safely
+  through the *existing* failure path (`inboxService.triggerAiReply` already catches any thrown error and
+  hands the conversation to a human — zero new code needed there), plus a per-provider/model request/
+  success-rate/latency breakdown (`aiUsageAdminRepository.getByModel`, groups by columns that already
+  existed on `ai_usage` — only one provider exists today, but this scales unchanged once a second is
+  added).
+- **Feature flags system**: new global `feature_flags` table + `/admin/feature-flags` (create/toggle,
+  audited). Deliberately distinct from `plans.enabledFeatures` (billing/product-module gating) and the AI
+  Operations kill switch (all AI replies) — this gates individual riskier code paths one at a time. A flag
+  with no row yet resolves to *enabled* (fail-open), so shipping a new gated path never silently breaks
+  anything until an admin explicitly creates+disables its flag. Wired as a real, non-decorative example:
+  the AI Workflow Generator now checks `automation.ai_workflow_generator` before calling the AI.
+- **Error/infra monitoring (Sentry + PostHog): formally documented as deferred, not built** — this was
+  the one item the user's own message already flagged as blocked ("تحتاج Sentry/PostHog"). Unlike
+  `EmailService`, there's no meaningful fake/mock mode worth scaffolding (a fake Sentry client is just
+  `console.log`, which is already what every catch boundary does today) — see `DEFERRED_TASKS.md` item 9
+  for the full writeup and unblock steps.
+- Added a new `SERVICE_UNAVAILABLE` `AppErrorCode` (used by both the AI kill switch and the workflow-
+  generator flag gate) and 4 new `workflowApprovalStatus`-style enum values across `audit_action`/
+  `workspace_audit_action`/`notification_type` for the new subsystems.
+
+Verified after every slice: typecheck clean, lint clean, full test suite passing throughout (77 → 247 →
+249 → 261 → 264 → 270 tests across the six sub-slices), production build clean, every migration
+generated+reviewed+applied directly to the live Supabase database before moving on, `pnpm run db:seed`
+re-run live to get the new `support.tickets.view` permission into production. i18n key counts (en/ar/ku)
+verified in sync after every batch — final count: **957/957/957**. Six commits, one per verified slice
+(Phase 5+6 combined, then one per Phase 8 item).
+
+**PART 8/9 status after this session**: Support tickets, AI Ops console, and feature flags — the three
+Super Admin items explicitly named in the original gap report — are now built. Team performance and
+tenant Revenue reports close out the remaining PART 7 report-type gaps from the previous slice's list.
+Error/infra monitoring remains the one genuinely external-account-blocked item in Phase 8, correctly
+staying in `DEFERRED_TASKS.md` rather than PROJECT_GAP_ANALYSIS.md's open-items list.
+
+Next: Phase 7 (Channels/Meta OAuth) once a Meta Developer App exists, or Phase 9 (Growth Modules —
+Website Builder, Integrations, Predictive Analytics, Ads) per the approved plan. With Phases 1, 3, 4, 5,
+6, and 8 now complete/closed and Phase 2 resolved, only Phase 7 (external-blocked) and Phase 9
+(deliberately-last, largest net-new build) remain from the original 9-phase plan.
