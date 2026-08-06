@@ -273,7 +273,8 @@
         "heading": "Needs your attention",
         "empty": "Nothing needs your attention right now.",
         "handover": "Waiting for a human reply — {name}",
-        "coldLead": "No contact in over a week — {name}"
+        "coldLead": "No contact in over a week — {name}",
+        "hotLead": "Hot lead — reach out today, {name}"
       },
       "growing": {
         "heading": "How your business is growing",
@@ -487,11 +488,32 @@
   "platformAdmin": {
     "badge": "Platform Admin",
     "backToDashboard": "Back to your dashboard",
+    "homeLink": "Home",
     "workspacesLink": "Workspaces",
     "plansLink": "Plans",
     "aiUsageLink": "AI Usage",
     "settingsLink": "Settings",
     "adminsLink": "Admins",
+    "home": {
+      "title": "Overview",
+      "description": "Everything running on the platform, at a glance.",
+      "workspacesHeading": "Workspaces",
+      "total": "Total",
+      "active": "Active",
+      "trial": "On trial",
+      "suspended": "Suspended",
+      "revenueHeading": "Revenue",
+      "mrr": "MRR",
+      "arr": "ARR",
+      "aiHeading": "AI usage",
+      "aiRequests": "Total requests",
+      "aiSuccessRate": "Success rate",
+      "aiAvgLatency": "Avg. latency",
+      "msValue": "{ms} ms",
+      "recentSignupsHeading": "Recent signups",
+      "noSignups": "No workspaces yet.",
+      "noOwner": "No owner"
+    },
     "aiUsage": {
       "title": "AI Usage",
       "description": "Requests, tokens, and reliability across every workspace.",

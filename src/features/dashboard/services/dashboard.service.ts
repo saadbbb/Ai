@@ -2,8 +2,10 @@ import "server-only";
 import { leadStageEnum, type LeadStage } from "@/db/schema";
 import { aiUsageRepository } from "@/features/ai/repository/ai-usage.repository";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
+import { leadTemperature } from "@/features/crm/lib/lead-score";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { taskRepository } from "@/features/crm/repository/task.repository";
+import { crmService } from "@/features/crm/services/crm.service";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { orderTotal } from "@/features/orders/lib/order-total";
@@ -124,7 +126,7 @@ export interface TodayBand {
 }
 
 /** PART 13B Band 2 — "what needs my attention," AI/rule-curated, capped and linkable. */
-export type AttentionItemType = "handover" | "cold_lead";
+export type AttentionItemType = "handover" | "cold_lead" | "hot_lead";
 
 export interface AttentionItem {
   type: AttentionItemType;
@@ -153,11 +155,12 @@ function daysSince(date: Date | null): number {
 async function getTodayAndAttentionBands(
   workspaceId: string,
 ): Promise<{ today: TodayBand; attention: AttentionBand; pipelineByStage: { stage: LeadStage; count: number }[] }> {
-  const [conversations, leads, orders, appointments] = await Promise.all([
+  const [conversations, leads, orders, appointments, scoredLeads] = await Promise.all([
     conversationRepository.findByWorkspaceId(workspaceId),
     leadRepository.findByWorkspaceId(workspaceId),
     orderRepository.findByWorkspaceId(workspaceId),
     appointmentRepository.findByWorkspaceId(workspaceId),
+    crmService.listLeads(workspaceId),
   ]);
 
   const today: TodayBand = {
@@ -192,12 +195,30 @@ async function getTodayAndAttentionBands(
       href: `/dashboard/contacts/${item.contact.id}`,
     }));
 
+  // "AI Recommendations" (PART 7 gap: "contact these 5 hot leads today") — reuses the same
+  // deterministic score crmService.listLeads/lead-score.ts already compute and the Leads
+  // board already displays, rather than a separate recommendation model.
+  const hotLeadItems: AttentionItem[] = scoredLeads
+    .filter((item) => !CLOSED_LEAD_STAGES.includes(item.lead.stage))
+    .filter((item) => {
+      const temperature = leadTemperature(item.score);
+      return temperature === "hot" || temperature === "priority";
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, ATTENTION_ITEM_LIMIT)
+    .map((item) => ({
+      type: "hot_lead",
+      id: item.lead.id,
+      label: item.contact.fullName,
+      href: `/dashboard/contacts/${item.contact.id}`,
+    }));
+
   const pipelineByStage = leadStageEnum.enumValues.map((stage) => ({
     stage,
     count: leads.filter((item) => item.lead.stage === stage).length,
   }));
 
-  return { today, attention: { items: [...handoverItems, ...coldLeadItems] }, pipelineByStage };
+  return { today, attention: { items: [...handoverItems, ...coldLeadItems, ...hotLeadItems] }, pipelineByStage };
 }
 
 /**

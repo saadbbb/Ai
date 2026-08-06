@@ -10,9 +10,10 @@ import { membershipRepository } from "@/features/workspace/repository/membership
 import { permissionService } from "@/features/workspace/services/permission.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
-const ATTENTION_LABEL_KEY: Record<AttentionItem["type"], "handover" | "coldLead"> = {
+const ATTENTION_LABEL_KEY: Record<AttentionItem["type"], "handover" | "coldLead" | "hotLead"> = {
   handover: "handover",
   cold_lead: "coldLead",
+  hot_lead: "hotLead",
 };
 
 /** Roles that see the narrower "My Work" band instead of the workspace-wide Today band — see PART 7's Agent Dashboard. */

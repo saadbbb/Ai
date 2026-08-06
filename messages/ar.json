@@ -273,7 +273,8 @@
         "heading": "بحاجة إلى انتباهك",
         "empty": "لا شيء يحتاج انتباهك الآن.",
         "handover": "بانتظار رد بشري — {name}",
-        "coldLead": "لا تواصل منذ أكثر من أسبوع — {name}"
+        "coldLead": "لا تواصل منذ أكثر من أسبوع — {name}",
+        "hotLead": "عميل محتمل ساخن — تواصل معه اليوم، {name}"
       },
       "growing": {
         "heading": "كيف ينمو عملك",
@@ -487,10 +488,31 @@
   "platformAdmin": {
     "badge": "إدارة المنصة",
     "backToDashboard": "الرجوع للوحة تحكمك",
+    "homeLink": "الرئيسية",
     "workspacesLink": "المساحات",
     "plansLink": "الباقات",
     "aiUsageLink": "استخدام الذكاء الاصطناعي",
     "settingsLink": "الإعدادات",
+    "home": {
+      "title": "نظرة عامة",
+      "description": "كل شي يشتغل على المنصة، بنظرة وحدة.",
+      "workspacesHeading": "مساحات العمل",
+      "total": "الإجمالي",
+      "active": "نشطة",
+      "trial": "تجربة مجانية",
+      "suspended": "موقوفة",
+      "revenueHeading": "الإيرادات",
+      "mrr": "MRR",
+      "arr": "ARR",
+      "aiHeading": "استخدام الذكاء الاصطناعي",
+      "aiRequests": "إجمالي الطلبات",
+      "aiSuccessRate": "نسبة النجاح",
+      "aiAvgLatency": "متوسط الاستجابة",
+      "msValue": "{ms} مللي ثانية",
+      "recentSignupsHeading": "أحدث التسجيلات",
+      "noSignups": "لا توجد مساحات بعد.",
+      "noOwner": "بدون مالك"
+    },
     "aiUsage": {
       "title": "استخدام الذكاء الاصطناعي",
       "description": "الطلبات والرموز (tokens) وموثوقية الأداء عبر كل مساحات العمل.",

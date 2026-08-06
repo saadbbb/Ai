@@ -786,3 +786,39 @@ codebase doesn't have yet, not a quick add), unified Super Admin home dashboard.
 
 Next: further Phase 8 scope, Phase 7 once a Meta Developer App exists, or Phase 9 (Growth Modules) per the
 approved plan.
+
+**2026-08-06 — Phase 8, second slice.** Two more PART 7/9 gaps, both explicitly named in the gap report:
+
+- **Unified Super Admin home dashboard** (PART 9: "`/admin` itself has no landing page beyond nav links").
+  New `/admin/page.tsx` — the first page a platform admin sees now — composing the same repositories
+  `/admin/revenue` and `/admin/ai-usage` already use (workspace counts by status, MRR/ARR via the existing
+  `calculateRevenue`, AI request volume/success rate/latency, 5 most recent signups) rather than a new
+  aggregation table, same "fine at this scale" reasoning the tenant dashboard already documents. Added a
+  "Home" nav link (`/admin`) as the first item in the admin nav — previously the nav had no way back to a
+  root overview at all.
+- **AI Recommendations on the tenant Home dashboard** (PART 7: "AI Recommendations feature — 'contact
+  these 5 hot leads today'" — explicitly the spec's own example). Rather than a new scoring model, this
+  reuses the exact same deterministic lead score (`crmService.listLeads` / `lead-score.ts`) already
+  computed for the Leads kanban board — a lead scored "hot" or "priority" (score ≥ 70, via the existing
+  `leadTemperature` classifier) and still in a non-terminal stage now appears as a new `hot_lead` item type
+  in the Home page's existing "Needs your attention" band (Band 2), alongside the pre-existing handover and
+  cold-lead items, sorted by score and capped at 5 — no new UI section, no new backend model, one more item
+  type in an already-established pattern.
+- No migration this slice either.
+- i18n: en/ar/ku updated and re-verified in sync (801 keys each, up from 780).
+- 7 new tests (hot-lead sorting/capping/terminal-stage-exclusion in `dashboard.service.test.ts`). No
+  dedicated test for `/admin/page.tsx` itself, consistent with this codebase's page/component testing
+  pattern (pages aren't unit tested; the underlying `calculateRevenue`/`aiUsageAdminRepository` logic they
+  compose already has its own coverage from earlier phases). Full suite: typecheck clean, lint clean,
+  **210/210 tests passing** (up from 207), production build clean — `/admin` now shows up as a real route
+  in the build output for the first time.
+
+**Still open after this Phase 8 slice**: chart variety (bar-chart-only), additional report types beyond
+the 4 existing CSV exports, billing invoices/discounts/multi-currency (blocked on a real payment gateway —
+business decision), Super Admin support tickets, AI Operations console (per-provider/per-model breakdown,
+global provider enable/disable), feature-flag system, infra/error monitoring (Sentry/PostHog — external
+accounts), delete/reset-trial/transfer-ownership workspace actions, broader audit event coverage. These
+remain accurately reflected as open items in PART 7/8/9's "Missing" sections above.
+
+Next: further Phase 8 scope, Phase 7 once a Meta Developer App exists, or Phase 9 (Growth Modules) per the
+approved plan.
