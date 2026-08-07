@@ -254,6 +254,7 @@
     "analyticsLink": "شیکاری",
     "websiteLink": "ماڵپەڕ",
     "integrationsLink": "پەیوەندییەکان",
+    "campaignsLink": "کەمپینەکان",
     "accountMenuLabel": "ڕێکخستنەکانی مکان‌ی کار",
     "workspaceProfileLink": "پرۆفایلی مکانی کار",
     "billingLink": "پارەدان",
@@ -644,7 +645,8 @@
         "knowledge_base": "بنکەی زانیاری",
         "analytics": "شیکاری",
         "website": "ماڵپەڕ و دوکان",
-        "integrations": "پەیوەندییەکان"
+        "integrations": "پەیوەندییەکان",
+        "campaigns": "کەمپینەکان"
       },
       "pricePlaceholder": "نرخ بە دیناری عێراقی (ئارەزوومەندانە)",
       "priceSummary": "{price} {currency}/مانگانە",
@@ -1067,6 +1069,39 @@
       "creating": "لە دروستکردندایە...",
       "create": "زیادکردنی بەشداربوون",
       "emptyState": "هێشتا هیچ بەشداربوونێکی Webhook نییە."
+    }
+  },
+  "campaigns": {
+    "title": "کەمپینەکان",
+    "description": "پەیامێک بنێرە بۆ بەشێک لە کڕیارەکانت، و بزانە کێ لە مەترسی لەدەستدانە.",
+    "newHeading": "کەمپینی نوێ",
+    "namePlaceholder": "ناوی کەمپین (ناوخۆیی)",
+    "subjectPlaceholder": "بابەتی ئیمەیل",
+    "messagePlaceholder": "پەیامەکەت بنووسە...",
+    "requiredHint": "ناو و بابەت و پەیام پێویستن.",
+    "lifecycleStagePlaceholder": "هەر قۆناغێکی ژیانی کڕیار",
+    "tagPlaceholder": "پاڵاوتن بەپێی Tag (ئارەزوومەندانە)",
+    "preview": "پێشبینینی وەرگرەکان",
+    "previewing": "لە ژماردندایە...",
+    "recipientCount": "{count} وەرگر (ئیمەیلیان تۆمارکراوە)",
+    "creating": "لە پاشەکەوتکردندایە...",
+    "create": "پاشەکەوتکردن وەک ڕەشنووس",
+    "emptyState": "هێشتا هیچ کەمپینێک نییە.",
+    "sentSummary": "نێردرا بۆ {count} وەرگر",
+    "draftStatus": "ڕەشنووس",
+    "send": "ئێستا بینێرە",
+    "sending": "لە ناردندایە...",
+    "confirmSend": "ئەم کەمپینە ئێستا بنێردرێت؟ ناتوانرێت پاشگەز بێتەوە.",
+    "sentToast": "کەمپین نێردرا بۆ {count} وەرگر.",
+    "churnRisk": {
+      "heading": "کڕیارانی لە مەترسیدا",
+      "description": "کڕیارانێک کە ماوەیەکە داواکارییان نەکردووە یان پەیوەندییان پێوە نەکراوە — کاندیدی باشن بۆ کەمپینی گەڕاندنەوە.",
+      "emptyState": "لە ئێستادا هیچ کڕیارێک لە مەترسیدا نییە.",
+      "levels": {
+        "low": "مەترسی کەم",
+        "medium": "مەترسی ناوەند",
+        "high": "مەترسی بەرز"
+      }
     }
   },
   "aiTest": {

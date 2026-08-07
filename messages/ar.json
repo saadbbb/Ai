@@ -254,6 +254,7 @@
     "analyticsLink": "التحليلات",
     "websiteLink": "الموقع",
     "integrationsLink": "التكاملات",
+    "campaignsLink": "الحملات",
     "accountMenuLabel": "إعدادات مساحة العمل",
     "workspaceProfileLink": "ملف مساحة العمل",
     "billingLink": "الفوترة",
@@ -644,7 +645,8 @@
         "knowledge_base": "قاعدة المعرفة",
         "analytics": "التحليلات",
         "website": "الموقع والمتجر",
-        "integrations": "التكاملات"
+        "integrations": "التكاملات",
+        "campaigns": "الحملات"
       },
       "pricePlaceholder": "السعر بالدينار العراقي (اختياري)",
       "priceSummary": "{price} {currency}/شهرياً",
@@ -1067,6 +1069,39 @@
       "creating": "جارٍ الإنشاء...",
       "create": "إضافة اشتراك",
       "emptyState": "لا توجد اشتراكات Webhook بعد."
+    }
+  },
+  "campaigns": {
+    "title": "الحملات",
+    "description": "أرسل رسالة إلى شريحة من عملائك، وشاهد من هو معرّض لخطر فقدانه.",
+    "newHeading": "حملة جديدة",
+    "namePlaceholder": "اسم الحملة (داخلي)",
+    "subjectPlaceholder": "موضوع البريد الإلكتروني",
+    "messagePlaceholder": "اكتب رسالتك...",
+    "requiredHint": "الاسم والموضوع والرسالة مطلوبة.",
+    "lifecycleStagePlaceholder": "أي مرحلة دورة حياة",
+    "tagPlaceholder": "تصفية حسب Tag (اختياري)",
+    "preview": "معاينة المستلمين",
+    "previewing": "جارٍ العد...",
+    "recipientCount": "{count} مستلم (لديهم بريد إلكتروني مسجل)",
+    "creating": "جارٍ الحفظ...",
+    "create": "حفظ كمسودة",
+    "emptyState": "لا توجد حملات بعد.",
+    "sentSummary": "أُرسلت إلى {count} مستلم",
+    "draftStatus": "مسودة",
+    "send": "إرسال الآن",
+    "sending": "جارٍ الإرسال...",
+    "confirmSend": "إرسال هذه الحملة الآن؟ لا يمكن التراجع عن هذا.",
+    "sentToast": "أُرسلت الحملة إلى {count} مستلم.",
+    "churnRisk": {
+      "heading": "عملاء معرّضون للخطر",
+      "description": "عملاء لم يطلبوا أو يتم التواصل معهم منذ فترة — مرشحون جيدون لحملة استعادة.",
+      "emptyState": "لا يوجد حالياً عملاء معرّضون للخطر.",
+      "levels": {
+        "low": "خطر منخفض",
+        "medium": "خطر متوسط",
+        "high": "خطر عالٍ"
+      }
     }
   },
   "aiTest": {

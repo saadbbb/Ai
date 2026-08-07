@@ -254,6 +254,7 @@
     "analyticsLink": "Analytics",
     "websiteLink": "Website",
     "integrationsLink": "Integrations",
+    "campaignsLink": "Campaigns",
     "accountMenuLabel": "Workspace settings",
     "workspaceProfileLink": "Workspace Profile",
     "billingLink": "Billing",
@@ -644,7 +645,8 @@
         "knowledge_base": "Knowledge Base",
         "analytics": "Analytics",
         "website": "Website & Store",
-        "integrations": "Integrations"
+        "integrations": "Integrations",
+        "campaigns": "Campaigns"
       },
       "pricePlaceholder": "Price in IQD (optional)",
       "priceSummary": "{price} {currency}/mo",
@@ -1067,6 +1069,39 @@
       "creating": "Creating...",
       "create": "Add subscription",
       "emptyState": "No webhook subscriptions yet."
+    }
+  },
+  "campaigns": {
+    "title": "Campaigns",
+    "description": "Send a message to a segment of your customers, and see who's at risk of churning.",
+    "newHeading": "New campaign",
+    "namePlaceholder": "Campaign name (internal)",
+    "subjectPlaceholder": "Email subject",
+    "messagePlaceholder": "Write your message...",
+    "requiredHint": "Name, subject, and message are required.",
+    "lifecycleStagePlaceholder": "Any lifecycle stage",
+    "tagPlaceholder": "Filter by tag (optional)",
+    "preview": "Preview recipients",
+    "previewing": "Counting...",
+    "recipientCount": "{count} recipients (with an email on file)",
+    "creating": "Saving...",
+    "create": "Save as draft",
+    "emptyState": "No campaigns yet.",
+    "sentSummary": "Sent to {count} recipients",
+    "draftStatus": "Draft",
+    "send": "Send now",
+    "sending": "Sending...",
+    "confirmSend": "Send this campaign now? This can't be undone.",
+    "sentToast": "Campaign sent to {count} recipients.",
+    "churnRisk": {
+      "heading": "Customers at risk",
+      "description": "Customers who haven't ordered or been contacted in a while — good candidates for a win-back campaign.",
+      "emptyState": "No customers currently look at risk.",
+      "levels": {
+        "low": "Low risk",
+        "medium": "Medium risk",
+        "high": "High risk"
+      }
     }
   },
   "aiTest": {

@@ -15,6 +15,7 @@ export const FEATURE_KEYS = [
   "analytics",
   "website",
   "integrations",
+  "campaigns",
 ] as const;
 
 export type FeatureKey = (typeof FEATURE_KEYS)[number];

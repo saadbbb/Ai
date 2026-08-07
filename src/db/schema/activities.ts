@@ -25,6 +25,7 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "note_added",
   "task_created",
   "task_completed",
+  "campaign_message_sent",
 ]);
 
 /** Who caused the event — distinguishes a human click from something the AI decided on its own. */
