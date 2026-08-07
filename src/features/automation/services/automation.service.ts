@@ -19,6 +19,7 @@ import { taskRepository } from "@/features/crm/repository/task.repository";
 import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
 import { isWithinWorkingHours } from "@/features/ai/lib/working-hours";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
+import { integrationService } from "@/features/integrations/services/integration.service";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { messageRepository } from "@/features/inbox/repository/message.repository";
@@ -597,6 +598,10 @@ async function runAndLog(
  */
 async function dispatch(workspaceId: string, event: AutomationEvent): Promise<void> {
   try {
+    // Fires unconditionally, independent of whether any workflow matches below —
+    // webhook subscriptions are an always-on notification channel, not a workflow.
+    await integrationService.notifyWebhookSubscribers(workspaceId, event);
+
     const workflows = await workflowRepository.findActiveByTrigger(workspaceId, event.type);
     const triggerMatches = workflows.filter((workflow) => matchesTrigger(workflow, event));
     if (triggerMatches.length === 0) return;

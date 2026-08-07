@@ -36,3 +36,4 @@ export * from "./workspace-audit-logs";
 export * from "./support-tickets";
 export * from "./feature-flags";
 export * from "./storefronts";
+export * from "./integrations";

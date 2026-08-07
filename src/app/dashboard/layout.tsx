@@ -44,6 +44,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     canViewAnalytics,
     canViewAutomations,
     canViewSupport,
+    canManageIntegrations,
   ] = await Promise.all([
     getTranslations("dashboard"),
     platformAdminService.isPlatformAdmin(user.email),
@@ -53,6 +54,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     permissionService.hasPermission(user.id, workspace.id, "analytics.view"),
     permissionService.hasPermission(user.id, workspace.id, "automation.workflows.view"),
     permissionService.hasPermission(user.id, workspace.id, "support.tickets.view"),
+    permissionService.hasPermission(user.id, workspace.id, "integrations.manage"),
   ]);
   const isSuspended = workspace.subscriptionStatus === "suspended";
   const [settings, enabledFeatures] = await Promise.all([
@@ -89,6 +91,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         ...(canViewAutomations ? [{ href: "/dashboard/automations", label: t("automationsLink"), feature: "automations" as const }] : []),
         ...(canViewAnalytics ? [{ href: "/dashboard/analytics", label: t("analyticsLink"), feature: "analytics" as const }] : []),
         { href: "/dashboard/website", label: t("websiteLink"), feature: "website" as const },
+        ...(canManageIntegrations ? [{ href: "/dashboard/integrations", label: t("integrationsLink"), feature: "integrations" as const }] : []),
       ],
     },
   ];

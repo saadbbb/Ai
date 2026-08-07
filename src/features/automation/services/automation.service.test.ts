@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Contact, Workflow } from "@/db/schema";
 
+vi.mock("@/features/integrations/services/integration.service", () => ({
+  integrationService: {
+    notifyWebhookSubscribers: vi.fn(),
+  },
+}));
+
 vi.mock("../repository/workflow.repository", () => ({
   workflowRepository: {
     findActiveByTrigger: vi.fn(),
@@ -163,6 +169,7 @@ const { workflowApprovalRepository } = await import("../repository/workflow-appr
 const { aiService } = await import("@/features/ai/services/ai.service");
 const { emailService } = await import("@/lib/email");
 const { safeWebhookPost } = await import("../lib/safe-webhook-fetch");
+const { integrationService } = await import("@/features/integrations/services/integration.service");
 const { automationService } = await import("./automation.service");
 
 const WORKSPACE_ID = "workspace-1";
@@ -232,6 +239,7 @@ beforeEach(() => {
   vi.mocked(messageRepository.create).mockResolvedValue({ id: "message-1" } as never);
   vi.mocked(conversationRepository.touchLastMessage).mockResolvedValue(undefined);
   vi.mocked(conversationRepository.updateAiStatus).mockResolvedValue(undefined);
+  vi.mocked(integrationService.notifyWebhookSubscribers).mockResolvedValue(undefined);
 });
 
 describe("automationService.dispatch — matching", () => {
@@ -754,6 +762,19 @@ describe("automationService.dispatch — never throws", () => {
     expect(workflowRepository.logExecution).toHaveBeenCalledWith(
       expect.objectContaining({ success: false, errorMessage: expect.any(String) }),
     );
+  });
+});
+
+describe("automationService.dispatch — webhook subscribers", () => {
+  it("notifies webhook subscribers even when no workflow matches the event", async () => {
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(integrationService.notifyWebhookSubscribers).toHaveBeenCalledWith(WORKSPACE_ID, {
+      type: "lead_created",
+      contactId: CONTACT_ID,
+    });
   });
 });
 

@@ -253,6 +253,7 @@
     "automationsLink": "الأتمتة",
     "analyticsLink": "التحليلات",
     "websiteLink": "الموقع",
+    "integrationsLink": "التكاملات",
     "accountMenuLabel": "إعدادات مساحة العمل",
     "workspaceProfileLink": "ملف مساحة العمل",
     "billingLink": "الفوترة",
@@ -642,7 +643,8 @@
         "automations": "الأتمتة",
         "knowledge_base": "قاعدة المعرفة",
         "analytics": "التحليلات",
-        "website": "الموقع والمتجر"
+        "website": "الموقع والمتجر",
+        "integrations": "التكاملات"
       },
       "pricePlaceholder": "السعر بالدينار العراقي (اختياري)",
       "priceSummary": "{price} {currency}/شهرياً",
@@ -1040,6 +1042,31 @@
       "submitting": "جارٍ الإرسال...",
       "submit": "إرسال الاستفسار",
       "thankYou": "شكراً! سنتواصل معك قريباً."
+    }
+  },
+  "integrations": {
+    "title": "التكاملات",
+    "description": "مفاتيح API للاتصال بأدوات خارجية، وWebhooks تنطلق عند أحداث فورية.",
+    "apiKeys": {
+      "heading": "مفاتيح API",
+      "description": "استخدم مفتاح API لقراءة/كتابة بياناتك من أداة أو سكربت خارجي.",
+      "revealHint": "انسخ هذا المفتاح الآن — لن تتمكن من رؤيته مرة أخرى.",
+      "namePlaceholder": "اسم المفتاح، مثال: \"Zapier\"",
+      "creating": "جارٍ الإنشاء...",
+      "create": "إنشاء مفتاح",
+      "emptyState": "لا توجد مفاتيح API بعد.",
+      "active": "فعّال",
+      "revoked": "مُلغى",
+      "revoke": "إلغاء"
+    },
+    "webhooks": {
+      "heading": "اشتراكات Webhook",
+      "description": "احصل على طلب POST فوري عند حدوث أحد هذه الأحداث.",
+      "requiredHint": "الرابط وحدث واحد على الأقل مطلوبان.",
+      "urlPlaceholder": "https://your-endpoint.example.com/webhook",
+      "creating": "جارٍ الإنشاء...",
+      "create": "إضافة اشتراك",
+      "emptyState": "لا توجد اشتراكات Webhook بعد."
     }
   },
   "aiTest": {

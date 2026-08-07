@@ -71,7 +71,7 @@ async function assertSafeDestination(url: URL): Promise<void> {
  * validation failure, network error, non-2xx response, or timeout — callers
  * (automationService's retry loop) treat that uniformly as an action failure.
  */
-export async function safeWebhookPost(urlString: string, payload: unknown): Promise<void> {
+export async function safeWebhookPost(urlString: string, payload: unknown, extraHeaders?: Record<string, string>): Promise<void> {
   let url: URL;
   try {
     url = new URL(urlString);
@@ -87,7 +87,7 @@ export async function safeWebhookPost(urlString: string, payload: unknown): Prom
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...extraHeaders },
       body: JSON.stringify(payload),
       redirect: "manual",
       signal: controller.signal,

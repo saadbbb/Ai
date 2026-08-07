@@ -253,6 +253,7 @@
     "automationsLink": "خۆکارکردن",
     "analyticsLink": "شیکاری",
     "websiteLink": "ماڵپەڕ",
+    "integrationsLink": "پەیوەندییەکان",
     "accountMenuLabel": "ڕێکخستنەکانی مکان‌ی کار",
     "workspaceProfileLink": "پرۆفایلی مکانی کار",
     "billingLink": "پارەدان",
@@ -642,7 +643,8 @@
         "automations": "خۆکارکردن",
         "knowledge_base": "بنکەی زانیاری",
         "analytics": "شیکاری",
-        "website": "ماڵپەڕ و دوکان"
+        "website": "ماڵپەڕ و دوکان",
+        "integrations": "پەیوەندییەکان"
       },
       "pricePlaceholder": "نرخ بە دیناری عێراقی (ئارەزوومەندانە)",
       "priceSummary": "{price} {currency}/مانگانە",
@@ -1040,6 +1042,31 @@
       "submitting": "لە ناردندایە...",
       "submit": "ناردنی پرسیار",
       "thankYou": "سوپاس! بەم زووانە پەیوەندیت پێوە دەکەینەوە."
+    }
+  },
+  "integrations": {
+    "title": "پەیوەندییەکان",
+    "description": "کلیلی API بۆ پەیوەندیکردن بە ئامرازە دەرەکییەکان، و Webhook کە لە کاتی ڕووداوە ڕاستەقینەکاندا چالاک دەبن.",
+    "apiKeys": {
+      "heading": "کلیلەکانی API",
+      "description": "کلیلی API بەکاربێنە بۆ خوێندنەوە/نووسینی زانیارییەکانت لە ئامراز یان سکریپتێکی دەرەکییەوە.",
+      "revealHint": "ئێستا ئەم کلیلە کۆپی بکە — چیتر نایبینیتەوە.",
+      "namePlaceholder": "ناوی کلیل، بۆ نموونە: \"Zapier\"",
+      "creating": "لە دروستکردندایە...",
+      "create": "دروستکردنی کلیل",
+      "emptyState": "هێشتا هیچ کلیلێکی API نییە.",
+      "active": "چالاک",
+      "revoked": "هەڵوەشێنراوەتەوە",
+      "revoke": "هەڵوەشاندنەوە"
+    },
+    "webhooks": {
+      "heading": "بەشداربوونی Webhook",
+      "description": "داواکارییەکی POST ڕاستەقینە وەربگرە کاتێک یەکێک لەم ڕووداوانە ڕوودەدات.",
+      "requiredHint": "لینک و بەلایەنی کەمەوە یەک ڕووداو پێویستە.",
+      "urlPlaceholder": "https://your-endpoint.example.com/webhook",
+      "creating": "لە دروستکردندایە...",
+      "create": "زیادکردنی بەشداربوون",
+      "emptyState": "هێشتا هیچ بەشداربوونێکی Webhook نییە."
     }
   },
   "aiTest": {

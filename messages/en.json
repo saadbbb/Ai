@@ -253,6 +253,7 @@
     "automationsLink": "Automations",
     "analyticsLink": "Analytics",
     "websiteLink": "Website",
+    "integrationsLink": "Integrations",
     "accountMenuLabel": "Workspace settings",
     "workspaceProfileLink": "Workspace Profile",
     "billingLink": "Billing",
@@ -642,7 +643,8 @@
         "automations": "Automations",
         "knowledge_base": "Knowledge Base",
         "analytics": "Analytics",
-        "website": "Website & Store"
+        "website": "Website & Store",
+        "integrations": "Integrations"
       },
       "pricePlaceholder": "Price in IQD (optional)",
       "priceSummary": "{price} {currency}/mo",
@@ -1040,6 +1042,31 @@
       "submitting": "Sending...",
       "submit": "Send inquiry",
       "thankYou": "Thanks! We'll get back to you soon."
+    }
+  },
+  "integrations": {
+    "title": "Integrations",
+    "description": "API keys for connecting external tools, and webhooks that fire on real-time events.",
+    "apiKeys": {
+      "heading": "API keys",
+      "description": "Use an API key to read/write your data from an external tool or script.",
+      "revealHint": "Copy this key now — you won't be able to see it again.",
+      "namePlaceholder": "Key name, e.g. \"Zapier\"",
+      "creating": "Creating...",
+      "create": "Create key",
+      "emptyState": "No API keys yet.",
+      "active": "Active",
+      "revoked": "Revoked",
+      "revoke": "Revoke"
+    },
+    "webhooks": {
+      "heading": "Webhook subscriptions",
+      "description": "Get a real-time POST request whenever one of these events happens.",
+      "requiredHint": "A URL and at least one event are required.",
+      "urlPlaceholder": "https://your-endpoint.example.com/webhook",
+      "creating": "Creating...",
+      "create": "Add subscription",
+      "emptyState": "No webhook subscriptions yet."
     }
   },
   "aiTest": {

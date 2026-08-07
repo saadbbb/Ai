@@ -14,6 +14,7 @@ export const FEATURE_KEYS = [
   "knowledge_base",
   "analytics",
   "website",
+  "integrations",
 ] as const;
 
 export type FeatureKey = (typeof FEATURE_KEYS)[number];
