@@ -16,6 +16,7 @@ const PERMISSIONS = [
   { key: "support.tickets.view", description: "View and open support tickets with the platform team" },
   { key: "integrations.manage", description: "Create/revoke API keys and manage webhook subscriptions" },
   { key: "campaigns.manage", description: "Create and send proactive marketing campaigns" },
+  { key: "ads.manage", description: "Manage ad campaigns and view attribution reporting" },
 ] as const;
 
 const ROLES: Array<{ key: string; name: string; description: string; permissionKeys: string[] }> = [
@@ -41,6 +42,7 @@ const ROLES: Array<{ key: string; name: string; description: string; permissionK
       "support.tickets.view",
       "integrations.manage",
       "campaigns.manage",
+      "ads.manage",
     ],
   },
   {
@@ -56,6 +58,7 @@ const ROLES: Array<{ key: string; name: string; description: string; permissionK
       "automation.workflows.manage",
       "support.tickets.view",
       "campaigns.manage",
+      "ads.manage",
     ],
   },
   {

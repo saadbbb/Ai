@@ -255,6 +255,7 @@
     "websiteLink": "Website",
     "integrationsLink": "Integrations",
     "campaignsLink": "Campaigns",
+    "adsLink": "Ads",
     "accountMenuLabel": "Workspace settings",
     "workspaceProfileLink": "Workspace Profile",
     "billingLink": "Billing",
@@ -646,7 +647,8 @@
         "analytics": "Analytics",
         "website": "Website & Store",
         "integrations": "Integrations",
-        "campaigns": "Campaigns"
+        "campaigns": "Campaigns",
+        "ads": "Ads"
       },
       "pricePlaceholder": "Price in IQD (optional)",
       "priceSummary": "{price} {currency}/mo",
@@ -1102,6 +1104,35 @@
         "medium": "Medium risk",
         "high": "High risk"
       }
+    }
+  },
+  "ads": {
+    "title": "Ads",
+    "description": "Track ad campaigns and see which ones are actually driving customers and revenue.",
+    "metaAccountLabel": "Meta Ads account",
+    "connected": "Connected",
+    "notConnectedHint": "Not connected yet — this activates once Meta Ads integration is available.",
+    "campaigns": {
+      "heading": "Campaigns",
+      "description": "Log a campaign you're running, and tag it with the value customers will mention or that appears as their contact source.",
+      "namePlaceholder": "Campaign name",
+      "utmPlaceholder": "Tag (matches contact source), e.g. \"Instagram Summer Sale\"",
+      "budgetPlaceholder": "Budget (optional)",
+      "requiredHint": "Name and tag are required.",
+      "creating": "Saving...",
+      "create": "Add campaign",
+      "emptyState": "No ad campaigns logged yet.",
+      "statuses": {
+        "active": "Active",
+        "paused": "Paused",
+        "ended": "Ended"
+      }
+    },
+    "attribution": {
+      "heading": "Attribution",
+      "description": "Contacts and revenue traced back to each campaign via their contact source.",
+      "emptyState": "Log a campaign to see attribution here.",
+      "contactCount": "{count} contacts"
     }
   },
   "aiTest": {

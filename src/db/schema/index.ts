@@ -38,3 +38,4 @@ export * from "./feature-flags";
 export * from "./storefronts";
 export * from "./integrations";
 export * from "./campaigns";
+export * from "./ads";

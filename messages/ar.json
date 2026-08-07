@@ -255,6 +255,7 @@
     "websiteLink": "الموقع",
     "integrationsLink": "التكاملات",
     "campaignsLink": "الحملات",
+    "adsLink": "الإعلانات",
     "accountMenuLabel": "إعدادات مساحة العمل",
     "workspaceProfileLink": "ملف مساحة العمل",
     "billingLink": "الفوترة",
@@ -646,7 +647,8 @@
         "analytics": "التحليلات",
         "website": "الموقع والمتجر",
         "integrations": "التكاملات",
-        "campaigns": "الحملات"
+        "campaigns": "الحملات",
+        "ads": "الإعلانات"
       },
       "pricePlaceholder": "السعر بالدينار العراقي (اختياري)",
       "priceSummary": "{price} {currency}/شهرياً",
@@ -1102,6 +1104,35 @@
         "medium": "خطر متوسط",
         "high": "خطر عالٍ"
       }
+    }
+  },
+  "ads": {
+    "title": "الإعلانات",
+    "description": "تتبّع حملاتك الإعلانية وشاهد أيها يجلب عملاء وإيرادات فعلياً.",
+    "metaAccountLabel": "حساب Meta Ads",
+    "connected": "متصل",
+    "notConnectedHint": "غير متصل بعد — سيُفعّل هذا عند توفر تكامل Meta Ads.",
+    "campaigns": {
+      "heading": "الحملات",
+      "description": "سجّل حملة تديرها، وضع لها وسماً بالقيمة التي سيذكرها العملاء أو التي تظهر كمصدر جهة الاتصال.",
+      "namePlaceholder": "اسم الحملة",
+      "utmPlaceholder": "الوسم (يطابق مصدر جهة الاتصال)، مثال: \"عرض الصيف - انستغرام\"",
+      "budgetPlaceholder": "الميزانية (اختياري)",
+      "requiredHint": "الاسم والوسم مطلوبان.",
+      "creating": "جارٍ الحفظ...",
+      "create": "إضافة حملة",
+      "emptyState": "لا توجد حملات إعلانية مسجّلة بعد.",
+      "statuses": {
+        "active": "نشطة",
+        "paused": "متوقفة",
+        "ended": "منتهية"
+      }
+    },
+    "attribution": {
+      "heading": "الإسناد",
+      "description": "جهات الاتصال والإيرادات المتتبَّعة إلى كل حملة عبر مصدر جهة الاتصال.",
+      "emptyState": "سجّل حملة لرؤية الإسناد هنا.",
+      "contactCount": "{count} جهة اتصال"
     }
   },
   "aiTest": {
