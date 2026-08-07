@@ -214,6 +214,7 @@
       "productNamePlaceholder": "Product name",
       "descriptionPlaceholder": "Description (optional)",
       "pricePlaceholder": "Price (optional)",
+      "imageUrlPlaceholder": "Image URL (optional, shown on your storefront)",
       "addProduct": "Add product",
       "servicesHeading": "Services",
       "serviceNamePlaceholder": "Service name",
@@ -251,6 +252,7 @@
     "growthSection": "Growth",
     "automationsLink": "Automations",
     "analyticsLink": "Analytics",
+    "websiteLink": "Website",
     "accountMenuLabel": "Workspace settings",
     "workspaceProfileLink": "Workspace Profile",
     "billingLink": "Billing",
@@ -639,7 +641,8 @@
         "appointments": "Appointments",
         "automations": "Automations",
         "knowledge_base": "Knowledge Base",
-        "analytics": "Analytics"
+        "analytics": "Analytics",
+        "website": "Website & Store"
       },
       "pricePlaceholder": "Price in IQD (optional)",
       "priceSummary": "{price} {currency}/mo",
@@ -1004,6 +1007,39 @@
       "warm": "Warm",
       "hot": "Hot",
       "priority": "Priority"
+    }
+  },
+  "website": {
+    "title": "Website & Store",
+    "description": "A public storefront for your business — customers can browse your catalog and send an inquiry.",
+    "saved": "Saved.",
+    "publishLabel": "Store is live",
+    "publishedHint": "Your store is live at {url}",
+    "unpublishedHint": "Your store isn't public yet — publish it once you're happy with it.",
+    "contentHeading": "Content",
+    "heroTitleLabel": "Headline",
+    "heroTitlePlaceholder": "Welcome to our store",
+    "heroSubtitleLabel": "Subheadline",
+    "heroSubtitlePlaceholder": "Quality products, fast delivery",
+    "aboutLabel": "About",
+    "aboutPlaceholder": "Tell customers about your business...",
+    "contactPhoneLabel": "Phone",
+    "contactEmailLabel": "Email",
+    "colorLabel": "Accent color",
+    "saving": "Saving...",
+    "save": "Save",
+    "public": {
+      "aboutHeading": "About us",
+      "productsHeading": "Products",
+      "servicesHeading": "Services",
+      "contactHeading": "Get in touch",
+      "namePlaceholder": "Your name",
+      "phonePlaceholder": "Your phone number",
+      "messagePlaceholder": "What are you interested in?",
+      "requiredHint": "Name, phone, and message are required.",
+      "submitting": "Sending...",
+      "submit": "Send inquiry",
+      "thankYou": "Thanks! We'll get back to you soon."
     }
   },
   "aiTest": {

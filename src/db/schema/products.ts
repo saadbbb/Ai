@@ -11,6 +11,9 @@ export const products = pgTable(
     name: text("name").notNull(),
     description: text("description"),
     price: numeric("price", { precision: 12, scale: 2 }),
+    // Raw URL text field, same convention as workspaces.logoUrl — no upload widget until
+    // Cloudflare R2 credentials exist (see DEFERRED_TASKS.md). Used by the public storefront.
+    imageUrl: text("image_url"),
     isActive: boolean("is_active").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

@@ -57,6 +57,7 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
     name: "Widget",
     description: null,
     price: "19.99",
+    imageUrl: null,
     isActive: true,
     createdAt: new Date(),
     ...overrides,

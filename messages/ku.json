@@ -214,6 +214,7 @@
       "productNamePlaceholder": "ناوی بەرهەم",
       "descriptionPlaceholder": "وەسف (ئارەزوومەندانە)",
       "pricePlaceholder": "نرخ (ئارەزوومەندانە)",
+      "imageUrlPlaceholder": "لینکی وێنە (ئارەزوومەندانە، لە دوکانەکەت دەردەکەوێت)",
       "addProduct": "زیادکردنی بەرهەم",
       "servicesHeading": "خزمەتگوزارییەکان",
       "serviceNamePlaceholder": "ناوی خزمەتگوزاری",
@@ -251,6 +252,7 @@
     "growthSection": "گەشەکردن",
     "automationsLink": "خۆکارکردن",
     "analyticsLink": "شیکاری",
+    "websiteLink": "ماڵپەڕ",
     "accountMenuLabel": "ڕێکخستنەکانی مکان‌ی کار",
     "workspaceProfileLink": "پرۆفایلی مکانی کار",
     "billingLink": "پارەدان",
@@ -639,7 +641,8 @@
         "appointments": "کاتە دیاریکراوەکان",
         "automations": "خۆکارکردن",
         "knowledge_base": "بنکەی زانیاری",
-        "analytics": "شیکاری"
+        "analytics": "شیکاری",
+        "website": "ماڵپەڕ و دوکان"
       },
       "pricePlaceholder": "نرخ بە دیناری عێراقی (ئارەزوومەندانە)",
       "priceSummary": "{price} {currency}/مانگانە",
@@ -1004,6 +1007,39 @@
       "warm": "گەرم",
       "hot": "زۆر گەرم",
       "priority": "پێشینە"
+    }
+  },
+  "website": {
+    "title": "ماڵپەڕ و دوکان",
+    "description": "دوکانێکی گشتی بۆ بازرگانییەکەت — کڕیارەکان دەتوانن کاتالۆگەکەت ببینن و پرسیارێک بنێرن.",
+    "saved": "پاشەکەوت کرا.",
+    "publishLabel": "دوکان چالاکە",
+    "publishedHint": "دوکانەکەت چالاکە لە {url}",
+    "unpublishedHint": "دوکانەکەت هێشتا گشتی نییە — کاتێک ئامادەیت بڵاوی بکەرەوە.",
+    "contentHeading": "ناوەڕۆک",
+    "heroTitleLabel": "سەردێڕی سەرەکی",
+    "heroTitlePlaceholder": "بەخێربێن بۆ دوکانەکەمان",
+    "heroSubtitleLabel": "سەردێڕی لاوەکی",
+    "heroSubtitlePlaceholder": "بەرهەمی باش، گەیاندنی خێرا",
+    "aboutLabel": "دەربارە",
+    "aboutPlaceholder": "لەبارەی بازرگانییەکەتەوە بۆ کڕیاران بنووسە...",
+    "contactPhoneLabel": "تەلەفۆن",
+    "contactEmailLabel": "ئیمەیل",
+    "colorLabel": "ڕەنگی تایبەت",
+    "saving": "لە پاشەکەوتکردندایە...",
+    "save": "پاشەکەوتکردن",
+    "public": {
+      "aboutHeading": "دەربارەمان",
+      "productsHeading": "بەرهەمەکان",
+      "servicesHeading": "خزمەتگوزارییەکان",
+      "contactHeading": "پەیوەندیمان پێوە بکە",
+      "namePlaceholder": "ناوت",
+      "phonePlaceholder": "ژمارە تەلەفۆنت",
+      "messagePlaceholder": "بە چی سەرنجڕاکێش دەبیت؟",
+      "requiredHint": "ناو و تەلەفۆن و پەیام پێویستن.",
+      "submitting": "لە ناردندایە...",
+      "submit": "ناردنی پرسیار",
+      "thankYou": "سوپاس! بەم زووانە پەیوەندیت پێوە دەکەینەوە."
     }
   },
   "aiTest": {

@@ -9,6 +9,7 @@ export const productEntrySchema = z.object({
   name: z.string().trim().min(1).max(200),
   description: z.string().trim().max(2000).optional(),
   price: z.coerce.number().nonnegative().optional(),
+  imageUrl: z.string().trim().url().max(2000).optional().or(z.literal("")),
 });
 
 export const serviceEntrySchema = z.object({

@@ -214,6 +214,7 @@
       "productNamePlaceholder": "اسم المنتج",
       "descriptionPlaceholder": "الوصف (اختياري)",
       "pricePlaceholder": "السعر (اختياري)",
+      "imageUrlPlaceholder": "رابط الصورة (اختياري، يظهر في متجرك)",
       "addProduct": "إضافة منتج",
       "servicesHeading": "الخدمات",
       "serviceNamePlaceholder": "اسم الخدمة",
@@ -251,6 +252,7 @@
     "growthSection": "النمو",
     "automationsLink": "الأتمتة",
     "analyticsLink": "التحليلات",
+    "websiteLink": "الموقع",
     "accountMenuLabel": "إعدادات مساحة العمل",
     "workspaceProfileLink": "ملف مساحة العمل",
     "billingLink": "الفوترة",
@@ -639,7 +641,8 @@
         "appointments": "المواعيد",
         "automations": "الأتمتة",
         "knowledge_base": "قاعدة المعرفة",
-        "analytics": "التحليلات"
+        "analytics": "التحليلات",
+        "website": "الموقع والمتجر"
       },
       "pricePlaceholder": "السعر بالدينار العراقي (اختياري)",
       "priceSummary": "{price} {currency}/شهرياً",
@@ -1004,6 +1007,39 @@
       "warm": "دافئ",
       "hot": "ساخن",
       "priority": "أولوية"
+    }
+  },
+  "website": {
+    "title": "الموقع والمتجر",
+    "description": "متجر عام لعملك — يستطيع العملاء تصفح كتالوجك وإرسال استفسار.",
+    "saved": "تم الحفظ.",
+    "publishLabel": "المتجر مباشر",
+    "publishedHint": "متجرك مباشر على {url}",
+    "unpublishedHint": "متجرك ليس عاماً بعد — انشره عندما تكون راضياً عنه.",
+    "contentHeading": "المحتوى",
+    "heroTitleLabel": "العنوان الرئيسي",
+    "heroTitlePlaceholder": "مرحباً بكم في متجرنا",
+    "heroSubtitleLabel": "العنوان الفرعي",
+    "heroSubtitlePlaceholder": "منتجات عالية الجودة، توصيل سريع",
+    "aboutLabel": "عن المتجر",
+    "aboutPlaceholder": "أخبر العملاء عن عملك...",
+    "contactPhoneLabel": "الهاتف",
+    "contactEmailLabel": "البريد الإلكتروني",
+    "colorLabel": "لون التمييز",
+    "saving": "جارٍ الحفظ...",
+    "save": "حفظ",
+    "public": {
+      "aboutHeading": "من نحن",
+      "productsHeading": "المنتجات",
+      "servicesHeading": "الخدمات",
+      "contactHeading": "تواصل معنا",
+      "namePlaceholder": "اسمك",
+      "phonePlaceholder": "رقم هاتفك",
+      "messagePlaceholder": "بماذا أنت مهتم؟",
+      "requiredHint": "الاسم والهاتف والرسالة مطلوبة.",
+      "submitting": "جارٍ الإرسال...",
+      "submit": "إرسال الاستفسار",
+      "thankYou": "شكراً! سنتواصل معك قريباً."
     }
   },
   "aiTest": {

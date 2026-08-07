@@ -37,6 +37,16 @@ export const contactRepository = {
     return contact ?? null;
   },
 
+  /** Used to dedupe a returning visitor on the public storefront inquiry form — phone is the only reliable identifier a public form can collect. */
+  async findByPhone(phone: string, workspaceId: string): Promise<Contact | null> {
+    const [contact] = await db
+      .select()
+      .from(contacts)
+      .where(and(eq(contacts.phone, phone), eq(contacts.workspaceId, workspaceId)))
+      .limit(1);
+    return contact ?? null;
+  },
+
   async create(data: NewContact): Promise<Contact> {
     const [contact] = await db.insert(contacts).values(data).returning();
     return contact;

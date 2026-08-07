@@ -88,6 +88,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       links: [
         ...(canViewAutomations ? [{ href: "/dashboard/automations", label: t("automationsLink"), feature: "automations" as const }] : []),
         ...(canViewAnalytics ? [{ href: "/dashboard/analytics", label: t("analyticsLink"), feature: "analytics" as const }] : []),
+        { href: "/dashboard/website", label: t("websiteLink"), feature: "website" as const },
       ],
     },
   ];

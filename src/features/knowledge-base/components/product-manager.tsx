@@ -19,9 +19,10 @@ interface DraftProduct {
   name: string;
   description: string;
   price: string;
+  imageUrl: string;
 }
 
-const emptyDraft: DraftProduct = { name: "", description: "", price: "" };
+const emptyDraft: DraftProduct = { name: "", description: "", price: "", imageUrl: "" };
 
 export function ProductManager({ initialProducts }: ProductManagerProps) {
   const t = useTranslations("onboarding.knowledgeBase");
@@ -39,6 +40,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
       name: product.name,
       description: product.description ?? "",
       price: product.price ?? "",
+      imageUrl: product.imageUrl ?? "",
     });
   }
 
@@ -49,6 +51,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
       name: editDraft.name,
       description: editDraft.description || undefined,
       price: editDraft.price === "" ? undefined : editDraft.price,
+      imageUrl: editDraft.imageUrl || undefined,
     });
     setIsSaving(false);
 
@@ -82,6 +85,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
       name: newDraft.name,
       description: newDraft.description || undefined,
       price: newDraft.price === "" ? undefined : newDraft.price,
+      imageUrl: newDraft.imageUrl || undefined,
     });
     setIsSaving(false);
 
@@ -121,6 +125,11 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
                 onChange={(event) => setEditDraft({ ...editDraft, price: event.target.value })}
                 placeholder={t("pricePlaceholder")}
               />
+              <Input
+                value={editDraft.imageUrl}
+                onChange={(event) => setEditDraft({ ...editDraft, imageUrl: event.target.value })}
+                placeholder={t("imageUrlPlaceholder")}
+              />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)}>
                   {tCommon("cancel")}
@@ -138,6 +147,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
                   {product.price && <span className="text-muted-foreground"> — {product.price}</span>}
                 </p>
                 {product.description && <p className="text-sm text-muted-foreground">{product.description}</p>}
+                {product.imageUrl && <p className="truncate text-xs text-muted-foreground">{product.imageUrl}</p>}
               </div>
               <div className="flex shrink-0 gap-1">
                 <Button type="button" variant="ghost" size="sm" onClick={() => startEdit(product)}>
@@ -168,6 +178,11 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
             value={newDraft.price}
             onChange={(event) => setNewDraft({ ...newDraft, price: event.target.value })}
             placeholder={t("pricePlaceholder")}
+          />
+          <Input
+            value={newDraft.imageUrl}
+            onChange={(event) => setNewDraft({ ...newDraft, imageUrl: event.target.value })}
+            placeholder={t("imageUrlPlaceholder")}
           />
           <div className="flex justify-end">
             <Button type="button" variant="outline" size="sm" disabled={isSaving} onClick={handleAdd}>
