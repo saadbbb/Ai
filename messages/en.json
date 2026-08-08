@@ -416,6 +416,23 @@
         "tasksCompleted": "Tasks completed",
         "avgResponseTime": "Avg. response time"
       }
+    },
+    "website": {
+      "title": "Website analytics",
+      "pageViews": "Page views",
+      "productViews": "Product views",
+      "formSubmissions": "Form submissions",
+      "topProducts": "Most-viewed products",
+      "formBreakdown": "Submissions by form",
+      "formTypes": {
+        "contact": "Contact",
+        "quote": "Quote request",
+        "support": "Support request",
+        "order": "Order",
+        "appointment": "Appointment request",
+        "newsletter": "Newsletter signup",
+        "unknown": "Other"
+      }
     }
   },
   "team": {
@@ -600,6 +617,15 @@
     "itemCount": "{count} items",
     "backLink": "← Back to Orders",
     "notesHeading": "Notes",
+    "shipping": {
+      "heading": "Shipping",
+      "carrierPlaceholder": "Carrier (e.g. Aramex, DHL)",
+      "trackingNumberPlaceholder": "Tracking number",
+      "trackingUrlPlaceholder": "Tracking link (optional)",
+      "save": "Save",
+      "saving": "Saving...",
+      "saved": "Shipping info saved."
+    },
     "subtotalHeading": "Subtotal",
     "discountHeading": "Discount",
     "taxHeading": "Tax",
@@ -1441,10 +1467,36 @@
       "featured": "Featured products",
       "products": "Product catalog preview",
       "services": "Services preview",
+      "testimonials": "Reviews & testimonials",
       "contact": "Contact form"
     },
     "hideSection": "Hide",
     "showSection": "Show",
+    "reviews": {
+      "heading": "Reviews & testimonials",
+      "noReviews": "No reviews yet.",
+      "authorPlaceholder": "Customer name",
+      "textPlaceholder": "What did they say?",
+      "featuredLabel": "Featured",
+      "publishedLabel": "Published",
+      "draftLabel": "Draft",
+      "addReview": "Add review"
+    },
+    "blog": {
+      "heading": "Blog",
+      "noPosts": "No posts yet.",
+      "titlePlaceholder": "Post title",
+      "slugPlaceholder": "URL slug (auto-generated if left blank)",
+      "excerptPlaceholder": "Short summary",
+      "coverImagePlaceholder": "Cover image URL",
+      "contentPlaceholder": "Write the post...",
+      "publishedLabel": "Published",
+      "draftLabel": "Draft",
+      "addPost": "Add post",
+      "topicPlaceholder": "Topic to draft a post about",
+      "generateWithAi": "Generate with AI",
+      "generating": "Generating..."
+    },
     "legalHeading": "Legal pages",
     "privacyLabel": "Privacy policy",
     "termsLabel": "Terms of service",
@@ -1518,6 +1570,7 @@
         "home": "Home",
         "products": "Products",
         "about": "About",
+        "blog": "Blog",
         "contact": "Contact",
         "faq": "FAQ"
       },
@@ -1532,7 +1585,33 @@
       "promo": {
         "dismiss": "No thanks"
       },
-      "featuredHeading": "Featured"
+      "featuredHeading": "Featured",
+      "testimonialsHeading": "What our customers say",
+      "blogHeading": "From our blog",
+      "noPosts": "No posts yet.",
+      "backToBlog": "← Back to blog",
+      "appointmentHeading": "Book an appointment",
+      "appointment": {
+        "namePlaceholder": "Your name",
+        "phonePlaceholder": "Your phone number",
+        "servicePlaceholder": "Select a service (optional)",
+        "notesPlaceholder": "Notes (optional)",
+        "requiredHint": "Name, phone, and a preferred date/time are required.",
+        "submitting": "Sending...",
+        "submit": "Request appointment",
+        "thankYou": "Thanks! We'll confirm your appointment soon."
+      },
+      "newsletter": {
+        "emailPlaceholder": "Your email",
+        "subscribe": "Subscribe",
+        "submitting": "Subscribing...",
+        "thankYou": "You're subscribed!"
+      },
+      "formTabs": {
+        "contact": "Contact",
+        "quote": "Request a quote",
+        "support": "Support"
+      }
     }
   },
   "integrations": {
@@ -1557,7 +1636,13 @@
       "urlPlaceholder": "https://your-endpoint.example.com/webhook",
       "creating": "Creating...",
       "create": "Add subscription",
-      "emptyState": "No webhook subscriptions yet."
+      "emptyState": "No webhook subscriptions yet.",
+      "viewDeliveries": "View deliveries",
+      "hideDeliveries": "Hide deliveries",
+      "loadingDeliveries": "Loading...",
+      "noDeliveries": "No deliveries yet.",
+      "deliverySuccess": "Delivered",
+      "deliveryFailed": "Failed"
     }
   },
   "campaigns": {
@@ -1570,6 +1655,9 @@
     "requiredHint": "Name, subject, and message are required.",
     "lifecycleStagePlaceholder": "Any lifecycle stage",
     "tagPlaceholder": "Filter by tag (optional)",
+    "churnRiskSegmentLabel": "Target high-churn-risk customers only",
+    "templatePlaceholder": "Start from a template (optional)",
+    "variableHint": "Use {{contactName}} to insert the customer's name.",
     "preview": "Preview recipients",
     "previewing": "Counting...",
     "recipientCount": "{count} recipients (with an email on file)",
@@ -1593,6 +1681,10 @@
       }
     }
   },
+  "unsubscribe": {
+    "heading": "You've been unsubscribed",
+    "message": "You won't receive any more marketing emails from this business. Transactional messages about your own orders/appointments are unaffected."
+  },
   "ads": {
     "title": "Ads",
     "description": "Track ad campaigns and see which ones are actually driving customers and revenue.",
@@ -1605,6 +1697,7 @@
       "namePlaceholder": "Campaign name",
       "utmPlaceholder": "Tag (matches contact source), e.g. \"Instagram Summer Sale\"",
       "budgetPlaceholder": "Budget (optional)",
+      "spendPlaceholder": "Actual spend",
       "requiredHint": "Name and tag are required.",
       "creating": "Saving...",
       "create": "Add campaign",
@@ -1619,7 +1712,17 @@
       "heading": "Attribution",
       "description": "Contacts and revenue traced back to each campaign via their contact source.",
       "emptyState": "Log a campaign to see attribution here.",
-      "contactCount": "{count} contacts"
+      "contactCount": "{count} contacts",
+      "revenue": "Revenue",
+      "spend": "Spend",
+      "cpl": "CPL",
+      "roas": "ROAS"
+    },
+    "insights": {
+      "heading": "AI insights",
+      "description": "A quick AI read of which campaigns are working, based on the attribution numbers above.",
+      "generate": "Generate insights",
+      "generating": "Analyzing..."
     }
   },
   "aiTest": {

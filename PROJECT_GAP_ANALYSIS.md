@@ -316,29 +316,62 @@ This is pure route/presentation restructuring per the spec's own "Implementation
 
 ## PART 14 — Website Builder, Online Store & Landing Platform
 
-**Status: Substantially closed (2026-08-07).** Scoped deliberately as a real, working single-template
+**Status: Substantially closed (2026-08-08).** Scoped deliberately as a real, working curated-template
 storefront rather than a general drag-and-drop page builder — same "real MVP over a toy general editor"
-tradeoff already made for the Automation visual canvas.
+tradeoff already made for the Automation visual canvas. Grew substantially past the 2026-08-07 snapshot
+below across a 13-slice pass (Phase 5.1-5.13 in this session's own numbering) — every slice shipped with
+real migrations, tests, i18n parity, and a clean typecheck/lint/build.
 
 **Implemented:**
-- Public storefront at `/store/[workspace-slug]` (zero-auth route) — hero section, about text, live
-  product/service grid (reads directly from the existing catalog, not a duplicated copy), contact info,
-  and an inquiry form. Submitting creates a real Contact + Lead via the existing CRM/automation
-  plumbing (`source: "Website"`), rate-limited since it's the one write path in the app reachable with
-  no authentication.
-- Tenant-side editor at `/dashboard/website` (publish toggle, hero/about/contact/accent-color fields),
-  gated by a new "website" plan feature.
-- `products.imageUrl` added (raw URL field, same convention as `workspaces.logoUrl`) so the storefront
-  has something to show per product.
+- Public storefront at `/store/[workspace-slug]` (zero-auth route), now a real multi-page site: home,
+  `/products` (search/filter/sort), `/products/[id]` (gallery, variants, related items, WhatsApp CTA),
+  `/about`, `/faq`, `/contact` (tabbed contact/quote/support forms), `/checkout`, `/privacy`, `/terms`,
+  `/blog`, `/blog/[slug]` — all sharing one `StorefrontShell` (header/footer/nav/announcement bar/popup/
+  locale switcher).
+- Tenant-side editor at `/dashboard/website`: publish toggle, custom URL slug, 4 curated themes ×
+  4 fonts × button/corner/header/footer styles × dark mode, per-locale hero/about text (en base columns
+  + `translations` JSONB override for ar/ku, editor has an EN/AR/KU tab switcher), social links, tracking
+  pixel IDs (Meta/GA/GTM/TikTok), SEO title/description, up/down section reordering with show/hide,
+  legal pages, a single configurable announcement bar + popup (trigger: first-visit/delay/exit-intent).
+- Real product catalog depth: search/category-filter/sort (newest/price/best-selling/discounted) on
+  `/products`, a full product detail page, and `recommendProducts` (same-category-first, best-selling
+  fallback) driving "related products."
+- Real cart/checkout/order flow (`CartProvider` + localStorage, `/checkout`) replacing the old
+  inquiry-only path — creates a real `Order`, re-pricing every line server-side from the live catalog so
+  a tampered client request can never check out at an invented price.
+- AI storefront assistant (public chat widget, reuses `aiService`) plus smart product recommendations.
+- Promotions: announcement bar, featured-products section, countdown timer on discounted items, the
+  configurable popup above.
+- Forms depth: contact/quote/support (tabbed, one `InquiryForm` + `formType`), appointment requests
+  (creates a real `Appointment`, not just a Lead), newsletter signup (`newsletter_subscribers` table).
+- SEO: per-page `generateMetadata` (OG/Twitter/canonical) via a shared `buildStorefrontMetadata` helper,
+  `LocalBusiness`/`Product`/`FAQPage`/`Article` JSON-LD, a site-wide `sitemap.xml` (every published store
+  + its active products/posts) and `robots.txt` (allows `/store`, disallows the app's internal routes).
+- Reviews & testimonials: staff-entered (not public-submission) star-rating testimonials, optional
+  "featured" flag, a `testimonials` home-page section, `AggregateRating` in the LocalBusiness JSON-LD.
+- Blog: basic CRUD (`blog_posts` table) plus an AI-assisted "generate a draft from a topic" button
+  reusing the same provider/router as the rest of the app — staff review/edit before publishing.
+- Website analytics: a lightweight `storefront_events` log (page view / product view / form submission,
+  not a full web-analytics pipeline) surfaced as a "Website analytics" section on `/dashboard/analytics`
+  when the workspace has the website feature.
+- Every storefront `<img>` converted to `next/image` (`unoptimized`, since product/logo/cover URLs are
+  arbitrary externally-hosted addresses this app doesn't control — no `remotePatterns` wildcard).
+- `products.imageUrl`/`galleryImageUrls` (raw URL fields, same convention as `workspaces.logoUrl`).
 
-**Not built, deliberately out of scope:** drag-and-drop section/theme editing, multiple pages, custom
-domains — a general page-builder engine, not what a real MVP needed.
+**Not built, deliberately out of scope:** full drag-and-drop section/theme editing (scoped to a curated
+4-theme picker + up/down reordering), custom domains, per-product/service multi-language names (only the
+storefront's own hero/about editorial copy is multi-locale — making the whole catalog multi-locale would
+ripple into orders, the AI tools, and every place a product name is stored as a plain-string snapshot),
+public review submission with a moderation queue (reviews are staff-entered testimonials, not customer-
+submitted), live shipping-carrier integrations (no carrier account exists to integrate against — a manual
+carrier/tracking-number stopgap on the Order model itself is covered under PART 5/6 territory, see the
+2026-08-08 Execution Log entry).
 
 ---
 
 ## PART 15 — Integration Platform & Extensibility
 
-**Status: Closed (2026-08-07).**
+**Status: Closed (2026-08-07), depth added (2026-08-08).**
 
 **Implemented:**
 - API keys: generate/revoke workspace-scoped keys (SHA-256 hashed at rest, plaintext shown once), a
@@ -351,18 +384,27 @@ domains — a general page-builder engine, not what a real MVP needed.
   automation trigger type is automatically also a valid webhook event with no new call sites.
 - New `/dashboard/integrations` page, gated by a new "integrations" plan feature +
   `integrations.manage` permission (owner/admin only).
+- **(2026-08-08) Monitoring**: every webhook delivery attempt (success or failure) is logged to a new
+  `webhook_deliveries` table and viewable per-subscription from the dashboard ("View deliveries") — real
+  visibility into whether a Zapier/Make endpoint is actually receiving events, not just silence.
+- **(2026-08-08) Accountability**: API key creation/revocation and webhook creation/deletion now write to
+  `workspace_audit_logs` (new `api_key_created`/`api_key_revoked`/`webhook_created`/`webhook_revoked`
+  actions) — who did what, when.
 
 **Not built:** the spec's named shipping/accounting/calendar/SMS provider adapters — no such external
-accounts exist to integrate against yet; the API-key/webhook layer is the generic extensibility surface
-those would plug into once needed.
+accounts exist to integrate against yet (now explicitly tracked in `DEFERRED_TASKS.md`, not just implied);
+the API-key/webhook layer is the generic extensibility surface those would plug into once needed. Also
+not built: automatic webhook retries (delivery log gives a real signal to size that against later) and
+encryption-at-rest for `webhookSubscriptions.secret` (needs a new production secret — see
+`DEFERRED_TASKS.md` item 9, a sign-off decision, not an engineering gap).
 
 ---
 
 ## PART 16 — AI Predictive Analytics & Proactive Marketing Campaigns
 
-**Status: Substantially closed (2026-08-07).** The "sequence after Channels are unblocked" recommendation
-below was revisited: rather than block the whole Part on Phase 7, campaigns send over email (the one
-real, working outbound channel today) instead of waiting for WhatsApp/Instagram.
+**Status: Substantially closed (2026-08-07), depth added (2026-08-08).** The "sequence after Channels
+are unblocked" recommendation below was revisited: rather than block the whole Part on Phase 7, campaigns
+send over email (the one real, working outbound channel today) instead of waiting for WhatsApp/Instagram.
 
 **Implemented:**
 - Churn risk: a deterministic, explainable heuristic (same approach as `lead-score.ts` — not a fake ML
@@ -371,20 +413,31 @@ real, working outbound channel today) instead of waiting for WhatsApp/Instagram.
   existed via the Phase 8 "AI Recommendations" Home band (reuses lead score) — this fills the missing
   churn half.
 - Proactive campaigns: draft a segmented email blast (reusing the exact lifecycleStage/tag filter
-  primitives Contacts/Leads already use), preview the real recipient count, send via `EmailService`.
-  Best-effort per recipient; each successful send logs a per-contact activity. New "campaigns" plan
-  feature + `campaigns.manage` permission (owner/admin/manager).
+  primitives Contacts/Leads already use, plus a new "target high-churn-risk contacts only" segment option
+  added 2026-08-08), preview the real recipient count, send via `EmailService`. Best-effort per
+  recipient; each successful send logs a per-contact activity. New "campaigns" plan feature +
+  `campaigns.manage` permission (owner/admin/manager).
+- **(2026-08-08) Templates**: the campaign composer can start from any saved message template
+  (`message_templates`, already built for the inbox composer) instead of a blank message box.
+- **(2026-08-08) Personalization**: `{{contactName}}` is substituted per-recipient before sending.
+- **(2026-08-08) Compliance & rate-limiting**: every campaign email footer now carries a real one-click
+  unsubscribe link (`/unsubscribe/[workspaceId]/[contactId]`, zero-auth by design) that sets a new
+  `contacts.marketingOptOut` flag, permanently excluded from every future campaign's recipient list
+  (transactional messages are unaffected). Sending is rate-limited to 20 campaigns/workspace/day
+  (`checkRateLimit`, already-existing infra, previously unused here). Every send writes a
+  `campaign_sent` entry to `workspace_audit_logs`.
 
 **Not built:** WhatsApp/Instagram broadcast sending — genuinely blocked on Phase 7/Meta OAuth, and would
-have been a placeholder implementation to fake now.
+have been a placeholder implementation to fake now. Also not built: campaign scheduling (send-later) —
+today's campaigns send immediately on demand.
 
 ---
 
 ## PART 17 — Ads Module, Meta Marketing Integration & Ad Intelligence
 
-**Status: Substantially closed (2026-08-07).** Meta Ads OAuth handled the same way Phase 7's WhatsApp/
-Instagram channels were: a real, ready-to-receive data model behind a disabled "Coming soon" connect
-button, not faked OAuth/API calls.
+**Status: Substantially closed (2026-08-07), depth added (2026-08-08).** Meta Ads OAuth handled the same
+way Phase 7's WhatsApp/Instagram channels were: a real, ready-to-receive data model behind a disabled
+"Coming soon" connect button, not faked OAuth/API calls.
 
 **Implemented:**
 - `ad_accounts` table (not_connected/connected) + `/dashboard/ads` connect-account card, ready to flip
@@ -395,9 +448,21 @@ button, not faked OAuth/API calls.
   the public API, or set by hand) is matched against each campaign's tag, and revenue from
   delivered/completed orders is summed per campaign via one SQL aggregation — real numbers, no Meta
   dependency. New "ads" plan feature + `ads.manage` permission (owner/admin/manager).
+- **(2026-08-08) Manual spend + real ROAS/CPL**: a new `ad_campaigns.actualSpend` field (manually entered,
+  since there's no live Meta spend feed) drives real cost-per-lead and return-on-ad-spend numbers in the
+  attribution report — computed from actual logged data, never estimated/invented.
+- **(2026-08-08) AI Ads Intelligence**: a staff-triggered "Generate insights" button
+  (`adsService.generateAdInsights`, same provider/router as the rest of the app) reads the current
+  attribution numbers (contacts, revenue, spend, CPL, ROAS) and writes 2-4 plain-English sentences on
+  what's working and one concrete suggestion — an AI *read* of real data, not an automated optimizer that
+  acts on its own.
+- **(2026-08-08) Accountability**: logging an ad campaign now writes an `ad_campaign_created` entry to
+  `workspace_audit_logs`.
 
 **Not built:** live Meta Marketing API sync (campaign/ad-set/ad/creative pull, spend data, live OAuth) —
-hard-blocked on the same Meta Developer App + Business verification requirement as Phase 7.
+hard-blocked on the same Meta Developer App + Business verification requirement as Phase 7. Also not
+built: a full Ad Set/Ad/Creative-level schema (today's model is campaign-level only) and automated
+optimization actions (the AI insights panel above is read-only by design).
 
 ---
 
@@ -1086,3 +1151,77 @@ Next: the only remaining work from the original plan is Phase 7, and it cannot p
 the user creating a Meta Developer App and completing Business verification — a real, multi-week external
 process, not an engineering task. Until then, this project's spec-compliance work (as scoped by the
 2026-08-06 audit and this execution log) is essentially done.
+
+**2026-08-08 — Second pass, driven by `FEATURE_COMPARISON_2026-08-07.md`'s independent 191-feature
+line-by-line comparison against the reference spec** (a fresh, more granular audit than the one behind
+the log above). Split into 6 phases by the user, worked strictly in order, no phase skipped:
+
+- **Phase 2** — Billing depth: invoices, coupons, refunds, 7-state subscription lifecycle, billing
+  notifications, workspace-deletion audit trail.
+- **Phase 3** — Dashboard/Analytics + Super Admin depth: platform admin roles, feature-flag overrides,
+  support-ticket depth, revenue/usage/team-performance reports, AI Operations console, system health.
+- **Phase 4** — AI + CRM + Inbox depth (22 items): task reminders + AI-suggested tasks, typed notes with
+  @mentions, order-abandonment follow-ups, a unified activity log, manual tagging, inbox filters/search,
+  conversation-view and composer depth, 6 new inbox notification triggers, and an AI Router with
+  complexity-based model escalation + transient-failure fallback (`TransientProviderError`).
+- **Phase 5 (5.1-5.13)** — Website Builder depth, see the rewritten PART 14 section above for the full
+  list: storefront settings/themes/multi-page structure, product catalog depth, real cart/checkout, AI
+  storefront assistant, promotions, forms depth (contact/quote/support/appointment/newsletter), SEO
+  (metadata/sitemap/robots/JSON-LD), reviews & testimonials, blog with AI-assisted drafting, website
+  analytics, `next/image` conversion, and per-locale (en/ar/ku) hero/about storefront content with a real
+  locale switcher on the public storefront (`src/components/locale-switcher.tsx`, already built for the
+  dashboard, reused as-is).
+- **Phase 6** — Campaigns + Ads + Integrations depth (see below), closing out this session's 6-phase plan.
+
+Verified after every one of the 13 Phase-5 slices individually (not just at the end): typecheck clean,
+full test suite passing throughout (601 → 625 across the slices), lint clean (the pre-existing `<img>`
+warnings flagged in the Phase-9 log above are now actually resolved — converted to `next/image` with
+`unoptimized`, see PART 14), production build clean, every migration (0066-0070: `newsletter_subscribers`,
+`reviews`, `blog_posts`, `storefront_events`, `storefronts.translations`) generated, reviewed, and applied
+directly to the live Supabase database before moving to the next slice. i18n key counts (en/ar/ku)
+verified in sync after every batch — final count: **1418/1418/1418** (up from 1236 at the start of this
+session's Phase 4 close-out).
+
+**2026-08-08 — Phase 6 (final phase of this session's plan), items #149-191 of
+`FEATURE_COMPARISON_2026-08-07.md`.** An Explore-agent audit first confirmed which of the 43 named gaps
+(Integration Architecture #149-168, CRM Campaign engine #169-176, Ads Module #177-191) were still real as
+of today (none had drifted — PART 15-17's 2026-08-07 state matched the gap doc exactly), which were
+genuinely blocked on an external account, and which were buildable now. Worked in 4 slices:
+
+- **Slice 1 — Campaign depth (#171-176)**: template reuse (`message_templates`), `{{contactName}}`
+  substitution, a real one-click unsubscribe flow (`contacts.marketingOptOut` + `/unsubscribe/[workspaceId]/
+  [contactId]`, zero-auth by design), a "target high-churn-risk contacts only" segment option
+  (`campaigns.segmentChurnRisk`), a 20-sends/workspace/day rate limit (reused `checkRateLimit`, previously
+  unused here), and a `campaign_sent` audit-log entry.
+- **Slice 2 — Integration depth (#161-168)**: a new `webhook_deliveries` log (every attempt, success or
+  failure) surfaced as "View deliveries" per subscription in the dashboard, plus audit-log entries for
+  API key and webhook subscription create/revoke. Deliberately not built: async delivery via the existing
+  BullMQ queue (kept synchronous, same accepted-scope-decision reasoning automation's own inline fallback
+  already documents) and secret encryption at rest (new production secret, needs sign-off — added to
+  `DEFERRED_TASKS.md` item 9 rather than done unilaterally).
+- **Slice 3 — Ads depth (#186-188, #191)**: `ad_campaigns.actualSpend` (manual entry) drives real CPL/ROAS
+  in the attribution report; a staff-triggered "Generate insights" button
+  (`adsService.generateAdInsights`) produces a short AI read of the attribution numbers (same
+  provider/router as the rest of the app) — read-only advice, not an automated optimizer; an
+  `ad_campaign_created` audit-log entry.
+- **Slice 4 — Shipping stopgap (#151-154)**: `orders.shippingCarrier`/`trackingNumber`/`trackingUrl`
+  (manual fields, editable from an order's detail page) — real data entry against no carrier account,
+  same "smaller but real" pattern as every other scoped-down item this session. Shipping/accounting/
+  calendar/SMS provider integrations added to `DEFERRED_TASKS.md`'s "Known future items" section — they
+  existed as spec gaps before this session but had never been explicitly tracked there.
+
+Verified after each slice: typecheck clean, full test suite passing throughout (633 → 640 across the
+slices), lint clean, production build clean, every migration (0071-0074: `contacts.marketingOptOut` +
+`campaigns.segmentChurnRisk` + `workspace_audit_action` enum extension, `webhook_deliveries`,
+`ad_campaigns.actualSpend`, `orders` shipping columns + `activity_type` enum extension) generated,
+reviewed, and applied directly to the live database. i18n key counts (en/ar/ku) verified in sync after
+every slice — final count: **1445/1445/1445**.
+
+**This closes every phase of this session's 6-phase plan.** Combined with the prior "essentially done"
+declaration above (2026-08-07, every phase but Meta-blocked Phase 7), this second pass — driven by a
+fresh, more granular 191-item line-by-line audit — closes the additional real gaps that audit surfaced,
+same rigor throughout: real migrations against the live database, real tests, i18n parity, and a
+clean typecheck/lint/build after every single slice, no exceptions.
+
+Next: nothing outstanding from either audit except Phase 7 (Meta OAuth, blocked on external Business
+verification) and the explicitly-tracked external-account items in `DEFERRED_TASKS.md`.

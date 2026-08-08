@@ -7,6 +7,15 @@ export const serviceRepository = {
     return db.select().from(services).where(eq(services.workspaceId, workspaceId));
   },
 
+  async findById(id: string, workspaceId: string): Promise<Service | null> {
+    const [service] = await db
+      .select()
+      .from(services)
+      .where(and(eq(services.id, id), eq(services.workspaceId, workspaceId)))
+      .limit(1);
+    return service ?? null;
+  },
+
   async createMany(data: NewService[]): Promise<Service[]> {
     if (data.length === 0) return [];
     return db.insert(services).values(data).returning();

@@ -81,6 +81,7 @@ export const contactRepository = {
         | "birthDate"
         | "gender"
         | "timezone"
+        | "marketingOptOut"
       >
     >,
   ): Promise<Contact | null> {

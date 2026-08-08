@@ -6,6 +6,12 @@ export interface AttributionStat {
   campaign: AdCampaign;
   contactCount: number;
   revenue: number;
+  /** null when actualSpend hasn't been entered yet — spend-derived metrics can't be computed without it. */
+  spend: number | null;
+  /** Cost per lead — spend / contactCount. */
+  cpl: number | null;
+  /** Return on ad spend — revenue / spend. */
+  roas: number | null;
 }
 
 const REVENUE_ORDER_STATUSES = ["delivered", "completed"] as const;
@@ -38,6 +44,15 @@ export const adCampaignRepository = {
     return row ?? null;
   },
 
+  async updateSpend(id: string, workspaceId: string, actualSpend: number): Promise<AdCampaign | null> {
+    const [row] = await db
+      .update(adCampaigns)
+      .set({ actualSpend: actualSpend.toString(), updatedAt: new Date() })
+      .where(and(eq(adCampaigns.id, id), eq(adCampaigns.workspaceId, workspaceId)))
+      .returning();
+    return row ?? null;
+  },
+
   /**
    * Attribution: a contact is credited to a campaign when contacts.source
    * exactly matches that campaign's utmCampaign tag — the same free-text
@@ -64,10 +79,18 @@ export const adCampaignRepository = {
 
     const bySource = new Map(rows.map((row) => [row.source, { contactCount: Number(row.contactCount), revenue: Number(row.revenue) }]));
 
-    return campaigns.map((campaign) => ({
-      campaign,
-      contactCount: bySource.get(campaign.utmCampaign)?.contactCount ?? 0,
-      revenue: bySource.get(campaign.utmCampaign)?.revenue ?? 0,
-    }));
+    return campaigns.map((campaign) => {
+      const contactCount = bySource.get(campaign.utmCampaign)?.contactCount ?? 0;
+      const revenue = bySource.get(campaign.utmCampaign)?.revenue ?? 0;
+      const spend = campaign.actualSpend === null ? null : Number(campaign.actualSpend);
+      return {
+        campaign,
+        contactCount,
+        revenue,
+        spend,
+        cpl: spend !== null && contactCount > 0 ? spend / contactCount : null,
+        roas: spend !== null && spend > 0 ? revenue / spend : null,
+      };
+    });
   },
 };

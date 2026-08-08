@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { StorefrontShell } from "@/features/storefront/components/storefront-shell";
 import { getStorefrontData } from "@/features/storefront/lib/get-storefront-data";
 import { extractCategories, filterAndSortProducts, type ProductSort } from "@/features/storefront/lib/product-catalog";
+import { buildStorefrontMetadata } from "@/features/storefront/lib/seo";
+import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
 import { orderRepository } from "@/features/orders/repository/order.repository";
@@ -14,6 +18,20 @@ interface PageProps {
 }
 
 const SORT_OPTIONS: ProductSort[] = ["newest", "price_asc", "price_desc", "best_selling", "discounted"];
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const row = await storefrontRepository.findPublishedByWorkspaceSlug(slug);
+  if (!row) return {};
+  const t = await getTranslations("website.public");
+  return buildStorefrontMetadata({
+    slug,
+    path: "/products",
+    workspaceName: row.workspaceName,
+    storefront: row.storefront,
+    title: `${t("productsHeading")} — ${row.workspaceName}`,
+  });
+}
 
 export default async function StoreProductsPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
@@ -77,7 +95,14 @@ export default async function StoreProductsPage({ params, searchParams }: PagePr
                 <Link key={product.id} href={`/store/${slug}/products/${product.id}`}>
                   <Card className="h-full transition-shadow hover:shadow-md">
                     {product.imageUrl && (
-                      <img src={product.imageUrl} alt={product.name} className="h-40 w-full rounded-t-lg object-cover" />
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        width={400}
+                        height={300}
+                        unoptimized
+                        className="h-40 w-full rounded-t-lg object-cover"
+                      />
                     )}
                     <CardContent className="space-y-1">
                       <p className="font-medium">{product.name}</p>

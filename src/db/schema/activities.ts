@@ -14,6 +14,7 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "lead_stage_changed",
   "order_created",
   "order_status_changed",
+  "order_shipping_updated",
   "appointment_created",
   "appointment_status_changed",
   "contact_tagged",

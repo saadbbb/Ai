@@ -7,6 +7,8 @@ import { LineChartCard } from "@/features/analytics/components/line-chart-card";
 import { HealthScoreCard } from "@/features/analytics/components/health-score-card";
 import { resolveAnalyticsRange, type AnalyticsRangeKey } from "@/features/analytics/lib/date-range";
 import { analyticsService } from "@/features/analytics/services/analytics.service";
+import { featureAccessService } from "@/features/platform-admin/services/feature-access.service";
+import { storefrontAnalyticsService } from "@/features/storefront/services/storefront-analytics.service";
 import { requireFeature, requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 
 interface PageProps {
@@ -21,9 +23,11 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
   await requireWorkspacePermission(user.id, workspace.id, "analytics.view");
 
   const range = resolveAnalyticsRange(rangeParam, fromParam, toParam);
-  const [summary, teamPerformance] = await Promise.all([
+  const hasWebsiteFeature = await featureAccessService.hasFeature(workspace, "website");
+  const [summary, teamPerformance, websiteSummary] = await Promise.all([
     analyticsService.getSummary(workspace.id, range),
     analyticsService.getTeamPerformance(workspace.id, range),
+    hasWebsiteFeature ? storefrontAnalyticsService.getWebsiteSummary(workspace.id, range) : Promise.resolve(null),
   ]);
 
   const [t, tOrders, tAppointments, tChannel, tCommon] = await Promise.all([
@@ -261,6 +265,29 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           </div>
         )}
       </div>
+
+      {websiteSummary && (
+        <div className="space-y-3">
+          <h2 className="text-sm font-medium">{t("website.title")}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <StatTile label={t("website.pageViews")} value={websiteSummary.pageViews} />
+            <StatTile label={t("website.productViews")} value={websiteSummary.productViews} />
+            <StatTile label={t("website.formSubmissions")} value={websiteSummary.formSubmissions} />
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <BarChartCard
+              title={t("website.topProducts")}
+              data={websiteSummary.topProducts.map((row) => ({ label: row.productName, value: row.count }))}
+              emptyMessage={t("charts.empty")}
+            />
+            <BarChartCard
+              title={t("website.formBreakdown")}
+              data={websiteSummary.formBreakdown.map((row) => ({ label: t(`website.formTypes.${row.formType}`), value: row.count }))}
+              emptyMessage={t("charts.empty")}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

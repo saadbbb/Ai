@@ -1,4 +1,4 @@
-import { integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { contactLifecycleStageEnum } from "./contacts";
 import { workspaces } from "./workspaces";
 
@@ -23,6 +23,8 @@ export const campaigns = pgTable("campaigns", {
   message: text("message").notNull(),
   segmentLifecycleStage: contactLifecycleStageEnum("segment_lifecycle_stage"),
   segmentTag: text("segment_tag"),
+  /** CRM Segment Definition depth (PART 13 gap #171) — targets exactly the contacts churn-risk.ts scores "high", instead of a lifecycle stage/tag. Mutually exclusive with the two fields above in the UI, though the schema doesn't enforce that. */
+  segmentChurnRisk: boolean("segment_churn_risk").notNull().default(false),
   status: campaignStatusEnum("status").notNull().default("draft"),
   recipientCount: integer("recipient_count").notNull().default(0),
   sentAt: timestamp("sent_at", { withTimezone: true }),

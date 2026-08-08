@@ -24,6 +24,7 @@ vi.mock("../repository/order.repository", () => ({
     findById: vi.fn(),
     create: vi.fn(),
     updateStatus: vi.fn(),
+    updateShipping: vi.fn(),
   },
 }));
 
@@ -71,6 +72,7 @@ function makeContact(overrides: Partial<Contact> = {}): Contact {
     birthDate: null,
     gender: null,
     timezone: null,
+    marketingOptOut: false,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
@@ -91,6 +93,9 @@ function makeOrder(overrides: Partial<Order> = {}): Order {
     deliveryMethod: null,
     deliveryAddress: null,
     notes: null,
+    shippingCarrier: null,
+    trackingNumber: null,
+    trackingUrl: null,
     followupNotifiedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -244,5 +249,40 @@ describe("orderService.updateOrderStatus", () => {
     await orderService.updateOrderStatus(WORKSPACE_ID, "order-1", "cancelled", ACTOR);
 
     expect(crmService.advanceLifecycleStage).not.toHaveBeenCalled();
+  });
+});
+
+describe("orderService.updateShipping", () => {
+  it("throws NOT_FOUND when the order doesn't exist in this workspace", async () => {
+    vi.mocked(orderRepository.findById).mockResolvedValue(null);
+
+    await expect(
+      orderService.updateShipping(WORKSPACE_ID, "missing-order", { trackingNumber: "TRK123" }, ACTOR),
+    ).rejects.toThrow("Order not found.");
+    expect(orderRepository.updateShipping).not.toHaveBeenCalled();
+  });
+
+  it("updates the shipping fields and logs an activity", async () => {
+    vi.mocked(orderRepository.findById).mockResolvedValue(makeOrderListItem());
+    vi.mocked(orderRepository.updateShipping).mockResolvedValue(
+      makeOrder({ shippingCarrier: "Aramex", trackingNumber: "TRK123" }),
+    );
+
+    const result = await orderService.updateShipping(
+      WORKSPACE_ID,
+      "order-1",
+      { shippingCarrier: "Aramex", trackingNumber: "TRK123" },
+      ACTOR,
+    );
+
+    expect(orderRepository.updateShipping).toHaveBeenCalledWith("order-1", WORKSPACE_ID, {
+      shippingCarrier: "Aramex",
+      trackingNumber: "TRK123",
+      trackingUrl: null,
+    });
+    expect(activityRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ contactId: CONTACT_ID, type: "order_shipping_updated" }),
+    );
+    expect(result.trackingNumber).toBe("TRK123");
   });
 });

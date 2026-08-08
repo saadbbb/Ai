@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import type {
   Storefront,
   StorefrontButtonStyle,
@@ -31,7 +32,10 @@ const FOOTER_STYLES: StorefrontFooterStyle[] = ["standard", "minimal"];
 const POPUP_TRIGGERS: StorefrontPopupTrigger[] = ["first_visit", "delay", "exit_intent"];
 const SOCIAL_KEYS = ["whatsapp", "instagram", "facebook", "tiktok", "youtube", "snapchat", "telegram"] as const;
 const TRACKING_KEYS = ["metaPixelId", "googleAnalyticsId", "googleTagManagerId", "tiktokPixelId"] as const;
-const ALL_SECTION_KEYS = ["hero", "about", "featured", "products", "services", "contact"] as const;
+const ALL_SECTION_KEYS = ["hero", "about", "featured", "products", "services", "testimonials", "contact"] as const;
+const CONTENT_LOCALES = ["en", "ar", "ku"] as const;
+const CONTENT_LOCALE_LABELS: Record<(typeof CONTENT_LOCALES)[number], string> = { en: "English", ar: "العربية", ku: "کوردی" };
+type StorefrontTranslations = Record<string, { heroTitle?: string; heroSubtitle?: string; aboutText?: string }>;
 
 function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
@@ -96,6 +100,8 @@ export function StorefrontEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [slugValue, setSlugValue] = useState(slug);
   const [isSavingSlug, setIsSavingSlug] = useState(false);
+  const [contentLocale, setContentLocale] = useState<(typeof CONTENT_LOCALES)[number]>("en");
+  const [translations, setTranslations] = useState<StorefrontTranslations>(storefront.translations ?? {});
 
   const hiddenSections = ALL_SECTION_KEYS.filter((key) => !sections.includes(key));
 
@@ -111,6 +117,21 @@ export function StorefrontEditor({
       [next[index], next[target]] = [next[target], next[index]];
       return next;
     });
+  }
+
+  function contentFieldValue(field: "heroTitle" | "heroSubtitle" | "aboutText"): string {
+    if (contentLocale === "en") return field === "heroTitle" ? heroTitle : field === "heroSubtitle" ? heroSubtitle : aboutText;
+    return translations[contentLocale]?.[field] ?? "";
+  }
+
+  function setContentFieldValue(field: "heroTitle" | "heroSubtitle" | "aboutText", value: string) {
+    if (contentLocale === "en") {
+      if (field === "heroTitle") setHeroTitle(value);
+      else if (field === "heroSubtitle") setHeroSubtitle(value);
+      else setAboutText(value);
+      return;
+    }
+    setTranslations((current) => ({ ...current, [contentLocale]: { ...current[contentLocale], [field]: value } }));
   }
 
   async function handleSave() {
@@ -137,6 +158,7 @@ export function StorefrontEditor({
       trackingIds,
       seoTitle: seoTitle || undefined,
       seoDescription: seoDescription || undefined,
+      translations,
       sections,
       privacyPolicyText: privacyPolicyText || undefined,
       termsText: termsText || undefined,
@@ -205,18 +227,48 @@ export function StorefrontEditor({
 
       <Card>
         <CardContent className="space-y-3">
-          <p className="text-sm font-medium">{t("contentHeading")}</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-medium">{t("contentHeading")}</p>
+            <div className="flex gap-1">
+              {CONTENT_LOCALES.map((locale) => (
+                <button
+                  key={locale}
+                  type="button"
+                  onClick={() => setContentLocale(locale)}
+                  className={cn(
+                    "rounded-md px-2 py-1 text-xs",
+                    contentLocale === locale ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
+                  )}
+                >
+                  {CONTENT_LOCALE_LABELS[locale]}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="space-y-2">
             <label className="text-sm text-muted-foreground">{t("heroTitleLabel")}</label>
-            <Input value={heroTitle} onChange={(event) => setHeroTitle(event.target.value)} placeholder={t("heroTitlePlaceholder")} />
+            <Input
+              value={contentFieldValue("heroTitle")}
+              onChange={(event) => setContentFieldValue("heroTitle", event.target.value)}
+              placeholder={t("heroTitlePlaceholder")}
+            />
           </div>
           <div className="space-y-2">
             <label className="text-sm text-muted-foreground">{t("heroSubtitleLabel")}</label>
-            <Input value={heroSubtitle} onChange={(event) => setHeroSubtitle(event.target.value)} placeholder={t("heroSubtitlePlaceholder")} />
+            <Input
+              value={contentFieldValue("heroSubtitle")}
+              onChange={(event) => setContentFieldValue("heroSubtitle", event.target.value)}
+              placeholder={t("heroSubtitlePlaceholder")}
+            />
           </div>
           <div className="space-y-2">
             <label className="text-sm text-muted-foreground">{t("aboutLabel")}</label>
-            <Textarea value={aboutText} onChange={(event) => setAboutText(event.target.value)} rows={4} placeholder={t("aboutPlaceholder")} />
+            <Textarea
+              value={contentFieldValue("aboutText")}
+              onChange={(event) => setContentFieldValue("aboutText", event.target.value)}
+              rows={4}
+              placeholder={t("aboutPlaceholder")}
+            />
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="space-y-2">

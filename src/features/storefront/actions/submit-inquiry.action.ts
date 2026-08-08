@@ -4,6 +4,7 @@ import { workspaceRepository } from "@/features/workspace/repository/workspace.r
 import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
 import { checkRateLimit } from "@/lib/rate-limit/rate-limit";
 import { actionFail, actionOk, actionValidationError, AppError, type ActionResult } from "@/lib/errors/app-error";
+import { storefrontAnalyticsService } from "../services/storefront-analytics.service";
 import { storefrontService } from "../services/storefront.service";
 import { submitInquirySchema } from "../validation/schemas";
 
@@ -34,7 +35,9 @@ export async function submitInquiryAction(input: unknown): Promise<ActionResult<
       fullName: parsed.data.fullName,
       phone: parsed.data.phone,
       message: parsed.data.message,
+      formType: parsed.data.formType,
     });
+    await storefrontAnalyticsService.trackFormSubmission(workspace.id, parsed.data.formType ?? "contact");
 
     return actionOk(null);
   } catch (error) {

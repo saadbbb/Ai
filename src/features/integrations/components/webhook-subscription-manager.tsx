@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import type { WebhookSubscription } from "@/db/schema";
+import type { WebhookDelivery, WebhookSubscription } from "@/db/schema";
 import { createWebhookSubscriptionAction } from "../actions/create-webhook-subscription.action";
 import { deleteWebhookSubscriptionAction } from "../actions/delete-webhook-subscription.action";
+import { listWebhookDeliveriesAction } from "../actions/list-webhook-deliveries.action";
 import { setWebhookSubscriptionActiveAction } from "../actions/set-webhook-subscription-active.action";
 import { AUTOMATION_EVENT_TYPES } from "../validation/schemas";
 
@@ -21,6 +22,27 @@ export function WebhookSubscriptionManager({ initialSubscriptions }: { initialSu
   const [url, setUrl] = useState("");
   const [eventTypes, setEventTypes] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [deliveries, setDeliveries] = useState<WebhookDelivery[]>([]);
+  const [isLoadingDeliveries, setIsLoadingDeliveries] = useState(false);
+
+  async function handleToggleDeliveries(subscriptionId: string) {
+    if (expandedId === subscriptionId) {
+      setExpandedId(null);
+      return;
+    }
+
+    setExpandedId(subscriptionId);
+    setIsLoadingDeliveries(true);
+    const result = await listWebhookDeliveriesAction({ subscriptionId });
+    setIsLoadingDeliveries(false);
+
+    if (!result.success) {
+      toast.error(result.error.message);
+      return;
+    }
+    setDeliveries(result.data);
+  }
 
   function toggleEventType(type: string) {
     setEventTypes((current) => (current.includes(type) ? current.filter((item) => item !== type) : [...current, type]));
@@ -96,19 +118,43 @@ export function WebhookSubscriptionManager({ initialSubscriptions }: { initialSu
         ) : (
           <div className="divide-y rounded-lg border">
             {subscriptions.map((subscription) => (
-              <div key={subscription.id} className="flex items-center justify-between gap-4 p-3 text-sm">
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{subscription.url}</p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {subscription.eventTypes.map((type) => tEvents(type)).join(", ")}
-                  </p>
+              <div key={subscription.id} className="p-3 text-sm">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{subscription.url}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {subscription.eventTypes.map((type) => tEvents(type)).join(", ")}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Button type="button" variant="ghost" size="sm" onClick={() => handleToggleDeliveries(subscription.id)}>
+                      {expandedId === subscription.id ? t("hideDeliveries") : t("viewDeliveries")}
+                    </Button>
+                    <Switch checked={subscription.isActive} onCheckedChange={(next) => handleToggle(subscription, next)} />
+                    <Button type="button" variant="ghost" size="sm" onClick={() => handleDelete(subscription.id)}>
+                      {tCommon("delete")}
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <Switch checked={subscription.isActive} onCheckedChange={(next) => handleToggle(subscription, next)} />
-                  <Button type="button" variant="ghost" size="sm" onClick={() => handleDelete(subscription.id)}>
-                    {tCommon("delete")}
-                  </Button>
-                </div>
+                {expandedId === subscription.id && (
+                  <div className="mt-2 space-y-1 rounded-md bg-muted/50 p-2">
+                    {isLoadingDeliveries ? (
+                      <p className="text-xs text-muted-foreground">{t("loadingDeliveries")}</p>
+                    ) : deliveries.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">{t("noDeliveries")}</p>
+                    ) : (
+                      deliveries.map((delivery) => (
+                        <div key={delivery.id} className="flex items-center justify-between gap-2 text-xs">
+                          <span className={delivery.success ? "text-green-600" : "text-destructive"}>
+                            {delivery.success ? t("deliverySuccess") : t("deliveryFailed")}
+                          </span>
+                          <span className="text-muted-foreground">{tEvents(delivery.eventType)}</span>
+                          <span className="text-muted-foreground">{new Date(delivery.createdAt).toLocaleString()}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>

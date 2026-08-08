@@ -49,7 +49,34 @@ export const webhookSubscriptions = pgTable(
   (table) => [index("webhook_subscriptions_workspace_id_idx").on(table.workspaceId)],
 );
 
+/**
+ * Integrations Monitoring depth (PART 13 gap #165) — one row per delivery
+ * attempt, success or failure, so a workspace owner can actually see whether
+ * their Zapier/Make endpoint is receiving events instead of guessing from
+ * silence. Deliberately a flat log, not a retry queue — see
+ * `notifyWebhookSubscribers`'s own comment on why retries aren't built yet.
+ */
+export const webhookDeliveries = pgTable(
+  "webhook_deliveries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    subscriptionId: uuid("subscription_id")
+      .notNull()
+      .references(() => webhookSubscriptions.id, { onDelete: "cascade" }),
+    eventType: text("event_type").notNull(),
+    success: boolean("success").notNull(),
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("webhook_deliveries_subscription_id_idx").on(table.subscriptionId, table.createdAt)],
+);
+
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type NewApiKey = typeof apiKeys.$inferInsert;
 export type WebhookSubscription = typeof webhookSubscriptions.$inferSelect;
 export type NewWebhookSubscription = typeof webhookSubscriptions.$inferInsert;
+export type WebhookDelivery = typeof webhookDeliveries.$inferSelect;
+export type NewWebhookDelivery = typeof webhookDeliveries.$inferInsert;

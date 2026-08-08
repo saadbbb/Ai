@@ -416,6 +416,23 @@
         "tasksCompleted": "ئەرکە تەواوبووەکان",
         "avgResponseTime": "ناوەندی کاتی وەڵام"
       }
+    },
+    "website": {
+      "title": "شیکاری ماڵپەڕ",
+      "pageViews": "بینینی پەڕەکان",
+      "productViews": "بینینی بەرهەمەکان",
+      "formSubmissions": "ناردنی فۆرمەکان",
+      "topProducts": "زۆرترین بەرهەمی بینراو",
+      "formBreakdown": "ناردنەکان بەپێی فۆرم",
+      "formTypes": {
+        "contact": "پەیوەندی",
+        "quote": "داواکاری نرخ",
+        "support": "داواکاری پشتگیری",
+        "order": "داواکاری کڕین",
+        "appointment": "داواکاری کات",
+        "newsletter": "بەشداربوونی نامەکان",
+        "unknown": "هیتر"
+      }
     }
   },
   "team": {
@@ -600,6 +617,15 @@
     "itemCount": "{count} بەرهەم",
     "backLink": "← گەڕانەوە بۆ داواکارییەکان",
     "notesHeading": "تێبینییەکان",
+    "shipping": {
+      "heading": "گەیاندن",
+      "carrierPlaceholder": "کۆمپانیای گەیاندن (بۆ نموونە Aramex، DHL)",
+      "trackingNumberPlaceholder": "ژمارەی شوێنپێدان",
+      "trackingUrlPlaceholder": "لینکی شوێنپێدان (ئارەزوومەندانە)",
+      "save": "پاشەکەوتکردن",
+      "saving": "پاشەکەوتکردن...",
+      "saved": "زانیاری گەیاندن پاشەکەوت کرا."
+    },
     "subtotalHeading": "کۆی لاوەکی",
     "discountHeading": "داشکاندن",
     "taxHeading": "باج",
@@ -1441,10 +1467,36 @@
       "featured": "بەرهەمە تایبەتەکان",
       "products": "پێشبینینی کاتالۆگی بەرهەمەکان",
       "services": "پێشبینینی خزمەتگوزارییەکان",
+      "testimonials": "هەڵسەنگاندن و بۆچوونەکان",
       "contact": "فۆرمی پەیوەندی"
     },
     "hideSection": "شاردنەوە",
     "showSection": "نیشاندان",
+    "reviews": {
+      "heading": "هەڵسەنگاندن و بۆچوونەکان",
+      "noReviews": "هێشتا هیچ هەڵسەنگاندنێک نییە.",
+      "authorPlaceholder": "ناوی کڕیار",
+      "textPlaceholder": "چیان گوت؟",
+      "featuredLabel": "تایبەت",
+      "publishedLabel": "بڵاوکراوەتەوە",
+      "draftLabel": "ڕەشنووس",
+      "addReview": "زیادکردنی هەڵسەنگاندن"
+    },
+    "blog": {
+      "heading": "بلۆگ",
+      "noPosts": "هێشتا هیچ بابەتێک نییە.",
+      "titlePlaceholder": "ناونیشانی بابەت",
+      "slugPlaceholder": "لینکی URL (خۆکارانە دروست دەبێت ئەگەر بەتاڵ بمێنێتەوە)",
+      "excerptPlaceholder": "کورتەیەکی پوخت",
+      "coverImagePlaceholder": "لینکی وێنەی بەرگ",
+      "contentPlaceholder": "بابەتەکە بنووسە...",
+      "publishedLabel": "بڵاوکراوەتەوە",
+      "draftLabel": "ڕەشنووس",
+      "addPost": "زیادکردنی بابەت",
+      "topicPlaceholder": "بابەتێک بۆ نووسینی پۆست لەسەری",
+      "generateWithAi": "دروستکردن بە زیرەکی دەستکرد",
+      "generating": "دروستکردن..."
+    },
     "legalHeading": "پەڕە یاساییەکان",
     "privacyLabel": "سیاسەتی تایبەتمەندی",
     "termsLabel": "مەرجەکانی خزمەتگوزاری",
@@ -1518,6 +1570,7 @@
         "home": "سەرەکی",
         "products": "بەرهەمەکان",
         "about": "دەربارە",
+        "blog": "بلۆگ",
         "contact": "پەیوەندی",
         "faq": "پرسیارە دووبارەکراوەکان"
       },
@@ -1532,7 +1585,33 @@
       "promo": {
         "dismiss": "نەخێر سوپاس"
       },
-      "featuredHeading": "تایبەت"
+      "featuredHeading": "تایبەت",
+      "testimonialsHeading": "کڕیارەکانمان چی دەڵێن",
+      "blogHeading": "لە بلۆگەکەمان",
+      "noPosts": "هێشتا هیچ بابەتێک نییە.",
+      "backToBlog": "← گەڕانەوە بۆ بلۆگ",
+      "appointmentHeading": "کات بۆ چاوپێکەوتن دیاری بکە",
+      "appointment": {
+        "namePlaceholder": "ناوت",
+        "phonePlaceholder": "ژمارە تەلەفۆنەکەت",
+        "servicePlaceholder": "خزمەتگوزارییەک هەڵبژێرە (ئارەزوومەندانە)",
+        "notesPlaceholder": "تێبینی (ئارەزوومەندانە)",
+        "requiredHint": "ناو، ژمارە تەلەفۆن و کاتی دڵخواز پێویستن.",
+        "submitting": "ناردن...",
+        "submit": "داواکاری کات",
+        "thankYou": "سوپاس! بەم زووانە کاتەکەت پشتڕاست دەکەینەوە."
+      },
+      "newsletter": {
+        "emailPlaceholder": "ئیمەیڵەکەت",
+        "subscribe": "بەشداربوون",
+        "submitting": "بەشداربوون...",
+        "thankYou": "بەسەرکەوتوویی بەشدار بوویت!"
+      },
+      "formTabs": {
+        "contact": "پەیوەندی",
+        "quote": "داواکاری نرخ",
+        "support": "پشتگیری"
+      }
     }
   },
   "integrations": {
@@ -1557,7 +1636,13 @@
       "urlPlaceholder": "https://your-endpoint.example.com/webhook",
       "creating": "لە دروستکردندایە...",
       "create": "زیادکردنی بەشداربوون",
-      "emptyState": "هێشتا هیچ بەشداربوونێکی Webhook نییە."
+      "emptyState": "هێشتا هیچ بەشداربوونێکی Webhook نییە.",
+      "viewDeliveries": "بینینی گەیاندنەکان",
+      "hideDeliveries": "شاردنەوەی گەیاندنەکان",
+      "loadingDeliveries": "بارکردن...",
+      "noDeliveries": "هێشتا هیچ گەیاندنێک نییە.",
+      "deliverySuccess": "گەیشت",
+      "deliveryFailed": "سەرکەوتوو نەبوو"
     }
   },
   "campaigns": {
@@ -1570,6 +1655,9 @@
     "requiredHint": "ناو و بابەت و پەیام پێویستن.",
     "lifecycleStagePlaceholder": "هەر قۆناغێکی ژیانی کڕیار",
     "tagPlaceholder": "پاڵاوتن بەپێی Tag (ئارەزوومەندانە)",
+    "churnRiskSegmentLabel": "تەنها ئامانجگرتنی کڕیارانی مەترسی بەرزی لەدەستدان",
+    "templatePlaceholder": "دەستپێبکە لە قاڵبێکەوە (ئارەزوومەندانە)",
+    "variableHint": "{{contactName}} بەکاربێنە بۆ زیادکردنی ناوی کڕیار.",
     "preview": "پێشبینینی وەرگرەکان",
     "previewing": "لە ژماردندایە...",
     "recipientCount": "{count} وەرگر (ئیمەیلیان تۆمارکراوە)",
@@ -1593,6 +1681,10 @@
       }
     }
   },
+  "unsubscribe": {
+    "heading": "بەشداربوونت هەڵوەشێنرایەوە",
+    "message": "چیتر ئیمەیلی بازاڕگەری لەم بزنسە وەرناگریت. پەیامەکانی سەبارەت بە داواکاری یان کاتەکانی خۆت کاریگەری لەسەر نابێت."
+  },
   "ads": {
     "title": "ڕیکلامەکان",
     "description": "چاودێری کەمپینەکانی ڕیکلام بکە و بزانە کامیان بەڕاستی کڕیار و داهات دەهێنن.",
@@ -1605,6 +1697,7 @@
       "namePlaceholder": "ناوی کەمپین",
       "utmPlaceholder": "تاگ (لەگەڵ سەرچاوەی پەیوەندی یەکدەگرێتەوە)، بۆ نموونە: \"داشکاندنی هاوینی ئینستاگرام\"",
       "budgetPlaceholder": "بودجە (ئارەزوومەندانە)",
+      "spendPlaceholder": "خەرجی ڕاستەقینە",
       "requiredHint": "ناو و تاگ پێویستن.",
       "creating": "لە پاشەکەوتکردندایە...",
       "create": "زیادکردنی کەمپین",
@@ -1619,7 +1712,17 @@
       "heading": "دیاریکردنی سەرچاوە",
       "description": "پەیوەندییەکان و داهاتی گەڕاوەتەوە بۆ هەر کەمپینێک لە ڕێگەی سەرچاوەی پەیوەندییەکەیانەوە.",
       "emptyState": "کەمپینێک تۆمار بکە بۆ بینینی دیاریکردنی سەرچاوە لێرە.",
-      "contactCount": "{count} پەیوەندی"
+      "contactCount": "{count} پەیوەندی",
+      "revenue": "داهات",
+      "spend": "خەرجی",
+      "cpl": "تێچووی هەر لیدێک",
+      "roas": "گەڕانەوەی خەرجی ڕیکلام"
+    },
+    "insights": {
+      "heading": "تێڕوانینی زیرەکی دەستکرد",
+      "description": "خوێندنەوەیەکی خێرای زیرەکی دەستکرد بۆ کامیان کاریگەرن، بەپێی ژمارەکانی سەرچاوەی سەرەوە.",
+      "generate": "دروستکردنی تێڕوانین",
+      "generating": "شیکردنەوە..."
     }
   },
   "aiTest": {

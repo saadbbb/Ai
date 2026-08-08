@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { AdAccountCard } from "@/features/ads/components/ad-account-card";
 import { AdCampaignManager } from "@/features/ads/components/ad-campaign-manager";
+import { AdInsightsPanel } from "@/features/ads/components/ad-insights-panel";
 import { AttributionReport } from "@/features/ads/components/attribution-report";
 import { adsService } from "@/features/ads/services/ads.service";
 import { requireFeature, requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
@@ -26,6 +27,7 @@ export default async function AdsPage() {
       </div>
       <AdAccountCard adAccount={adAccount} />
       <AttributionReport stats={attributionStats} />
+      <AdInsightsPanel />
       <AdCampaignManager initialCampaigns={campaigns} />
     </div>
   );

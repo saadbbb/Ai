@@ -8,7 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { submitInquiryAction } from "../actions/submit-inquiry.action";
 
-export function InquiryForm({ slug, initialMessage = "" }: { slug: string; initialMessage?: string }) {
+interface InquiryFormProps {
+  slug: string;
+  initialMessage?: string;
+  formType?: "contact" | "quote" | "support";
+}
+
+export function InquiryForm({ slug, initialMessage = "", formType = "contact" }: InquiryFormProps) {
   const t = useTranslations("website.public");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -23,7 +29,7 @@ export function InquiryForm({ slug, initialMessage = "" }: { slug: string; initi
     }
 
     setIsSubmitting(true);
-    const result = await submitInquiryAction({ slug, fullName, phone, message });
+    const result = await submitInquiryAction({ slug, fullName, phone, message, formType });
     setIsSubmitting(false);
 
     if (!result.success) {

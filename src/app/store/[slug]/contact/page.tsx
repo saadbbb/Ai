@@ -1,10 +1,27 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { InquiryForm } from "@/features/storefront/components/inquiry-form";
+import { ContactFormTabs } from "@/features/storefront/components/contact-form-tabs";
 import { StorefrontShell } from "@/features/storefront/components/storefront-shell";
 import { getStorefrontData } from "@/features/storefront/lib/get-storefront-data";
+import { buildStorefrontMetadata } from "@/features/storefront/lib/seo";
+import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const row = await storefrontRepository.findPublishedByWorkspaceSlug(slug);
+  if (!row) return {};
+  const t = await getTranslations("website.public");
+  return buildStorefrontMetadata({
+    slug,
+    path: "/contact",
+    workspaceName: row.workspaceName,
+    storefront: row.storefront,
+    title: `${t("contactHeading")} — ${row.workspaceName}`,
+  });
 }
 
 export default async function StoreContactPage({ params }: PageProps) {
@@ -21,7 +38,7 @@ export default async function StoreContactPage({ params }: PageProps) {
             {[storefront.contactPhone, storefront.contactEmail].filter(Boolean).join(" · ")}
           </p>
         )}
-        <InquiryForm slug={slug} />
+        <ContactFormTabs slug={slug} />
       </section>
     </StorefrontShell>
   );

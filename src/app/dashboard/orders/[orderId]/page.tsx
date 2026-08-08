@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OrderStatusSelect } from "@/features/orders/components/order-status-select";
+import { ShippingForm } from "@/features/orders/components/shipping-form";
 import { orderGrandTotal, orderSubtotal } from "@/features/orders/lib/order-total";
 import { orderService } from "@/features/orders/services/order.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -95,6 +96,8 @@ export default async function OrderDetailPage({ params }: PageProps) {
           <p className="text-sm text-muted-foreground whitespace-pre-wrap">{order.notes}</p>
         </div>
       )}
+
+      {order.deliveryMethod === "delivery" && <ShippingForm order={order} />}
     </div>
   );
 }

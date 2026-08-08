@@ -4,18 +4,25 @@ import { safeWebhookPost } from "@/features/automation/lib/safe-webhook-fetch";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
+import { workspaceAuditLogRepository } from "@/features/workspace/repository/workspace-audit-log.repository";
 import { AppError } from "@/lib/errors/app-error";
 import { apiKeyRepository } from "../repository/api-key.repository";
+import { webhookDeliveryRepository } from "../repository/webhook-delivery.repository";
 import { webhookSubscriptionRepository } from "../repository/webhook-subscription.repository";
 import { generateApiKey, hashApiKey } from "../lib/api-key";
 import { generateWebhookSecret, signWebhookPayload } from "../lib/webhook-signature";
+
+interface IntegrationActor {
+  userId: string;
+  email: string;
+}
 
 async function listApiKeys(workspaceId: string): Promise<ApiKey[]> {
   return apiKeyRepository.findByWorkspaceId(workspaceId);
 }
 
 /** The plaintext key is returned once, here, and never again — the caller must show it to the user immediately. */
-async function createApiKey(workspaceId: string, name: string): Promise<{ apiKey: ApiKey; plaintext: string }> {
+async function createApiKey(workspaceId: string, name: string, actor: IntegrationActor): Promise<{ apiKey: ApiKey; plaintext: string }> {
   const generated = generateApiKey();
   const apiKey = await apiKeyRepository.create({
     workspaceId,
@@ -23,12 +30,34 @@ async function createApiKey(workspaceId: string, name: string): Promise<{ apiKey
     keyPrefix: generated.displayPrefix,
     keyHash: generated.hash,
   });
+
+  await workspaceAuditLogRepository.log({
+    workspaceId,
+    actorUserId: actor.userId,
+    actorEmail: actor.email,
+    action: "api_key_created",
+    targetType: "api_key",
+    targetId: apiKey.id,
+    summary: `Created API key "${name}".`,
+  });
+
   return { apiKey, plaintext: generated.plaintext };
 }
 
-async function revokeApiKey(workspaceId: string, id: string): Promise<ApiKey> {
+async function revokeApiKey(workspaceId: string, id: string, actor: IntegrationActor): Promise<ApiKey> {
   const revoked = await apiKeyRepository.revoke(id, workspaceId);
   if (!revoked) throw new AppError("NOT_FOUND", "API key not found.");
+
+  await workspaceAuditLogRepository.log({
+    workspaceId,
+    actorUserId: actor.userId,
+    actorEmail: actor.email,
+    action: "api_key_revoked",
+    targetType: "api_key",
+    targetId: id,
+    summary: `Revoked API key "${revoked.name}".`,
+  });
+
   return revoked;
 }
 
@@ -44,11 +73,28 @@ async function listWebhookSubscriptions(workspaceId: string): Promise<WebhookSub
   return webhookSubscriptionRepository.findByWorkspaceId(workspaceId);
 }
 
-async function createWebhookSubscription(workspaceId: string, url: string, eventTypes: string[]): Promise<WebhookSubscription> {
+async function createWebhookSubscription(
+  workspaceId: string,
+  url: string,
+  eventTypes: string[],
+  actor: IntegrationActor,
+): Promise<WebhookSubscription> {
   if (!url.startsWith("https://")) {
     throw new AppError("VALIDATION_ERROR", "Webhook URL must use https://.");
   }
-  return webhookSubscriptionRepository.create({ workspaceId, url, eventTypes, secret: generateWebhookSecret() });
+  const subscription = await webhookSubscriptionRepository.create({ workspaceId, url, eventTypes, secret: generateWebhookSecret() });
+
+  await workspaceAuditLogRepository.log({
+    workspaceId,
+    actorUserId: actor.userId,
+    actorEmail: actor.email,
+    action: "webhook_created",
+    targetType: "webhook_subscription",
+    targetId: subscription.id,
+    summary: `Created a webhook subscription to ${url}.`,
+  });
+
+  return subscription;
 }
 
 async function setWebhookSubscriptionActive(workspaceId: string, id: string, isActive: boolean): Promise<WebhookSubscription> {
@@ -57,8 +103,23 @@ async function setWebhookSubscriptionActive(workspaceId: string, id: string, isA
   return updated;
 }
 
-async function deleteWebhookSubscription(workspaceId: string, id: string): Promise<void> {
+async function deleteWebhookSubscription(workspaceId: string, id: string, actor: IntegrationActor): Promise<void> {
   await webhookSubscriptionRepository.delete(id, workspaceId);
+
+  await workspaceAuditLogRepository.log({
+    workspaceId,
+    actorUserId: actor.userId,
+    actorEmail: actor.email,
+    action: "webhook_revoked",
+    targetType: "webhook_subscription",
+    targetId: id,
+    summary: "Removed a webhook subscription.",
+  });
+}
+
+/** Recent delivery attempts for one subscription, newest first — Integrations Monitoring depth (PART 13 gap #165). */
+async function listWebhookDeliveries(subscriptionId: string) {
+  return webhookDeliveryRepository.findBySubscriptionId(subscriptionId);
 }
 
 /**
@@ -68,6 +129,9 @@ async function deleteWebhookSubscription(workspaceId: string, id: string): Promi
  * webhook subscription event, with no new call sites scattered across the
  * app. Best-effort per subscription: one failing endpoint never blocks
  * delivery to the others, and never propagates back to automation dispatch.
+ * Every attempt (success or failure) is logged to `webhook_deliveries` so
+ * Monitoring (#165) has something real to show — no automatic retries yet,
+ * a real, contained follow-up once this log surfaces a need for one.
  */
 async function notifyWebhookSubscribers(workspaceId: string, event: { type: string; [key: string]: unknown }): Promise<void> {
   const subscriptions = await webhookSubscriptionRepository.findActiveByWorkspaceAndEvent(workspaceId, event.type);
@@ -80,8 +144,21 @@ async function notifyWebhookSubscribers(workspaceId: string, event: { type: stri
         await safeWebhookPost(subscription.url, payload, {
           "X-Webhook-Signature": signWebhookPayload(subscription.secret, payload),
         });
+        await webhookDeliveryRepository.create({
+          workspaceId,
+          subscriptionId: subscription.id,
+          eventType: event.type,
+          success: true,
+        });
       } catch (error) {
         console.error(`[integrations] webhook delivery to ${subscription.url} failed:`, error);
+        await webhookDeliveryRepository.create({
+          workspaceId,
+          subscriptionId: subscription.id,
+          eventType: event.type,
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
       }
     }),
   );
@@ -135,6 +212,7 @@ export const integrationService = {
   createWebhookSubscription,
   setWebhookSubscriptionActive,
   deleteWebhookSubscription,
+  listWebhookDeliveries,
   notifyWebhookSubscribers,
   createLeadViaApi,
 };

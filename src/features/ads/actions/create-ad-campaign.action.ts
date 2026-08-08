@@ -18,7 +18,7 @@ export async function createAdCampaignAction(input: unknown): Promise<ActionResu
   await requireWorkspacePermission(user.id, workspace.id, "ads.manage");
 
   try {
-    const campaign = await adsService.createCampaign(workspace.id, parsed.data);
+    const campaign = await adsService.createCampaign(workspace.id, parsed.data, { userId: user.id, email: user.email });
     return actionOk(campaign);
   } catch (error) {
     return actionFail(error);

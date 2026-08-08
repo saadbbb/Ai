@@ -134,9 +134,44 @@ async function updateOrderStatus(workspaceId: string, orderId: string, status: O
   return order;
 }
 
+interface UpdateShippingInput {
+  shippingCarrier?: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
+}
+
+/** Manual shipping stopgap (PART 13 gap #152) — see orders.ts's own comment on why this is manual entry, not a carrier API. */
+async function updateShipping(workspaceId: string, orderId: string, input: UpdateShippingInput, actor: ActivityActor): Promise<Order> {
+  const existing = await orderRepository.findById(orderId, workspaceId);
+  if (!existing) {
+    throw new AppError("NOT_FOUND", "Order not found.");
+  }
+
+  const order = await orderRepository.updateShipping(orderId, workspaceId, {
+    shippingCarrier: input.shippingCarrier || null,
+    trackingNumber: input.trackingNumber || null,
+    trackingUrl: input.trackingUrl || null,
+  });
+  if (!order) {
+    throw new AppError("NOT_FOUND", "Order not found.");
+  }
+
+  await activityRepository.log({
+    workspaceId,
+    contactId: order.contactId,
+    type: "order_shipping_updated",
+    actor,
+    summary: input.trackingNumber ? `Shipment tracking added: ${input.trackingNumber}.` : "Shipment tracking updated.",
+    link: `/dashboard/orders/${order.id}`,
+  });
+
+  return order;
+}
+
 export const orderService = {
   listOrders,
   getOrder,
   createOrder,
   updateOrderStatus,
+  updateShipping,
 };

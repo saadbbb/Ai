@@ -4,6 +4,7 @@ import { workspaceRepository } from "@/features/workspace/repository/workspace.r
 import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
 import { checkRateLimit } from "@/lib/rate-limit/rate-limit";
 import { actionFail, actionOk, actionValidationError, AppError, type ActionResult } from "@/lib/errors/app-error";
+import { storefrontAnalyticsService } from "../services/storefront-analytics.service";
 import { storefrontService } from "../services/storefront.service";
 import { submitOrderSchema } from "../validation/schemas";
 
@@ -33,6 +34,8 @@ export async function submitOrderAction(input: unknown): Promise<ActionResult<{ 
       notes: parsed.data.notes,
       items: parsed.data.items,
     });
+
+    await storefrontAnalyticsService.trackFormSubmission(workspace.id, "order");
 
     return actionOk({ orderId: result.order.id });
   } catch (error) {

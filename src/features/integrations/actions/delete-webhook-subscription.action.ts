@@ -16,7 +16,7 @@ export async function deleteWebhookSubscriptionAction(input: unknown): Promise<A
   await requireWorkspacePermission(user.id, workspace.id, "integrations.manage");
 
   try {
-    await integrationService.deleteWebhookSubscription(workspace.id, parsed.data.id);
+    await integrationService.deleteWebhookSubscription(workspace.id, parsed.data.id, { userId: user.id, email: user.email });
     return actionOk(null);
   } catch (error) {
     return actionFail(error);

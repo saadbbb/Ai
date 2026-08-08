@@ -21,6 +21,17 @@ vi.mock("../repository/webhook-subscription.repository", () => ({
   },
 }));
 
+vi.mock("../repository/webhook-delivery.repository", () => ({
+  webhookDeliveryRepository: {
+    create: vi.fn(),
+    findBySubscriptionId: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/workspace/repository/workspace-audit-log.repository", () => ({
+  workspaceAuditLogRepository: { log: vi.fn() },
+}));
+
 vi.mock("@/features/automation/lib/safe-webhook-fetch", () => ({
   safeWebhookPost: vi.fn(),
 }));
@@ -43,6 +54,8 @@ vi.mock("@/features/automation/services/automation.service", () => ({
 
 const { apiKeyRepository } = await import("../repository/api-key.repository");
 const { webhookSubscriptionRepository } = await import("../repository/webhook-subscription.repository");
+const { webhookDeliveryRepository } = await import("../repository/webhook-delivery.repository");
+const { workspaceAuditLogRepository } = await import("@/features/workspace/repository/workspace-audit-log.repository");
 const { safeWebhookPost } = await import("@/features/automation/lib/safe-webhook-fetch");
 const { activityRepository } = await import("@/features/crm/repository/activity.repository");
 const { leadRepository } = await import("@/features/crm/repository/lead.repository");
@@ -51,6 +64,7 @@ const { automationService } = await import("@/features/automation/services/autom
 const { integrationService } = await import("./integration.service");
 
 const WORKSPACE_ID = "workspace-1";
+const ACTOR = { userId: "user-1", email: "owner@example.com" };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -69,7 +83,7 @@ describe("integrationService.createApiKey", () => {
       createdAt: new Date(),
     }));
 
-    const result = await integrationService.createApiKey(WORKSPACE_ID, "Zapier");
+    const result = await integrationService.createApiKey(WORKSPACE_ID, "Zapier", ACTOR);
 
     expect(result.plaintext.startsWith("sk_live_")).toBe(true);
     expect(apiKeyRepository.create).toHaveBeenCalledWith(
@@ -77,6 +91,9 @@ describe("integrationService.createApiKey", () => {
     );
     // The stored hash must never equal the plaintext itself.
     expect(result.apiKey.keyHash).not.toBe(result.plaintext);
+    expect(workspaceAuditLogRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, action: "api_key_created" }),
+    );
   });
 });
 
@@ -84,7 +101,17 @@ describe("integrationService.revokeApiKey", () => {
   it("throws NOT_FOUND when the key doesn't belong to this workspace", async () => {
     vi.mocked(apiKeyRepository.revoke).mockResolvedValue(null);
 
-    await expect(integrationService.revokeApiKey(WORKSPACE_ID, "key-1")).rejects.toThrow(/not found/i);
+    await expect(integrationService.revokeApiKey(WORKSPACE_ID, "key-1", ACTOR)).rejects.toThrow(/not found/i);
+  });
+
+  it("logs an audit entry when a key is revoked", async () => {
+    vi.mocked(apiKeyRepository.revoke).mockResolvedValue({ id: "key-1", name: "Zapier" } as ApiKey);
+
+    await integrationService.revokeApiKey(WORKSPACE_ID, "key-1", ACTOR);
+
+    expect(workspaceAuditLogRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, action: "api_key_revoked" }),
+    );
   });
 });
 
@@ -111,18 +138,32 @@ describe("integrationService.authenticateApiKey", () => {
 describe("integrationService.createWebhookSubscription", () => {
   it("rejects a non-https URL", async () => {
     await expect(
-      integrationService.createWebhookSubscription(WORKSPACE_ID, "http://example.com/hook", ["lead_created"]),
+      integrationService.createWebhookSubscription(WORKSPACE_ID, "http://example.com/hook", ["lead_created"], ACTOR),
     ).rejects.toThrow(/https/);
     expect(webhookSubscriptionRepository.create).not.toHaveBeenCalled();
   });
 
-  it("generates a secret and stores the subscription for an https URL", async () => {
+  it("generates a secret, stores the subscription for an https URL, and logs an audit entry", async () => {
     vi.mocked(webhookSubscriptionRepository.create).mockResolvedValue({ id: "sub-1" } as WebhookSubscription);
 
-    await integrationService.createWebhookSubscription(WORKSPACE_ID, "https://example.com/hook", ["lead_created"]);
+    await integrationService.createWebhookSubscription(WORKSPACE_ID, "https://example.com/hook", ["lead_created"], ACTOR);
 
     expect(webhookSubscriptionRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({ workspaceId: WORKSPACE_ID, url: "https://example.com/hook", eventTypes: ["lead_created"] }),
+    );
+    expect(workspaceAuditLogRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, action: "webhook_created" }),
+    );
+  });
+});
+
+describe("integrationService.deleteWebhookSubscription", () => {
+  it("logs an audit entry after deleting", async () => {
+    await integrationService.deleteWebhookSubscription(WORKSPACE_ID, "sub-1", ACTOR);
+
+    expect(webhookSubscriptionRepository.delete).toHaveBeenCalledWith("sub-1", WORKSPACE_ID);
+    expect(workspaceAuditLogRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, action: "webhook_revoked" }),
     );
   });
 });
@@ -136,7 +177,7 @@ describe("integrationService.notifyWebhookSubscribers", () => {
     expect(safeWebhookPost).not.toHaveBeenCalled();
   });
 
-  it("signs and posts to every matching subscription", async () => {
+  it("signs and posts to every matching subscription, logging a successful delivery each", async () => {
     vi.mocked(webhookSubscriptionRepository.findActiveByWorkspaceAndEvent).mockResolvedValue([
       { id: "sub-1", url: "https://a.example.com/hook", secret: "secret-a" } as WebhookSubscription,
       { id: "sub-2", url: "https://b.example.com/hook", secret: "secret-b" } as WebhookSubscription,
@@ -150,9 +191,12 @@ describe("integrationService.notifyWebhookSubscribers", () => {
       expect.objectContaining({ event: "lead_created" }),
       expect.objectContaining({ "X-Webhook-Signature": expect.any(String) }),
     );
+    expect(webhookDeliveryRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ subscriptionId: "sub-1", eventType: "lead_created", success: true }),
+    );
   });
 
-  it("never throws when a delivery fails — one bad endpoint doesn't block the others", async () => {
+  it("never throws when a delivery fails — one bad endpoint doesn't block the others, and the failure is logged", async () => {
     vi.mocked(webhookSubscriptionRepository.findActiveByWorkspaceAndEvent).mockResolvedValue([
       { id: "sub-1", url: "https://a.example.com/hook", secret: "secret-a" } as WebhookSubscription,
     ]);
@@ -161,6 +205,10 @@ describe("integrationService.notifyWebhookSubscribers", () => {
     await expect(
       integrationService.notifyWebhookSubscribers(WORKSPACE_ID, { type: "lead_created", contactId: "c1" }),
     ).resolves.toBeUndefined();
+
+    expect(webhookDeliveryRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ subscriptionId: "sub-1", success: false, error: "endpoint down" }),
+    );
   });
 });
 

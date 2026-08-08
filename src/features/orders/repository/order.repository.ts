@@ -99,6 +99,19 @@ export const orderRepository = {
     return order ?? null;
   },
 
+  async updateShipping(
+    id: string,
+    workspaceId: string,
+    data: { shippingCarrier?: string | null; trackingNumber?: string | null; trackingUrl?: string | null },
+  ): Promise<Order | null> {
+    const [order] = await db
+      .update(orders)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(orders.id, id), eq(orders.workspaceId, workspaceId)))
+      .returning();
+    return order ?? null;
+  },
+
   /** Total ordered quantity per product, across every order status — feeds the storefront's "best-selling" sort. */
   async sumQuantityByProductId(workspaceId: string): Promise<Map<string, number>> {
     const rows = await db

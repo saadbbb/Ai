@@ -20,6 +20,7 @@ export async function previewRecipientsAction(input: unknown): Promise<ActionRes
     const recipients = await campaignService.previewRecipients(workspace.id, {
       lifecycleStage: parsed.data.segmentLifecycleStage,
       tag: parsed.data.segmentTag,
+      churnRisk: parsed.data.segmentChurnRisk,
     });
     return actionOk(recipients);
   } catch (error) {

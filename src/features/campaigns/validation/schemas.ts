@@ -8,6 +8,7 @@ export const createCampaignSchema = z.object({
   message: z.string().trim().min(1).max(5000),
   segmentLifecycleStage: contactLifecycleStageSchema.optional(),
   segmentTag: z.string().trim().max(100).optional(),
+  segmentChurnRisk: z.boolean().optional(),
 });
 
 export const sendCampaignSchema = z.object({
@@ -17,4 +18,10 @@ export const sendCampaignSchema = z.object({
 export const previewRecipientsSchema = z.object({
   segmentLifecycleStage: contactLifecycleStageSchema.optional(),
   segmentTag: z.string().trim().max(100).optional(),
+  segmentChurnRisk: z.boolean().optional(),
+});
+
+export const unsubscribeSchema = z.object({
+  workspaceId: z.string().uuid(),
+  contactId: z.string().uuid(),
 });

@@ -7,13 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { contactLifecycleStageEnum, type Campaign, type ContactLifecycleStage } from "@/db/schema";
+import { contactLifecycleStageEnum, type Campaign, type ContactLifecycleStage, type MessageTemplate } from "@/db/schema";
 import { createCampaignAction } from "../actions/create-campaign.action";
 import { previewRecipientsAction } from "../actions/preview-recipients.action";
 import { sendCampaignAction } from "../actions/send-campaign.action";
 
-export function CampaignManager({ initialCampaigns }: { initialCampaigns: Campaign[] }) {
+interface CampaignManagerProps {
+  initialCampaigns: Campaign[];
+  templates: MessageTemplate[];
+}
+
+export function CampaignManager({ initialCampaigns, templates }: CampaignManagerProps) {
   const t = useTranslations("campaigns");
   const tLifecycle = useTranslations("contacts.lifecycle");
   const [campaigns, setCampaigns] = useState(initialCampaigns);
@@ -22,6 +28,7 @@ export function CampaignManager({ initialCampaigns }: { initialCampaigns: Campai
   const [message, setMessage] = useState("");
   const [segmentLifecycleStage, setSegmentLifecycleStage] = useState<ContactLifecycleStage | "">("");
   const [segmentTag, setSegmentTag] = useState("");
+  const [segmentChurnRisk, setSegmentChurnRisk] = useState(false);
   const [previewCount, setPreviewCount] = useState<number | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -32,6 +39,7 @@ export function CampaignManager({ initialCampaigns }: { initialCampaigns: Campai
     const result = await previewRecipientsAction({
       segmentLifecycleStage: segmentLifecycleStage || undefined,
       segmentTag: segmentTag || undefined,
+      segmentChurnRisk: segmentChurnRisk || undefined,
     });
     setIsPreviewing(false);
 
@@ -55,6 +63,7 @@ export function CampaignManager({ initialCampaigns }: { initialCampaigns: Campai
       message,
       segmentLifecycleStage: segmentLifecycleStage || undefined,
       segmentTag: segmentTag || undefined,
+      segmentChurnRisk: segmentChurnRisk || undefined,
     });
     setIsCreating(false);
 
@@ -69,6 +78,7 @@ export function CampaignManager({ initialCampaigns }: { initialCampaigns: Campai
     setMessage("");
     setSegmentLifecycleStage("");
     setSegmentTag("");
+    setSegmentChurnRisk(false);
     setPreviewCount(null);
   }
 
@@ -95,7 +105,22 @@ export function CampaignManager({ initialCampaigns }: { initialCampaigns: Campai
           <p className="text-sm font-medium">{t("newHeading")}</p>
           <Input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("namePlaceholder")} />
           <Input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder={t("subjectPlaceholder")} />
+          {templates.length > 0 && (
+            <Select onValueChange={(templateId) => setMessage(templates.find((t) => t.id === templateId)?.content ?? "")}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("templatePlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {templates.map((template) => (
+                  <SelectItem key={template.id} value={template.id}>
+                    {template.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           <Textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={4} placeholder={t("messagePlaceholder")} />
+          <p className="text-xs text-muted-foreground">{t("variableHint")}</p>
 
           <div className="grid gap-2 sm:grid-cols-2">
             <Select
@@ -125,6 +150,17 @@ export function CampaignManager({ initialCampaigns }: { initialCampaigns: Campai
               placeholder={t("tagPlaceholder")}
             />
           </div>
+
+          <label className="flex items-center gap-2 text-sm">
+            <Switch
+              checked={segmentChurnRisk}
+              onCheckedChange={(checked) => {
+                setSegmentChurnRisk(checked);
+                setPreviewCount(null);
+              }}
+            />
+            {t("churnRiskSegmentLabel")}
+          </label>
 
           <div className="flex items-center gap-3">
             <Button type="button" variant="outline" size="sm" disabled={isPreviewing} onClick={handlePreview}>

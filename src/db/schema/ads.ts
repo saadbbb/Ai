@@ -44,6 +44,8 @@ export const adCampaigns = pgTable("ad_campaigns", {
   utmCampaign: text("utm_campaign").notNull(),
   status: adCampaignStatusEnum("status").notNull().default("active"),
   budget: numeric("budget", { precision: 12, scale: 2 }),
+  /** Ad Performance Analytics depth (PART 13 gap #186) — actual spend to date, entered manually since there's no live Meta spend feed yet; drives CPL/ROAS in the attribution report. Distinct from `budget` (the planned ceiling, set once) — this is updated as spend accrues. */
+  actualSpend: numeric("actual_spend", { precision: 12, scale: 2 }),
   startDate: timestamp("start_date", { withTimezone: true }),
   endDate: timestamp("end_date", { withTimezone: true }),
   externalCampaignId: text("external_campaign_id"),

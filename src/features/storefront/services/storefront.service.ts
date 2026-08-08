@@ -9,14 +9,18 @@ import type {
   StorefrontPopupTrigger,
   StorefrontTheme,
 } from "@/db/schema";
+import type { Contact } from "@/db/schema";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { automationService } from "@/features/automation/services/automation.service";
+import { appointmentService } from "@/features/appointments/services/appointment.service";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
+import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
 import { orderService } from "@/features/orders/services/order.service";
 import type { OrderListItem } from "@/features/orders/repository/order.repository";
 import { AppError } from "@/lib/errors/app-error";
+import { newsletterSubscriberRepository } from "../repository/newsletter-subscriber.repository";
 import { storefrontRepository } from "../repository/storefront.repository";
 
 interface StorefrontInput {
@@ -41,6 +45,7 @@ interface StorefrontInput {
   trackingIds?: Record<string, string>;
   seoTitle?: string;
   seoDescription?: string;
+  translations?: Record<string, { heroTitle?: string; heroSubtitle?: string; aboutText?: string }>;
   sections: string[];
   privacyPolicyText?: string;
   termsText?: string;
@@ -59,6 +64,23 @@ interface InquiryInput {
   fullName: string;
   phone: string;
   message: string;
+  formType?: "contact" | "quote" | "support";
+}
+
+/** Shared by every public storefront write path — dedupes a visitor by phone within the workspace. */
+async function findOrCreateContactByPhone(
+  workspaceId: string,
+  input: { fullName: string; phone: string; address?: string },
+): Promise<Contact> {
+  const existing = await contactRepository.findByPhone(input.phone, workspaceId);
+  if (existing) return existing;
+  return contactRepository.create({
+    workspaceId,
+    fullName: input.fullName,
+    phone: input.phone,
+    source: "Website",
+    address: input.address || null,
+  });
 }
 
 /** One row per workspace, created on first visit to the editor — same check-then-create pattern as ai_agents. */
@@ -72,6 +94,21 @@ async function getOrCreateForWorkspace(workspaceId: string): Promise<Storefront>
 function pruneBlank(map: Record<string, string> | undefined): Record<string, string> {
   if (!map) return {};
   return Object.fromEntries(Object.entries(map).filter(([, value]) => value.trim() !== ""));
+}
+
+/** Drops blank fields within each locale override, then drops any locale left with nothing at all. */
+function pruneTranslations(
+  translations: StorefrontInput["translations"],
+): Record<string, { heroTitle?: string; heroSubtitle?: string; aboutText?: string }> {
+  if (!translations) return {};
+  const result: Record<string, { heroTitle?: string; heroSubtitle?: string; aboutText?: string }> = {};
+  for (const [locale, fields] of Object.entries(translations)) {
+    const cleaned = Object.fromEntries(
+      Object.entries(fields).filter(([, value]) => typeof value === "string" && value.trim() !== ""),
+    );
+    if (Object.keys(cleaned).length > 0) result[locale] = cleaned;
+  }
+  return result;
 }
 
 async function updateStorefront(workspaceId: string, input: StorefrontInput): Promise<Storefront> {
@@ -98,6 +135,7 @@ async function updateStorefront(workspaceId: string, input: StorefrontInput): Pr
     trackingIds: pruneBlank(input.trackingIds),
     seoTitle: input.seoTitle || null,
     seoDescription: input.seoDescription || null,
+    translations: pruneTranslations(input.translations),
     sections: input.sections,
     privacyPolicyText: input.privacyPolicyText || null,
     termsText: input.termsText || null,
@@ -122,25 +160,23 @@ async function updateStorefront(workspaceId: string, input: StorefrontInput): Pr
  * lead_created activity/automation wiring crmService.createLeadFromConversation
  * already established, with `source: "Website"` marking where it came from.
  */
-async function submitInquiry(workspaceId: string, input: InquiryInput): Promise<void> {
-  let contact = await contactRepository.findByPhone(input.phone, workspaceId);
-  if (!contact) {
-    contact = await contactRepository.create({
-      workspaceId,
-      fullName: input.fullName,
-      phone: input.phone,
-      source: "Website",
-    });
-  }
+const INQUIRY_LABELS: Record<NonNullable<InquiryInput["formType"]>, string> = {
+  contact: "Inquiry",
+  quote: "Quote request",
+  support: "Support request",
+};
 
+async function submitInquiry(workspaceId: string, input: InquiryInput): Promise<void> {
+  const contact = await findOrCreateContactByPhone(workspaceId, input);
   const lead = await leadRepository.create({ workspaceId, contactId: contact.id, conversationId: null });
 
+  const label = INQUIRY_LABELS[input.formType ?? "contact"];
   await activityRepository.log({
     workspaceId,
     contactId: contact.id,
     type: "lead_created",
     actor: { type: "system" },
-    summary: `Inquiry submitted via the storefront: "${input.message}"`,
+    summary: `${label} submitted via the storefront: "${input.message}"`,
   });
 
   await automationService.dispatch(workspaceId, { type: "lead_created", contactId: lead.contactId });
@@ -185,16 +221,11 @@ async function submitOrder(workspaceId: string, input: OrderInput): Promise<Orde
     return { productId: product.id, name: product.name, unitPrice, quantity: item.quantity };
   });
 
-  let contact = await contactRepository.findByPhone(input.phone, workspaceId);
-  if (!contact) {
-    contact = await contactRepository.create({
-      workspaceId,
-      fullName: input.fullName,
-      phone: input.phone,
-      source: "Website",
-      address: input.deliveryAddress || null,
-    });
-  }
+  const contact = await findOrCreateContactByPhone(workspaceId, {
+    fullName: input.fullName,
+    phone: input.phone,
+    address: input.deliveryAddress,
+  });
 
   return orderService.createOrder(
     workspaceId,
@@ -209,9 +240,53 @@ async function submitOrder(workspaceId: string, input: OrderInput): Promise<Orde
   );
 }
 
+interface AppointmentRequestInput {
+  fullName: string;
+  phone: string;
+  serviceId?: string;
+  preferredAt: Date;
+  notes?: string;
+}
+
+/**
+ * Forms depth (PART 13 gap #140) — a public appointment request creates a
+ * real Appointment, not a Lead: appointmentService.createAppointment already
+ * does contact validation, activity logging, and automation dispatch, so this
+ * is a thin wrapper that resolves the optional serviceId to a name/duration
+ * first. Lands in the default "scheduled" status, same as any other
+ * appointment — staff confirm or reschedule from there.
+ */
+async function submitAppointmentRequest(workspaceId: string, input: AppointmentRequestInput) {
+  const contact = await findOrCreateContactByPhone(workspaceId, input);
+
+  const service = input.serviceId ? await serviceRepository.findById(input.serviceId, workspaceId) : null;
+
+  return appointmentService.createAppointment(
+    workspaceId,
+    {
+      contactId: contact.id,
+      serviceId: service?.id,
+      serviceName: service?.name,
+      scheduledAt: input.preferredAt,
+      durationMinutes: service?.durationMinutes ?? 30,
+      notes: input.notes,
+    },
+    { type: "system" },
+  );
+}
+
+/** Idempotent — resubscribing with the same email is a silent no-op, not an error. */
+async function subscribeToNewsletter(workspaceId: string, email: string): Promise<void> {
+  const existing = await newsletterSubscriberRepository.findByWorkspaceAndEmail(workspaceId, email);
+  if (existing) return;
+  await newsletterSubscriberRepository.create({ workspaceId, email });
+}
+
 export const storefrontService = {
   getOrCreateForWorkspace,
   updateStorefront,
   submitInquiry,
   submitOrder,
+  submitAppointmentRequest,
+  subscribeToNewsletter,
 };

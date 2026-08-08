@@ -20,6 +20,14 @@ export const workspaceAuditActionEnum = pgEnum("workspace_audit_action", [
   "support_ticket_created",
   "support_ticket_replied",
   "login",
+  // Integrations/Campaigns/Ads depth (PART 13 gaps #168/#176/#191) — every
+  // credential-issuing or broadcast-sending action gets an accountable trail.
+  "api_key_created",
+  "api_key_revoked",
+  "webhook_created",
+  "webhook_revoked",
+  "campaign_sent",
+  "ad_campaign_created",
 ]);
 
 export const workspaceAuditLogs = pgTable(

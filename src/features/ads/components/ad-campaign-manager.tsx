@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { adCampaignStatusEnum, type AdCampaign, type AdCampaignStatus } from "@/db/schema";
 import { createAdCampaignAction } from "../actions/create-ad-campaign.action";
+import { updateAdCampaignSpendAction } from "../actions/update-ad-campaign-spend.action";
 import { updateAdCampaignStatusAction } from "../actions/update-ad-campaign-status.action";
 
 export function AdCampaignManager({ initialCampaigns }: { initialCampaigns: AdCampaign[] }) {
@@ -19,6 +20,29 @@ export function AdCampaignManager({ initialCampaigns }: { initialCampaigns: AdCa
   const [budget, setBudget] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [spendDrafts, setSpendDrafts] = useState<Record<string, string>>({});
+  const [savingSpendId, setSavingSpendId] = useState<string | null>(null);
+
+  async function handleSaveSpend(campaignId: string) {
+    const draft = spendDrafts[campaignId];
+    if (!draft || Number.isNaN(Number(draft))) return;
+
+    setSavingSpendId(campaignId);
+    const result = await updateAdCampaignSpendAction({ campaignId, actualSpend: Number(draft) });
+    setSavingSpendId(null);
+
+    if (!result.success) {
+      toast.error(result.error.message);
+      return;
+    }
+
+    setCampaigns((current) => current.map((campaign) => (campaign.id === campaignId ? result.data : campaign)));
+    setSpendDrafts((current) => {
+      const next = { ...current };
+      delete next[campaignId];
+      return next;
+    });
+  }
 
   async function handleCreate() {
     if (!name.trim() || !utmCampaign.trim()) {
@@ -83,22 +107,34 @@ export function AdCampaignManager({ initialCampaigns }: { initialCampaigns: AdCa
                   <p className="truncate font-medium">{campaign.name}</p>
                   <p className="truncate text-xs text-muted-foreground">{campaign.utmCampaign}</p>
                 </div>
-                <Select
-                  value={campaign.status}
-                  onValueChange={(value) => handleStatusChange(campaign.id, value as AdCampaignStatus)}
-                  disabled={savingId === campaign.id}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {adCampaignStatusEnum.enumValues.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {t(`statuses.${status}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    className="w-28"
+                    placeholder={t("spendPlaceholder")}
+                    value={spendDrafts[campaign.id] ?? campaign.actualSpend ?? ""}
+                    onChange={(event) => setSpendDrafts((current) => ({ ...current, [campaign.id]: event.target.value }))}
+                    onBlur={() => handleSaveSpend(campaign.id)}
+                    disabled={savingSpendId === campaign.id}
+                  />
+                  <Select
+                    value={campaign.status}
+                    onValueChange={(value) => handleStatusChange(campaign.id, value as AdCampaignStatus)}
+                    disabled={savingId === campaign.id}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {adCampaignStatusEnum.enumValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {t(`statuses.${status}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             ))}
           </div>

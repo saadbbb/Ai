@@ -37,4 +37,13 @@ export const storefrontRepository = {
       .limit(1);
     return row ?? null;
   },
+
+  /** SEO sitemap (PART 13 gap #141) — every published storefront, for building the site-wide sitemap.xml. */
+  async findAllPublished(): Promise<{ slug: string; workspaceId: string; updatedAt: Date }[]> {
+    return db
+      .select({ slug: workspaces.slug, workspaceId: workspaces.id, updatedAt: storefronts.updatedAt })
+      .from(storefronts)
+      .innerJoin(workspaces, eq(workspaces.id, storefronts.workspaceId))
+      .where(eq(storefronts.isPublished, true));
+  },
 };

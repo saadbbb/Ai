@@ -1,0 +1,1 @@
+ALTER TABLE "ad_campaigns" ADD COLUMN "actual_spend" numeric(12, 2);

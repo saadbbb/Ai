@@ -17,7 +17,10 @@ export async function sendCampaignAction(input: unknown): Promise<ActionResult<C
   await requireWorkspacePermission(user.id, workspace.id, "campaigns.manage");
 
   try {
-    const campaign = await campaignService.sendCampaign(workspace.id, parsed.data.campaignId);
+    const campaign = await campaignService.sendCampaign(workspace.id, parsed.data.campaignId, {
+      userId: user.id,
+      email: user.email,
+    });
     return actionOk(campaign);
   } catch (error) {
     return actionFail(error);

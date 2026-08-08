@@ -1,9 +1,13 @@
 import { getTranslations } from "next-intl/server";
+import Image from "next/image";
 import Link from "next/link";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import type { Storefront } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import { CartProvider } from "../lib/cart-context";
 import { CartBadge } from "./cart-badge";
+import { NewsletterSignupForm } from "./newsletter-signup-form";
+import { PageViewTracker } from "./page-view-tracker";
 import { PromoPopup } from "./promo-popup";
 import { SocialLinksRow } from "./social-links-row";
 import { StoreAssistantWidget } from "./store-assistant-widget";
@@ -25,6 +29,7 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
     { href: base, label: t("home") },
     { href: `${base}/products`, label: t("products") },
     { href: `${base}/about`, label: t("about") },
+    { href: `${base}/blog`, label: t("blog") },
     { href: `${base}/faq`, label: t("faq") },
     { href: `${base}/contact`, label: t("contact") },
   ];
@@ -33,6 +38,7 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
   return (
     <CartProvider slug={slug}>
       <div className={cn(storefront.darkMode && "dark", "min-h-full bg-background")}>
+        <PageViewTracker slug={slug} />
         <TrackingScripts ids={storefront.trackingIds} />
         <PromoPopup storefront={storefront} slug={slug} dismissLabel={tPromo("dismiss")} />
 
@@ -57,7 +63,16 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
             )}
           >
             <Link href={base} className="flex items-center gap-3">
-              {logoUrl && <img src={logoUrl} alt={workspaceName} className="h-10 w-10 rounded-full object-cover" />}
+              {logoUrl && (
+                <Image
+                  src={logoUrl}
+                  alt={workspaceName}
+                  width={40}
+                  height={40}
+                  unoptimized
+                  className="h-10 w-10 rounded-full object-cover"
+                />
+              )}
               <span className="text-lg font-semibold">{workspaceName}</span>
             </Link>
             <div className="flex items-center gap-4">
@@ -70,13 +85,16 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
                   ))}
                 </nav>
               )}
+              <LocaleSwitcher />
               <CartBadge slug={slug} />
             </div>
           </div>
         </header>
 
         {storefront.bannerImageUrl && (
-          <img src={storefront.bannerImageUrl} alt="" className="h-48 w-full object-cover sm:h-64" />
+          <div className="relative h-48 w-full sm:h-64">
+            <Image src={storefront.bannerImageUrl} alt="" fill unoptimized className="object-cover" />
+          </div>
         )}
 
         <main>{children}</main>
@@ -93,6 +111,7 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
               </nav>
             )}
             <SocialLinksRow links={storefront.socialLinks} />
+            {storefront.footerStyle !== "minimal" && <NewsletterSignupForm slug={slug} />}
             <p className="text-xs text-muted-foreground">
               © {new Date().getFullYear()} {workspaceName}
             </p>

@@ -1,4 +1,4 @@
-import { index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { languageEnum, workspaces } from "./workspaces";
 import { users } from "./users";
 
@@ -60,6 +60,8 @@ export const contacts = pgTable(
     gender: text("gender"),
     /** IANA timezone (e.g. "Asia/Baghdad") — distinct from workspaces.timezone, which is the business's own. */
     timezone: text("timezone"),
+    /** Campaign Security & Compliance depth (PART 13 gap #176) — set via the unsubscribe link in every campaign email footer; excluded from every future campaign's recipient list. Never affects transactional/AI-reply messages, only broadcast campaigns. */
+    marketingOptOut: boolean("marketing_opt_out").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

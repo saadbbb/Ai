@@ -38,3 +38,10 @@ export const updateOrderStatusSchema = z.object({
   orderId: z.string().uuid(),
   status: z.enum(orderStatusEnum.enumValues),
 });
+
+export const updateOrderShippingSchema = z.object({
+  orderId: z.string().uuid(),
+  shippingCarrier: z.string().trim().max(100).optional(),
+  trackingNumber: z.string().trim().max(100).optional(),
+  trackingUrl: z.string().trim().url().max(2000).optional().or(z.literal("")),
+});

@@ -18,7 +18,10 @@ export async function createWebhookSubscriptionAction(input: unknown): Promise<A
   await requireWorkspacePermission(user.id, workspace.id, "integrations.manage");
 
   try {
-    const subscription = await integrationService.createWebhookSubscription(workspace.id, parsed.data.url, parsed.data.eventTypes);
+    const subscription = await integrationService.createWebhookSubscription(workspace.id, parsed.data.url, parsed.data.eventTypes, {
+      userId: user.id,
+      email: user.email,
+    });
     return actionOk(subscription);
   } catch (error) {
     return actionFail(error);

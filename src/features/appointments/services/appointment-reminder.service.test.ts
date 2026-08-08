@@ -65,6 +65,7 @@ function makeContact(overrides: Partial<Contact> = {}): Contact {
     birthDate: null,
     gender: null,
     timezone: null,
+    marketingOptOut: false,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

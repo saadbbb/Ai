@@ -60,6 +60,17 @@ export const storefronts = pgTable(
     trackingIds: jsonb("tracking_ids").$type<Record<string, string>>().notNull().default({}),
     seoTitle: text("seo_title"),
     seoDescription: text("seo_description"),
+    // Multi-language storefront content (PART 13 gap #145) — heroTitle/
+    // heroSubtitle/aboutText above are the default-locale ("en") copy; this
+    // holds per-locale overrides for every OTHER configured locale (ar/ku),
+    // keyed by locale code. Scoped to the storefront's own editorial text —
+    // product/service names and legal pages stay single-locale, since making
+    // the whole catalog multi-locale would ripple into orders, the AI tools,
+    // and every place a product name is stored as a plain string snapshot.
+    translations: jsonb("translations")
+      .$type<Record<string, { heroTitle?: string; heroSubtitle?: string; aboutText?: string }>>()
+      .notNull()
+      .default({}),
     // Ordered, visible section keys for the home page (Section Builder depth,
     // scoped to a curated real subset with up/down reordering in the editor
     // rather than a full drag-and-drop 14-section builder — see

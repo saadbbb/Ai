@@ -17,7 +17,7 @@ export async function revokeApiKeyAction(input: unknown): Promise<ActionResult<A
   await requireWorkspacePermission(user.id, workspace.id, "integrations.manage");
 
   try {
-    const apiKey = await integrationService.revokeApiKey(workspace.id, parsed.data.id);
+    const apiKey = await integrationService.revokeApiKey(workspace.id, parsed.data.id, { userId: user.id, email: user.email });
     return actionOk(apiKey);
   } catch (error) {
     return actionFail(error);

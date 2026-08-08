@@ -416,6 +416,23 @@
         "tasksCompleted": "المهام المكتملة",
         "avgResponseTime": "متوسط زمن الرد"
       }
+    },
+    "website": {
+      "title": "إحصاءات الموقع",
+      "pageViews": "مشاهدات الصفحات",
+      "productViews": "مشاهدات المنتجات",
+      "formSubmissions": "طلبات النماذج",
+      "topProducts": "الأكثر مشاهدة من المنتجات",
+      "formBreakdown": "الطلبات حسب النموذج",
+      "formTypes": {
+        "contact": "تواصل",
+        "quote": "طلب عرض سعر",
+        "support": "طلب دعم",
+        "order": "طلبية",
+        "appointment": "طلب موعد",
+        "newsletter": "اشتراك النشرة",
+        "unknown": "أخرى"
+      }
     }
   },
   "team": {
@@ -600,6 +617,15 @@
     "itemCount": "{count} عنصر",
     "backLink": "← الرجوع إلى الطلبات",
     "notesHeading": "ملاحظات",
+    "shipping": {
+      "heading": "الشحن",
+      "carrierPlaceholder": "شركة الشحن (مثل أرامكس، DHL)",
+      "trackingNumberPlaceholder": "رقم التتبع",
+      "trackingUrlPlaceholder": "رابط التتبع (اختياري)",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ...",
+      "saved": "تم حفظ معلومات الشحن."
+    },
     "subtotalHeading": "المجموع الفرعي",
     "discountHeading": "الخصم",
     "taxHeading": "الضريبة",
@@ -1441,10 +1467,36 @@
       "featured": "منتجات مميّزة",
       "products": "معاينة كتالوج المنتجات",
       "services": "معاينة الخدمات",
+      "testimonials": "التقييمات والشهادات",
       "contact": "نموذج التواصل"
     },
     "hideSection": "إخفاء",
     "showSection": "إظهار",
+    "reviews": {
+      "heading": "التقييمات والشهادات",
+      "noReviews": "لا توجد تقييمات بعد.",
+      "authorPlaceholder": "اسم العميل",
+      "textPlaceholder": "ماذا قال؟",
+      "featuredLabel": "مميّز",
+      "publishedLabel": "منشور",
+      "draftLabel": "مسودة",
+      "addReview": "إضافة تقييم"
+    },
+    "blog": {
+      "heading": "المدونة",
+      "noPosts": "لا توجد تدوينات بعد.",
+      "titlePlaceholder": "عنوان التدوينة",
+      "slugPlaceholder": "رابط URL (يُنشأ تلقائياً إذا تُرك فارغاً)",
+      "excerptPlaceholder": "ملخص قصير",
+      "coverImagePlaceholder": "رابط صورة الغلاف",
+      "contentPlaceholder": "اكتب التدوينة...",
+      "publishedLabel": "منشور",
+      "draftLabel": "مسودة",
+      "addPost": "إضافة تدوينة",
+      "topicPlaceholder": "موضوع لصياغة تدوينة عنه",
+      "generateWithAi": "توليد بالذكاء الاصطناعي",
+      "generating": "جارٍ التوليد..."
+    },
     "legalHeading": "الصفحات القانونية",
     "privacyLabel": "سياسة الخصوصية",
     "termsLabel": "شروط الخدمة",
@@ -1518,6 +1570,7 @@
         "home": "الرئيسية",
         "products": "المنتجات",
         "about": "من نحن",
+        "blog": "المدونة",
         "contact": "تواصل",
         "faq": "الأسئلة الشائعة"
       },
@@ -1532,7 +1585,33 @@
       "promo": {
         "dismiss": "لا شكراً"
       },
-      "featuredHeading": "مميّز"
+      "featuredHeading": "مميّز",
+      "testimonialsHeading": "ماذا يقول عملاؤنا",
+      "blogHeading": "من مدونتنا",
+      "noPosts": "لا توجد تدوينات بعد.",
+      "backToBlog": "← الرجوع إلى المدونة",
+      "appointmentHeading": "احجز موعداً",
+      "appointment": {
+        "namePlaceholder": "اسمك",
+        "phonePlaceholder": "رقم هاتفك",
+        "servicePlaceholder": "اختر خدمة (اختياري)",
+        "notesPlaceholder": "ملاحظات (اختياري)",
+        "requiredHint": "الاسم والهاتف والموعد المفضل مطلوبة.",
+        "submitting": "جارٍ الإرسال...",
+        "submit": "طلب موعد",
+        "thankYou": "شكراً! سنؤكد موعدك قريباً."
+      },
+      "newsletter": {
+        "emailPlaceholder": "بريدك الإلكتروني",
+        "subscribe": "اشتراك",
+        "submitting": "جارٍ الاشتراك...",
+        "thankYou": "تم اشتراكك بنجاح!"
+      },
+      "formTabs": {
+        "contact": "تواصل",
+        "quote": "طلب عرض سعر",
+        "support": "الدعم"
+      }
     }
   },
   "integrations": {
@@ -1557,7 +1636,13 @@
       "urlPlaceholder": "https://your-endpoint.example.com/webhook",
       "creating": "جارٍ الإنشاء...",
       "create": "إضافة اشتراك",
-      "emptyState": "لا توجد اشتراكات Webhook بعد."
+      "emptyState": "لا توجد اشتراكات Webhook بعد.",
+      "viewDeliveries": "عرض عمليات التسليم",
+      "hideDeliveries": "إخفاء عمليات التسليم",
+      "loadingDeliveries": "جارٍ التحميل...",
+      "noDeliveries": "لا توجد عمليات تسليم بعد.",
+      "deliverySuccess": "تم التسليم",
+      "deliveryFailed": "فشل"
     }
   },
   "campaigns": {
@@ -1570,6 +1655,9 @@
     "requiredHint": "الاسم والموضوع والرسالة مطلوبة.",
     "lifecycleStagePlaceholder": "أي مرحلة دورة حياة",
     "tagPlaceholder": "تصفية حسب Tag (اختياري)",
+    "churnRiskSegmentLabel": "استهداف العملاء عالي مخاطر الفقدان فقط",
+    "templatePlaceholder": "ابدأ من قالب (اختياري)",
+    "variableHint": "استخدم {{contactName}} لإدراج اسم العميل.",
     "preview": "معاينة المستلمين",
     "previewing": "جارٍ العد...",
     "recipientCount": "{count} مستلم (لديهم بريد إلكتروني مسجل)",
@@ -1593,6 +1681,10 @@
       }
     }
   },
+  "unsubscribe": {
+    "heading": "تم إلغاء اشتراكك",
+    "message": "لن تصلك المزيد من رسائل التسويق من هذا النشاط التجاري. الرسائل الخاصة بطلباتك أو مواعيدك لا تتأثر."
+  },
   "ads": {
     "title": "الإعلانات",
     "description": "تتبّع حملاتك الإعلانية وشاهد أيها يجلب عملاء وإيرادات فعلياً.",
@@ -1605,6 +1697,7 @@
       "namePlaceholder": "اسم الحملة",
       "utmPlaceholder": "الوسم (يطابق مصدر جهة الاتصال)، مثال: \"عرض الصيف - انستغرام\"",
       "budgetPlaceholder": "الميزانية (اختياري)",
+      "spendPlaceholder": "الإنفاق الفعلي",
       "requiredHint": "الاسم والوسم مطلوبان.",
       "creating": "جارٍ الحفظ...",
       "create": "إضافة حملة",
@@ -1619,7 +1712,17 @@
       "heading": "الإسناد",
       "description": "جهات الاتصال والإيرادات المتتبَّعة إلى كل حملة عبر مصدر جهة الاتصال.",
       "emptyState": "سجّل حملة لرؤية الإسناد هنا.",
-      "contactCount": "{count} جهة اتصال"
+      "contactCount": "{count} جهة اتصال",
+      "revenue": "الإيراد",
+      "spend": "الإنفاق",
+      "cpl": "تكلفة العميل المحتمل",
+      "roas": "العائد على الإنفاق"
+    },
+    "insights": {
+      "heading": "رؤى الذكاء الاصطناعي",
+      "description": "قراءة سريعة بالذكاء الاصطناعي لأداء الحملات، بناءً على أرقام الإسناد أعلاه.",
+      "generate": "توليد الرؤى",
+      "generating": "جارٍ التحليل..."
     }
   },
   "aiTest": {

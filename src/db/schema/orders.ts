@@ -43,6 +43,15 @@ export const orders = pgTable(
     // a customer can ship different orders to different places.
     deliveryAddress: text("delivery_address"),
     notes: text("notes"),
+    // Order to Shipping Workflow depth (PART 13 gap #152), scoped to manual
+    // entry rather than a live carrier API — no carrier account exists to
+    // integrate against yet (see DEFERRED_TASKS.md). Real and useful today:
+    // staff type in the carrier/tracking number once they've shipped, and the
+    // customer-facing order status page can link straight to the carrier's
+    // own tracking page via trackingUrl.
+    shippingCarrier: text("shipping_carrier"),
+    trackingNumber: text("tracking_number"),
+    trackingUrl: text("tracking_url"),
     followupNotifiedAt: timestamp("followup_notified_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

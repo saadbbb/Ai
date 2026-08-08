@@ -33,6 +33,18 @@ vi.mock("@/features/orders/services/order.service", () => ({
   orderService: { createOrder: vi.fn() },
 }));
 
+vi.mock("@/features/appointments/services/appointment.service", () => ({
+  appointmentService: { createAppointment: vi.fn() },
+}));
+
+vi.mock("@/features/knowledge-base/repository/service.repository", () => ({
+  serviceRepository: { findById: vi.fn() },
+}));
+
+vi.mock("../repository/newsletter-subscriber.repository", () => ({
+  newsletterSubscriberRepository: { findByWorkspaceAndEmail: vi.fn(), create: vi.fn() },
+}));
+
 const { storefrontRepository } = await import("../repository/storefront.repository");
 const { activityRepository } = await import("@/features/crm/repository/activity.repository");
 const { leadRepository } = await import("@/features/crm/repository/lead.repository");
@@ -40,6 +52,9 @@ const { automationService } = await import("@/features/automation/services/autom
 const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
 const { productRepository } = await import("@/features/knowledge-base/repository/product.repository");
 const { orderService } = await import("@/features/orders/services/order.service");
+const { appointmentService } = await import("@/features/appointments/services/appointment.service");
+const { serviceRepository } = await import("@/features/knowledge-base/repository/service.repository");
+const { newsletterSubscriberRepository } = await import("../repository/newsletter-subscriber.repository");
 const { storefrontService } = await import("./storefront.service");
 
 const WORKSPACE_ID = "workspace-1";
@@ -69,6 +84,7 @@ function makeStorefront(overrides: Partial<Storefront> = {}): Storefront {
     trackingIds: {},
     seoTitle: null,
     seoDescription: null,
+    translations: {},
     sections: ["hero", "about", "products", "services", "contact"],
     privacyPolicyText: null,
     termsText: null,
@@ -151,6 +167,23 @@ describe("storefrontService.updateStorefront", () => {
     );
   });
 
+  it("drops blank fields within a locale override and drops locales left empty", async () => {
+    const existing = makeStorefront();
+    vi.mocked(storefrontRepository.findByWorkspaceId).mockResolvedValue(existing);
+    vi.mocked(storefrontRepository.update).mockResolvedValue(existing);
+
+    await storefrontService.updateStorefront(WORKSPACE_ID, {
+      ...BASE_INPUT,
+      translations: { ar: { heroTitle: "أهلاً", heroSubtitle: "" }, ku: {} },
+    });
+
+    expect(storefrontRepository.update).toHaveBeenCalledWith(
+      existing.id,
+      WORKSPACE_ID,
+      expect.objectContaining({ translations: { ar: { heroTitle: "أهلاً" } } }),
+    );
+  });
+
   it("passes every style field straight through", async () => {
     const existing = makeStorefront();
     vi.mocked(storefrontRepository.findByWorkspaceId).mockResolvedValue(existing);
@@ -192,6 +225,96 @@ describe("storefrontService.submitInquiry", () => {
     expect(contactRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({ workspaceId: WORKSPACE_ID, fullName: "New Visitor", phone: "+9647701234568", source: "Website" }),
     );
+  });
+
+  it("labels the activity summary by formType", async () => {
+    vi.mocked(contactRepository.findByPhone).mockResolvedValue({ id: "contact-1" } as Contact);
+    vi.mocked(leadRepository.create).mockResolvedValue({ id: "lead-1", contactId: "contact-1" } as never);
+
+    await storefrontService.submitInquiry(WORKSPACE_ID, {
+      fullName: "Jane",
+      phone: "+9647701234567",
+      message: "Need a bulk price",
+      formType: "quote",
+    });
+
+    expect(activityRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ summary: expect.stringContaining("Quote request submitted") }),
+    );
+  });
+});
+
+describe("storefrontService.submitAppointmentRequest", () => {
+  it("resolves the optional serviceId to a name/duration and reuses the contact-dedupe pattern", async () => {
+    vi.mocked(contactRepository.findByPhone).mockResolvedValue(null);
+    vi.mocked(contactRepository.create).mockResolvedValue({ id: "contact-1" } as Contact);
+    vi.mocked(serviceRepository.findById).mockResolvedValue({
+      id: "service-1",
+      name: "Haircut",
+      durationMinutes: 45,
+    } as never);
+    vi.mocked(appointmentService.createAppointment).mockResolvedValue({ id: "appt-1" } as never);
+
+    const preferredAt = new Date("2030-01-01T10:00:00Z");
+    await storefrontService.submitAppointmentRequest(WORKSPACE_ID, {
+      fullName: "Jane",
+      phone: "+9647701234567",
+      serviceId: "service-1",
+      preferredAt,
+    });
+
+    expect(appointmentService.createAppointment).toHaveBeenCalledWith(
+      WORKSPACE_ID,
+      expect.objectContaining({
+        contactId: "contact-1",
+        serviceId: "service-1",
+        serviceName: "Haircut",
+        scheduledAt: preferredAt,
+        durationMinutes: 45,
+      }),
+      { type: "system" },
+    );
+  });
+
+  it("defaults to a 30-minute slot when no service is selected", async () => {
+    vi.mocked(contactRepository.findByPhone).mockResolvedValue({ id: "contact-1" } as Contact);
+    vi.mocked(appointmentService.createAppointment).mockResolvedValue({ id: "appt-2" } as never);
+
+    await storefrontService.submitAppointmentRequest(WORKSPACE_ID, {
+      fullName: "Jane",
+      phone: "+9647701234567",
+      preferredAt: new Date("2030-01-01T10:00:00Z"),
+    });
+
+    expect(serviceRepository.findById).not.toHaveBeenCalled();
+    expect(appointmentService.createAppointment).toHaveBeenCalledWith(
+      WORKSPACE_ID,
+      expect.objectContaining({ durationMinutes: 30, serviceId: undefined, serviceName: undefined }),
+      { type: "system" },
+    );
+  });
+});
+
+describe("storefrontService.subscribeToNewsletter", () => {
+  it("subscribes a new email", async () => {
+    vi.mocked(newsletterSubscriberRepository.findByWorkspaceAndEmail).mockResolvedValue(null);
+
+    await storefrontService.subscribeToNewsletter(WORKSPACE_ID, "visitor@example.com");
+
+    expect(newsletterSubscriberRepository.create).toHaveBeenCalledWith({
+      workspaceId: WORKSPACE_ID,
+      email: "visitor@example.com",
+    });
+  });
+
+  it("is a silent no-op when the email is already subscribed", async () => {
+    vi.mocked(newsletterSubscriberRepository.findByWorkspaceAndEmail).mockResolvedValue({
+      id: "sub-1",
+    } as never);
+
+    await storefrontService.subscribeToNewsletter(WORKSPACE_ID, "visitor@example.com");
+
+    expect(newsletterSubscriberRepository.create).not.toHaveBeenCalled();
   });
 });
 

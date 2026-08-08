@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { CampaignManager } from "@/features/campaigns/components/campaign-manager";
 import { ChurnRiskList } from "@/features/campaigns/components/churn-risk-list";
 import { campaignService } from "@/features/campaigns/services/campaign.service";
+import { messageTemplateRepository } from "@/features/inbox/repository/message-template.repository";
 import { requireFeature, requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 
 export default async function CampaignsPage() {
@@ -11,9 +12,10 @@ export default async function CampaignsPage() {
   await requireWorkspacePermission(user.id, workspace.id, "campaigns.manage");
   const t = await getTranslations("campaigns");
 
-  const [campaigns, churnRisk] = await Promise.all([
+  const [campaigns, churnRisk, templates] = await Promise.all([
     campaignService.listCampaigns(workspace.id),
     campaignService.listChurnRisk(workspace.id),
+    messageTemplateRepository.findByWorkspaceId(workspace.id),
   ]);
 
   return (
@@ -23,7 +25,7 @@ export default async function CampaignsPage() {
         <p className="text-sm text-muted-foreground">{t("description")}</p>
       </div>
       <ChurnRiskList rows={churnRisk} />
-      <CampaignManager initialCampaigns={campaigns} />
+      <CampaignManager initialCampaigns={campaigns} templates={templates} />
     </div>
   );
 }

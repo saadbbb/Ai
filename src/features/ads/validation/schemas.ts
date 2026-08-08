@@ -12,3 +12,8 @@ export const updateAdCampaignStatusSchema = z.object({
   campaignId: z.string().uuid(),
   status: z.enum(["active", "paused", "ended"]),
 });
+
+export const updateAdCampaignSpendSchema = z.object({
+  campaignId: z.string().uuid(),
+  actualSpend: z.coerce.number().nonnegative(),
+});
