@@ -149,6 +149,10 @@ vi.mock("@/features/ai/services/ai.service", () => ({
   },
 }));
 
+vi.mock("@/lib/queue/automation-queue", () => ({
+  enqueueAutomationEvent: vi.fn(),
+}));
+
 const { workflowRepository } = await import("../repository/workflow.repository");
 const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
 const { activityRepository } = await import("@/features/crm/repository/activity.repository");
@@ -170,6 +174,7 @@ const { aiService } = await import("@/features/ai/services/ai.service");
 const { emailService } = await import("@/lib/email");
 const { safeWebhookPost } = await import("../lib/safe-webhook-fetch");
 const { integrationService } = await import("@/features/integrations/services/integration.service");
+const { enqueueAutomationEvent } = await import("@/lib/queue/automation-queue");
 const { automationService } = await import("./automation.service");
 
 const WORKSPACE_ID = "workspace-1";
@@ -212,12 +217,23 @@ const CONTACT: Contact = {
   lifecycleStage: "lead",
   assignedAgentId: null,
   lastContactAt: null,
+  address: null,
+  budget: null,
+  preferredContactMethod: null,
+  preferredProducts: [],
+  birthDate: null,
+  gender: null,
+  timezone: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Every existing test in this file exercises processEvent's logic directly, so
+  // dispatch() must fall back to running inline (as it does today with no Redis
+  // configured) unless a test explicitly opts into the "queued" path below.
+  vi.mocked(enqueueAutomationEvent).mockResolvedValue(false);
   vi.mocked(contactRepository.findById).mockResolvedValue(CONTACT);
   vi.mocked(workflowRepository.logExecution).mockResolvedValue({} as never);
   vi.mocked(taskRepository.create).mockResolvedValue({ id: "task-1", title: "Follow up" } as never);
@@ -426,6 +442,7 @@ describe("automationService.dispatch — create_note", () => {
         contactId: CONTACT_ID,
         content: "Reach out to Jane Customer",
         pinned: false,
+        type: "ai",
         authorUserId: null,
       }),
     );
@@ -541,6 +558,9 @@ describe("automationService.dispatch — assign_agent", () => {
 
     expect(conversationRepository.assign).toHaveBeenCalledWith("conv-1", WORKSPACE_ID, "user-1");
     expect(activityRepository.log).toHaveBeenCalledWith(expect.objectContaining({ type: "conversation_assigned" }));
+    expect(notificationRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, type: "assignment" }),
+    );
     expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
   });
 
@@ -588,7 +608,7 @@ describe("automationService.dispatch — webhook_call", () => {
     expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
   });
 
-  it("fails (and is retried) when the webhook post rejects", async () => {
+  it("fails (and is retried) when the webhook post rejects, then notifies the workspace", async () => {
     const workflow = makeWorkflow({ actionType: "webhook_call", actionConfig: { webhookUrl: "https://example.com/hook" } });
     vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
     vi.mocked(safeWebhookPost).mockRejectedValue(new Error("blocked address"));
@@ -597,6 +617,9 @@ describe("automationService.dispatch — webhook_call", () => {
 
     expect(safeWebhookPost).toHaveBeenCalledTimes(2); // MAX_ACTION_ATTEMPTS
     expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+    expect(notificationRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, type: "webhook_failure" }),
+    );
   });
 
   it("fails when no webhook URL is configured", async () => {
@@ -959,7 +982,10 @@ describe("automationService.dispatch — conditions", () => {
     });
     vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([workflow]);
     vi.mocked(orderRepository.findByContactId).mockResolvedValue([
-      { items: [{ unitPrice: "100.00", quantity: 1 }] } as never,
+      {
+        order: { discountAmount: "0", taxAmount: "0", deliveryFee: "0" },
+        items: [{ unitPrice: "100.00", quantity: 1 }],
+      } as never,
     ]);
 
     await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
@@ -1150,7 +1176,7 @@ describe("automationService.dispatch — send_ai_reply", () => {
     expect(messageRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({ workspaceId: WORKSPACE_ID, conversationId: "conv-1", senderType: "ai", content: "Hello! How can I help?" }),
     );
-    expect(conversationRepository.touchLastMessage).toHaveBeenCalledWith("conv-1", WORKSPACE_ID, "Hello! How can I help?");
+    expect(conversationRepository.touchLastMessage).toHaveBeenCalledWith("conv-1", WORKSPACE_ID, "Hello! How can I help?", "ai");
     expect(conversationRepository.updateAiStatus).not.toHaveBeenCalled();
     expect(workflowRepository.logExecution).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
   });
@@ -1278,5 +1304,46 @@ describe("automationService.decideApproval", () => {
 
     await expect(automationService.decideApproval(WORKSPACE_ID, "approval-1", "approved", "user-1")).resolves.toBeUndefined();
     expect(workflowRepository.findById).not.toHaveBeenCalled();
+  });
+});
+
+describe("automationService.dispatch — queue handoff", () => {
+  it("enqueues the event and never touches workflow matching when the queue accepts it", async () => {
+    vi.mocked(enqueueAutomationEvent).mockResolvedValue(true);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(enqueueAutomationEvent).toHaveBeenCalledWith({
+      workspaceId: WORKSPACE_ID,
+      event: { type: "lead_created", contactId: CONTACT_ID },
+    });
+    expect(workflowRepository.findActiveByTrigger).not.toHaveBeenCalled();
+    expect(integrationService.notifyWebhookSubscribers).not.toHaveBeenCalled();
+  });
+
+  it("falls back to running the event inline when the queue rejects it (no Redis configured)", async () => {
+    vi.mocked(enqueueAutomationEvent).mockResolvedValue(false);
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([]);
+
+    await automationService.dispatch(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(integrationService.notifyWebhookSubscribers).toHaveBeenCalledWith(WORKSPACE_ID, {
+      type: "lead_created",
+      contactId: CONTACT_ID,
+    });
+    expect(workflowRepository.findActiveByTrigger).toHaveBeenCalled();
+  });
+});
+
+describe("automationService.processEvent", () => {
+  it("is exported directly for the worker process to call per dequeued job", async () => {
+    vi.mocked(workflowRepository.findActiveByTrigger).mockResolvedValue([]);
+
+    await automationService.processEvent(WORKSPACE_ID, { type: "lead_created", contactId: CONTACT_ID });
+
+    expect(integrationService.notifyWebhookSubscribers).toHaveBeenCalledWith(WORKSPACE_ID, {
+      type: "lead_created",
+      contactId: CONTACT_ID,
+    });
   });
 });

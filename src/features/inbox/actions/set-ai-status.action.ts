@@ -55,3 +55,20 @@ export async function closeConversationAction(input: unknown): Promise<ActionRes
     return actionFail(error);
   }
 }
+
+export async function reopenConversationAction(input: unknown): Promise<ActionResult<undefined>> {
+  const parsed = conversationIdSchema.safeParse(input);
+  if (!parsed.success) {
+    return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
+  }
+
+  const user = await requireUser();
+  const workspace = await requireWorkspaceForUser(user.id);
+
+  try {
+    await inboxService.reopenConversation(workspace.id, parsed.data.conversationId);
+    return actionOk(undefined);
+  } catch (error) {
+    return actionFail(error);
+  }
+}

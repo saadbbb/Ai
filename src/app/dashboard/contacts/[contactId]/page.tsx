@@ -3,10 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
+import { LifecycleStageSelect } from "@/features/crm/components/lifecycle-stage-select";
 import { NotePanel } from "@/features/crm/components/note-panel";
+import { TagManager } from "@/features/crm/components/tag-manager";
 import { TaskPanel } from "@/features/crm/components/task-panel";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { calculateLeadScore, leadTemperature } from "@/features/crm/lib/lead-score";
+import { suggestNextAction } from "@/features/crm/lib/next-action";
 import { mergeTimeline, type TimelineItem } from "@/features/crm/lib/timeline";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { noteRepository } from "@/features/crm/repository/note.repository";
@@ -14,7 +17,7 @@ import { taskRepository } from "@/features/crm/repository/task.repository";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { messageRepository } from "@/features/inbox/repository/message.repository";
-import { orderTotal } from "@/features/orders/lib/order-total";
+import { orderGrandTotal } from "@/features/orders/lib/order-total";
 import { orderRepository } from "@/features/orders/repository/order.repository";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
@@ -41,7 +44,7 @@ export default async function ContactDetailPage({ params }: PageProps) {
     orderRepository.findByContactId(contactId, workspace.id),
     appointmentRepository.findByContactId(contactId, workspace.id),
     taskRepository.findByContactId(contactId, workspace.id),
-    noteRepository.findByContactId(contactId, workspace.id),
+    noteRepository.findByContactId(contactId, workspace.id, user.id),
     activityRepository.findByContactId(contactId, workspace.id),
   ]);
 
@@ -55,6 +58,55 @@ export default async function ContactDetailPage({ params }: PageProps) {
   const messageCounts = await messageRepository.countByConversationIds(leadConversationIds);
   const hasOrder = orders.length > 0;
   const hasAppointment = appointmentList.length > 0;
+
+  const COMPLETED_ORDER_STATUSES = ["delivered", "completed"];
+  const completedOrders = orders.filter((item) => COMPLETED_ORDER_STATUSES.includes(item.order.status));
+  const lifetimeValue = completedOrders.reduce((sum, item) => sum + orderGrandTotal(item.items, item.order), 0);
+
+  const productQuantities = new Map<string, number>();
+  for (const item of completedOrders) {
+    for (const line of item.items) {
+      productQuantities.set(line.name, (productQuantities.get(line.name) ?? 0) + line.quantity);
+    }
+  }
+  const favoriteProducts = [...productQuantities.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([name]) => name);
+
+  const CLOSED_LEAD_STAGES = ["won", "lost", "cancelled"];
+  const isHotLead = leads.some((lead) => {
+    if (CLOSED_LEAD_STAGES.includes(lead.stage)) return false;
+    const score = calculateLeadScore({
+      messageCount: lead.conversationId ? (messageCounts.get(lead.conversationId) ?? 0) : 0,
+      hasOrder,
+      hasAppointment,
+      tags: contact.tags,
+      stage: lead.stage,
+      lastContactAt: contact.lastContactAt,
+    });
+    const temperature = leadTemperature(score);
+    return temperature === "hot" || temperature === "priority";
+  });
+  const now = new Date();
+  const overdueTask = tasks
+    .filter((task) => task.status === "open" && task.dueAt && task.dueAt < now)
+    .sort((a, b) => (a.dueAt as Date).getTime() - (b.dueAt as Date).getTime())[0];
+  const hasUpcomingAppointment = appointmentList.some(
+    (item) => ["scheduled", "confirmed"].includes(item.appointment.status) && item.appointment.scheduledAt > now,
+  );
+  const daysSinceLastContact = contact.lastContactAt
+    ? Math.floor((now.getTime() - contact.lastContactAt.getTime()) / (1000 * 60 * 60 * 24))
+    : null;
+
+  const nextAction = suggestNextAction({
+    hasDraftOrder: orders.some((item) => item.order.status === "draft"),
+    overdueTaskTitle: overdueTask?.title ?? null,
+    hasUpcomingAppointment,
+    isHotLead,
+    lifecycleStage: contact.lifecycleStage,
+    daysSinceLastContact,
+  });
 
   const timeline = mergeTimeline(
     conversations.map(
@@ -87,7 +139,7 @@ export default async function ContactDetailPage({ params }: PageProps) {
       ({ order, items }): TimelineItem => ({
         id: `order-${order.id}`,
         label: `${tOrders("title")}: ${tOrders(`statuses.${order.status}`)}`,
-        meta: orderTotal(items).toFixed(2),
+        meta: orderGrandTotal(items, order).toFixed(2),
         timestamp: order.updatedAt,
         href: `/dashboard/orders/${order.id}`,
       }),
@@ -123,22 +175,42 @@ export default async function ContactDetailPage({ params }: PageProps) {
         <div>
           <h1 className="text-xl font-semibold">{contact.fullName}</h1>
           <p className="text-sm text-muted-foreground">
-            {[contact.phone, contact.email, contact.country, contact.city].filter(Boolean).join(" · ") ||
-              t("noContactInfo")}
+            {[
+              contact.phone,
+              contact.email,
+              contact.instagramId ? `@${contact.instagramId}` : null,
+              contact.country,
+              contact.city,
+              contact.language ? t(`languages.${contact.language}`) : null,
+            ]
+              .filter(Boolean)
+              .join(" · ") || t("noContactInfo")}
           </p>
           <div className="mt-1 flex flex-wrap items-center gap-1">
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-              {t(`lifecycle.${contact.lifecycleStage}`)}
-            </span>
+            <LifecycleStageSelect contactId={contact.id} initialStage={contact.lifecycleStage} />
             {contact.source && (
               <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{contact.source}</span>
             )}
-            {contact.tags.map((tag) => (
-              <span key={tag} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                {tag}
-              </span>
-            ))}
           </div>
+          <div className="mt-1">
+            <TagManager contactId={contact.id} initialTags={contact.tags} />
+          </div>
+          {(contact.address || contact.budget || contact.preferredContactMethod || contact.timezone || contact.birthDate || contact.gender) && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              {[
+                contact.address ? t("fields.address", { value: contact.address }) : null,
+                contact.budget ? t("fields.budget", { value: contact.budget }) : null,
+                contact.preferredContactMethod
+                  ? t("fields.preferredContactMethod", { value: t(`preferredContactMethods.${contact.preferredContactMethod}`) })
+                  : null,
+                contact.timezone ? t("fields.timezone", { value: contact.timezone }) : null,
+                contact.birthDate ? t("fields.birthDate", { value: contact.birthDate }) : null,
+                contact.gender ? t("fields.gender", { value: contact.gender }) : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          )}
           {contact.aiSummary && (
             <p className="mt-2 max-w-md rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">{contact.aiSummary}</p>
           )}
@@ -152,6 +224,32 @@ export default async function ContactDetailPage({ params }: PageProps) {
           </Button>
         </div>
       </div>
+
+      {nextAction && (
+        <div className="rounded-lg border border-dashed p-3 text-sm">
+          <p className="text-xs font-medium text-muted-foreground">{t("nextAction.heading")}</p>
+          <p>
+            {nextAction.detail
+              ? t(`nextAction.${nextAction.type}`, { detail: nextAction.detail })
+              : t(`nextAction.${nextAction.type}`)}
+          </p>
+        </div>
+      )}
+
+      {(completedOrders.length > 0 || favoriteProducts.length > 0) && (
+        <div className="flex flex-wrap gap-4 rounded-lg border p-3 text-sm">
+          <div>
+            <p className="text-xs text-muted-foreground">{t("lifetimeValue")}</p>
+            <p className="font-medium">{lifetimeValue.toFixed(2)}</p>
+          </div>
+          {favoriteProducts.length > 0 && (
+            <div>
+              <p className="text-xs text-muted-foreground">{t("favoriteProducts")}</p>
+              <p className="font-medium">{favoriteProducts.join(", ")}</p>
+            </div>
+          )}
+        </div>
+      )}
 
       <TaskPanel contactId={contact.id} initialTasks={tasks} />
 

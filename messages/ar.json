@@ -214,7 +214,15 @@
       "productNamePlaceholder": "اسم المنتج",
       "descriptionPlaceholder": "الوصف (اختياري)",
       "pricePlaceholder": "السعر (اختياري)",
+      "discountedPricePlaceholder": "سعر العرض (اختياري)",
+      "categoryPlaceholder": "الفئة (اختياري)",
       "imageUrlPlaceholder": "رابط الصورة (اختياري، يظهر في متجرك)",
+      "galleryImageUrlsPlaceholder": "روابط صور إضافية، كل رابط في سطر (اختياري)",
+      "variantNamesPlaceholder": "الخيارات، مفصولة بفواصل، مثال: صغير، متوسط، كبير (اختياري)",
+      "aiVisibleLabel": "يمكن للذكاء الاصطناعي التوصية بهذا المنتج",
+      "aiHiddenBadge": "مخفي عن الذكاء الاصطناعي",
+      "featuredLabel": "مميّز في المتجر",
+      "promotionEndsAtLabel": "انتهاء العرض (اختياري)",
       "addProduct": "إضافة منتج",
       "servicesHeading": "الخدمات",
       "serviceNamePlaceholder": "اسم الخدمة",
@@ -292,12 +300,26 @@
         "appointmentsCompleted": "مواعيد مكتملة",
         "pipelineHeading": "مسار المبيعات",
         "pipelineEmpty": "لا يوجد عملاء محتملون في المسار بعد."
+      },
+      "business": {
+        "heading": "الأعمال",
+        "subscriptionStatus": "الاشتراك",
+        "plan": "الخطة",
+        "noPlan": "لا توجد خطة",
+        "topChannel": "أفضل قناة",
+        "topProduct": "أفضل منتج",
+        "topAgent": "أفضل موظف"
       }
     },
     "suspended": {
       "title": "حسابك موقوف",
       "description": "تواصل معنا لحل الموضوع والرجوع للعمل.",
       "whatsappCta": "تواصل معنا عبر واتساب"
+    },
+    "overdue": {
+      "past_due": "دفعة اشتراكك متأخرة.",
+      "grace": "إشعار أخير — اشتراكك ما زال متأخرًا وسيُوقَف قريبًا.",
+      "cta": "جدّد الآن"
     },
     "insights": {
       "heading": "رؤى الذكاء الاصطناعي",
@@ -312,10 +334,14 @@
     "title": "التحليلات",
     "description": "نظرة سريعة على أداء عملك.",
     "range": {
+      "today": "اليوم",
+      "yesterday": "أمس",
       "7d": "آخر 7 أيام",
       "30d": "آخر 30 يوم",
       "90d": "آخر 90 يوم",
-      "month": "هذا الشهر"
+      "month": "هذا الشهر",
+      "custom": "مدى مخصص",
+      "apply": "تطبيق"
     },
     "kpis": {
       "newLeads": "ليدز جدد",
@@ -338,7 +364,11 @@
         "leadConversion": "تحويل الليدز",
         "orderCompletion": "إتمام الطلبات",
         "appointmentCompletion": "إتمام المواعيد",
-        "aiSuccess": "نجاح الذكاء الاصطناعي"
+        "aiSuccess": "نجاح الذكاء الاصطناعي",
+        "responseTime": "زمن الاستجابة",
+        "missedConversations": "المحادثات التي تعالجها الذكاء الاصطناعي",
+        "automationSuccess": "معدل نجاح الأتمتة",
+        "revenueTrend": "اتجاه الإيراد"
       }
     },
     "charts": {
@@ -348,7 +378,32 @@
       "appointmentsByStatus": "المواعيد حسب الحالة",
       "conversationsByChannel": "المحادثات حسب القناة",
       "revenueByProduct": "الإيرادات حسب المنتج",
+      "messagesByDay": "الرسائل",
+      "appointmentsByDay": "المواعيد المجدولة",
+      "leadsByChannel": "الليدز حسب القناة",
+      "revenueByChannel": "الإيراد حسب القناة",
+      "topServices": "أفضل الخدمات",
       "empty": "لا توجد بيانات بعد لهذا المدى."
+    },
+    "depth": {
+      "title": "مقاييس أعمق",
+      "salesReport": "تقرير المبيعات:",
+      "customersReport": "تقرير العملاء:",
+      "channelsReport": "تقرير القنوات:",
+      "avgOrderValue": "متوسط قيمة الطلب",
+      "salesGrowth": "نمو المبيعات",
+      "repeatCustomerRate": "العملاء المتكررون",
+      "winRate": "معدل الفوز بالليدز",
+      "aiHandoffRate": "معدل التحويل للبشر",
+      "avgResponseAi": "متوسط استجابة الذكاء الاصطناعي",
+      "avgResponseHuman": "متوسط استجابة الموظف",
+      "avgAppointmentLeadTime": "متوسط مدة الحجز المسبق",
+      "newCustomers": "عملاء جدد",
+      "returningCustomers": "عملاء عائدون",
+      "direct": "مباشر / يدوي",
+      "seconds": "{count} ث",
+      "minutes": "{count} د",
+      "hours": "{count} س"
     },
     "teamPerformance": {
       "title": "أداء الفريق",
@@ -448,7 +503,22 @@
       "channelInstagram": "إنستغرام",
       "aiActive": "الذكاء الاصطناعي يرد",
       "aiPaused": "الذكاء الاصطناعي متوقف مؤقتاً",
-      "aiHandedOver": "بحاجة إلى موظف بشري"
+      "aiHandedOver": "بحاجة إلى موظف بشري",
+      "searchPlaceholder": "ابحث في المحادثات...",
+      "filters": {
+        "pinned": "مثبّت",
+        "priority": "أولوية",
+        "unassigned": "غير مُسنَد",
+        "needsReply": "بحاجة إلى رد",
+        "archived": "مؤرشف"
+      },
+      "pinnedMarker": "مثبّت",
+      "pin": "تثبيت",
+      "unpin": "إلغاء التثبيت",
+      "markPriority": "وضع علامة أولوية",
+      "unmarkPriority": "إزالة علامة الأولوية",
+      "archive": "أرشفة",
+      "reopen": "إعادة فتح"
     },
     "new": {
       "title": "ابدأ محادثة",
@@ -465,17 +535,30 @@
       "pauseAi": "إيقاف الذكاء الاصطناعي مؤقتاً",
       "resumeAi": "استئناف الذكاء الاصطناعي",
       "closeConversation": "إغلاق المحادثة",
+      "handToHuman": "تحويل إلى موظف بشري",
       "closedBadge": "مغلقة",
       "senderAi": "الموظف الذكي",
       "senderYou": "أنت",
       "senderSystem": "النظام",
-      "switchToReply": "الرد بدلاً من ذلك",
-      "logCustomerMessage": "تسجيل رسالة من العميل بدلاً من ذلك",
+      "modeReply": "رد",
+      "modeLog": "تسجيل رسالة العميل",
+      "modeNote": "ملاحظة داخلية",
       "logCustomerPlaceholder": "ماذا قال العميل؟",
+      "notePlaceholder": "اكتب ملاحظة داخلية للفريق...",
       "replyPlaceholder": "اكتب ردّك...",
       "sendReply": "إرسال الرد",
       "sending": "جارٍ الإرسال...",
       "logSubmit": "تسجيل الرسالة",
+      "saveNote": "حفظ الملاحظة",
+      "noteSaved": "تم حفظ الملاحظة.",
+      "suggestReply": "اقتراح رد",
+      "suggesting": "جارٍ الاقتراح...",
+      "templates": "القوالب",
+      "noTemplates": "لا توجد قوالب بعد.",
+      "deleteTemplate": "حذف",
+      "newTemplate": "+ قالب جديد",
+      "newTemplateNamePlaceholder": "اسم القالب",
+      "saveTemplate": "حفظ",
       "channel": {
         "manual": "يدوي",
         "whatsapp": "واتساب",
@@ -483,7 +566,30 @@
       },
       "createLead": "إنشاء عميل محتمل",
       "leadCreated": "تم إنشاء العميل المحتمل.",
-      "viewInPipeline": "عرضه في مسار المبيعات ←"
+      "viewInPipeline": "عرضه في مسار المبيعات ←",
+      "unassigned": "غير مُسنَد",
+      "context": {
+        "viewFullProfile": "عرض الملف الكامل ←",
+        "leadStage": "مرحلة العميل المحتمل",
+        "noLead": "لا يوجد عميل محتمل بعد.",
+        "ordersHeading": "الطلبات الأخيرة",
+        "noOrders": "لا توجد طلبات بعد.",
+        "appointmentsHeading": "المواعيد القادمة",
+        "noAppointments": "لا توجد مواعيد بعد.",
+        "activityHeading": "النشاط الأخير",
+        "noActivity": "لا يوجد نشاط بعد."
+      },
+      "intents": {
+        "greeting": "تحية",
+        "question": "سؤال",
+        "complaint": "شكوى",
+        "purchase_intent": "نية شراء",
+        "price_inquiry": "استفسار عن السعر",
+        "appointment_request": "طلب موعد",
+        "cancellation": "إلغاء",
+        "urgent": "عاجل",
+        "spam": "غير مرغوب"
+      }
     }
   },
   "orders": {
@@ -494,6 +600,10 @@
     "itemCount": "{count} عنصر",
     "backLink": "← الرجوع إلى الطلبات",
     "notesHeading": "ملاحظات",
+    "subtotalHeading": "المجموع الفرعي",
+    "discountHeading": "الخصم",
+    "taxHeading": "الضريبة",
+    "deliveryFeeHeading": "رسوم التوصيل",
     "totalHeading": "الإجمالي",
     "noOrdersForContact": "لا توجد طلبات لهذه الجهة بعد.",
     "statuses": {
@@ -522,6 +632,24 @@
       "addItem": "إضافة عنصر",
       "itemRequired": "أضف عنصراً واحداً على الأقل.",
       "notesLabel": "ملاحظات (اختياري)",
+      "discountLabel": "الخصم",
+      "taxLabel": "الضريبة",
+      "deliveryFeeLabel": "رسوم التوصيل",
+      "paymentMethodLabel": "طريقة الدفع",
+      "paymentMethodPlaceholder": "اختر (اختياري)",
+      "paymentMethods": {
+        "cash": "نقدًا",
+        "card": "بطاقة",
+        "bank_transfer": "تحويل بنكي",
+        "other": "أخرى"
+      },
+      "deliveryMethodLabel": "طريقة التوصيل",
+      "deliveryMethodPlaceholder": "اختر (اختياري)",
+      "deliveryMethods": {
+        "pickup": "استلام من المكان",
+        "delivery": "توصيل"
+      },
+      "subtotal": "المجموع الفرعي: {subtotal}",
       "total": "الإجمالي: {total}",
       "submit": "إنشاء الطلب",
       "submitting": "جارٍ الإنشاء..."
@@ -534,15 +662,36 @@
     "statuses": {
       "trial": "تجريبية",
       "active": "نشطة",
-      "suspended": "موقوفة"
+      "past_due": "الدفع متأخر",
+      "grace": "إشعار أخير",
+      "suspended": "موقوفة",
+      "cancelled": "ملغاة",
+      "expired": "منتهية"
     },
     "activeDescription": "أنت مشترك بالفعل. شكراً لكونك عميلاً معنا!",
+    "overdue": {
+      "past_due": "دفعة اشتراكك متأخرة — جدّده لتجنّب انقطاع الخدمة.",
+      "grace": "إشعار أخير — اشتراكك ما زال متأخرًا وسيُوقَف قريبًا."
+    },
     "expiresOn": "يتجدّد/ينتهي بتاريخ {date}",
     "ctaDescription": "لسا ما نستقبل دفع بالبطاقات — راسلنا على واتساب وراح نفعّل اشتراكك بأنفسنا.",
     "whatsappCta": "اشترك عبر واتساب",
     "fallbackWithEmail": "الاشتراكات لسا ما فُتحت. راسلنا على {email} إذا مهتم.",
     "fallbackNoContact": "الاشتراكات لسا ما فُتحت. تابعنا قريباً.",
-    "defaultMessage": "مرحباً! أريد الاشتراك بمنصة الموظف الذكي لـ'{{workspaceName}}'."
+    "defaultMessage": "مرحباً! أريد الاشتراك بمنصة الموظف الذكي لـ'{{workspaceName}}'.",
+    "usageHeading": "استخدام هذه الخطة",
+    "usageUnlimited": "لا حدود استخدام على خطتك.",
+    "usage": {
+      "users": "أعضاء الفريق",
+      "aiAgents": "وكلاء الذكاء الاصطناعي",
+      "channels": "القنوات المتصلة",
+      "conversationsPerMonth": "محادثات هذا الشهر",
+      "knowledgeFiles": "مستندات المعرفة",
+      "automationWorkflows": "سير عمل الأتمتة",
+      "integrations": "التكاملات"
+    },
+    "historyHeading": "سجل الفوترة",
+    "downloadPdf": "تنزيل PDF"
   },
   "platformAdmin": {
     "badge": "إدارة المنصة",
@@ -550,10 +699,13 @@
     "homeLink": "الرئيسية",
     "workspacesLink": "المساحات",
     "plansLink": "الباقات",
+    "couponsLink": "الكوبونات",
+    "refundsLink": "المبالغ المستردة",
     "aiUsageLink": "استخدام الذكاء الاصطناعي",
     "aiOperationsLink": "عمليات الذكاء الاصطناعي",
     "ticketsLink": "التذاكر",
     "featureFlagsLink": "أعلام الميزات",
+    "systemHealthLink": "صحة النظام",
     "settingsLink": "الإعدادات",
     "home": {
       "title": "نظرة عامة",
@@ -570,7 +722,14 @@
       "aiRequests": "إجمالي الطلبات",
       "aiSuccessRate": "نسبة النجاح",
       "aiAvgLatency": "متوسط الاستجابة",
+      "aiInputTokens": "رموز الإدخال",
+      "aiOutputTokens": "رموز الإخراج",
       "msValue": "{ms} مللي ثانية",
+      "openTickets": "تذاكر مفتوحة",
+      "trendsHeading": "الاتجاهات (آخر 30 يوم)",
+      "dailySignups": "التسجيلات اليومية",
+      "activeWorkspacesPerDay": "مساحات العمل النشطة يوميًا",
+      "trendsEmpty": "لا توجد بيانات بعد لهذه الفترة.",
       "recentSignupsHeading": "أحدث التسجيلات",
       "noSignups": "لا توجد مساحات بعد.",
       "noOwner": "بدون مالك"
@@ -599,7 +758,11 @@
       "byModelHeading": "حسب النموذج",
       "emptyState": "لا توجد طلبات ذكاء اصطناعي مسجّلة بعد.",
       "modelRequests": "{count} طلب",
-      "msValue": "{ms} مللي ثانية"
+      "msValue": "{ms} مللي ثانية",
+      "rateLimitsHeading": "نشاط حدود المعدل",
+      "rateLimitsDescription": "أكثر نطاقات حدود المعدل ازدحامًا على مستوى المنصة (تسجيل الدخول، OTP، مفاتيح API، إلخ) في الساعة الأخيرة — ليست خاصة بالذكاء الاصطناعي، إذ لا يوجد حد معدل للردود الذكية حاليًا.",
+      "rateLimitsEmpty": "لا يوجد نشاط لحدود المعدل في الساعة الأخيرة.",
+      "rateLimitCount": "{count} محاولة"
     },
     "adminsLink": "المسؤولون",
     "workspaces": {
@@ -612,17 +775,69 @@
       "statuses": {
         "trial": "تجريبية",
         "active": "نشطة",
-        "suspended": "موقوفة"
+        "past_due": "الدفع متأخر",
+        "grace": "إشعار أخير",
+        "suspended": "موقوفة",
+        "cancelled": "ملغاة",
+        "expired": "منتهية"
       },
       "activate": "تفعيل",
       "planLabel": "الباقة",
       "planPlaceholder": "اختر باقة",
       "daysLabel": "الأيام",
+      "couponLabel": "كوبون (اختياري)",
+      "couponPlaceholder": "الكود",
       "activating": "جارٍ التفعيل...",
       "confirmActivate": "تأكيد",
       "planSummary": "الباقة: {plan}",
       "expiresOn": "تنتهي {date}",
-      "view": "عرض"
+      "view": "عرض",
+      "allStatuses": "كل الحالات",
+      "allPlans": "كل الخطط",
+      "noPlanFilter": "بدون خطة",
+      "aiUsageSummary": "{requests} طلب ذكاء اصطناعي · {tokens} رمز",
+      "delete": "حذف",
+      "deleteWarning": "سيؤدي هذا إلى حذف \"{slug}\" نهائيًا مع كل ما فيه — جهات الاتصال، الطلبات، المحادثات، كل شيء. لا يمكن التراجع عن هذا. اكتب المعرّف (slug) أدناه للتأكيد.",
+      "deleting": "جارٍ الحذف...",
+      "confirmDelete": "حذف نهائيًا"
+    },
+    "coupons": {
+      "title": "الكوبونات",
+      "description": "أكواد خصم يمكن للمشرف تطبيقها عند تفعيل اشتراك مساحة عمل.",
+      "emptyState": "لا توجد كوبونات بعد.",
+      "codePlaceholder": "الكود، مثال: WELCOME20",
+      "percentage": "خصم نسبي",
+      "fixed": "خصم ثابت",
+      "valuePlaceholder": "القيمة",
+      "maxRedemptionsPlaceholder": "أقصى استخدام (اختياري)",
+      "addCoupon": "إضافة كوبون",
+      "percentageOff": "خصم {value}%",
+      "fixedOff": "خصم {value}",
+      "redemptions": "استُخدم {used}/{max}",
+      "expiresOn": "ينتهي {date}",
+      "inactive": "غير مفعّل",
+      "deactivate": "تعطيل",
+      "reactivate": "إعادة تفعيل"
+    },
+    "refunds": {
+      "title": "المبالغ المستردة",
+      "description": "طلب ومتابعة استرداد المبالغ للفواتير المدفوعة.",
+      "emptyState": "لا توجد مبالغ مستردة بعد.",
+      "invoicePlaceholder": "اختر فاتورة مدفوعة",
+      "amountPlaceholder": "المبلغ",
+      "reasonPlaceholder": "السبب",
+      "createRefund": "طلب استرداد",
+      "status": {
+        "requested": "مطلوب",
+        "approved": "موافق عليه",
+        "rejected": "مرفوض",
+        "completed": "مكتمل"
+      },
+      "action": {
+        "approved": "موافقة",
+        "rejected": "رفض",
+        "completed": "تعليم كمكتمل"
+      }
     },
     "plans": {
       "title": "الباقات",
@@ -650,9 +865,23 @@
         "campaigns": "الحملات",
         "ads": "الإعلانات"
       },
-      "pricePlaceholder": "السعر بالدينار العراقي (اختياري)",
+      "pricePlaceholder": "السعر (اختياري)",
       "priceSummary": "{price} {currency}/شهرياً",
-      "noPriceSet": "السعر غير محدد بعد — مستثنى من حساب MRR/ARR."
+      "noPriceSet": "السعر غير محدد بعد — مستثنى من حساب MRR/ARR.",
+      "limitsHeading": "حدود الاستخدام (اختياري)",
+      "limitsHint": "اترك الحقل فارغًا لجعله بلا حدود. حدَّي التخزين واستدعاءات API مخزَّنان لكن غير مُفعَّلين بعد.",
+      "noLimitsSet": "لا حدود استخدام محدَّدة — بلا حدود.",
+      "limits": {
+        "maxUsers": "أقصى عدد مستخدمين",
+        "maxAiAgents": "أقصى عدد وكلاء AI",
+        "maxChannels": "أقصى عدد قنوات",
+        "maxConversationsPerMonth": "أقصى محادثات/شهر",
+        "maxStorageMb": "أقصى تخزين (MB)",
+        "maxKnowledgeFiles": "أقصى مستندات معرفة",
+        "maxAutomationWorkflows": "أقصى سير عمل أتمتة",
+        "maxApiCallsPerMonth": "أقصى استدعاءات API/شهر",
+        "maxIntegrations": "أقصى عدد تكاملات"
+      }
     },
     "settings": {
       "title": "إعدادات المنصة",
@@ -681,7 +910,14 @@
       "confirmRemove": "إزالة صلاحية هذا المسؤول؟",
       "emailPlaceholder": "email@example.com",
       "add": "إضافة",
-      "adding": "جارٍ الإضافة..."
+      "adding": "جارٍ الإضافة...",
+      "roles": {
+        "administrator": "مدير",
+        "support_agent": "موظف دعم",
+        "finance": "مالية",
+        "developer": "مطوّر",
+        "read_only": "قراءة فقط"
+      }
     },
     "auditLogLink": "سجل التدقيق",
     "auditLog": {
@@ -706,10 +942,26 @@
         "high": "عالية",
         "urgent": "عاجلة"
       },
+      "categories": {
+        "billing": "الفوترة",
+        "technical": "تقني",
+        "account": "الحساب",
+        "feature_request": "طلب ميزة",
+        "other": "أخرى"
+      },
+      "unassigned": "غير مسندة",
+      "avgResponseTime": "متوسط زمن أول رد",
+      "avgResolutionTime": "متوسط زمن الحل",
+      "underAnHour": "أقل من ساعة",
+      "hoursValue": "{count} س",
       "thread": {
         "supportTeam": "فريق الدعم",
+        "internalNote": "ملاحظة داخلية",
         "replyPlaceholder": "اكتب رداً...",
+        "internalNotePlaceholder": "اكتب ملاحظة داخلية (غير مرئية للمستأجر)...",
+        "internalNoteToggle": "ملاحظة داخلية",
         "submit": "إرسال الرد",
+        "submitInternal": "حفظ الملاحظة",
         "submitting": "جارٍ الإرسال..."
       }
     },
@@ -723,9 +975,32 @@
       "requiredHint": "المفتاح والاسم مطلوبان.",
       "create": "إنشاء العلم",
       "creating": "جارٍ الإنشاء...",
-      "emptyState": "لا توجد أعلام ميزات بعد."
+      "emptyState": "لا توجد أعلام ميزات بعد.",
+      "manageOverrides": "استثناءات مساحات العمل",
+      "overrideCount": "{count} استثناء لمساحة عمل",
+      "noOverrides": "لا توجد استثناءات خاصة بمساحة عمل.",
+      "selectWorkspace": "اختر مساحة عمل",
+      "forcedOn": "مفعّل قسرًا",
+      "forcedOff": "معطّل قسرًا",
+      "addOverride": "إضافة استثناء",
+      "removeOverride": "إزالة"
+    },
+    "systemHealth": {
+      "title": "صحة النظام",
+      "description": "فحوصات اتصال حية للبنية التحتية الأساسية للمنصة.",
+      "database": "قاعدة البيانات",
+      "redis": "Redis",
+      "queue": "طابور الأتمتة",
+      "email": "البريد الإلكتروني",
+      "latency": "{ms} مللي ثانية",
+      "statuses": {
+        "ok": "سليم",
+        "degraded": "متدهور",
+        "not_configured": "غير مُهيّأ"
+      }
     },
     "revenueLink": "الإيرادات",
+    "platformAnalyticsLink": "تحليلات المنصة",
     "revenue": {
       "title": "الإيرادات",
       "description": "الإيراد الشهري والسنوي المتكرر من الاشتراكات النشطة المسعّرة.",
@@ -736,7 +1011,31 @@
       "unpricedHint": "بعض الحسابات النشطة على خطة بدون سعر محدد — حدد سعراً لتلك الخطة عشان تنحسب ضمن MRR/ARR.",
       "byPlanHeading": "حسب الخطة",
       "emptyState": "لا توجد اشتراكات نشطة مسعّرة بعد.",
-      "planSubscriptions": "{count} اشتراك"
+      "planSubscriptions": "{count} اشتراك",
+      "arpu": "متوسط الإيراد لكل مستخدم",
+      "ltv": "القيمة الدائمة للعميل",
+      "newSubscriptions": "جديدة ({days} يوم)",
+      "renewals": "تجديدات ({days} يوم)",
+      "cancellations": "إلغاءات ({days} يوم)",
+      "churnRate": "معدل التسرب",
+      "trialConversionRate": "تحويل التجربة",
+      "paymentFailures": "فشل الدفع ({days} يوم)",
+      "reports": {
+        "subscriptions": "تقرير الاشتراكات",
+        "invoices": "تقرير الفواتير",
+        "refunds": "تقرير المبالغ المستردة"
+      }
+    },
+    "platformAnalytics": {
+      "title": "تحليلات المنصة",
+      "description": "الاحتفاظ والصناعات والجغرافيا واعتماد القنوات عبر جميع مساحات العمل.",
+      "retentionCohort": "مساحات عمل عمرها {days}+ يوم",
+      "retentionStillActive": "لا تزال معنا",
+      "retentionRate": "معدل الاحتفاظ",
+      "topIndustries": "أفضل الصناعات",
+      "geographicDistribution": "التوزيع الجغرافي",
+      "channelUsage": "استخدام القنوات",
+      "empty": "لا توجد بيانات بعد."
     },
     "impersonation": {
       "banner": "🔒 تعرض الآن \"{workspace}\" كمشرف رئيسي — للعرض فقط، ومسجّل بسجل التدقيق.",
@@ -842,7 +1141,8 @@
         "tag_added": "يُضاف وسم لجهة اتصال",
         "message_received": "يرسل العميل رسالة",
         "message_replied": "يتم الرد على رسالة",
-        "ai_failed": "يفشل الموظف الذكي بالرد"
+        "ai_failed": "يفشل الموظف الذكي بالرد",
+        "conversation_assigned": "تُسنَد محادثة إلى عضو في الفريق"
       },
       "stagePlaceholder": "اختر مرحلة",
       "statusPlaceholder": "اختر حالة",
@@ -935,6 +1235,7 @@
     "newAppointment": "موعد جديد",
     "emptyState": "لا توجد مواعيد بعد. أنشئ واحداً من صفحة جهة اتصال.",
     "noAppointmentsForContact": "لا توجد مواعيد لهذه الجهة بعد.",
+    "assignedTo": "مُسنَد إلى {name}",
     "statuses": {
       "scheduled": "مجدوَل",
       "confirmed": "مؤكَّد",
@@ -955,6 +1256,8 @@
       "serviceNamePlaceholder": "مثال: استشارة",
       "dateTimeLabel": "التاريخ والوقت",
       "durationLabel": "المدة (دقائق)",
+      "assignedToLabel": "مُسنَد إلى (اختياري)",
+      "assignedToPlaceholder": "اختر عضو فريق",
       "notesLabel": "ملاحظات (اختياري)",
       "submit": "إنشاء الموعد",
       "submitting": "جارٍ الإنشاء..."
@@ -965,6 +1268,8 @@
     "description": "كل شخص تواصل معك، في دليل واحد.",
     "emptyState": "لا توجد جهات اتصال بعد. تُنشأ تلقائياً من صندوق المحادثات.",
     "noContactInfo": "لا يوجد رقم هاتف أو بريد إلكتروني مسجّل.",
+    "addTagPlaceholder": "+ إضافة وسم",
+    "removeTag": "إزالة الوسم \"{tag}\"",
     "noMessagesYet": "لا توجد رسائل بعد.",
     "backLink": "← الرجوع إلى جهات الاتصال",
     "leadsHeading": "العملاء المحتملون",
@@ -973,10 +1278,40 @@
     "noConversations": "لا توجد محادثات بعد.",
     "lifecycle": {
       "lead": "عميل محتمل",
+      "quotation": "أُرسل عرض سعر",
       "customer": "عميل",
       "repeat_customer": "عميل متكرر",
       "vip": "VIP",
       "loyal_customer": "عميل مخلص"
+    },
+    "languages": {
+      "ar": "العربية",
+      "en": "الإنجليزية",
+      "ku": "الكردية"
+    },
+    "preferredContactMethods": {
+      "whatsapp": "واتساب",
+      "instagram": "إنستغرام",
+      "phone": "الهاتف",
+      "email": "البريد الإلكتروني"
+    },
+    "fields": {
+      "address": "العنوان: {value}",
+      "budget": "الميزانية: {value}",
+      "preferredContactMethod": "يفضّل: {value}",
+      "timezone": "المنطقة الزمنية: {value}",
+      "birthDate": "تاريخ الميلاد: {value}",
+      "gender": "الجنس: {value}"
+    },
+    "lifetimeValue": "القيمة الدائمة",
+    "favoriteProducts": "المنتجات المفضلة",
+    "nextAction": {
+      "heading": "الخطوة التالية المقترحة",
+      "follow_up_draft_order": "تابع مع العميل لإتمام طلبه المعلّق.",
+      "complete_overdue_task": "مهمة متأخرة: \"{detail}\" — أكملها الآن.",
+      "prepare_for_appointment": "لديه موعد قادم — تأكد أن كل شيء جاهز.",
+      "reach_out_hot_lead": "هذا عميل محتمل ساخن — تواصل معه اليوم.",
+      "check_in_vip": "مضت فترة طويلة — تواصل مع هذا العميل المميز."
     },
     "filters": {
       "lifecycleAll": "كل المراحل",
@@ -1034,6 +1369,101 @@
     "colorLabel": "لون التمييز",
     "saving": "جارٍ الحفظ...",
     "save": "حفظ",
+    "urlHeading": "رابط المتجر",
+    "urlLabel": "رابط مخصص",
+    "brandingHeading": "الهوية والتصميم",
+    "secondaryColorLabel": "اللون الثانوي",
+    "faviconLabel": "رابط أيقونة الموقع (Favicon)",
+    "bannerLabel": "رابط صورة البانر",
+    "themeLabel": "القالب",
+    "themes": {
+      "modern": "عصري",
+      "minimal": "بسيط",
+      "classic": "كلاسيكي",
+      "bold": "جريء"
+    },
+    "fontLabel": "الخط",
+    "fonts": {
+      "inter": "Inter",
+      "poppins": "Poppins",
+      "playfair": "Playfair Display",
+      "roboto_mono": "Roboto Mono"
+    },
+    "buttonStyleLabel": "شكل الأزرار",
+    "buttonStyles": {
+      "rounded": "مدوّر",
+      "square": "مربّع",
+      "pill": "كبسولي"
+    },
+    "cornerStyleLabel": "شكل الزوايا",
+    "cornerStyles": {
+      "sharp": "حادة",
+      "soft": "ناعمة",
+      "round": "دائرية"
+    },
+    "headerStyleLabel": "نمط الترويسة",
+    "headerStyles": {
+      "standard": "قياسي",
+      "centered": "وسطي",
+      "minimal": "بسيط"
+    },
+    "footerStyleLabel": "نمط التذييل",
+    "footerStyles": {
+      "standard": "قياسي",
+      "minimal": "بسيط"
+    },
+    "darkModeLabel": "الوضع الليلي",
+    "socialHeading": "روابط التواصل الاجتماعي",
+    "social": {
+      "whatsapp": "واتساب",
+      "instagram": "إنستغرام",
+      "facebook": "فيسبوك",
+      "tiktok": "تيك توك",
+      "youtube": "يوتيوب",
+      "snapchat": "سناب شات",
+      "telegram": "تيليجرام"
+    },
+    "seoHeading": "تحسين محركات البحث (SEO)",
+    "seoTitleLabel": "عنوان SEO",
+    "seoDescriptionLabel": "وصف SEO",
+    "trackingHeading": "التتبّع والتحليلات",
+    "tracking": {
+      "metaPixelId": "معرّف Meta Pixel",
+      "googleAnalyticsId": "معرّف Google Analytics",
+      "googleTagManagerId": "معرّف Google Tag Manager",
+      "tiktokPixelId": "معرّف TikTok Pixel"
+    },
+    "sectionsHeading": "أقسام الصفحة الرئيسية",
+    "sectionsHint": "أعد ترتيب أو أخفِ أقسام الصفحة الرئيسية لمتجرك.",
+    "sections": {
+      "hero": "شريط البطل",
+      "about": "معاينة من نحن",
+      "featured": "منتجات مميّزة",
+      "products": "معاينة كتالوج المنتجات",
+      "services": "معاينة الخدمات",
+      "contact": "نموذج التواصل"
+    },
+    "hideSection": "إخفاء",
+    "showSection": "إظهار",
+    "legalHeading": "الصفحات القانونية",
+    "privacyLabel": "سياسة الخصوصية",
+    "termsLabel": "شروط الخدمة",
+    "promotionsHeading": "العروض الترويجية",
+    "announcementBarLabel": "شريط الإعلانات",
+    "announcementBarPlaceholder": "مثال: شحن مجاني للطلبات فوق 50$",
+    "announcementBarLinkLabel": "رابط شريط الإعلانات",
+    "popupHeading": "النافذة المنبثقة",
+    "popupTitlePlaceholder": "عنوان النافذة المنبثقة",
+    "popupMessagePlaceholder": "رسالة النافذة المنبثقة",
+    "popupButtonTextPlaceholder": "نص الزر",
+    "popupButtonLinkPlaceholder": "رابط الزر",
+    "popupTriggerLabel": "إظهار النافذة المنبثقة",
+    "popupTriggers": {
+      "first_visit": "عند أول زيارة",
+      "delay": "بعد مدة زمنية",
+      "exit_intent": "عند مغادرة الصفحة"
+    },
+    "popupDelayLabel": "المدة (بالثواني)",
     "public": {
       "aboutHeading": "من نحن",
       "productsHeading": "المنتجات",
@@ -1045,7 +1475,64 @@
       "requiredHint": "الاسم والهاتف والرسالة مطلوبة.",
       "submitting": "جارٍ الإرسال...",
       "submit": "إرسال الاستفسار",
-      "thankYou": "شكراً! سنتواصل معك قريباً."
+      "thankYou": "شكراً! سنتواصل معك قريباً.",
+      "readMore": "قراءة المزيد ←",
+      "viewAll": "عرض الكل ←",
+      "noProducts": "لا توجد منتجات بعد.",
+      "faqHeading": "الأسئلة الشائعة",
+      "noFaqs": "لا توجد أسئلة مُجاب عنها بعد.",
+      "privacyHeading": "سياسة الخصوصية",
+      "termsHeading": "شروط الخدمة",
+      "searchPlaceholder": "ابحث عن منتجات...",
+      "allCategories": "كل الفئات",
+      "sortOptions": {
+        "newest": "الأحدث",
+        "price_asc": "السعر: من الأقل للأعلى",
+        "price_desc": "السعر: من الأعلى للأقل",
+        "best_selling": "الأكثر مبيعاً",
+        "discounted": "عليها خصم"
+      },
+      "applyFilters": "تطبيق",
+      "share": "مشاركة",
+      "linkCopied": "تم نسخ الرابط.",
+      "backToProducts": "← الرجوع إلى المنتجات",
+      "variantsLabel": "الخيارات",
+      "askOnWhatsapp": "اسأل عبر واتساب",
+      "whatsappMessage": "مرحباً! أنا مهتم بـ {product}.",
+      "interestedHeading": "مهتم بهذا؟",
+      "interestedMessage": "أنا مهتم بـ {product}.",
+      "relatedHeading": "قد يعجبك أيضاً",
+      "addToCart": "أضف إلى السلة",
+      "addedToCart": "تمت إضافة {product} إلى سلتك.",
+      "checkoutHeading": "إتمام الطلب",
+      "checkoutRequiredHint": "الاسم والهاتف وعنصر واحد على الأقل مطلوبة.",
+      "orderPlacedHeading": "تم تقديم الطلب!",
+      "orderPlacedHint": "سنتواصل معك قريباً لتأكيد طلبك.",
+      "cartEmpty": "سلتك فارغة.",
+      "removeFromCart": "إزالة",
+      "cartTotal": "الإجمالي",
+      "addressPlaceholder": "عنوان التوصيل (اختياري)",
+      "notesPlaceholder": "ملاحظات (اختياري)",
+      "placeOrder": "تقديم الطلب",
+      "nav": {
+        "home": "الرئيسية",
+        "products": "المنتجات",
+        "about": "من نحن",
+        "contact": "تواصل",
+        "faq": "الأسئلة الشائعة"
+      },
+      "assistant": {
+        "title": "اسألنا أي شيء",
+        "greeting": "مرحباً! اسألني عن منتجاتنا أو الأسعار أو أي شيء آخر.",
+        "placeholder": "اكتب رسالة...",
+        "send": "إرسال",
+        "open": "فتح مساعد الدردشة",
+        "close": "إغلاق مساعد الدردشة"
+      },
+      "promo": {
+        "dismiss": "لا شكراً"
+      },
+      "featuredHeading": "مميّز"
     }
   },
   "integrations": {
@@ -1163,9 +1650,13 @@
     "pageDescription": "تفاصيل نشاطك التجاري ولغة لوحة التحكم."
   },
   "auditLog": {
-    "pageTitle": "سجل التدقيق",
-    "pageDescription": "كل إجراء إداري متعلق بالفريق تم تنفيذه في مساحة العمل هذه — دعوات، تغييرات أدوار، إزالة أعضاء.",
-    "emptyState": "لا توجد أحداث مسجلة بعد."
+    "pageTitle": "سجل النشاط",
+    "pageDescription": "كل حدث في مساحة العمل هذه — نشاط العملاء وإجراءات إدارة الفريق — في تغذية واحدة.",
+    "emptyState": "لا يوجد نشاط مسجل بعد.",
+    "source": {
+      "crm": "إدارة العملاء",
+      "admin": "الإدارة"
+    }
   },
   "knowledgeBasePage": {
     "pageTitle": "قاعدة المعرفة",
@@ -1192,7 +1683,12 @@
     "placeholder": "اكتب ملاحظة عن هذا العميل...",
     "add": "إضافة ملاحظة",
     "empty": "لا توجد ملاحظات لهذا العميل بعد.",
-    "delete": "حذف"
+    "delete": "حذف",
+    "types": {
+      "team": "الفريق",
+      "private": "خاص",
+      "ai": "الذكاء الاصطناعي"
+    }
   },
   "activity": {
     "title": "النشاط",

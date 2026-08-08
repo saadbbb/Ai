@@ -8,7 +8,7 @@ import { taskRepository } from "@/features/crm/repository/task.repository";
 import { crmService } from "@/features/crm/services/crm.service";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
-import { orderTotal } from "@/features/orders/lib/order-total";
+import { orderGrandTotal } from "@/features/orders/lib/order-total";
 import { orderRepository } from "@/features/orders/repository/order.repository";
 
 const CLOSED_LEAD_STAGES: LeadStage[] = ["won", "lost", "cancelled"];
@@ -90,7 +90,7 @@ async function getSummary(workspaceId: string): Promise<DashboardSummary> {
       ({ order, contact, items }): ActivityItem => ({
         type: "order",
         id: order.id,
-        label: `${contact.fullName} — ${orderTotal(items).toFixed(2)}`,
+        label: `${contact.fullName} — ${orderGrandTotal(items, order).toFixed(2)}`,
         timestamp: order.createdAt,
         href: `/dashboard/orders/${order.id}`,
       }),
@@ -106,7 +106,7 @@ async function getSummary(workspaceId: string): Promise<DashboardSummary> {
     activeOrdersCount: orders.filter((item) => ACTIVE_ORDER_STATUSES.includes(item.order.status)).length,
     revenueTotal: orders
       .filter((item) => REVENUE_ORDER_STATUSES.includes(item.order.status))
-      .reduce((sum, item) => sum + orderTotal(item.items), 0),
+      .reduce((sum, item) => sum + orderGrandTotal(item.items, item.order), 0),
     aiActiveCount: conversations.filter((item) => item.conversation.aiStatus === "active").length,
     needsHumanCount: conversations.filter((item) => item.conversation.aiStatus === "handed_over").length,
     aiRequestsToday,
@@ -170,7 +170,7 @@ async function getTodayAndAttentionBands(
     appointmentsToday: appointments.filter((item) => isToday(item.appointment.scheduledAt)).length,
     revenueToday: orders
       .filter((item) => REVENUE_ORDER_STATUSES.includes(item.order.status) && isToday(item.order.createdAt))
-      .reduce((sum, item) => sum + orderTotal(item.items), 0),
+      .reduce((sum, item) => sum + orderGrandTotal(item.items, item.order), 0),
   };
 
   const handoverItems: AttentionItem[] = conversations

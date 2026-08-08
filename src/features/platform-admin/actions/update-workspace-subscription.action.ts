@@ -1,7 +1,7 @@
-"use server";
+﻿"use server";
 
 import type { Workspace } from "@/db/schema";
-import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
+import { requireWritePlatformAdmin } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, AppError, type ActionResult } from "@/lib/errors/app-error";
 import { auditLogRepository } from "../repository/audit-log.repository";
 import { workspaceAdminRepository } from "../repository/workspace-admin.repository";
@@ -13,7 +13,7 @@ export async function updateWorkspaceSubscriptionAction(input: unknown): Promise
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
 
-  const admin = await requirePlatformAdmin();
+  const admin = await requireWritePlatformAdmin();
 
   try {
     const workspace = await workspaceAdminRepository.updateSubscriptionStatus(

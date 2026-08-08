@@ -10,16 +10,18 @@ import { AppError } from "@/lib/errors/app-error";
 import { activityRepository, type ActivityActor } from "../repository/activity.repository";
 import { leadRepository, type LeadFilters, type LeadListItem } from "../repository/lead.repository";
 import { calculateLeadScore } from "../lib/lead-score";
+import { canTransitionLeadStage } from "../lib/lead-stage";
 
 const REVENUE_ORDER_STATUSES = ["delivered", "completed"];
 const LOYAL_THRESHOLD = 5;
 const REPEAT_THRESHOLD = 2;
 const LIFECYCLE_RANK: Record<ContactLifecycleStage, number> = {
   lead: 0,
-  customer: 1,
-  repeat_customer: 2,
-  vip: 3,
-  loyal_customer: 4,
+  quotation: 1,
+  customer: 2,
+  repeat_customer: 3,
+  vip: 4,
+  loyal_customer: 5,
 };
 
 export interface LeadListItemWithScore extends LeadListItem {
@@ -91,6 +93,14 @@ async function createLeadFromConversation(workspaceId: string, conversationId: s
 }
 
 async function updateLeadStage(workspaceId: string, leadId: string, stage: LeadStage, actor: ActivityActor): Promise<Lead> {
+  const existing = await leadRepository.findById(leadId, workspaceId);
+  if (!existing) {
+    throw new AppError("NOT_FOUND", "Lead not found.");
+  }
+  if (!canTransitionLeadStage(existing.stage, stage)) {
+    throw new AppError("VALIDATION_ERROR", `A lead can't move from "${existing.stage}" to "${stage}".`);
+  }
+
   const lead = await leadRepository.updateStage(leadId, workspaceId, stage);
   if (!lead) {
     throw new AppError("NOT_FOUND", "Lead not found.");
@@ -135,9 +145,68 @@ async function advanceLifecycleStage(workspaceId: string, contactId: string): Pr
   }
 }
 
+/**
+ * The manual counterpart to advanceLifecycleStage — lets a team member set
+ * "quotation" (nothing auto-advances into it) or correct/override any other
+ * stage by hand. No transition guard here: unlike leads.stage's tightly
+ * defined pipeline, lifecycle stage is inherently a human judgment call in
+ * both directions (e.g. demoting a "vip" who churned back to "customer").
+ */
+async function setLifecycleStage(
+  workspaceId: string,
+  contactId: string,
+  stage: ContactLifecycleStage,
+  actor: ActivityActor,
+): Promise<void> {
+  const contact = await contactRepository.updateLifecycleStage(contactId, workspaceId, stage);
+  if (!contact) {
+    throw new AppError("NOT_FOUND", "Contact not found.");
+  }
+
+  await activityRepository.log({
+    workspaceId,
+    contactId,
+    type: "contact_updated",
+    actor,
+    summary: `Lifecycle stage set to "${stage}".`,
+  });
+}
+
+/**
+ * The human counterpart to the AI's add_tag tool — same activity logging and
+ * automation dispatch, so a manually-added tag can trigger a "tag_added"
+ * workflow exactly like an AI-added one (PART 5 gap: automation previously
+ * only ever heard about AI-added tags, never a team member's).
+ */
+async function addTag(workspaceId: string, contactId: string, tag: string, actor: ActivityActor): Promise<void> {
+  await contactRepository.addTag(contactId, workspaceId, tag);
+  await activityRepository.log({
+    workspaceId,
+    contactId,
+    type: "contact_tagged",
+    actor,
+    summary: `Tagged the customer with "${tag}".`,
+  });
+  await automationService.dispatch(workspaceId, { type: "tag_added", contactId, tag });
+}
+
+async function removeTag(workspaceId: string, contactId: string, tag: string, actor: ActivityActor): Promise<void> {
+  await contactRepository.removeTag(contactId, workspaceId, tag);
+  await activityRepository.log({
+    workspaceId,
+    contactId,
+    type: "contact_untagged",
+    actor,
+    summary: `Removed the "${tag}" tag from the customer.`,
+  });
+}
+
 export const crmService = {
   listLeads,
   createLeadFromConversation,
   updateLeadStage,
   advanceLifecycleStage,
+  setLifecycleStage,
+  addTag,
+  removeTag,
 };

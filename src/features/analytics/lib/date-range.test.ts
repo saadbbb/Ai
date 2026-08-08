@@ -51,4 +51,37 @@ describe("resolveAnalyticsRange", () => {
     const range = resolveAnalyticsRange(undefined);
     expect(range.key).toBe("30d");
   });
+
+  it("today covers just today so far", () => {
+    const range = resolveAnalyticsRange("today");
+    expect(range.key).toBe("today");
+    expect(range.days).toEqual(["2026-03-15"]);
+    expect(range.to).toEqual(FAKE_NOW);
+  });
+
+  it("yesterday covers exactly the prior UTC day", () => {
+    const range = resolveAnalyticsRange("yesterday");
+    expect(range.key).toBe("yesterday");
+    expect(range.days).toEqual(["2026-03-14"]);
+    expect(range.from).toEqual(new Date("2026-03-14T00:00:00.000Z"));
+    expect(range.to).toEqual(new Date("2026-03-14T23:59:59.999Z"));
+  });
+
+  it("custom uses the given from/to bounds", () => {
+    const range = resolveAnalyticsRange("custom", "2026-03-01", "2026-03-05T12:00:00.000Z");
+    expect(range.key).toBe("custom");
+    expect(range.days).toEqual(["2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05"]);
+  });
+
+  it("custom falls back to 30d when from is missing", () => {
+    const range = resolveAnalyticsRange("custom", undefined, "2026-03-05");
+    expect(range.key).toBe("custom");
+    expect(range.days).toHaveLength(30);
+  });
+
+  it("custom falls back to 30d when from is after to", () => {
+    const range = resolveAnalyticsRange("custom", "2026-03-10", "2026-03-05");
+    expect(range.key).toBe("custom");
+    expect(range.days).toHaveLength(30);
+  });
 });

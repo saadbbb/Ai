@@ -14,6 +14,17 @@ vi.mock("../repository/analytics.repository", () => ({
     conversationsByAgent: vi.fn(),
     tasksCompletedByAgent: vi.fn(),
     avgFirstResponseSecondsByAgent: vi.fn(),
+    leadsByChannel: vi.fn(),
+    avgFirstResponseSecondsBySenderType: vi.fn(),
+    conversationHandoverStats: vi.fn(),
+    automationStats: vi.fn(),
+    messagesCreatedByDay: vi.fn(),
+    repeatCustomerStats: vi.fn(),
+    appointmentsByDay: vi.fn(),
+    avgAppointmentLeadTimeSeconds: vi.fn(),
+    topServicesByAppointmentCount: vi.fn(),
+    revenueByChannel: vi.fn(),
+    newVsReturningCustomers: vi.fn(),
   },
 }));
 
@@ -46,6 +57,17 @@ function mockAllEmpty() {
   vi.mocked(analyticsRepository.conversationsByAgent).mockResolvedValue([]);
   vi.mocked(analyticsRepository.tasksCompletedByAgent).mockResolvedValue([]);
   vi.mocked(analyticsRepository.avgFirstResponseSecondsByAgent).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.leadsByChannel).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.avgFirstResponseSecondsBySenderType).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.conversationHandoverStats).mockResolvedValue({ total: 0, handedOver: 0 });
+  vi.mocked(analyticsRepository.automationStats).mockResolvedValue({ total: 0, successCount: 0 });
+  vi.mocked(analyticsRepository.messagesCreatedByDay).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.repeatCustomerStats).mockResolvedValue({ totalCustomers: 0, repeatCustomers: 0 });
+  vi.mocked(analyticsRepository.appointmentsByDay).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.avgAppointmentLeadTimeSeconds).mockResolvedValue(null);
+  vi.mocked(analyticsRepository.topServicesByAppointmentCount).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.revenueByChannel).mockResolvedValue([]);
+  vi.mocked(analyticsRepository.newVsReturningCustomers).mockResolvedValue({ newCustomers: 0, returningCustomers: 0 });
 }
 
 beforeEach(() => {
@@ -130,6 +152,93 @@ describe("analyticsService.getSummary — kpis", () => {
       { day: "2026-03-14", value: 0 },
       { day: "2026-03-15", value: 4 },
     ]);
+  });
+});
+
+describe("analyticsService.getSummary — depth metrics", () => {
+  it("computes average order value from revenue and completed orders", async () => {
+    mockAllEmpty();
+    vi.mocked(analyticsRepository.revenueByDay).mockResolvedValue([{ day: "2026-03-15", value: 400 }]);
+    vi.mocked(analyticsRepository.ordersByStatus).mockResolvedValue([{ status: "completed", count: 4 }]);
+
+    const summary = await analyticsService.getSummary("workspace-1", RANGE);
+
+    expect(summary.sales.avgOrderValue).toBe(100);
+  });
+
+  it("computes sales growth against the equal-length prior period", async () => {
+    mockAllEmpty();
+    vi.mocked(analyticsRepository.revenueByDay).mockImplementation(async (_ws, from) => {
+      // The prior-period call uses a `from` before the current range's `from`.
+      return from.getTime() < RANGE.from.getTime() ? [{ day: "prev", value: 100 }] : [{ day: "cur", value: 150 }];
+    });
+
+    const summary = await analyticsService.getSummary("workspace-1", RANGE);
+
+    expect(summary.sales.growthPercent).toBe(50);
+  });
+
+  it("maps AI vs human response times from the sender-type breakdown", async () => {
+    mockAllEmpty();
+    vi.mocked(analyticsRepository.avgFirstResponseSecondsBySenderType).mockResolvedValue([
+      { senderType: "ai", avgSeconds: 30, replyCount: 10 },
+      { senderType: "agent", avgSeconds: 600, replyCount: 5 },
+    ]);
+
+    const summary = await analyticsService.getSummary("workspace-1", RANGE);
+
+    expect(summary.conversations.avgResponseSecondsAi).toBe(30);
+    expect(summary.conversations.avgResponseSecondsHuman).toBe(600);
+  });
+
+  it("derives the AI handoff rate and win rate from raw counts", async () => {
+    mockAllEmpty();
+    vi.mocked(analyticsRepository.conversationHandoverStats).mockResolvedValue({ total: 10, handedOver: 3 });
+    vi.mocked(analyticsRepository.leadsByStage).mockResolvedValue([
+      { status: "won", count: 3 },
+      { status: "lost", count: 1 },
+    ]);
+
+    const summary = await analyticsService.getSummary("workspace-1", RANGE);
+
+    expect(summary.ai.handoffRate).toBe(0.3);
+    expect(summary.leads.winRate).toBe(0.75);
+  });
+
+  it("converts appointment lead time from seconds to hours", async () => {
+    mockAllEmpty();
+    vi.mocked(analyticsRepository.avgAppointmentLeadTimeSeconds).mockResolvedValue(7200);
+
+    const summary = await analyticsService.getSummary("workspace-1", RANGE);
+
+    expect(summary.appointments.avgLeadTimeHours).toBe(2);
+  });
+
+  it("passes through new vs returning customer counts", async () => {
+    mockAllEmpty();
+    vi.mocked(analyticsRepository.newVsReturningCustomers).mockResolvedValue({ newCustomers: 4, returningCustomers: 2 });
+
+    const summary = await analyticsService.getSummary("workspace-1", RANGE);
+
+    expect(summary.customers).toEqual({ newCount: 4, returningCount: 2 });
+  });
+
+  it("folds response time, missed-conversation, automation, and revenue-trend rates into the health score", async () => {
+    mockAllEmpty();
+    vi.mocked(analyticsRepository.avgFirstResponseSecondsBySenderType).mockResolvedValue([
+      { senderType: "agent", avgSeconds: 300, replyCount: 1 }, // <= fast threshold -> rate 1
+    ]);
+    vi.mocked(analyticsRepository.conversationHandoverStats).mockResolvedValue({ total: 10, handedOver: 0 }); // rate 1 (inverted)
+    vi.mocked(analyticsRepository.automationStats).mockResolvedValue({ total: 5, successCount: 5 }); // rate 1
+    vi.mocked(analyticsRepository.revenueByDay).mockResolvedValue([]); // current 0, previous 0 -> null (no baseline)
+
+    const summary = await analyticsService.getSummary("workspace-1", RANGE);
+
+    expect(summary.healthScore.breakdown.find((item) => item.key === "responseTime")?.rate).toBe(1);
+    expect(summary.healthScore.breakdown.find((item) => item.key === "missedConversations")?.rate).toBe(1);
+    expect(summary.healthScore.breakdown.find((item) => item.key === "automationSuccess")?.rate).toBe(1);
+    expect(summary.healthScore.breakdown.find((item) => item.key === "revenueTrend")?.rate).toBeNull();
+    expect(summary.healthScore.score).toBe(100);
   });
 });
 

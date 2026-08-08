@@ -1,7 +1,15 @@
-import { boolean, index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { contacts } from "./contacts";
 import { users } from "./users";
 import { workspaces } from "./workspaces";
+
+/**
+ * "team" (default) = visible to the whole workspace. "private" = visible only
+ * to its author — filtered out for everyone else at the repository layer.
+ * "ai" = written by the automation engine's create_note action, no human
+ * author; shown with a distinct badge rather than treated as private.
+ */
+export const noteTypeEnum = pgEnum("note_type", ["team", "private", "ai"]);
 
 export const notes = pgTable(
   "notes",
@@ -15,6 +23,7 @@ export const notes = pgTable(
       .references(() => contacts.id, { onDelete: "cascade" }),
     content: text("content").notNull(),
     authorUserId: uuid("author_user_id").references(() => users.id, { onDelete: "set null" }),
+    type: noteTypeEnum("type").notNull().default("team"),
     pinned: boolean("pinned").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -23,3 +32,4 @@ export const notes = pgTable(
 
 export type Note = typeof notes.$inferSelect;
 export type NewNote = typeof notes.$inferInsert;
+export type NoteType = (typeof noteTypeEnum.enumValues)[number];

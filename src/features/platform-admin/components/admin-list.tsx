@@ -8,10 +8,14 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { PlatformAdmin } from "@/db/schema";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { PlatformAdmin, PlatformAdminRole } from "@/db/schema";
 import { addPlatformAdminAction } from "../actions/add-platform-admin.action";
 import { removePlatformAdminAction } from "../actions/remove-platform-admin.action";
+import { setPlatformAdminRoleAction } from "../actions/set-platform-admin-role.action";
 import { addPlatformAdminSchema } from "../validation/schemas";
+
+const ROLES: PlatformAdminRole[] = ["administrator", "support_agent", "finance", "developer", "read_only"];
 
 type FormValues = z.infer<typeof addPlatformAdminSchema>;
 
@@ -31,8 +35,11 @@ export function AdminList({
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
-  } = useForm<FormValues>({ resolver: zodResolver(addPlatformAdminSchema) });
+  } = useForm<FormValues>({ resolver: zodResolver(addPlatformAdminSchema), defaultValues: { role: "administrator" } });
+  const selectedRole = watch("role") ?? "administrator";
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -45,7 +52,7 @@ export function AdminList({
     }
 
     setAdmins((current) => [...current, result.data]);
-    reset();
+    reset({ role: "administrator" });
   });
 
   async function handleRemove(id: string) {
@@ -58,6 +65,16 @@ export function AdminList({
     }
 
     setAdmins((current) => current.filter((admin) => admin.id !== id));
+  }
+
+  async function handleRoleChange(id: string, role: PlatformAdminRole) {
+    const result = await setPlatformAdminRoleAction({ id, role });
+    if (!result.success) {
+      toast.error(result.error.message);
+      return;
+    }
+
+    setAdmins((current) => current.map((admin) => (admin.id === id ? result.data : admin)));
   }
 
   return (
@@ -81,20 +98,35 @@ export function AdminList({
           <p className="text-sm text-muted-foreground">{t("noManagedAdmins")}</p>
         ) : (
           <div className="divide-y rounded-lg border">
-            {admins.map((admin) => (
-              <div key={admin.id} className="flex items-center justify-between p-3 text-sm">
-                <span>{admin.email}</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  disabled={admin.email === currentUserEmail.toLowerCase()}
-                  onClick={() => handleRemove(admin.id)}
-                >
-                  {t("remove")}
-                </Button>
-              </div>
-            ))}
+            {admins.map((admin) => {
+              const isSelf = admin.email === currentUserEmail.toLowerCase();
+              return (
+                <div key={admin.id} className="flex items-center justify-between gap-2 p-3 text-sm">
+                  <span className="truncate">{admin.email}</span>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={admin.role}
+                      onValueChange={(value) => handleRoleChange(admin.id, value as PlatformAdminRole)}
+                      disabled={isSelf}
+                    >
+                      <SelectTrigger size="sm" className="w-auto">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ROLES.map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {t(`roles.${role}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button type="button" variant="ghost" size="sm" disabled={isSelf} onClick={() => handleRemove(admin.id)}>
+                      {t("remove")}
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -103,6 +135,18 @@ export function AdminList({
             <Input placeholder={t("emailPlaceholder")} {...register("email")} />
             {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email.message}</p>}
           </div>
+          <Select value={selectedRole} onValueChange={(value) => setValue("role", value as PlatformAdminRole)}>
+            <SelectTrigger size="sm" className="w-auto">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {ROLES.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {t(`roles.${role}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? t("adding") : t("add")}
           </Button>

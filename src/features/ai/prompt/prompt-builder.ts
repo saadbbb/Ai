@@ -1,5 +1,9 @@
 import "server-only";
 import type { AiAgent, BusinessPolicy, Faq, Product, Service } from "@/db/schema";
+import { isWithinWorkingHours } from "../lib/working-hours";
+
+/** Keeps prompt size bounded regardless of how large a workspace's catalog grows. */
+const MAX_CATALOG_ITEMS = 50;
 
 const TONE_DESCRIPTIONS: Record<string, string> = {
   friendly: "Friendly and warm.",
@@ -38,15 +42,10 @@ interface BuildSystemPromptInput {
   customerSummary?: string | null;
 }
 
-export function buildSystemPrompt({
-  agent,
-  faqs,
-  products,
-  services,
-  policy,
-  toolsEnabled,
-  customerSummary,
-}: BuildSystemPromptInput): string {
+export function buildSystemPrompt(
+  { agent, faqs, products, services, policy, toolsEnabled, customerSummary }: BuildSystemPromptInput,
+  now: Date = new Date(),
+): string {
   const sections: string[] = [];
 
   sections.push(
@@ -70,16 +69,26 @@ export function buildSystemPrompt({
   sections.push(`Style: ${CREATIVITY_DESCRIPTIONS[agent.creativity] ?? agent.creativity}`);
 
   if (faqs.length > 0) {
-    const faqText = faqs.map((faq) => `Q: ${faq.question}\nA: ${faq.answer}`).join("\n\n");
+    const faqText = faqs
+      .slice(0, MAX_CATALOG_ITEMS)
+      .map((faq) => `Q: ${faq.question}\nA: ${faq.answer}`)
+      .join("\n\n");
     sections.push(`Frequently asked questions:\n${faqText}`);
   }
 
   if (products.length > 0) {
     const productText = products
+      .slice(0, MAX_CATALOG_ITEMS)
       .map((product) => {
-        const price = product.price ? ` — ${product.price}` : "";
+        const price = product.discountedPrice
+          ? ` — ${product.price} now ${product.discountedPrice} (on sale)`
+          : product.price
+            ? ` — ${product.price}`
+            : "";
+        const category = product.category ? ` [${product.category}]` : "";
         const description = product.description ? `: ${product.description}` : "";
-        return `- ${product.name}${price}${description}`;
+        const variants = product.variants.length > 0 ? ` (options: ${product.variants.map((v) => v.name).join(", ")})` : "";
+        return `- ${product.name}${category}${price}${variants}${description}`;
       })
       .join("\n");
     sections.push(`Products:\n${productText}`);
@@ -87,6 +96,7 @@ export function buildSystemPrompt({
 
   if (services.length > 0) {
     const serviceText = services
+      .slice(0, MAX_CATALOG_ITEMS)
       .map((service) => {
         const price = service.price ? ` — ${service.price}` : "";
         const duration = service.durationMinutes ? ` (${service.durationMinutes} min)` : "";
@@ -95,6 +105,16 @@ export function buildSystemPrompt({
       })
       .join("\n");
     sections.push(`Services:\n${serviceText}`);
+  }
+
+  if (agent.workingHours) {
+    sections.push(
+      isWithinWorkingHours(agent.workingHours, now)
+        ? "The business is currently open."
+        : `The business is currently closed right now.${
+            agent.workingHours.holidayNotes ? ` (${agent.workingHours.holidayNotes})` : ""
+          } You can still answer questions and take down what the customer needs, but let them know a team member will follow up once the business reopens if their request needs a person.`,
+    );
   }
 
   const policyLines: string[] = [];
@@ -126,7 +146,8 @@ export function buildSystemPrompt({
   if (toolsEnabled) {
     sections.push(
       "You have tools available to record leads, book appointments, create orders, update the customer's " +
-        "contact info, tag the customer, and hand the conversation to a human. Use them naturally as part of " +
+        "contact info, tag the customer, create a follow-up task for the team when something needs a person to " +
+        "do later, and hand the conversation to a human. Use them naturally as part of " +
         "doing your job — never mention that tools, a CRM, or any system exists to the customer.",
     );
   }

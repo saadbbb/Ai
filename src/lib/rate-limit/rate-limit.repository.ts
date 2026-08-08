@@ -1,9 +1,20 @@
 import "server-only";
-import { sql } from "drizzle-orm";
+import { desc, gte, sql } from "drizzle-orm";
 import { db } from "@/db/client";
-import { rateLimitBuckets } from "@/db/schema";
+import { type RateLimitBucket, rateLimitBuckets } from "@/db/schema";
 
 export const rateLimitRepository = {
+  /** Feeds the Super Admin AI Operations page's rate-limit visibility (PART 9 gap) — the busiest buckets with a window still open in the last hour, across every key namespace (login/OTP/API keys/etc), not just AI. */
+  async findMostActive(limit = 20): Promise<RateLimitBucket[]> {
+    const since = new Date(Date.now() - 60 * 60 * 1000);
+    return db
+      .select()
+      .from(rateLimitBuckets)
+      .where(gte(rateLimitBuckets.windowStart, since))
+      .orderBy(desc(rateLimitBuckets.count))
+      .limit(limit);
+  },
+
   /**
    * Atomic fixed-window increment: resets to 1 if the existing bucket's
    * window has expired, otherwise increments it — one round trip, race-free

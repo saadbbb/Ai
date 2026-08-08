@@ -6,7 +6,7 @@ import { appointmentRepository } from "@/features/appointments/repository/appoin
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
-import { orderTotal } from "@/features/orders/lib/order-total";
+import { orderGrandTotal } from "@/features/orders/lib/order-total";
 import { orderRepository } from "@/features/orders/repository/order.repository";
 import { ImpersonationBanner } from "@/features/platform-admin/components/impersonation-banner";
 import { auditLogRepository } from "@/features/platform-admin/repository/audit-log.repository";
@@ -136,7 +136,7 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
                 <div key={order.id} className="flex items-center justify-between p-3 text-sm">
                   <span className="truncate">{contact.fullName}</span>
                   <span className="shrink-0 text-xs text-muted-foreground">
-                    {tOrders(`statuses.${order.status}`)} · {orderTotal(items).toFixed(2)}
+                    {tOrders(`statuses.${order.status}`)} · {orderGrandTotal(items, order).toFixed(2)}
                   </span>
                 </div>
               ))}

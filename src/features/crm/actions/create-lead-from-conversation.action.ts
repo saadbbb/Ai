@@ -1,7 +1,7 @@
 "use server";
 
 import type { Lead } from "@/db/schema";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { crmService } from "../services/crm.service";
 import { createLeadFromConversationSchema } from "../validation/schemas";
@@ -14,6 +14,7 @@ export async function createLeadFromConversationAction(input: unknown): Promise<
 
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireWorkspacePermission(user.id, workspace.id, "crm.records.manage");
 
   try {
     const lead = await crmService.createLeadFromConversation(workspace.id, parsed.data.conversationId, {

@@ -1,14 +1,18 @@
 import "server-only";
+import { detectIntent } from "@/features/ai/lib/intent-detection";
 import type { ChatMessage } from "@/features/ai/providers/types";
 import { aiService } from "@/features/ai/services/ai.service";
 import { automationService } from "@/features/automation/services/automation.service";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
+import { userRepository } from "@/features/auth/repository/user.repository";
+import { notificationRepository } from "@/features/notifications/repository/notification.repository";
+import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { AppError } from "@/lib/errors/app-error";
 import { channelRepository } from "../repository/channel.repository";
 import { contactRepository } from "../repository/contact.repository";
-import { conversationRepository, type ConversationListItem } from "../repository/conversation.repository";
+import { conversationRepository, type ConversationFilters, type ConversationListItem } from "../repository/conversation.repository";
 import { messageRepository } from "../repository/message.repository";
-import type { Message } from "@/db/schema";
+import type { ConversationPriority, Message } from "@/db/schema";
 
 const AI_HISTORY_LIMIT = 30;
 
@@ -48,7 +52,7 @@ function toTranscript(history: Message[]): string {
  * instead of throwing back through the caller (see claude.provider.ts, which
  * throws AppError today because ANTHROPIC_API_KEY isn't set yet).
  */
-async function triggerAiReply(workspaceId: string, conversationId: string, contactId: string): Promise<Message> {
+async function triggerAiReply(workspaceId: string, conversationId: string, contactId: string, contactName: string): Promise<Message> {
   const history = await messageRepository.findByConversationId(conversationId, workspaceId);
 
   try {
@@ -60,7 +64,7 @@ async function triggerAiReply(workspaceId: string, conversationId: string, conta
       senderType: "ai",
       content: result.text,
     });
-    await conversationRepository.touchLastMessage(conversationId, workspaceId, previewOf(result.text));
+    await conversationRepository.touchLastMessage(conversationId, workspaceId, previewOf(result.text), "ai");
     await automationService.dispatch(workspaceId, { type: "message_replied", contactId });
 
     if (result.needsHumanHandover) {
@@ -71,7 +75,18 @@ async function triggerAiReply(workspaceId: string, conversationId: string, conta
         contactId,
         type: "conversation_handed_over",
         actor: { type: "ai" },
-        summary: "AI handed the conversation to a human.",
+        summary: result.handoverReason
+          ? `AI handed the conversation to a human (${result.handoverCategory ?? "other"}): ${result.handoverReason}`
+          : "AI handed the conversation to a human.",
+        link: `/dashboard/inbox/${conversationId}`,
+      });
+      await notificationRepository.create({
+        workspaceId,
+        type: "human_handover",
+        title: `Handover: ${contactName}`,
+        message: result.handoverReason
+          ? `The AI handed ${contactName}'s conversation to a human: ${result.handoverReason}`
+          : `The AI handed ${contactName}'s conversation to a human.`,
         link: `/dashboard/inbox/${conversationId}`,
       });
 
@@ -101,13 +116,20 @@ async function triggerAiReply(workspaceId: string, conversationId: string, conta
       summary: "Conversation handed to a human — the AI employee failed to generate a reply.",
       link: `/dashboard/inbox/${conversationId}`,
     });
+    await notificationRepository.create({
+      workspaceId,
+      type: "human_handover",
+      title: `Handover: ${contactName}`,
+      message: `The AI employee failed to reply to ${contactName} and handed the conversation to a human.`,
+      link: `/dashboard/inbox/${conversationId}`,
+    });
     return message;
   }
 }
 
-async function listConversations(workspaceId: string): Promise<ConversationListItem[]> {
+async function listConversations(workspaceId: string, filters?: ConversationFilters): Promise<ConversationListItem[]> {
   await channelRepository.ensureDefaultChannels(workspaceId);
-  return conversationRepository.findByWorkspaceId(workspaceId);
+  return conversationRepository.findByWorkspaceId(workspaceId, filters);
 }
 
 async function getConversation(workspaceId: string, conversationId: string) {
@@ -155,11 +177,12 @@ async function startConversation(workspaceId: string, input: StartConversationIn
     conversationId: conversation.id,
     senderType: "customer",
     content: input.initialMessage,
+    detectedIntent: detectIntent(input.initialMessage),
   });
-  await conversationRepository.touchLastMessage(conversation.id, workspaceId, previewOf(input.initialMessage));
+  await conversationRepository.touchLastMessage(conversation.id, workspaceId, previewOf(input.initialMessage), "customer");
   await automationService.dispatch(workspaceId, { type: "message_received", contactId: contact.id });
 
-  await triggerAiReply(workspaceId, conversation.id, contact.id);
+  await triggerAiReply(workspaceId, conversation.id, contact.id, contact.fullName);
 
   return { id: conversation.id };
 }
@@ -177,15 +200,25 @@ async function logCustomerMessage(workspaceId: string, conversationId: string, c
     conversationId,
     senderType: "customer",
     content,
+    detectedIntent: detectIntent(content),
   });
-  await conversationRepository.touchLastMessage(conversationId, workspaceId, previewOf(content));
+  await conversationRepository.touchLastMessage(conversationId, workspaceId, previewOf(content), "customer");
   await contactRepository.touchLastContact(item.contact.id, workspaceId);
   await automationService.dispatch(workspaceId, { type: "message_received", contactId: item.contact.id });
 
   if (item.conversation.aiStatus === "active") {
-    const replyMessage = await triggerAiReply(workspaceId, conversationId, item.contact.id);
+    const replyMessage = await triggerAiReply(workspaceId, conversationId, item.contact.id, item.contact.fullName);
     return [customerMessage, replyMessage];
   }
+
+  // AI isn't handling this conversation (paused/handed over) — a human needs to see this directly.
+  await notificationRepository.create({
+    workspaceId,
+    type: "new_message",
+    title: `New message: ${item.contact.fullName}`,
+    message: previewOf(content),
+    link: `/dashboard/inbox/${conversationId}`,
+  });
 
   return [customerMessage];
 }
@@ -210,7 +243,7 @@ async function sendAgentReply(
     senderUserId: userId,
     content,
   });
-  await conversationRepository.touchLastMessage(conversationId, workspaceId, previewOf(content));
+  await conversationRepository.touchLastMessage(conversationId, workspaceId, previewOf(content), "agent");
   await conversationRepository.assignIfUnassigned(conversationId, workspaceId, userId);
   await automationService.dispatch(workspaceId, { type: "message_replied", contactId: item.contact.id });
 
@@ -242,6 +275,105 @@ async function closeConversation(workspaceId: string, conversationId: string): P
   await conversationRepository.updateStatus(conversationId, workspaceId, "closed");
 }
 
+/** The un-archive counterpart to closeConversation — brings a closed conversation back into the active list. */
+async function reopenConversation(workspaceId: string, conversationId: string): Promise<void> {
+  const item = await conversationRepository.findById(conversationId, workspaceId);
+  if (!item) throw new AppError("NOT_FOUND", "Conversation not found.");
+
+  await conversationRepository.updateStatus(conversationId, workspaceId, "open");
+}
+
+async function setPinned(workspaceId: string, conversationId: string, pinned: boolean): Promise<void> {
+  const item = await conversationRepository.findById(conversationId, workspaceId);
+  if (!item) throw new AppError("NOT_FOUND", "Conversation not found.");
+
+  await conversationRepository.setPinned(conversationId, workspaceId, pinned);
+}
+
+async function setPriority(workspaceId: string, conversationId: string, priority: ConversationPriority): Promise<void> {
+  const item = await conversationRepository.findById(conversationId, workspaceId);
+  if (!item) throw new AppError("NOT_FOUND", "Conversation not found.");
+
+  await conversationRepository.setPriority(conversationId, workspaceId, priority);
+}
+
+/**
+ * A human assigning a conversation to a teammate — the manual counterpart to
+ * automation's own "assign_agent" action. Closes PART 5's automation-events
+ * gap: previously only an AI/automation-driven assignment dispatched
+ * anything, so a workflow could never react to a person doing the same thing.
+ */
+async function assignConversation(workspaceId: string, conversationId: string, userId: string): Promise<void> {
+  const item = await conversationRepository.findById(conversationId, workspaceId);
+  if (!item) throw new AppError("NOT_FOUND", "Conversation not found.");
+
+  const member = await membershipRepository.findByUserAndWorkspace(userId, workspaceId);
+  if (!member) throw new AppError("NOT_FOUND", "That team member is no longer part of this workspace.");
+
+  const assignedUser = await userRepository.findById(userId);
+  await conversationRepository.assign(conversationId, workspaceId, userId);
+  await activityRepository.log({
+    workspaceId,
+    contactId: item.contact.id,
+    type: "conversation_assigned",
+    actor: { type: "human", userId },
+    summary: `Conversation assigned to ${assignedUser?.email ?? "a team member"}.`,
+    link: `/dashboard/inbox/${conversationId}`,
+  });
+  await automationService.dispatch(workspaceId, { type: "conversation_assigned", contactId: item.contact.id });
+  await notificationRepository.create({
+    workspaceId,
+    type: "assignment",
+    title: `Assigned: ${item.contact.fullName}`,
+    message: `${item.contact.fullName}'s conversation was assigned to ${assignedUser?.email ?? "a team member"}.`,
+    link: `/dashboard/inbox/${conversationId}`,
+  });
+}
+
+/**
+ * Drafts a reply for a human agent to review/edit before sending — never
+ * auto-sent and never runs tools (same "no context = no tool-calling" path
+ * as the test-your-AI-employee screen), unlike triggerAiReply's autonomous
+ * send. Closes the Message Composer's "AI suggestion" gap.
+ */
+async function suggestReply(workspaceId: string, conversationId: string): Promise<string> {
+  const item = await conversationRepository.findById(conversationId, workspaceId);
+  if (!item) throw new AppError("NOT_FOUND", "Conversation not found.");
+
+  const history = await messageRepository.findByConversationId(conversationId, workspaceId);
+  const result = await aiService.generateReply(workspaceId, toChatHistory(history));
+  return result.text;
+}
+
+/**
+ * An explicit, immediate handover — distinct from pauseAi (a human is just
+ * temporarily taking over but the AI could resume) and from the AI's own
+ * needsHumanHandover path. Closes the Message Composer's "explicit hand to
+ * human" gap: previously the only manual control was pause/resume.
+ */
+async function handToHuman(workspaceId: string, conversationId: string, userId: string): Promise<void> {
+  const item = await conversationRepository.findById(conversationId, workspaceId);
+  if (!item) throw new AppError("NOT_FOUND", "Conversation not found.");
+
+  await conversationRepository.updateAiStatus(conversationId, workspaceId, "handed_over");
+  await automationService.dispatch(workspaceId, { type: "conversation_handed_over", contactId: item.contact.id });
+  await activityRepository.log({
+    workspaceId,
+    contactId: item.contact.id,
+    type: "conversation_handed_over",
+    actor: { type: "human", userId },
+    summary: "A team member took the conversation over from the AI.",
+    link: `/dashboard/inbox/${conversationId}`,
+  });
+  await notificationRepository.create({
+    workspaceId,
+    type: "human_handover",
+    title: `Handover: ${item.contact.fullName}`,
+    message: `A team member took ${item.contact.fullName}'s conversation over from the AI.`,
+    link: `/dashboard/inbox/${conversationId}`,
+  });
+}
+
 export const inboxService = {
   listConversations,
   getConversation,
@@ -251,4 +383,10 @@ export const inboxService = {
   resumeAi,
   pauseAi,
   closeConversation,
+  reopenConversation,
+  setPinned,
+  setPriority,
+  assignConversation,
+  suggestReply,
+  handToHuman,
 };

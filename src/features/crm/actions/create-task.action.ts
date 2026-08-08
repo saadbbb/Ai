@@ -1,7 +1,7 @@
 "use server";
 
 import type { Task } from "@/db/schema";
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { taskService } from "../services/task.service";
 import { createTaskSchema } from "../validation/schemas";
@@ -14,6 +14,7 @@ export async function createTaskAction(input: unknown): Promise<ActionResult<Tas
 
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireWorkspacePermission(user.id, workspace.id, "crm.records.manage");
 
   try {
     const task = await taskService.createTask(workspace.id, user.id, parsed.data);

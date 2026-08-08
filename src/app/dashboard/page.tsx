@@ -6,6 +6,7 @@ import { analyticsService } from "@/features/analytics/services/analytics.servic
 import { InsightsPanel } from "@/features/ai/components/insights-panel";
 import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { dashboardService, type AttentionItem } from "@/features/dashboard/services/dashboard.service";
+import { planRepository } from "@/features/platform-admin/repository/plan.repository";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { permissionService } from "@/features/workspace/services/permission.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -25,6 +26,8 @@ export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
   const tLeads = await getTranslations("leads");
   const tAnalytics = await getTranslations("analytics");
+  const tChannel = await getTranslations("inbox.thread.channel");
+  const tBilling = await getTranslations("billing");
 
   // Today and attention bands share the same authorization requirement (base workspace
   // membership, already verified above). Growth is independently re-verified below since
@@ -39,6 +42,20 @@ export default async function DashboardPage() {
   const myWork = isIndividualContributor ? await dashboardService.getMyWorkBand(workspace.id, user.id) : null;
 
   const growth = canViewGrowth ? await analyticsService.getSummary(workspace.id, resolveAnalyticsRange(undefined)) : null;
+
+  // PART 7 gap: Owner/Admin/Manager saw an identical dashboard — this "Business"
+  // band (subscription health + top performers) is Owner-only, the one piece of
+  // context the other management roles don't need day-to-day.
+  const isOwner = roleKey === "owner";
+  const [plan, teamPerformance] = await Promise.all([
+    isOwner && workspace.planId ? planRepository.findById(workspace.planId) : Promise.resolve(null),
+    isOwner ? analyticsService.getTeamPerformance(workspace.id, resolveAnalyticsRange(undefined)) : Promise.resolve([]),
+  ]);
+  const topChannel = growth
+    ? [...growth.conversationsByChannel].filter((row) => row.count > 0).sort((a, b) => b.count - a.count)[0]
+    : undefined;
+  const topProduct = growth?.revenueByProduct[0];
+  const topAgent = teamPerformance.length > 0 ? teamPerformance[0] : undefined;
 
   return (
     <div className="space-y-8">
@@ -119,6 +136,10 @@ export default async function DashboardPage() {
                 orderCompletion: tAnalytics("healthScore.breakdown.orderCompletion"),
                 appointmentCompletion: tAnalytics("healthScore.breakdown.appointmentCompletion"),
                 aiSuccess: tAnalytics("healthScore.breakdown.aiSuccess"),
+                responseTime: tAnalytics("healthScore.breakdown.responseTime"),
+                missedConversations: tAnalytics("healthScore.breakdown.missedConversations"),
+                automationSuccess: tAnalytics("healthScore.breakdown.automationSuccess"),
+                revenueTrend: tAnalytics("healthScore.breakdown.revenueTrend"),
               }}
             />
 
@@ -146,6 +167,25 @@ export default async function DashboardPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+      )}
+
+      {isOwner && (
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium">{t("bands.business.heading")}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatTile
+              label={t("bands.business.subscriptionStatus")}
+              value={tBilling(`statuses.${workspace.subscriptionStatus}`)}
+            />
+            <StatTile label={t("bands.business.plan")} value={plan?.name ?? t("bands.business.noPlan")} />
+            <StatTile
+              label={t("bands.business.topChannel")}
+              value={topChannel ? tChannel(topChannel.status) : "—"}
+            />
+            <StatTile label={t("bands.business.topProduct")} value={topProduct?.productName ?? "—"} />
+            <StatTile label={t("bands.business.topAgent")} value={topAgent?.email ?? "—"} />
           </div>
         </section>
       )}

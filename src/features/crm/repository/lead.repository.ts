@@ -42,6 +42,15 @@ export const leadRepository = {
       .orderBy(desc(leads.createdAt));
   },
 
+  async findById(id: string, workspaceId: string): Promise<Lead | null> {
+    const [lead] = await db
+      .select()
+      .from(leads)
+      .where(and(eq(leads.id, id), eq(leads.workspaceId, workspaceId)))
+      .limit(1);
+    return lead ?? null;
+  },
+
   async findByConversationId(conversationId: string, workspaceId: string): Promise<Lead | null> {
     const [lead] = await db
       .select()

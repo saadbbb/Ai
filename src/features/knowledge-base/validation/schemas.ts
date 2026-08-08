@@ -9,7 +9,17 @@ export const productEntrySchema = z.object({
   name: z.string().trim().min(1).max(200),
   description: z.string().trim().max(2000).optional(),
   price: z.coerce.number().nonnegative().optional(),
+  /** Only meaningful while <= price — validated as a business rule in the service, not here, since price may not be set yet either. */
+  discountedPrice: z.coerce.number().nonnegative().optional(),
+  category: z.string().trim().max(100).optional(),
   imageUrl: z.string().trim().url().max(2000).optional().or(z.literal("")),
+  /** One URL per line — same raw-text convention as imageUrl, no upload widget (see DEFERRED_TASKS.md). */
+  galleryImageUrlsText: z.string().trim().max(4000).optional(),
+  /** Comma-separated option names, e.g. "Small, Medium, Large" — no per-variant price override in this form yet. */
+  variantNamesText: z.string().trim().max(1000).optional(),
+  aiVisible: z.boolean().default(true),
+  featured: z.boolean().default(false),
+  promotionEndsAt: z.coerce.date().optional(),
 });
 
 export const serviceEntrySchema = z.object({

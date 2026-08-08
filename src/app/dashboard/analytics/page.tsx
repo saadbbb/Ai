@@ -10,17 +10,17 @@ import { analyticsService } from "@/features/analytics/services/analytics.servic
 import { requireFeature, requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 
 interface PageProps {
-  searchParams: Promise<{ range?: string }>;
+  searchParams: Promise<{ range?: string; from?: string; to?: string }>;
 }
 
 export default async function AnalyticsPage({ searchParams }: PageProps) {
-  const { range: rangeParam } = await searchParams;
+  const { range: rangeParam, from: fromParam, to: toParam } = await searchParams;
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
   await requireFeature(workspace, "analytics");
   await requireWorkspacePermission(user.id, workspace.id, "analytics.view");
 
-  const range = resolveAnalyticsRange(rangeParam);
+  const range = resolveAnalyticsRange(rangeParam, fromParam, toParam);
   const [summary, teamPerformance] = await Promise.all([
     analyticsService.getSummary(workspace.id, range),
     analyticsService.getTeamPerformance(workspace.id, range),
@@ -36,13 +36,20 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
   const exportLabels = { csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") };
 
   const rangeLabels: Record<AnalyticsRangeKey, string> = {
+    today: t("range.today"),
+    yesterday: t("range.yesterday"),
     "7d": t("range.7d"),
     "30d": t("range.30d"),
     "90d": t("range.90d"),
     month: t("range.month"),
+    custom: t("range.custom"),
   };
 
   const currency = (value: number) => value.toFixed(2);
+  const rangeQuery =
+    range.key === "custom"
+      ? `range=custom&from=${fromParam}&to=${toParam}`
+      : `range=${range.key}`;
 
   return (
     <div className="space-y-6">
@@ -51,7 +58,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           <h1 className="text-xl font-semibold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        <DateRangeSelect value={range.key} labels={rangeLabels} />
+        <DateRangeSelect value={range.key} labels={rangeLabels} applyLabel={t("range.apply")} from={fromParam} to={toParam} />
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -81,6 +88,10 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           orderCompletion: t("healthScore.breakdown.orderCompletion"),
           appointmentCompletion: t("healthScore.breakdown.appointmentCompletion"),
           aiSuccess: t("healthScore.breakdown.aiSuccess"),
+          responseTime: t("healthScore.breakdown.responseTime"),
+          missedConversations: t("healthScore.breakdown.missedConversations"),
+          automationSuccess: t("healthScore.breakdown.automationSuccess"),
+          revenueTrend: t("healthScore.breakdown.revenueTrend"),
         }}
       />
 
@@ -124,15 +135,104 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
 
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-sm font-medium">{t("depth.title")}</h2>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">{t("depth.salesReport")}</span>
+              <ExportButtons reportPath={`/api/reports/sales?${rangeQuery}`} labels={exportLabels} />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">{t("depth.customersReport")}</span>
+              <ExportButtons reportPath={`/api/reports/customers?${rangeQuery}`} labels={exportLabels} />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">{t("depth.channelsReport")}</span>
+              <ExportButtons reportPath={`/api/reports/channels?${rangeQuery}`} labels={exportLabels} />
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <StatTile label={t("depth.avgOrderValue")} value={summary.sales.avgOrderValue === null ? "—" : currency(summary.sales.avgOrderValue)} />
+          <StatTile
+            label={t("depth.salesGrowth")}
+            value={summary.sales.growthPercent === null ? "—" : `${Math.round(summary.sales.growthPercent)}%`}
+          />
+          <StatTile
+            label={t("depth.repeatCustomerRate")}
+            value={summary.sales.repeatCustomerRate === null ? "—" : `${Math.round(summary.sales.repeatCustomerRate * 100)}%`}
+          />
+          <StatTile label={t("depth.winRate")} value={summary.leads.winRate === null ? "—" : `${Math.round(summary.leads.winRate * 100)}%`} />
+          <StatTile
+            label={t("depth.aiHandoffRate")}
+            value={summary.ai.handoffRate === null ? "—" : `${Math.round(summary.ai.handoffRate * 100)}%`}
+          />
+          <StatTile
+            label={t("depth.avgResponseAi")}
+            value={summary.conversations.avgResponseSecondsAi === null ? "—" : t("depth.seconds", { count: Math.round(summary.conversations.avgResponseSecondsAi) })}
+          />
+          <StatTile
+            label={t("depth.avgResponseHuman")}
+            value={
+              summary.conversations.avgResponseSecondsHuman === null
+                ? "—"
+                : t("depth.minutes", { count: Math.round(summary.conversations.avgResponseSecondsHuman / 60) })
+            }
+          />
+          <StatTile
+            label={t("depth.avgAppointmentLeadTime")}
+            value={summary.appointments.avgLeadTimeHours === null ? "—" : t("depth.hours", { count: Math.round(summary.appointments.avgLeadTimeHours) })}
+          />
+          <StatTile label={t("depth.newCustomers")} value={summary.customers.newCount} />
+          <StatTile label={t("depth.returningCustomers")} value={summary.customers.returningCount} />
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <LineChartCard
+            title={t("charts.messagesByDay")}
+            data={summary.conversations.byDay.map((row) => ({ label: row.day.slice(5), value: row.value }))}
+            emptyMessage={t("charts.empty")}
+          />
+          <LineChartCard
+            title={t("charts.appointmentsByDay")}
+            data={summary.appointments.byDay.map((row) => ({ label: row.day.slice(5), value: row.value }))}
+            emptyMessage={t("charts.empty")}
+          />
+          <BarChartCard
+            title={t("charts.leadsByChannel")}
+            data={summary.leads.byChannel.map((row) => ({
+              label: row.channelType ? tChannel(row.channelType) : t("depth.direct"),
+              value: row.count,
+            }))}
+            emptyMessage={t("charts.empty")}
+          />
+          <BarChartCard
+            title={t("charts.revenueByChannel")}
+            data={summary.channels.revenue.map((row) => ({
+              label: row.channelType ? tChannel(row.channelType) : t("depth.direct"),
+              value: row.revenue,
+            }))}
+            emptyMessage={t("charts.empty")}
+            format="currency"
+          />
+          <BarChartCard
+            title={t("charts.topServices")}
+            data={summary.appointments.topServices.map((row) => ({ label: row.serviceName, value: row.count }))}
+            emptyMessage={t("charts.empty")}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-sm font-medium">{t("teamPerformance.title")}</h2>
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("teamPerformance.revenueReport")}</span>
-              <ExportButtons reportPath={`/api/reports/revenue?range=${range.key}`} labels={exportLabels} />
+              <ExportButtons reportPath={`/api/reports/revenue?${rangeQuery}`} labels={exportLabels} />
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("teamPerformance.title")}</span>
-              <ExportButtons reportPath={`/api/reports/team-performance?range=${range.key}`} labels={exportLabels} />
+              <ExportButtons reportPath={`/api/reports/team-performance?${rangeQuery}`} labels={exportLabels} />
             </div>
           </div>
         </div>

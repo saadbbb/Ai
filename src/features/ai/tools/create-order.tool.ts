@@ -24,7 +24,7 @@ const schema = z.object({
  * business information (see the safety instructions in the system prompt).
  */
 async function execute(context: ToolContext, input: z.infer<typeof schema>): Promise<string> {
-  const products = await productRepository.findByWorkspaceId(context.workspaceId);
+  const products = await productRepository.findVisibleToAi(context.workspaceId);
 
   const items = input.items.map((item) => {
     const matched = products.find((product) => product.name.toLowerCase() === item.productName.toLowerCase());
@@ -34,13 +34,14 @@ async function execute(context: ToolContext, input: z.infer<typeof schema>): Pro
         `"${item.productName}" isn't in the product catalog — ask the customer to choose from the listed products.`,
       );
     }
-    if (matched.price === null) {
+    const price = matched.discountedPrice ?? matched.price;
+    if (price === null) {
       throw new AppError(
         "VALIDATION_ERROR",
         `"${matched.name}" doesn't have a price set — ask a team member for pricing before placing this order.`,
       );
     }
-    return { productId: matched.id, name: matched.name, unitPrice: matched.price, quantity: item.quantity };
+    return { productId: matched.id, name: matched.name, unitPrice: price, quantity: item.quantity };
   });
 
   const order = await orderService.createOrder(

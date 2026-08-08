@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { type NewPlatformAdmin, type PlatformAdmin, platformAdmins } from "@/db/schema";
+import { type NewPlatformAdmin, type PlatformAdmin, type PlatformAdminRole, platformAdmins } from "@/db/schema";
 
 export const platformAdminRepository = {
   async findAll(): Promise<PlatformAdmin[]> {
@@ -31,5 +31,10 @@ export const platformAdminRepository = {
 
   async delete(id: string): Promise<void> {
     await db.delete(platformAdmins).where(eq(platformAdmins.id, id));
+  },
+
+  async updateRole(id: string, role: PlatformAdminRole): Promise<PlatformAdmin | null> {
+    const [row] = await db.update(platformAdmins).set({ role }).where(eq(platformAdmins.id, id)).returning();
+    return row ?? null;
   },
 };

@@ -48,6 +48,12 @@ async function inviteMember(
   email: string,
   roleId: string,
 ): Promise<{ invitation: Invitation; link: string }> {
+  const targetRole = await roleRepository.findById(roleId);
+  if (!targetRole) throw new AppError("VALIDATION_ERROR", "That role doesn't exist.");
+  if (targetRole.key === "owner") {
+    throw new AppError("VALIDATION_ERROR", "The owner role can't be assigned through an invitation.");
+  }
+
   const existingInvite = await invitationRepository.findPendingByEmail(workspace.id, email);
   if (existingInvite) {
     throw new AppError("VALIDATION_ERROR", "This email already has a pending invitation.");
@@ -110,9 +116,13 @@ async function updateMemberRole(workspaceId: string, memberId: string, roleId: s
   if (!target) throw new AppError("NOT_FOUND", "Member not found.");
   if (target.role.key === "owner") throw new AppError("VALIDATION_ERROR", "The workspace owner's role can't be changed.");
 
-  await membershipRepository.updateRole(memberId, workspaceId, roleId);
-
   const newRole = await roleRepository.findById(roleId);
+  if (!newRole) throw new AppError("VALIDATION_ERROR", "That role doesn't exist.");
+  if (newRole.key === "owner") {
+    throw new AppError("VALIDATION_ERROR", "Ownership can't be granted by changing a member's role.");
+  }
+
+  await membershipRepository.updateRole(memberId, workspaceId, roleId);
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,

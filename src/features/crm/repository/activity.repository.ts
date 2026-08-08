@@ -38,4 +38,14 @@ export const activityRepository = {
       .where(and(eq(activities.contactId, contactId), eq(activities.workspaceId, workspaceId)))
       .orderBy(desc(activities.createdAt));
   },
+
+  /** Every CRM activity across the whole workspace (not scoped to one contact) — feeds the unified activity log. */
+  async findByWorkspaceId(workspaceId: string, limit = 200): Promise<Activity[]> {
+    return db
+      .select()
+      .from(activities)
+      .where(eq(activities.workspaceId, workspaceId))
+      .orderBy(desc(activities.createdAt))
+      .limit(limit);
+  },
 };

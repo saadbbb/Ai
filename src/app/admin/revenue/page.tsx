@@ -1,54 +1,94 @@
 import { getTranslations } from "next-intl/server";
+import { ExportButtons } from "@/components/export-buttons";
 import { StatTile } from "@/features/dashboard/components/stat-tile";
-import { calculateRevenue } from "@/features/platform-admin/lib/revenue";
-import { workspaceAdminRepository } from "@/features/platform-admin/repository/workspace-admin.repository";
+import { revenueService } from "@/features/platform-admin/services/revenue.service";
 
-function formatIqd(amount: number): string {
-  return `${amount.toLocaleString("en-US", { maximumFractionDigits: 0 })} IQD`;
+function formatAmount(amount: number, currency: string): string {
+  return `${amount.toLocaleString("en-US", { maximumFractionDigits: 0 })} ${currency}`;
 }
 
 export default async function AdminRevenuePage() {
-  const t = await getTranslations("platformAdmin.revenue");
-
-  const subscriptions = await workspaceAdminRepository.findActiveWithPlan();
-  const summary = calculateRevenue(subscriptions);
-  const unpricedCount = summary.activeSubscriptionCount - summary.pricedSubscriptionCount;
+  const [t, tCommon] = await Promise.all([
+    getTranslations("platformAdmin.revenue"),
+    getTranslations("common"),
+  ]);
+  const dashboard = await revenueService.getDashboard();
+  const exportLabels = { csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("description")}</p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">{t("reports.subscriptions")}</span>
+          <ExportButtons reportPath="/api/admin/reports/billing?type=subscriptions" labels={exportLabels} />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">{t("reports.invoices")}</span>
+          <ExportButtons reportPath="/api/admin/reports/billing?type=invoices" labels={exportLabels} />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">{t("reports.refunds")}</span>
+          <ExportButtons reportPath="/api/admin/reports/billing?type=refunds" labels={exportLabels} />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile label={t("mrr")} value={formatIqd(summary.mrr)} />
-        <StatTile label={t("arr")} value={formatIqd(summary.arr)} />
-        <StatTile label={t("activeSubscriptions")} value={summary.activeSubscriptionCount} />
-        <StatTile label={t("unpriced")} value={unpricedCount} />
+        <StatTile label={t("newSubscriptions", { days: dashboard.periodDays })} value={dashboard.newSubscriptions} />
+        <StatTile label={t("renewals", { days: dashboard.periodDays })} value={dashboard.renewals} />
+        <StatTile label={t("cancellations", { days: dashboard.periodDays })} value={dashboard.cancellations} />
+        <StatTile label={t("churnRate")} value={`${dashboard.churnRate}%`} />
+        <StatTile label={t("trialConversionRate")} value={`${dashboard.trialConversionRate}%`} />
+        <StatTile label={t("paymentFailures", { days: dashboard.periodDays })} value={dashboard.paymentFailures} />
       </div>
 
-      {unpricedCount > 0 && <p className="text-sm text-muted-foreground">{t("unpricedHint")}</p>}
+      {dashboard.byCurrency.length === 0 ? (
+        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+          {t("emptyState")}
+        </p>
+      ) : (
+        <div className="space-y-6">
+          {dashboard.byCurrency.map((summary) => {
+            const ltv = dashboard.ltvByCurrency.find((row) => row.currency === summary.currency);
+            const unpriced = summary.activeSubscriptionCount - summary.pricedSubscriptionCount;
 
-      <div className="space-y-3">
-        <h2 className="text-sm font-medium">{t("byPlanHeading")}</h2>
-        {summary.byPlan.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            {t("emptyState")}
-          </p>
-        ) : (
-          <div className="divide-y rounded-lg border">
-            {summary.byPlan.map((row) => (
-              <div key={row.planName} className="flex items-center justify-between gap-4 p-3 text-sm">
-                <span className="truncate font-medium">{row.planName}</span>
-                <span className="shrink-0 text-muted-foreground">
-                  {t("planSubscriptions", { count: row.subscriptionCount })} · {formatIqd(row.mrr)}
-                </span>
+            return (
+              <div key={summary.currency} className="space-y-3 rounded-lg border p-4">
+                <h2 className="text-sm font-medium">{summary.currency}</h2>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <StatTile label={t("mrr")} value={formatAmount(summary.mrr, summary.currency)} />
+                  <StatTile label={t("arr")} value={formatAmount(summary.arr, summary.currency)} />
+                  <StatTile label={t("arpu")} value={formatAmount(summary.arpu, summary.currency)} />
+                  <StatTile label={t("ltv")} value={formatAmount(ltv?.ltv ?? 0, summary.currency)} />
+                  <StatTile label={t("activeSubscriptions")} value={summary.activeSubscriptionCount} />
+                  <StatTile label={t("unpriced")} value={unpriced} />
+                </div>
+                {unpriced > 0 && <p className="text-sm text-muted-foreground">{t("unpricedHint")}</p>}
+
+                <div className="space-y-2">
+                  <h3 className="text-xs font-medium text-muted-foreground">{t("byPlanHeading")}</h3>
+                  <div className="divide-y rounded-lg border">
+                    {summary.byPlan.map((row) => (
+                      <div key={row.planName} className="flex items-center justify-between gap-4 p-3 text-sm">
+                        <span className="truncate font-medium">{row.planName}</span>
+                        <span className="shrink-0 text-muted-foreground">
+                          {t("planSubscriptions", { count: row.subscriptionCount })} · {formatAmount(row.mrr, summary.currency)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

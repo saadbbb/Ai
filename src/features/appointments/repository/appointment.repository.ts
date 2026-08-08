@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNull, lte } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   type Appointment,
@@ -8,6 +8,8 @@ import {
   contacts,
   type NewAppointment,
 } from "@/db/schema";
+
+const REMINDABLE_STATUSES: AppointmentStatus[] = ["scheduled", "confirmed"];
 
 export interface AppointmentListItem {
   appointment: Appointment;
@@ -67,5 +69,30 @@ export const appointmentRepository = {
       .from(appointments)
       .where(and(eq(appointments.workspaceId, workspaceId), inArray(appointments.contactId, contactIds)));
     return new Set(rows.map((row) => row.contactId));
+  },
+
+  /**
+   * Cross-tenant by design (cron-only, same pattern as
+   * leadRepository.findStaleOpenLeads) — finds every not-yet-reminded
+   * scheduled/confirmed appointment whose time falls inside the given
+   * window, regardless of workspace.
+   */
+  async findDueForReminder(from: Date, to: Date): Promise<AppointmentListItem[]> {
+    return db
+      .select(listSelection)
+      .from(appointments)
+      .innerJoin(contacts, eq(appointments.contactId, contacts.id))
+      .where(
+        and(
+          inArray(appointments.status, REMINDABLE_STATUSES),
+          isNull(appointments.reminderSentAt),
+          gte(appointments.scheduledAt, from),
+          lte(appointments.scheduledAt, to),
+        ),
+      );
+  },
+
+  async markReminderSent(id: string): Promise<void> {
+    await db.update(appointments).set({ reminderSentAt: new Date() }).where(eq(appointments.id, id));
   },
 };

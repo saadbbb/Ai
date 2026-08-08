@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ExportButtons } from "@/components/export-buttons";
 import { Input } from "@/components/ui/input";
 import { OrderStatusSelect } from "@/features/orders/components/order-status-select";
-import { orderTotal } from "@/features/orders/lib/order-total";
+import { orderGrandTotal } from "@/features/orders/lib/order-total";
 import { orderService } from "@/features/orders/services/order.service";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
@@ -55,7 +55,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
               <Link href={`/dashboard/orders/${order.id}`} className="min-w-0 flex-1">
                 <p className="truncate font-medium hover:underline">{contact.fullName}</p>
                 <p className="text-sm text-muted-foreground">
-                  {t("itemCount", { count: items.length })} · {orderTotal(items).toFixed(2)}
+                  {t("itemCount", { count: items.length })} · {orderGrandTotal(items, order).toFixed(2)}
                 </p>
               </Link>
               <div className="w-40 shrink-0">

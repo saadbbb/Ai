@@ -1,7 +1,7 @@
-"use server";
+﻿"use server";
 
 import type { PlatformAdmin } from "@/db/schema";
-import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
+import { requireWritePlatformAdmin } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, AppError, type ActionResult } from "@/lib/errors/app-error";
 import { auditLogRepository } from "../repository/audit-log.repository";
 import { platformAdminRepository } from "../repository/platform-admin.repository";
@@ -13,7 +13,7 @@ export async function addPlatformAdminAction(input: unknown): Promise<ActionResu
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
 
-  const admin = await requirePlatformAdmin();
+  const admin = await requireWritePlatformAdmin();
 
   try {
     const existing = await platformAdminRepository.findByEmail(parsed.data.email);
@@ -23,6 +23,7 @@ export async function addPlatformAdminAction(input: unknown): Promise<ActionResu
 
     const created = await platformAdminRepository.create({
       email: parsed.data.email,
+      role: parsed.data.role ?? "administrator",
       addedByEmail: admin.email,
     });
 
@@ -32,7 +33,7 @@ export async function addPlatformAdminAction(input: unknown): Promise<ActionResu
       action: "platform_admin_added",
       targetType: "platform_admin",
       targetId: created.id,
-      summary: `Granted platform admin access to ${created.email}.`,
+      summary: `Granted platform admin access to ${created.email} as "${created.role}".`,
     });
 
     return actionOk(created);

@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { noteService } from "../services/note.service";
 import { deleteNoteSchema } from "../validation/schemas";
@@ -13,6 +13,7 @@ export async function deleteNoteAction(input: unknown): Promise<ActionResult<und
 
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireWorkspacePermission(user.id, workspace.id, "crm.records.manage");
 
   try {
     await noteService.deleteNote(workspace.id, parsed.data.noteId);

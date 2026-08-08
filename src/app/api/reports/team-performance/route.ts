@@ -11,7 +11,11 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const format = parseReportFormat(url.searchParams.get("format"));
-  const range = resolveAnalyticsRange(url.searchParams.get("range") ?? undefined);
+  const range = resolveAnalyticsRange(
+    url.searchParams.get("range") ?? undefined,
+    url.searchParams.get("from") ?? undefined,
+    url.searchParams.get("to") ?? undefined,
+  );
   const rows = await analyticsService.getTeamPerformance(workspace.id, range);
 
   return reportResponse(

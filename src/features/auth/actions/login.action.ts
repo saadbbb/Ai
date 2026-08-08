@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { workspaceService } from "@/features/workspace/services/workspace.service";
+import { workspaceAuditLogRepository } from "@/features/workspace/repository/workspace-audit-log.repository";
 import { LOCALE_COOKIE_NAME } from "@/i18n/config";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -36,6 +37,21 @@ export async function loginAction(input: unknown): Promise<ActionResult> {
           maxAge: 60 * 60 * 24 * 365,
           sameSite: "lax",
         });
+
+        // Best-effort, same reasoning as the cookie/profile sync above — a logging
+        // failure must never turn an otherwise-successful login into an error.
+        try {
+          await workspaceAuditLogRepository.log({
+            workspaceId: workspace.id,
+            actorUserId: user.id,
+            actorEmail: user.email,
+            action: "login",
+            targetType: "session",
+            summary: `${user.email} logged in.`,
+          });
+        } catch (error) {
+          console.error("[login] failed to write audit log:", error);
+        }
       }
     }
 

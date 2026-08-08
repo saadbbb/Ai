@@ -106,11 +106,43 @@ describe("subscriptionCheckService.runDailyCheck", () => {
     expect(notificationRepository.create).not.toHaveBeenCalled();
   });
 
-  it("suspends a workspace whose expiry has passed and notifies it, trial or not", async () => {
+  it("moves a freshly-expired workspace to past_due (not suspended) and notifies it", async () => {
+    const workspace = makeWorkspace({
+      subscriptionExpiresAt: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago -> day 0
+    });
+    vi.mocked(workspaceAdminRepository.findActiveWithExpiry).mockResolvedValue([workspace]);
+
+    const result = await subscriptionCheckService.runDailyCheck();
+
+    expect(result.statusChanges).toBe(1);
+    expect(result.suspended).toBe(0);
+    expect(workspaceAdminRepository.updateSubscriptionStatus).toHaveBeenCalledWith("workspace-1", "past_due");
+    expect(notificationRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "subscription_expiring", title: expect.stringContaining("overdue") }),
+    );
+  });
+
+  it("moves a workspace 3 days past expiry into grace", async () => {
+    const workspace = makeWorkspace({
+      subscriptionStatus: "past_due",
+      subscriptionExpiresAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    });
+    vi.mocked(workspaceAdminRepository.findActiveWithExpiry).mockResolvedValue([workspace]);
+
+    await subscriptionCheckService.runDailyCheck();
+
+    expect(workspaceAdminRepository.updateSubscriptionStatus).toHaveBeenCalledWith("workspace-1", "grace");
+    expect(notificationRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ title: expect.stringContaining("Final notice") }),
+    );
+  });
+
+  it("suspends a workspace 7+ days past expiry, using trial wording when it never had a plan", async () => {
     const trialWorkspace = makeWorkspace({
       id: "workspace-trial",
-      subscriptionStatus: "trial",
-      subscriptionExpiresAt: new Date(Date.now() - 60 * 60 * 1000),
+      subscriptionStatus: "grace",
+      planId: null,
+      subscriptionExpiresAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     });
     vi.mocked(workspaceAdminRepository.findActiveWithExpiry).mockResolvedValue([trialWorkspace]);
 
@@ -123,10 +155,53 @@ describe("subscriptionCheckService.runDailyCheck", () => {
     );
   });
 
+  it("uses paid-subscription wording when suspending a workspace that had a plan", async () => {
+    const workspace = makeWorkspace({
+      subscriptionStatus: "grace",
+      planId: "plan-1",
+      subscriptionExpiresAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    });
+    vi.mocked(workspaceAdminRepository.findActiveWithExpiry).mockResolvedValue([workspace]);
+
+    await subscriptionCheckService.runDailyCheck();
+
+    expect(notificationRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "subscription_suspended", title: expect.stringContaining("subscription has been suspended") }),
+    );
+  });
+
+  it("does not re-notify a workspace already in the correct lifecycle stage", async () => {
+    const workspace = makeWorkspace({
+      subscriptionStatus: "past_due",
+      subscriptionExpiresAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // day 1, already past_due
+    });
+    vi.mocked(workspaceAdminRepository.findActiveWithExpiry).mockResolvedValue([workspace]);
+
+    const result = await subscriptionCheckService.runDailyCheck();
+
+    expect(result.statusChanges).toBe(0);
+    expect(workspaceAdminRepository.updateSubscriptionStatus).not.toHaveBeenCalled();
+    expect(notificationRepository.create).not.toHaveBeenCalled();
+  });
+
+  it("moves a long-suspended workspace to expired silently (no new notification)", async () => {
+    const workspace = makeWorkspace({
+      subscriptionStatus: "suspended",
+      subscriptionExpiresAt: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000), // 100 days past expiry
+    });
+    vi.mocked(workspaceAdminRepository.findActiveWithExpiry).mockResolvedValue([workspace]);
+
+    const result = await subscriptionCheckService.runDailyCheck();
+
+    expect(workspaceAdminRepository.updateSubscriptionStatus).toHaveBeenCalledWith("workspace-1", "expired");
+    expect(result.suspended).toBe(0);
+    expect(notificationRepository.create).not.toHaveBeenCalled();
+  });
+
   it("continues past a single workspace's failure without throwing", async () => {
     vi.mocked(workspaceAdminRepository.findActiveWithExpiry).mockResolvedValue([
-      makeWorkspace({ id: "workspace-bad", subscriptionExpiresAt: new Date(Date.now() - 1000) }),
-      makeWorkspace({ id: "workspace-good", subscriptionExpiresAt: new Date(Date.now() - 1000) }),
+      makeWorkspace({ id: "workspace-bad", subscriptionExpiresAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000) }),
+      makeWorkspace({ id: "workspace-good", subscriptionExpiresAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000) }),
     ]);
     vi.mocked(workspaceAdminRepository.updateSubscriptionStatus)
       .mockRejectedValueOnce(new Error("db down"))

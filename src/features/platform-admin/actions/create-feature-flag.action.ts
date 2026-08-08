@@ -1,7 +1,7 @@
-"use server";
+﻿"use server";
 
 import type { FeatureFlag } from "@/db/schema";
-import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
+import { requireWritePlatformAdmin } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, AppError, type ActionResult } from "@/lib/errors/app-error";
 import { auditLogRepository } from "../repository/audit-log.repository";
 import { featureFlagRepository } from "../repository/feature-flag.repository";
@@ -13,7 +13,7 @@ export async function createFeatureFlagAction(input: unknown): Promise<ActionRes
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
 
-  const admin = await requirePlatformAdmin();
+  const admin = await requireWritePlatformAdmin();
 
   try {
     const existing = await featureFlagRepository.findByKey(parsed.data.key);

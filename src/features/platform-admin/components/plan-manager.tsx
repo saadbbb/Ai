@@ -6,10 +6,23 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { billingCycleEnum, type BillingCycle, type Plan } from "@/db/schema";
+import { billingCycleEnum, currencyEnum, type BillingCycle, type Currency, type Plan } from "@/db/schema";
 import { deletePlanAction } from "../actions/delete-plan.action";
 import { savePlanAction } from "../actions/save-plan.action";
 import { FEATURE_KEYS, type FeatureKey } from "../lib/features";
+
+const LIMIT_KEYS = [
+  "maxUsers",
+  "maxAiAgents",
+  "maxChannels",
+  "maxConversationsPerMonth",
+  "maxStorageMb",
+  "maxKnowledgeFiles",
+  "maxAutomationWorkflows",
+  "maxApiCallsPerMonth",
+  "maxIntegrations",
+] as const;
+type LimitKey = (typeof LIMIT_KEYS)[number];
 
 interface Draft {
   name: string;
@@ -17,7 +30,21 @@ interface Draft {
   defaultDurationDays: string;
   enabledFeatures: FeatureKey[];
   price: string;
+  currency: Currency;
+  limits: Record<LimitKey, string>;
 }
+
+const emptyLimits: Record<LimitKey, string> = {
+  maxUsers: "",
+  maxAiAgents: "",
+  maxChannels: "",
+  maxConversationsPerMonth: "",
+  maxStorageMb: "",
+  maxKnowledgeFiles: "",
+  maxAutomationWorkflows: "",
+  maxApiCallsPerMonth: "",
+  maxIntegrations: "",
+};
 
 const emptyDraft: Draft = {
   name: "",
@@ -25,7 +52,36 @@ const emptyDraft: Draft = {
   defaultDurationDays: "30",
   enabledFeatures: [],
   price: "",
+  currency: "IQD",
+  limits: { ...emptyLimits },
 };
+
+function draftFromPlan(plan: Plan): Draft {
+  return {
+    name: plan.name,
+    billingCycle: plan.billingCycle,
+    defaultDurationDays: String(plan.defaultDurationDays),
+    enabledFeatures: plan.enabledFeatures as FeatureKey[],
+    price: plan.price ?? "",
+    currency: plan.currency,
+    limits: Object.fromEntries(LIMIT_KEYS.map((key) => [key, plan[key] != null ? String(plan[key]) : ""])) as Record<LimitKey, string>,
+  };
+}
+
+function toActionInput(draft: Draft) {
+  const limitEntries = Object.fromEntries(
+    LIMIT_KEYS.map((key) => [key, draft.limits[key].trim() ? draft.limits[key].trim() : undefined]),
+  );
+  return {
+    name: draft.name,
+    billingCycle: draft.billingCycle,
+    defaultDurationDays: draft.defaultDurationDays,
+    enabledFeatures: draft.enabledFeatures,
+    price: draft.price.trim() || undefined,
+    currency: draft.currency,
+    ...limitEntries,
+  };
+}
 
 function FeatureCheckboxes({
   t,
@@ -52,6 +108,35 @@ function FeatureCheckboxes({
   );
 }
 
+function LimitInputs({
+  t,
+  limits,
+  onChange,
+}: {
+  t: ReturnType<typeof useTranslations>;
+  limits: Record<LimitKey, string>;
+  onChange: (next: Record<LimitKey, string>) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{t("limitsHeading")}</p>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {LIMIT_KEYS.map((key) => (
+          <Input
+            key={key}
+            type="number"
+            min="1"
+            value={limits[key]}
+            onChange={(event) => onChange({ ...limits, [key]: event.target.value })}
+            placeholder={t(`limits.${key}`)}
+          />
+        ))}
+      </div>
+      <p className="text-xs text-muted-foreground">{t("limitsHint")}</p>
+    </div>
+  );
+}
+
 export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
   const t = useTranslations("platformAdmin.plans");
   const tCommon = useTranslations("common");
@@ -63,18 +148,12 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
 
   function startEdit(plan: Plan) {
     setEditingId(plan.id);
-    setEditDraft({
-      name: plan.name,
-      billingCycle: plan.billingCycle,
-      defaultDurationDays: String(plan.defaultDurationDays),
-      enabledFeatures: plan.enabledFeatures as FeatureKey[],
-      price: plan.price ?? "",
-    });
+    setEditDraft(draftFromPlan(plan));
   }
 
   async function saveEdit(id: string) {
     setIsSaving(true);
-    const result = await savePlanAction({ id, ...editDraft, price: editDraft.price.trim() || undefined });
+    const result = await savePlanAction({ id, ...toActionInput(editDraft) });
     setIsSaving(false);
 
     if (!result.success) {
@@ -102,7 +181,7 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
     if (!newDraft.name.trim()) return;
 
     setIsSaving(true);
-    const result = await savePlanAction({ ...newDraft, price: newDraft.price.trim() || undefined });
+    const result = await savePlanAction(toActionInput(newDraft));
     setIsSaving(false);
 
     if (!result.success) {
@@ -112,6 +191,12 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
 
     setPlans((current) => [...current, result.data]);
     setNewDraft(emptyDraft);
+  }
+
+  function limitsSummary(plan: Plan): string {
+    const set = LIMIT_KEYS.filter((key) => plan[key] != null);
+    if (set.length === 0) return t("noLimitsSet");
+    return set.map((key) => `${t(`limits.${key}`)}: ${plan[key]}`).join(" · ");
   }
 
   return (
@@ -148,19 +233,34 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
                 placeholder={t("daysPlaceholder")}
               />
             </div>
-            <Input
-              type="number"
-              min="0"
-              step="0.01"
-              value={editDraft.price}
-              onChange={(event) => setEditDraft({ ...editDraft, price: event.target.value })}
-              placeholder={t("pricePlaceholder")}
-            />
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={editDraft.price}
+                onChange={(event) => setEditDraft({ ...editDraft, price: event.target.value })}
+                placeholder={t("pricePlaceholder")}
+              />
+              <Select value={editDraft.currency} onValueChange={(value) => setEditDraft({ ...editDraft, currency: value as Currency })}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {currencyEnum.enumValues.map((currency) => (
+                    <SelectItem key={currency} value={currency}>
+                      {currency}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <FeatureCheckboxes
               t={t}
               selected={editDraft.enabledFeatures}
               onChange={(next) => setEditDraft({ ...editDraft, enabledFeatures: next })}
             />
+            <LimitInputs t={t} limits={editDraft.limits} onChange={(next) => setEditDraft({ ...editDraft, limits: next })} />
             <div className="flex justify-end gap-2">
               <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)}>
                 {tCommon("cancel")}
@@ -185,6 +285,7 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
                   ? t("noFeatures")
                   : plan.enabledFeatures.map((key) => t(`features.${key}`)).join(", ")}
               </p>
+              <p className="text-sm text-muted-foreground">{limitsSummary(plan)}</p>
             </div>
             <div className="flex shrink-0 gap-1">
               <Button type="button" variant="ghost" size="sm" onClick={() => startEdit(plan)}>
@@ -228,19 +329,34 @@ export function PlanManager({ initialPlans }: { initialPlans: Plan[] }) {
             placeholder={t("daysPlaceholder")}
           />
         </div>
-        <Input
-          type="number"
-          min="0"
-          step="0.01"
-          value={newDraft.price}
-          onChange={(event) => setNewDraft({ ...newDraft, price: event.target.value })}
-          placeholder={t("pricePlaceholder")}
-        />
+        <div className="grid grid-cols-2 gap-2">
+          <Input
+            type="number"
+            min="0"
+            step="0.01"
+            value={newDraft.price}
+            onChange={(event) => setNewDraft({ ...newDraft, price: event.target.value })}
+            placeholder={t("pricePlaceholder")}
+          />
+          <Select value={newDraft.currency} onValueChange={(value) => setNewDraft({ ...newDraft, currency: value as Currency })}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {currencyEnum.enumValues.map((currency) => (
+                <SelectItem key={currency} value={currency}>
+                  {currency}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <FeatureCheckboxes
           t={t}
           selected={newDraft.enabledFeatures}
           onChange={(next) => setNewDraft({ ...newDraft, enabledFeatures: next })}
         />
+        <LimitInputs t={t} limits={newDraft.limits} onChange={(next) => setNewDraft({ ...newDraft, limits: next })} />
         <div className="flex justify-end">
           <Button type="button" variant="outline" size="sm" disabled={isSaving} onClick={handleAdd}>
             {t("addPlan")}

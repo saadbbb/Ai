@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { orderStatusEnum } from "@/db/schema";
+import { orderDeliveryMethodEnum, orderPaymentMethodEnum, orderStatusEnum } from "@/db/schema";
 
 export const orderItemInputSchema = z.object({
   productId: z.string().uuid().optional(),
@@ -8,12 +8,31 @@ export const orderItemInputSchema = z.object({
   quantity: z.coerce.number().int().positive(),
 });
 
-export const createOrderSchema = z.object({
-  contactId: z.string().uuid(),
-  conversationId: z.string().uuid().optional(),
-  notes: z.string().trim().max(2000).optional(),
-  items: z.array(orderItemInputSchema).min(1),
-});
+const moneyAmountSchema = z.coerce
+  .number()
+  .nonnegative()
+  .default(0)
+  .transform((value) => value.toFixed(2));
+
+export const createOrderSchema = z
+  .object({
+    contactId: z.string().uuid(),
+    conversationId: z.string().uuid().optional(),
+    notes: z.string().trim().max(2000).optional(),
+    items: z.array(orderItemInputSchema).min(1),
+    discountAmount: moneyAmountSchema,
+    taxAmount: moneyAmountSchema,
+    deliveryFee: moneyAmountSchema,
+    paymentMethod: z.enum(orderPaymentMethodEnum.enumValues).optional(),
+    deliveryMethod: z.enum(orderDeliveryMethodEnum.enumValues).optional(),
+  })
+  .refine(
+    (data) => {
+      const subtotal = data.items.reduce((sum, item) => sum + Number.parseFloat(item.unitPrice) * item.quantity, 0);
+      return Number.parseFloat(data.discountAmount) <= subtotal;
+    },
+    { message: "The discount can't be larger than the order's subtotal.", path: ["discountAmount"] },
+  );
 
 export const updateOrderStatusSchema = z.object({
   orderId: z.string().uuid(),

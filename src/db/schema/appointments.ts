@@ -2,6 +2,7 @@ import { index, integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-
 import { contacts } from "./contacts";
 import { conversations } from "./conversations";
 import { services } from "./services";
+import { users } from "./users";
 import { workspaces } from "./workspaces";
 
 export const appointmentStatusEnum = pgEnum("appointment_status", [
@@ -30,6 +31,10 @@ export const appointments = pgTable(
     scheduledAt: timestamp("scheduled_at", { withTimezone: true }).notNull(),
     durationMinutes: integer("duration_minutes").notNull().default(30),
     status: appointmentStatusEnum("status").notNull().default("scheduled"),
+    assignedToUserId: uuid("assigned_to_user_id").references(() => users.id, { onDelete: "set null" }),
+    // Set once a reminder has gone out so the daily cron never reminds twice
+    // for the same appointment — same pattern as leads.lastFollowupNotifiedAt.
+    reminderSentAt: timestamp("reminder_sent_at", { withTimezone: true }),
     notes: text("notes"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -38,6 +43,7 @@ export const appointments = pgTable(
     index("appointments_workspace_id_idx").on(table.workspaceId),
     index("appointments_contact_id_idx").on(table.contactId),
     index("appointments_scheduled_at_idx").on(table.scheduledAt),
+    index("appointments_assigned_to_user_id_idx").on(table.assignedToUserId),
   ],
 );
 

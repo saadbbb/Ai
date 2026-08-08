@@ -20,6 +20,7 @@ export const tasks = pgTable(
     status: taskStatusEnum("status").notNull().default("open"),
     assignedToUserId: uuid("assigned_to_user_id").references(() => users.id, { onDelete: "set null" }),
     createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    reminderSentAt: timestamp("reminder_sent_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

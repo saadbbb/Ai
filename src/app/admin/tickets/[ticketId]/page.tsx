@@ -2,9 +2,12 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminTicketReplyForm } from "@/features/support/components/admin-ticket-reply-form";
+import { TicketAssigneeSelect } from "@/features/support/components/ticket-assignee-select";
+import { TicketCategorySelect } from "@/features/support/components/ticket-category-select";
 import { TicketStatusSelect } from "@/features/support/components/ticket-status-select";
 import { TicketThread } from "@/features/support/components/ticket-thread";
 import { ticketAdminService } from "@/features/support/services/ticket-admin.service";
+import { platformAdminService } from "@/features/platform-admin/services/platform-admin.service";
 import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
 import { AppError } from "@/lib/errors/app-error";
 
@@ -25,6 +28,7 @@ export default async function AdminTicketDetailPage({ params }: PageProps) {
     throw error;
   }
   const { ticket, workspaceName, messages } = data;
+  const admins = await platformAdminService.listAssignableAdmins();
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -39,9 +43,18 @@ export default async function AdminTicketDetailPage({ params }: PageProps) {
           </div>
           <TicketStatusSelect ticketId={ticket.id} initialStatus={ticket.status} />
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <TicketCategorySelect ticketId={ticket.id} initialCategory={ticket.category} />
+          <TicketAssigneeSelect ticketId={ticket.id} initialAssigneeUserId={ticket.assignedAdminUserId} admins={admins} />
+        </div>
       </div>
 
-      <TicketThread messages={messages} tenantLabel={workspaceName} adminLabel={t("thread.supportTeam")} />
+      <TicketThread
+        messages={messages}
+        tenantLabel={workspaceName}
+        adminLabel={t("thread.supportTeam")}
+        internalNoteLabel={t("thread.internalNote")}
+      />
       <AdminTicketReplyForm ticketId={ticket.id} />
     </div>
   );

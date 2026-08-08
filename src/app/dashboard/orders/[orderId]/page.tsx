@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OrderStatusSelect } from "@/features/orders/components/order-status-select";
-import { orderTotal } from "@/features/orders/lib/order-total";
+import { orderGrandTotal, orderSubtotal } from "@/features/orders/lib/order-total";
 import { orderService } from "@/features/orders/services/order.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 import { AppError } from "@/lib/errors/app-error";
@@ -52,11 +52,42 @@ export default async function OrderDetailPage({ params }: PageProps) {
             <span className="text-muted-foreground">{(Number.parseFloat(item.unitPrice) * item.quantity).toFixed(2)}</span>
           </div>
         ))}
+        <div className="space-y-1 p-3 text-sm text-muted-foreground">
+          <div className="flex items-center justify-between">
+            <span>{t("subtotalHeading")}</span>
+            <span>{orderSubtotal(items).toFixed(2)}</span>
+          </div>
+          {Number.parseFloat(order.discountAmount) > 0 && (
+            <div className="flex items-center justify-between">
+              <span>{t("discountHeading")}</span>
+              <span>-{Number.parseFloat(order.discountAmount).toFixed(2)}</span>
+            </div>
+          )}
+          {Number.parseFloat(order.taxAmount) > 0 && (
+            <div className="flex items-center justify-between">
+              <span>{t("taxHeading")}</span>
+              <span>{Number.parseFloat(order.taxAmount).toFixed(2)}</span>
+            </div>
+          )}
+          {Number.parseFloat(order.deliveryFee) > 0 && (
+            <div className="flex items-center justify-between">
+              <span>{t("deliveryFeeHeading")}</span>
+              <span>{Number.parseFloat(order.deliveryFee).toFixed(2)}</span>
+            </div>
+          )}
+        </div>
         <div className="flex items-center justify-between p-3 text-sm font-medium">
           <span>{t("totalHeading")}</span>
-          <span>{orderTotal(items).toFixed(2)}</span>
+          <span>{orderGrandTotal(items, order).toFixed(2)}</span>
         </div>
       </div>
+
+      {(order.paymentMethod || order.deliveryMethod) && (
+        <div className="flex gap-4 text-sm text-muted-foreground">
+          {order.paymentMethod && <span>{t(`new.paymentMethods.${order.paymentMethod}`)}</span>}
+          {order.deliveryMethod && <span>{t(`new.deliveryMethods.${order.deliveryMethod}`)}</span>}
+        </div>
+      )}
 
       {order.notes && (
         <div className="space-y-1">

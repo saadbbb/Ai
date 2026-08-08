@@ -1,7 +1,7 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { AppError } from "@/lib/errors/app-error";
-import type { AIProvider, GenerateReplyInput, GenerateReplyResult, ReplyStopReason } from "./types";
+import { TransientProviderError, type AIProvider, type GenerateReplyInput, type GenerateReplyResult, type ReplyStopReason } from "./types";
 
 const DEFAULT_MAX_TOKENS = 1024;
 
@@ -19,6 +19,20 @@ function getClient(): Anthropic {
     client = new Anthropic();
   }
   return client;
+}
+
+/**
+ * Rate-limited, momentarily overloaded, or a connection/timeout — worth
+ * AiRouter retrying against a different model. Everything else (bad API key,
+ * malformed request, content policy) would fail identically regardless of
+ * model, so it's surfaced as a normal AppError instead.
+ */
+export function isTransientAnthropicError(error: unknown): boolean {
+  if (error instanceof Anthropic.APIConnectionError) return true;
+  if (error instanceof Anthropic.APIError) {
+    return error.status === undefined || error.status === 429 || error.status >= 500;
+  }
+  return false;
 }
 
 function mapStopReason(stopReason: string | null): ReplyStopReason {
@@ -122,6 +136,9 @@ export function createClaudeProvider(model: string): AIProvider {
         };
       } catch (error) {
         console.error("[ai] Claude provider error:", error);
+        if (isTransientAnthropicError(error)) {
+          throw new TransientProviderError("The AI provider is temporarily unavailable.");
+        }
         throw new AppError("INTERNAL_ERROR", "The AI is temporarily unavailable. Please try again.");
       }
     },

@@ -8,6 +8,7 @@ export const createAppointmentSchema = z.object({
   scheduledAt: z.coerce.date(),
   durationMinutes: z.coerce.number().int().positive().max(24 * 60),
   notes: z.string().trim().max(2000).optional(),
+  assignedToUserId: z.string().uuid().optional(),
 });
 
 export const updateAppointmentStatusSchema = z.object({

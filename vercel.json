@@ -11,6 +11,30 @@
     {
       "path": "/api/cron/crm-followups",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/appointment-reminders",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/usage-warnings",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/inactive-members",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/task-reminders",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/order-followups",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/missed-conversations",
+      "schedule": "0 6 * * *"
     }
   ]
 }

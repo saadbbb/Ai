@@ -15,10 +15,12 @@ import { createAppointmentAction } from "../actions/create-appointment.action";
 export function NewAppointmentForm({
   contacts,
   services,
+  members,
   defaultContactId,
 }: {
   contacts: Contact[];
   services: Service[];
+  members: { id: string; label: string }[];
   defaultContactId?: string;
 }) {
   const router = useRouter();
@@ -28,6 +30,7 @@ export function NewAppointmentForm({
   const [serviceName, setServiceName] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
   const [durationMinutes, setDurationMinutes] = useState("30");
+  const [assignedToUserId, setAssignedToUserId] = useState("");
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -58,6 +61,7 @@ export function NewAppointmentForm({
       scheduledAt: new Date(scheduledAt).toISOString(),
       durationMinutes,
       notes: notes || undefined,
+      assignedToUserId: assignedToUserId || undefined,
     });
     setIsSubmitting(false);
 
@@ -130,6 +134,24 @@ export function NewAppointmentForm({
             />
           </div>
         </div>
+
+        {members.length > 0 && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("assignedToLabel")}</label>
+            <Select value={assignedToUserId} onValueChange={setAssignedToUserId}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("assignedToPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {members.map((member) => (
+                  <SelectItem key={member.id} value={member.id}>
+                    {member.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("notesLabel")}</label>

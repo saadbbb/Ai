@@ -1,5 +1,6 @@
 import "server-only";
 import type { Task, TaskPriority } from "@/db/schema";
+import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { AppError } from "@/lib/errors/app-error";
 import { activityRepository } from "../repository/activity.repository";
 import { taskRepository } from "../repository/task.repository";
@@ -16,6 +17,11 @@ async function listTasksForContact(workspaceId: string, contactId: string): Prom
 }
 
 async function createTask(workspaceId: string, userId: string, input: CreateTaskInput): Promise<Task> {
+  const contact = await contactRepository.findById(input.contactId, workspaceId);
+  if (!contact) {
+    throw new AppError("NOT_FOUND", "Contact not found.");
+  }
+
   const task = await taskRepository.create({
     workspaceId,
     contactId: input.contactId,

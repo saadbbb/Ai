@@ -31,14 +31,19 @@ vi.mock("@/features/knowledge-base/repository/service.repository", () => ({
 }));
 
 vi.mock("@/features/knowledge-base/repository/product.repository", () => ({
-  productRepository: { findByWorkspaceId: vi.fn() },
+  productRepository: { findByWorkspaceId: vi.fn(), findVisibleToAi: vi.fn() },
 }));
 
 vi.mock("@/features/orders/services/order.service", () => ({
   orderService: { createOrder: vi.fn() },
 }));
 
+vi.mock("@/features/crm/repository/task.repository", () => ({
+  taskRepository: { create: vi.fn() },
+}));
+
 const { toolExecutionRepository } = await import("../repository/tool-execution.repository");
+const { activityRepository } = await import("@/features/crm/repository/activity.repository");
 const { automationService } = await import("@/features/automation/services/automation.service");
 const { crmService } = await import("@/features/crm/services/crm.service");
 const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
@@ -46,6 +51,7 @@ const { appointmentService } = await import("@/features/appointments/services/ap
 const { serviceRepository } = await import("@/features/knowledge-base/repository/service.repository");
 const { productRepository } = await import("@/features/knowledge-base/repository/product.repository");
 const { orderService } = await import("@/features/orders/services/order.service");
+const { taskRepository } = await import("@/features/crm/repository/task.repository");
 const { createToolDispatcher } = await import("./registry");
 
 const BASE = { workspaceId: "workspace-1", contactId: "contact-1", conversationId: "conversation-1" };
@@ -57,8 +63,15 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
     name: "Widget",
     description: null,
     price: "19.99",
+    discountedPrice: null,
+    category: null,
     imageUrl: null,
+    galleryImageUrls: [],
+    variants: [],
     isActive: true,
+    aiVisible: true,
+    featured: false,
+    promotionEndsAt: null,
     createdAt: new Date(),
     ...overrides,
   };
@@ -127,11 +140,12 @@ describe("createToolDispatcher", () => {
 
   it("sets the handover signal without touching aiStatus directly", async () => {
     const { executeTool, signals } = createToolDispatcher(BASE);
-    const result = await executeTool("request_human_handover", { reason: "Refund request" });
+    const result = await executeTool("request_human_handover", { category: "refund_request", reason: "Refund request" });
 
     expect(result.isError).toBe(false);
     expect(signals.handoverRequested).toBe(true);
     expect(signals.handoverReason).toBe("Refund request");
+    expect(signals.handoverCategory).toBe("refund_request");
   });
 
   it("book_appointment matches a listed service by name (case-insensitive)", async () => {
@@ -167,7 +181,7 @@ describe("createToolDispatcher", () => {
   });
 
   it("create_order rejects a product that isn't in the catalog rather than inventing a price", async () => {
-    vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([]);
+    vi.mocked(productRepository.findVisibleToAi).mockResolvedValue([]);
 
     const { executeTool } = createToolDispatcher(BASE);
     const result = await executeTool("create_order", { items: [{ productName: "Ghost Product", quantity: 1 }] });
@@ -178,7 +192,7 @@ describe("createToolDispatcher", () => {
   });
 
   it("create_order rejects a matched product that has no price set", async () => {
-    vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([makeProduct({ price: null })]);
+    vi.mocked(productRepository.findVisibleToAi).mockResolvedValue([makeProduct({ price: null })]);
 
     const { executeTool } = createToolDispatcher(BASE);
     const result = await executeTool("create_order", { items: [{ productName: "Widget", quantity: 1 }] });
@@ -188,7 +202,7 @@ describe("createToolDispatcher", () => {
   });
 
   it("create_order matches catalog products and passes their real price through, never the model's guess", async () => {
-    vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([makeProduct()]);
+    vi.mocked(productRepository.findVisibleToAi).mockResolvedValue([makeProduct()]);
     vi.mocked(orderService.createOrder).mockResolvedValue({
       order: { id: "order-1" },
       contact: { id: "contact-1" },
@@ -206,6 +220,48 @@ describe("createToolDispatcher", () => {
         items: [{ productId: "product-1", name: "Widget", unitPrice: "19.99", quantity: 2 }],
       }),
       { type: "ai" },
+    );
+  });
+
+  it("create_order uses the discounted price over the regular price when one is set", async () => {
+    vi.mocked(productRepository.findVisibleToAi).mockResolvedValue([makeProduct({ price: "19.99", discountedPrice: "14.99" })]);
+    vi.mocked(orderService.createOrder).mockResolvedValue({
+      order: { id: "order-1" },
+      contact: { id: "contact-1" },
+      items: [{ unitPrice: "14.99", quantity: 1 }],
+    } as unknown as OrderListItem);
+
+    const { executeTool } = createToolDispatcher(BASE);
+    await executeTool("create_order", { items: [{ productName: "widget", quantity: 1 }] });
+
+    expect(orderService.createOrder).toHaveBeenCalledWith(
+      "workspace-1",
+      expect.objectContaining({ items: [{ productId: "product-1", name: "Widget", unitPrice: "14.99", quantity: 1 }] }),
+      { type: "ai" },
+    );
+  });
+
+  it("create_task creates a task with no human creator and logs the activity", async () => {
+    vi.mocked(taskRepository.create).mockResolvedValue({
+      id: "task-1",
+      title: "Call back with a quote",
+    } as never);
+
+    const { executeTool } = createToolDispatcher(BASE);
+    const result = await executeTool("create_task", { title: "Call back with a quote", priority: "high" });
+
+    expect(result.isError).toBe(false);
+    expect(taskRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: "workspace-1",
+        contactId: "contact-1",
+        title: "Call back with a quote",
+        priority: "high",
+        dueAt: null,
+      }),
+    );
+    expect(activityRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: "workspace-1", contactId: "contact-1", type: "task_created" }),
     );
   });
 });

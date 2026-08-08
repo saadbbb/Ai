@@ -65,6 +65,20 @@ export const requirePlatformAdmin = cache(async (): Promise<User> => {
 });
 
 /**
+ * Gates every platform-admin mutation (server actions) — a database-managed
+ * admin with the "read_only" role can view every /admin page but can't
+ * submit any of them. Bootstrap (env var) admins are always write-capable
+ * (see platformAdminService.isReadOnly). Redirects to /admin rather than
+ * /dashboard since a read-only admin still has legitimate access to the
+ * platform, just not to this one action.
+ */
+export const requireWritePlatformAdmin = cache(async (): Promise<User> => {
+  const user = await requirePlatformAdmin();
+  if (await platformAdminService.isReadOnly(user.email)) redirect("/admin");
+  return user;
+});
+
+/**
  * Gates workspace impersonation — bootstrap (PLATFORM_ADMIN_EMAILS) admins
  * only, never a self-service database-managed admin. Redirects a regular
  * platform admin back to the workspace list rather than /dashboard, since

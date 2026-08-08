@@ -38,11 +38,18 @@ export const ticketRepository = {
     return ticket ?? null;
   },
 
+  /** Never returns an internal (admin-only) note — see supportTicketMessages.isInternal's schema comment. */
   async findMessagesByTicketId(ticketId: string, workspaceId: string): Promise<SupportTicketMessage[]> {
     return db
       .select()
       .from(supportTicketMessages)
-      .where(and(eq(supportTicketMessages.ticketId, ticketId), eq(supportTicketMessages.workspaceId, workspaceId)))
+      .where(
+        and(
+          eq(supportTicketMessages.ticketId, ticketId),
+          eq(supportTicketMessages.workspaceId, workspaceId),
+          eq(supportTicketMessages.isInternal, false),
+        ),
+      )
       .orderBy(asc(supportTicketMessages.createdAt));
   },
 

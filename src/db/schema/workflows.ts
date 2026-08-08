@@ -15,6 +15,7 @@ export const workflowTriggerEnum = pgEnum("workflow_trigger", [
   "message_received",
   "message_replied",
   "ai_failed",
+  "conversation_assigned",
 ]);
 
 export const workflowActionEnum = pgEnum("workflow_action", [

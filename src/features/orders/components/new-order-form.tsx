@@ -35,6 +35,11 @@ export function NewOrderForm({
   const [contactId, setContactId] = useState(defaultContactId ?? "");
   const [items, setItems] = useState<ItemDraft[]>([{ ...emptyItem }]);
   const [notes, setNotes] = useState("");
+  const [discountAmount, setDiscountAmount] = useState("");
+  const [taxAmount, setTaxAmount] = useState("");
+  const [deliveryFee, setDeliveryFee] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [deliveryMethod, setDeliveryMethod] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function updateItem(index: number, patch: Partial<ItemDraft>) {
@@ -58,11 +63,12 @@ export function NewOrderForm({
     setItems((current) => current.filter((_, i) => i !== index));
   }
 
-  const total = items.reduce((sum, item) => {
+  const subtotal = items.reduce((sum, item) => {
     const price = Number.parseFloat(item.unitPrice) || 0;
     const quantity = Number.parseInt(item.quantity, 10) || 0;
     return sum + price * quantity;
   }, 0);
+  const total = subtotal - (Number.parseFloat(discountAmount) || 0) + (Number.parseFloat(taxAmount) || 0) + (Number.parseFloat(deliveryFee) || 0);
 
   async function handleSubmit() {
     if (!contactId) {
@@ -85,6 +91,11 @@ export function NewOrderForm({
         unitPrice: item.unitPrice || "0",
         quantity: item.quantity || "1",
       })),
+      discountAmount: discountAmount || undefined,
+      taxAmount: taxAmount || undefined,
+      deliveryFee: deliveryFee || undefined,
+      paymentMethod: paymentMethod || undefined,
+      deliveryMethod: deliveryMethod || undefined,
     });
     setIsSubmitting(false);
 
@@ -170,12 +181,57 @@ export function NewOrderForm({
           </Button>
         </div>
 
+        <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("discountLabel")}</label>
+            <Input type="number" step="0.01" min="0" value={discountAmount} onChange={(event) => setDiscountAmount(event.target.value)} placeholder="0" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("taxLabel")}</label>
+            <Input type="number" step="0.01" min="0" value={taxAmount} onChange={(event) => setTaxAmount(event.target.value)} placeholder="0" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("deliveryFeeLabel")}</label>
+            <Input type="number" step="0.01" min="0" value={deliveryFee} onChange={(event) => setDeliveryFee(event.target.value)} placeholder="0" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("paymentMethodLabel")}</label>
+            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("paymentMethodPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cash">{t("paymentMethods.cash")}</SelectItem>
+                <SelectItem value="card">{t("paymentMethods.card")}</SelectItem>
+                <SelectItem value="bank_transfer">{t("paymentMethods.bank_transfer")}</SelectItem>
+                <SelectItem value="other">{t("paymentMethods.other")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("deliveryMethodLabel")}</label>
+            <Select value={deliveryMethod} onValueChange={setDeliveryMethod}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("deliveryMethodPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pickup">{t("deliveryMethods.pickup")}</SelectItem>
+                <SelectItem value="delivery">{t("deliveryMethods.delivery")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("notesLabel")}</label>
           <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={2} />
         </div>
 
         <div className="flex items-center justify-between border-t pt-4">
+          <p className="text-sm text-muted-foreground">{t("subtotal", { subtotal: subtotal.toFixed(2) })}</p>
           <p className="text-sm font-medium">{t("total", { total: total.toFixed(2) })}</p>
           <Button type="button" disabled={isSubmitting} onClick={handleSubmit}>
             {isSubmitting ? t("submitting") : t("submit")}

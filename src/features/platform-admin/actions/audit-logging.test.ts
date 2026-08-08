@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { FeatureFlag, Plan, PlatformAdmin, User, Workspace } from "@/db/schema";
 
 vi.mock("@/lib/auth/auth-guard", () => ({
-  requirePlatformAdmin: vi.fn(),
+  requireWritePlatformAdmin: vi.fn(),
 }));
 
 vi.mock("../repository/audit-log.repository", () => ({
@@ -25,7 +25,7 @@ vi.mock("../repository/feature-flag.repository", () => ({
   featureFlagRepository: { findByKey: vi.fn(), create: vi.fn(), setEnabled: vi.fn() },
 }));
 
-const { requirePlatformAdmin } = await import("@/lib/auth/auth-guard");
+const { requireWritePlatformAdmin } = await import("@/lib/auth/auth-guard");
 const { auditLogRepository } = await import("../repository/audit-log.repository");
 const { workspaceAdminRepository } = await import("../repository/workspace-admin.repository");
 const { platformAdminRepository } = await import("../repository/platform-admin.repository");
@@ -45,7 +45,7 @@ const MISSING_ID = "99999999-9999-4999-8999-999999999999";
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(requirePlatformAdmin).mockResolvedValue(ADMIN);
+  vi.mocked(requireWritePlatformAdmin).mockResolvedValue(ADMIN);
 });
 
 describe("activateSubscriptionAction", () => {

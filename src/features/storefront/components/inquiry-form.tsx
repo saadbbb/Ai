@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { submitInquiryAction } from "../actions/submit-inquiry.action";
 
-export function InquiryForm({ slug }: { slug: string }) {
+export function InquiryForm({ slug, initialMessage = "" }: { slug: string; initialMessage?: string }) {
   const t = useTranslations("website.public");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialMessage);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
 

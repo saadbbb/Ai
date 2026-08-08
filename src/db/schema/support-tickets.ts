@@ -1,10 +1,17 @@
-import { index, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import { workspaces } from "./workspaces";
 
 export const supportTicketStatusEnum = pgEnum("support_ticket_status", ["open", "in_progress", "resolved", "closed"]);
 export const supportTicketPriorityEnum = pgEnum("support_ticket_priority", ["low", "medium", "high", "urgent"]);
 export const supportTicketAuthorTypeEnum = pgEnum("support_ticket_author_type", ["tenant", "admin"]);
+export const supportTicketCategoryEnum = pgEnum("support_ticket_category", [
+  "billing",
+  "technical",
+  "account",
+  "feature_request",
+  "other",
+]);
 
 export const supportTickets = pgTable(
   "support_tickets",
@@ -16,6 +23,13 @@ export const supportTickets = pgTable(
     subject: text("subject").notNull(),
     status: supportTicketStatusEnum("status").notNull().default("open"),
     priority: supportTicketPriorityEnum("priority").notNull().default("medium"),
+    category: supportTicketCategoryEnum("category").notNull().default("other"),
+    // Nullable — an unassigned ticket is a normal, common state, not an error.
+    assignedAdminUserId: uuid("assigned_admin_user_id").references(() => users.id, { onDelete: "set null" }),
+    // Set once when status first becomes "resolved" (see ticket-admin.repository.ts's
+    // updateStatus) — the source for resolution-time reporting; unlike updatedAt, it
+    // isn't overwritten by a later unrelated change.
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
     createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -47,6 +61,10 @@ export const supportTicketMessages = pgTable(
     authorType: supportTicketAuthorTypeEnum("author_type").notNull(),
     authorUserId: uuid("author_user_id").references(() => users.id, { onDelete: "set null" }),
     content: text("content").notNull(),
+    // Admin-only note, never returned by the tenant-scoped repository (see
+    // ticket.repository.ts's findMessagesByTicketId) — always false for a
+    // "tenant" authorType message, which has no way to set it.
+    isInternal: boolean("is_internal").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
@@ -62,3 +80,4 @@ export type SupportTicketPriority = (typeof supportTicketPriorityEnum.enumValues
 export type SupportTicketMessage = typeof supportTicketMessages.$inferSelect;
 export type NewSupportTicketMessage = typeof supportTicketMessages.$inferInsert;
 export type SupportTicketAuthorType = (typeof supportTicketAuthorTypeEnum.enumValues)[number];
+export type SupportTicketCategory = (typeof supportTicketCategoryEnum.enumValues)[number];

@@ -1,6 +1,6 @@
-"use server";
+﻿"use server";
 
-import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
+import { requireWritePlatformAdmin } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, AppError, type ActionResult } from "@/lib/errors/app-error";
 import { auditLogRepository } from "../repository/audit-log.repository";
 import { platformAdminRepository } from "../repository/platform-admin.repository";
@@ -12,7 +12,7 @@ export async function removePlatformAdminAction(input: unknown): Promise<ActionR
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
 
-  const admin = await requirePlatformAdmin();
+  const admin = await requireWritePlatformAdmin();
 
   try {
     const target = await platformAdminRepository.findById(parsed.data.id);

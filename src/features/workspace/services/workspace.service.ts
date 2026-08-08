@@ -6,6 +6,7 @@ import { workspaceMembers, workspaces } from "@/db/schema";
 import { AppError } from "@/lib/errors/app-error";
 import { membershipRepository } from "../repository/membership.repository";
 import { roleRepository } from "../repository/role.repository";
+import { workspaceRepository } from "../repository/workspace.repository";
 
 /** Spec's FREE TRIAL section: "14-day trial... Automatic expiration." */
 const TRIAL_DURATION_DAYS = 14;
@@ -33,6 +34,27 @@ async function generateUniqueSlug(base: string): Promise<string> {
     suffix += 1;
     candidate = `${root}-${suffix}`;
   }
+}
+
+const SLUG_PATTERN = /^[a-z0-9-]+$/;
+
+/**
+ * The manual counterpart to generateUniqueSlug — lets an owner pick their own
+ * /store/[slug] URL after signup (PART 13 gap: slug was previously permanent
+ * once auto-generated). Same format constraint as the generator's own output,
+ * checked case-sensitively against the DB's unique constraint on `slug`.
+ */
+async function updateSlug(workspaceId: string, slug: string): Promise<Workspace> {
+  if (!SLUG_PATTERN.test(slug)) {
+    throw new AppError("VALIDATION_ERROR", "URL can only contain lowercase letters, numbers, and hyphens.");
+  }
+
+  const existing = await workspaceRepository.findBySlug(slug);
+  if (existing && existing.id !== workspaceId) {
+    throw new AppError("VALIDATION_ERROR", "That URL is already taken.");
+  }
+
+  return workspaceRepository.update(workspaceId, { slug });
 }
 
 function defaultWorkspaceName(email: string): string {
@@ -93,4 +115,5 @@ async function getPrimaryWorkspaceForUser(userId: string, preferredWorkspaceId?:
 export const workspaceService = {
   createWorkspaceForNewUser,
   getPrimaryWorkspaceForUser,
+  updateSlug,
 };

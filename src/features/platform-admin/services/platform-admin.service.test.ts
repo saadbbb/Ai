@@ -29,6 +29,7 @@ describe("platformAdminService.isBootstrapAdmin", () => {
     vi.mocked(platformAdminRepository.findByEmail).mockResolvedValue({
       id: "pa-1",
       email: "delegated@example.com",
+      role: "administrator",
       addedByEmail: "owner@example.com",
       createdAt: new Date(),
     });
@@ -44,5 +45,36 @@ describe("platformAdminService.isBootstrapAdmin", () => {
 
   it("is false for an email not configured anywhere", () => {
     expect(platformAdminService.isBootstrapAdmin("nobody@example.com")).toBe(false);
+  });
+});
+
+describe("platformAdminService.isReadOnly", () => {
+  it("is true for a database-managed admin with the read_only role", async () => {
+    vi.mocked(platformAdminRepository.findByEmail).mockResolvedValue({
+      id: "pa-1",
+      email: "viewer@example.com",
+      role: "read_only",
+      addedByEmail: "owner@example.com",
+      createdAt: new Date(),
+    });
+
+    expect(await platformAdminService.isReadOnly("viewer@example.com")).toBe(true);
+  });
+
+  it("is false for a database-managed admin with a write role", async () => {
+    vi.mocked(platformAdminRepository.findByEmail).mockResolvedValue({
+      id: "pa-1",
+      email: "admin@example.com",
+      role: "administrator",
+      addedByEmail: "owner@example.com",
+      createdAt: new Date(),
+    });
+
+    expect(await platformAdminService.isReadOnly("admin@example.com")).toBe(false);
+  });
+
+  it("is never true for a bootstrap admin, even without checking the database", async () => {
+    expect(await platformAdminService.isReadOnly("owner@example.com")).toBe(false);
+    expect(platformAdminRepository.findByEmail).not.toHaveBeenCalled();
   });
 });

@@ -1,0 +1,1 @@
+ALTER TYPE "public"."workspace_audit_action" ADD VALUE 'login';

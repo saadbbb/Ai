@@ -38,6 +38,9 @@ export interface GenerateReplyResult {
   text: string;
   stopReason: ReplyStopReason;
   needsHumanHandover: boolean;
+  /** Set alongside needsHumanHandover — see request_human_handover.tool.ts's HandoverCategory. */
+  handoverCategory?: string;
+  handoverReason?: string;
   usage: {
     inputTokens: number;
     outputTokens: number;
@@ -51,3 +54,13 @@ export interface GenerateReplyResult {
 export interface AIProvider {
   generateReply(input: GenerateReplyInput): Promise<GenerateReplyResult>;
 }
+
+/**
+ * Thrown by a provider (after its own SDK-level retries are exhausted — see
+ * claude.provider.ts) for a failure worth retrying against a different model,
+ * e.g. rate-limited or momentarily overloaded — never for an error that would
+ * fail identically on any model (bad API key, malformed request). AiRouter is
+ * the only thing that should ever catch this; every other caller sees a plain
+ * AppError, same as before this existed.
+ */
+export class TransientProviderError extends Error {}

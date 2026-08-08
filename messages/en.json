@@ -214,7 +214,15 @@
       "productNamePlaceholder": "Product name",
       "descriptionPlaceholder": "Description (optional)",
       "pricePlaceholder": "Price (optional)",
+      "discountedPricePlaceholder": "Sale price (optional)",
+      "categoryPlaceholder": "Category (optional)",
       "imageUrlPlaceholder": "Image URL (optional, shown on your storefront)",
+      "galleryImageUrlsPlaceholder": "Extra gallery image URLs, one per line (optional)",
+      "variantNamesPlaceholder": "Options, comma-separated, e.g. Small, Medium, Large (optional)",
+      "aiVisibleLabel": "AI can recommend this product",
+      "aiHiddenBadge": "Hidden from AI",
+      "featuredLabel": "Featured on storefront",
+      "promotionEndsAtLabel": "Promotion ends (optional)",
       "addProduct": "Add product",
       "servicesHeading": "Services",
       "serviceNamePlaceholder": "Service name",
@@ -292,12 +300,26 @@
         "appointmentsCompleted": "Appointments completed",
         "pipelineHeading": "Pipeline",
         "pipelineEmpty": "No leads in the pipeline yet."
+      },
+      "business": {
+        "heading": "Business",
+        "subscriptionStatus": "Subscription",
+        "plan": "Plan",
+        "noPlan": "No plan",
+        "topChannel": "Top channel",
+        "topProduct": "Top product",
+        "topAgent": "Top agent"
       }
     },
     "suspended": {
       "title": "Your account is suspended",
       "description": "Get in touch with us to sort this out and get back to work.",
       "whatsappCta": "Contact us on WhatsApp"
+    },
+    "overdue": {
+      "past_due": "Your subscription payment is overdue.",
+      "grace": "Final notice — your subscription is still overdue and will be suspended soon.",
+      "cta": "Renew now"
     },
     "insights": {
       "heading": "AI Insights",
@@ -312,10 +334,14 @@
     "title": "Analytics",
     "description": "How your business is doing, at a glance.",
     "range": {
+      "today": "Today",
+      "yesterday": "Yesterday",
       "7d": "Last 7 days",
       "30d": "Last 30 days",
       "90d": "Last 90 days",
-      "month": "This month"
+      "month": "This month",
+      "custom": "Custom range",
+      "apply": "Apply"
     },
     "kpis": {
       "newLeads": "New leads",
@@ -338,7 +364,11 @@
         "leadConversion": "Lead conversion",
         "orderCompletion": "Order completion",
         "appointmentCompletion": "Appointment completion",
-        "aiSuccess": "AI success rate"
+        "aiSuccess": "AI success rate",
+        "responseTime": "Response time",
+        "missedConversations": "Conversations handled by AI",
+        "automationSuccess": "Automation success rate",
+        "revenueTrend": "Revenue trend"
       }
     },
     "charts": {
@@ -348,7 +378,32 @@
       "appointmentsByStatus": "Appointments by status",
       "conversationsByChannel": "Conversations by channel",
       "revenueByProduct": "Revenue by product",
+      "messagesByDay": "Messages",
+      "appointmentsByDay": "Appointments scheduled",
+      "leadsByChannel": "Leads by channel",
+      "revenueByChannel": "Revenue by channel",
+      "topServices": "Top services",
       "empty": "No data yet for this range."
+    },
+    "depth": {
+      "title": "Deeper metrics",
+      "salesReport": "Sales report:",
+      "customersReport": "Customers report:",
+      "channelsReport": "Channels report:",
+      "avgOrderValue": "Avg. order value",
+      "salesGrowth": "Sales growth",
+      "repeatCustomerRate": "Repeat customers",
+      "winRate": "Lead win rate",
+      "aiHandoffRate": "AI handoff rate",
+      "avgResponseAi": "Avg. AI response",
+      "avgResponseHuman": "Avg. human response",
+      "avgAppointmentLeadTime": "Avg. booking lead time",
+      "newCustomers": "New customers",
+      "returningCustomers": "Returning customers",
+      "direct": "Direct / manual",
+      "seconds": "{count}s",
+      "minutes": "{count} min",
+      "hours": "{count}h"
     },
     "teamPerformance": {
       "title": "Team performance",
@@ -448,7 +503,22 @@
       "channelInstagram": "Instagram",
       "aiActive": "AI replying",
       "aiPaused": "AI paused",
-      "aiHandedOver": "Needs a human"
+      "aiHandedOver": "Needs a human",
+      "searchPlaceholder": "Search conversations...",
+      "filters": {
+        "pinned": "Pinned",
+        "priority": "Priority",
+        "unassigned": "Unassigned",
+        "needsReply": "Needs reply",
+        "archived": "Archived"
+      },
+      "pinnedMarker": "PINNED",
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "markPriority": "Mark priority",
+      "unmarkPriority": "Unmark priority",
+      "archive": "Archive",
+      "reopen": "Reopen"
     },
     "new": {
       "title": "Start a conversation",
@@ -465,17 +535,30 @@
       "pauseAi": "Pause AI",
       "resumeAi": "Resume AI",
       "closeConversation": "Close conversation",
+      "handToHuman": "Hand to human",
       "closedBadge": "Closed",
       "senderAi": "AI employee",
       "senderYou": "You",
       "senderSystem": "System",
-      "switchToReply": "Reply instead",
-      "logCustomerMessage": "Log a customer message instead",
+      "modeReply": "Reply",
+      "modeLog": "Log customer message",
+      "modeNote": "Internal note",
       "logCustomerPlaceholder": "What did the customer say?",
+      "notePlaceholder": "Write an internal note for the team...",
       "replyPlaceholder": "Type your reply...",
       "sendReply": "Send reply",
       "sending": "Sending...",
       "logSubmit": "Log message",
+      "saveNote": "Save note",
+      "noteSaved": "Note saved.",
+      "suggestReply": "Suggest reply",
+      "suggesting": "Suggesting...",
+      "templates": "Templates",
+      "noTemplates": "No templates yet.",
+      "deleteTemplate": "Delete",
+      "newTemplate": "+ New template",
+      "newTemplateNamePlaceholder": "Template name",
+      "saveTemplate": "Save",
       "channel": {
         "manual": "Manual",
         "whatsapp": "WhatsApp",
@@ -483,7 +566,30 @@
       },
       "createLead": "Create lead",
       "leadCreated": "Lead created.",
-      "viewInPipeline": "View in Pipeline →"
+      "viewInPipeline": "View in Pipeline →",
+      "unassigned": "Unassigned",
+      "context": {
+        "viewFullProfile": "View full profile →",
+        "leadStage": "Lead stage",
+        "noLead": "No lead yet.",
+        "ordersHeading": "Recent orders",
+        "noOrders": "No orders yet.",
+        "appointmentsHeading": "Upcoming appointments",
+        "noAppointments": "No appointments yet.",
+        "activityHeading": "Recent activity",
+        "noActivity": "No activity yet."
+      },
+      "intents": {
+        "greeting": "Greeting",
+        "question": "Question",
+        "complaint": "Complaint",
+        "purchase_intent": "Purchase intent",
+        "price_inquiry": "Price inquiry",
+        "appointment_request": "Appointment request",
+        "cancellation": "Cancellation",
+        "urgent": "Urgent",
+        "spam": "Spam"
+      }
     }
   },
   "orders": {
@@ -494,6 +600,10 @@
     "itemCount": "{count} items",
     "backLink": "← Back to Orders",
     "notesHeading": "Notes",
+    "subtotalHeading": "Subtotal",
+    "discountHeading": "Discount",
+    "taxHeading": "Tax",
+    "deliveryFeeHeading": "Delivery fee",
     "totalHeading": "Total",
     "noOrdersForContact": "No orders for this contact yet.",
     "statuses": {
@@ -522,6 +632,24 @@
       "addItem": "Add item",
       "itemRequired": "Add at least one item.",
       "notesLabel": "Notes (optional)",
+      "discountLabel": "Discount",
+      "taxLabel": "Tax",
+      "deliveryFeeLabel": "Delivery fee",
+      "paymentMethodLabel": "Payment method",
+      "paymentMethodPlaceholder": "Select (optional)",
+      "paymentMethods": {
+        "cash": "Cash",
+        "card": "Card",
+        "bank_transfer": "Bank transfer",
+        "other": "Other"
+      },
+      "deliveryMethodLabel": "Delivery method",
+      "deliveryMethodPlaceholder": "Select (optional)",
+      "deliveryMethods": {
+        "pickup": "Pickup",
+        "delivery": "Delivery"
+      },
+      "subtotal": "Subtotal: {subtotal}",
       "total": "Total: {total}",
       "submit": "Create order",
       "submitting": "Creating..."
@@ -534,15 +662,36 @@
     "statuses": {
       "trial": "Trial",
       "active": "Active",
-      "suspended": "Suspended"
+      "past_due": "Payment overdue",
+      "grace": "Final notice",
+      "suspended": "Suspended",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
     },
     "activeDescription": "You're subscribed. Thanks for being a customer!",
+    "overdue": {
+      "past_due": "Your subscription payment is overdue — renew to avoid interruption.",
+      "grace": "Final notice — your subscription is still overdue and will be suspended soon."
+    },
     "expiresOn": "Renews/expires on {date}",
     "ctaDescription": "We don't charge cards yet — message us on WhatsApp and we'll set your subscription up personally.",
     "whatsappCta": "Subscribe via WhatsApp",
     "fallbackWithEmail": "Subscriptions aren't open yet. Email {email} if you're interested.",
     "fallbackNoContact": "Subscriptions aren't open yet. Check back soon.",
-    "defaultMessage": "Hi! I'd like to subscribe to the AI Employee Platform for '{{workspaceName}}'."
+    "defaultMessage": "Hi! I'd like to subscribe to the AI Employee Platform for '{{workspaceName}}'.",
+    "usageHeading": "Usage this plan",
+    "usageUnlimited": "No usage limits on your plan.",
+    "usage": {
+      "users": "Team members",
+      "aiAgents": "AI agents",
+      "channels": "Connected channels",
+      "conversationsPerMonth": "Conversations this month",
+      "knowledgeFiles": "Knowledge documents",
+      "automationWorkflows": "Automation workflows",
+      "integrations": "Integrations"
+    },
+    "historyHeading": "Billing history",
+    "downloadPdf": "Download PDF"
   },
   "platformAdmin": {
     "badge": "Platform Admin",
@@ -550,10 +699,13 @@
     "homeLink": "Home",
     "workspacesLink": "Workspaces",
     "plansLink": "Plans",
+    "couponsLink": "Coupons",
+    "refundsLink": "Refunds",
     "aiUsageLink": "AI Usage",
     "aiOperationsLink": "AI Operations",
     "ticketsLink": "Tickets",
     "featureFlagsLink": "Feature Flags",
+    "systemHealthLink": "System Health",
     "settingsLink": "Settings",
     "adminsLink": "Admins",
     "home": {
@@ -571,7 +723,14 @@
       "aiRequests": "Total requests",
       "aiSuccessRate": "Success rate",
       "aiAvgLatency": "Avg. latency",
+      "aiInputTokens": "Input tokens",
+      "aiOutputTokens": "Output tokens",
       "msValue": "{ms} ms",
+      "openTickets": "Open tickets",
+      "trendsHeading": "Trends (last 30 days)",
+      "dailySignups": "Daily signups",
+      "activeWorkspacesPerDay": "Active workspaces per day",
+      "trendsEmpty": "No data yet for this period.",
       "recentSignupsHeading": "Recent signups",
       "noSignups": "No workspaces yet.",
       "noOwner": "No owner"
@@ -600,7 +759,11 @@
       "byModelHeading": "By model",
       "emptyState": "No AI requests logged yet.",
       "modelRequests": "{count} requests",
-      "msValue": "{ms} ms"
+      "msValue": "{ms} ms",
+      "rateLimitsHeading": "Rate limit activity",
+      "rateLimitsDescription": "The busiest rate-limit buckets platform-wide (login, OTP, API keys, etc.) in the last hour — not AI-specific, since AI replies aren't rate-limited today.",
+      "rateLimitsEmpty": "No rate-limit activity in the last hour.",
+      "rateLimitCount": "{count} hits"
     },
     "workspaces": {
       "title": "Workspaces",
@@ -612,17 +775,69 @@
       "statuses": {
         "trial": "Trial",
         "active": "Active",
-        "suspended": "Suspended"
+        "past_due": "Payment overdue",
+        "grace": "Final notice",
+        "suspended": "Suspended",
+        "cancelled": "Cancelled",
+        "expired": "Expired"
       },
       "activate": "Activate",
       "planLabel": "Plan",
       "planPlaceholder": "Select a plan",
       "daysLabel": "Days",
+      "couponLabel": "Coupon (optional)",
+      "couponPlaceholder": "Code",
       "activating": "Activating...",
       "confirmActivate": "Confirm",
       "planSummary": "Plan: {plan}",
       "expiresOn": "Expires {date}",
-      "view": "View"
+      "view": "View",
+      "allStatuses": "All statuses",
+      "allPlans": "All plans",
+      "noPlanFilter": "No plan",
+      "aiUsageSummary": "{requests} AI requests · {tokens} tokens",
+      "delete": "Delete",
+      "deleteWarning": "This permanently deletes \"{slug}\" and everything in it — contacts, orders, conversations, everything. This cannot be undone. Type the slug below to confirm.",
+      "deleting": "Deleting...",
+      "confirmDelete": "Delete permanently"
+    },
+    "coupons": {
+      "title": "Coupons",
+      "description": "Discount codes an admin can apply when activating a workspace's subscription.",
+      "emptyState": "No coupons yet.",
+      "codePlaceholder": "Code, e.g. WELCOME20",
+      "percentage": "Percentage off",
+      "fixed": "Fixed amount off",
+      "valuePlaceholder": "Value",
+      "maxRedemptionsPlaceholder": "Max redemptions (optional)",
+      "addCoupon": "Add coupon",
+      "percentageOff": "{value}% off",
+      "fixedOff": "{value} off",
+      "redemptions": "{used}/{max} used",
+      "expiresOn": "expires {date}",
+      "inactive": "inactive",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate"
+    },
+    "refunds": {
+      "title": "Refunds",
+      "description": "Request and track refunds against paid invoices.",
+      "emptyState": "No refunds yet.",
+      "invoicePlaceholder": "Select a paid invoice",
+      "amountPlaceholder": "Amount",
+      "reasonPlaceholder": "Reason",
+      "createRefund": "Request refund",
+      "status": {
+        "requested": "Requested",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "completed": "Completed"
+      },
+      "action": {
+        "approved": "Approve",
+        "rejected": "Reject",
+        "completed": "Mark completed"
+      }
     },
     "plans": {
       "title": "Plans",
@@ -650,9 +865,23 @@
         "campaigns": "Campaigns",
         "ads": "Ads"
       },
-      "pricePlaceholder": "Price in IQD (optional)",
+      "pricePlaceholder": "Price (optional)",
       "priceSummary": "{price} {currency}/mo",
-      "noPriceSet": "No price set yet — excluded from MRR/ARR."
+      "noPriceSet": "No price set yet — excluded from MRR/ARR.",
+      "limitsHeading": "Usage limits (optional)",
+      "limitsHint": "Leave a field blank for unlimited. Storage and API-call limits are stored but not enforced yet.",
+      "noLimitsSet": "No usage limits set — unlimited.",
+      "limits": {
+        "maxUsers": "Max users",
+        "maxAiAgents": "Max AI agents",
+        "maxChannels": "Max channels",
+        "maxConversationsPerMonth": "Max conversations/mo",
+        "maxStorageMb": "Max storage (MB)",
+        "maxKnowledgeFiles": "Max knowledge documents",
+        "maxAutomationWorkflows": "Max automation workflows",
+        "maxApiCallsPerMonth": "Max API calls/mo",
+        "maxIntegrations": "Max integrations"
+      }
     },
     "settings": {
       "title": "Platform Settings",
@@ -681,7 +910,14 @@
       "confirmRemove": "Remove this admin's access?",
       "emailPlaceholder": "email@example.com",
       "add": "Add",
-      "adding": "Adding..."
+      "adding": "Adding...",
+      "roles": {
+        "administrator": "Administrator",
+        "support_agent": "Support Agent",
+        "finance": "Finance",
+        "developer": "Developer",
+        "read_only": "Read Only"
+      }
     },
     "auditLogLink": "Audit Log",
     "auditLog": {
@@ -706,10 +942,26 @@
         "high": "High",
         "urgent": "Urgent"
       },
+      "categories": {
+        "billing": "Billing",
+        "technical": "Technical",
+        "account": "Account",
+        "feature_request": "Feature request",
+        "other": "Other"
+      },
+      "unassigned": "Unassigned",
+      "avgResponseTime": "Avg. first response time",
+      "avgResolutionTime": "Avg. resolution time",
+      "underAnHour": "Under an hour",
+      "hoursValue": "{count}h",
       "thread": {
         "supportTeam": "Support team",
+        "internalNote": "Internal note",
         "replyPlaceholder": "Write a reply...",
+        "internalNotePlaceholder": "Write an internal note (not visible to the tenant)...",
+        "internalNoteToggle": "Internal note",
         "submit": "Send reply",
+        "submitInternal": "Save note",
         "submitting": "Sending..."
       }
     },
@@ -723,9 +975,32 @@
       "requiredHint": "Key and name are required.",
       "create": "Create flag",
       "creating": "Creating...",
-      "emptyState": "No feature flags yet."
+      "emptyState": "No feature flags yet.",
+      "manageOverrides": "Workspace overrides",
+      "overrideCount": "{count} workspace override(s)",
+      "noOverrides": "No workspace-specific overrides.",
+      "selectWorkspace": "Select a workspace",
+      "forcedOn": "Forced on",
+      "forcedOff": "Forced off",
+      "addOverride": "Add override",
+      "removeOverride": "Remove"
+    },
+    "systemHealth": {
+      "title": "System Health",
+      "description": "Live connectivity checks for the platform's core infrastructure.",
+      "database": "Database",
+      "redis": "Redis",
+      "queue": "Automation queue",
+      "email": "Email",
+      "latency": "{ms} ms",
+      "statuses": {
+        "ok": "OK",
+        "degraded": "Degraded",
+        "not_configured": "Not configured"
+      }
     },
     "revenueLink": "Revenue",
+    "platformAnalyticsLink": "Platform Analytics",
     "revenue": {
       "title": "Revenue",
       "description": "Monthly and annual recurring revenue from active, priced subscriptions.",
@@ -736,7 +1011,31 @@
       "unpricedHint": "Some active workspaces are on a plan with no price set — set a price on that plan to include it in MRR/ARR.",
       "byPlanHeading": "By plan",
       "emptyState": "No active, priced subscriptions yet.",
-      "planSubscriptions": "{count} subscriptions"
+      "planSubscriptions": "{count} subscriptions",
+      "arpu": "ARPU",
+      "ltv": "LTV",
+      "newSubscriptions": "New ({days}d)",
+      "renewals": "Renewals ({days}d)",
+      "cancellations": "Cancellations ({days}d)",
+      "churnRate": "Churn rate",
+      "trialConversionRate": "Trial conversion",
+      "paymentFailures": "Payment failures ({days}d)",
+      "reports": {
+        "subscriptions": "Subscriptions report",
+        "invoices": "Invoices report",
+        "refunds": "Refunds report"
+      }
+    },
+    "platformAnalytics": {
+      "title": "Platform Analytics",
+      "description": "Retention, industries, geography, and channel adoption across every workspace.",
+      "retentionCohort": "Workspaces {days}+ days old",
+      "retentionStillActive": "Still with us",
+      "retentionRate": "Retention rate",
+      "topIndustries": "Top industries",
+      "geographicDistribution": "Geographic distribution",
+      "channelUsage": "Channel usage",
+      "empty": "No data yet."
     },
     "impersonation": {
       "banner": "🔒 Viewing \"{workspace}\" as Super Admin — read-only, logged in the audit log.",
@@ -842,7 +1141,8 @@
         "tag_added": "A tag is added to a contact",
         "message_received": "A customer sends a message",
         "message_replied": "A message is replied to",
-        "ai_failed": "The AI employee fails to reply"
+        "ai_failed": "The AI employee fails to reply",
+        "conversation_assigned": "A conversation is assigned to a team member"
       },
       "stagePlaceholder": "Select a stage",
       "statusPlaceholder": "Select a status",
@@ -935,6 +1235,7 @@
     "newAppointment": "New appointment",
     "emptyState": "No appointments yet. Create one from a contact.",
     "noAppointmentsForContact": "No appointments for this contact yet.",
+    "assignedTo": "Assigned to {name}",
     "statuses": {
       "scheduled": "Scheduled",
       "confirmed": "Confirmed",
@@ -955,6 +1256,8 @@
       "serviceNamePlaceholder": "e.g. Consultation",
       "dateTimeLabel": "Date & time",
       "durationLabel": "Duration (minutes)",
+      "assignedToLabel": "Assigned to (optional)",
+      "assignedToPlaceholder": "Select a team member",
       "notesLabel": "Notes (optional)",
       "submit": "Create appointment",
       "submitting": "Creating..."
@@ -965,6 +1268,8 @@
     "description": "Everyone who has reached out, in one directory.",
     "emptyState": "No contacts yet. They're created automatically from the Inbox.",
     "noContactInfo": "No phone or email on file.",
+    "addTagPlaceholder": "+ Add tag",
+    "removeTag": "Remove tag \"{tag}\"",
     "noMessagesYet": "No messages yet.",
     "backLink": "← Back to Contacts",
     "leadsHeading": "Leads",
@@ -973,10 +1278,40 @@
     "noConversations": "No conversations yet.",
     "lifecycle": {
       "lead": "Lead",
+      "quotation": "Quotation Sent",
       "customer": "Customer",
       "repeat_customer": "Repeat Customer",
       "vip": "VIP",
       "loyal_customer": "Loyal Customer"
+    },
+    "languages": {
+      "ar": "Arabic",
+      "en": "English",
+      "ku": "Kurdish"
+    },
+    "preferredContactMethods": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "phone": "Phone",
+      "email": "Email"
+    },
+    "fields": {
+      "address": "Address: {value}",
+      "budget": "Budget: {value}",
+      "preferredContactMethod": "Prefers: {value}",
+      "timezone": "Timezone: {value}",
+      "birthDate": "Birthday: {value}",
+      "gender": "Gender: {value}"
+    },
+    "lifetimeValue": "Lifetime value",
+    "favoriteProducts": "Favorite products",
+    "nextAction": {
+      "heading": "Suggested next step",
+      "follow_up_draft_order": "Follow up on their pending order to help them complete it.",
+      "complete_overdue_task": "Overdue task: \"{detail}\" — complete it now.",
+      "prepare_for_appointment": "They have an upcoming appointment — make sure everything's ready.",
+      "reach_out_hot_lead": "This is a hot lead — reach out today.",
+      "check_in_vip": "It's been a while — check in with this VIP customer."
     },
     "filters": {
       "lifecycleAll": "All stages",
@@ -1034,6 +1369,101 @@
     "colorLabel": "Accent color",
     "saving": "Saving...",
     "save": "Save",
+    "urlHeading": "Store URL",
+    "urlLabel": "Custom URL",
+    "brandingHeading": "Branding & style",
+    "secondaryColorLabel": "Secondary color",
+    "faviconLabel": "Favicon URL",
+    "bannerLabel": "Banner image URL",
+    "themeLabel": "Theme",
+    "themes": {
+      "modern": "Modern",
+      "minimal": "Minimal",
+      "classic": "Classic",
+      "bold": "Bold"
+    },
+    "fontLabel": "Font",
+    "fonts": {
+      "inter": "Inter",
+      "poppins": "Poppins",
+      "playfair": "Playfair Display",
+      "roboto_mono": "Roboto Mono"
+    },
+    "buttonStyleLabel": "Button style",
+    "buttonStyles": {
+      "rounded": "Rounded",
+      "square": "Square",
+      "pill": "Pill"
+    },
+    "cornerStyleLabel": "Corner style",
+    "cornerStyles": {
+      "sharp": "Sharp",
+      "soft": "Soft",
+      "round": "Round"
+    },
+    "headerStyleLabel": "Header style",
+    "headerStyles": {
+      "standard": "Standard",
+      "centered": "Centered",
+      "minimal": "Minimal"
+    },
+    "footerStyleLabel": "Footer style",
+    "footerStyles": {
+      "standard": "Standard",
+      "minimal": "Minimal"
+    },
+    "darkModeLabel": "Dark mode",
+    "socialHeading": "Social links",
+    "social": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "youtube": "YouTube",
+      "snapchat": "Snapchat",
+      "telegram": "Telegram"
+    },
+    "seoHeading": "Search engine optimization",
+    "seoTitleLabel": "SEO title",
+    "seoDescriptionLabel": "SEO description",
+    "trackingHeading": "Tracking & analytics",
+    "tracking": {
+      "metaPixelId": "Meta Pixel ID",
+      "googleAnalyticsId": "Google Analytics ID",
+      "googleTagManagerId": "Google Tag Manager ID",
+      "tiktokPixelId": "TikTok Pixel ID"
+    },
+    "sectionsHeading": "Home page sections",
+    "sectionsHint": "Reorder or hide sections on your store's home page.",
+    "sections": {
+      "hero": "Hero banner",
+      "about": "About preview",
+      "featured": "Featured products",
+      "products": "Product catalog preview",
+      "services": "Services preview",
+      "contact": "Contact form"
+    },
+    "hideSection": "Hide",
+    "showSection": "Show",
+    "legalHeading": "Legal pages",
+    "privacyLabel": "Privacy policy",
+    "termsLabel": "Terms of service",
+    "promotionsHeading": "Promotions",
+    "announcementBarLabel": "Announcement bar",
+    "announcementBarPlaceholder": "e.g. Free shipping on orders over $50",
+    "announcementBarLinkLabel": "Announcement bar link",
+    "popupHeading": "Popup",
+    "popupTitlePlaceholder": "Popup title",
+    "popupMessagePlaceholder": "Popup message",
+    "popupButtonTextPlaceholder": "Button text",
+    "popupButtonLinkPlaceholder": "Button link",
+    "popupTriggerLabel": "Show popup",
+    "popupTriggers": {
+      "first_visit": "On first visit",
+      "delay": "After a delay",
+      "exit_intent": "When leaving the page"
+    },
+    "popupDelayLabel": "Delay (seconds)",
     "public": {
       "aboutHeading": "About us",
       "productsHeading": "Products",
@@ -1045,7 +1475,64 @@
       "requiredHint": "Name, phone, and message are required.",
       "submitting": "Sending...",
       "submit": "Send inquiry",
-      "thankYou": "Thanks! We'll get back to you soon."
+      "thankYou": "Thanks! We'll get back to you soon.",
+      "readMore": "Read more →",
+      "viewAll": "View all →",
+      "noProducts": "No products yet.",
+      "faqHeading": "Frequently asked questions",
+      "noFaqs": "No questions answered yet.",
+      "privacyHeading": "Privacy Policy",
+      "termsHeading": "Terms of Service",
+      "searchPlaceholder": "Search products...",
+      "allCategories": "All categories",
+      "sortOptions": {
+        "newest": "Newest",
+        "price_asc": "Price: low to high",
+        "price_desc": "Price: high to low",
+        "best_selling": "Best selling",
+        "discounted": "On sale"
+      },
+      "applyFilters": "Apply",
+      "share": "Share",
+      "linkCopied": "Link copied.",
+      "backToProducts": "← Back to products",
+      "variantsLabel": "Options",
+      "askOnWhatsapp": "Ask on WhatsApp",
+      "whatsappMessage": "Hi! I'm interested in {product}.",
+      "interestedHeading": "Interested in this?",
+      "interestedMessage": "I'm interested in {product}.",
+      "relatedHeading": "You might also like",
+      "addToCart": "Add to cart",
+      "addedToCart": "Added {product} to your cart.",
+      "checkoutHeading": "Checkout",
+      "checkoutRequiredHint": "Name, phone, and at least one item are required.",
+      "orderPlacedHeading": "Order placed!",
+      "orderPlacedHint": "We'll be in touch shortly to confirm your order.",
+      "cartEmpty": "Your cart is empty.",
+      "removeFromCart": "Remove",
+      "cartTotal": "Total",
+      "addressPlaceholder": "Delivery address (optional)",
+      "notesPlaceholder": "Notes (optional)",
+      "placeOrder": "Place order",
+      "nav": {
+        "home": "Home",
+        "products": "Products",
+        "about": "About",
+        "contact": "Contact",
+        "faq": "FAQ"
+      },
+      "assistant": {
+        "title": "Ask us anything",
+        "greeting": "Hi! Ask me about our products, prices, or anything else.",
+        "placeholder": "Type a message...",
+        "send": "Send",
+        "open": "Open chat assistant",
+        "close": "Close chat assistant"
+      },
+      "promo": {
+        "dismiss": "No thanks"
+      },
+      "featuredHeading": "Featured"
     }
   },
   "integrations": {
@@ -1163,9 +1650,13 @@
     "pageDescription": "Your business details and dashboard language."
   },
   "auditLog": {
-    "pageTitle": "Audit Log",
-    "pageDescription": "Every team-management action taken in this workspace — invitations, role changes, removals.",
-    "emptyState": "No audit events recorded yet."
+    "pageTitle": "Activity Log",
+    "pageDescription": "Every event in this workspace — customer activity and team-management actions — in one feed.",
+    "emptyState": "No activity recorded yet.",
+    "source": {
+      "crm": "CRM",
+      "admin": "Admin"
+    }
   },
   "knowledgeBasePage": {
     "pageTitle": "Knowledge Base",
@@ -1192,7 +1683,12 @@
     "placeholder": "Write a note about this customer...",
     "add": "Add note",
     "empty": "No notes for this contact yet.",
-    "delete": "Delete"
+    "delete": "Delete",
+    "types": {
+      "team": "Team",
+      "private": "Private",
+      "ai": "AI"
+    }
   },
   "activity": {
     "title": "Activity",

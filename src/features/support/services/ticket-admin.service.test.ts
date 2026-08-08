@@ -8,6 +8,9 @@ vi.mock("../repository/ticket-admin.repository", () => ({
     updateStatus: vi.fn(),
     findMessagesByTicketId: vi.fn(),
     createMessage: vi.fn(),
+    assign: vi.fn(),
+    setCategory: vi.fn(),
+    getTimingStats: vi.fn(),
   },
 }));
 
@@ -53,6 +56,9 @@ function makeTicket(overrides: Partial<SupportTicket> = {}): SupportTicket {
     subject: "Help please",
     status: "open",
     priority: "medium",
+    category: "other",
+    assignedAdminUserId: null,
+    resolvedAt: null,
     createdByUserId: "tenant-user-1",
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -77,6 +83,7 @@ describe("ticketAdminService.replyToTicket", () => {
       ticket: makeTicket({ status: "open" }),
       workspaceName: "Acme Co",
       workspaceId: WORKSPACE_ID,
+      assignedAdminEmail: null,
     });
     vi.mocked(ticketAdminRepository.createMessage).mockResolvedValue({ id: "message-1" } as never);
 
@@ -102,6 +109,7 @@ describe("ticketAdminService.replyToTicket", () => {
       ticket: makeTicket({ status: "in_progress" }),
       workspaceName: "Acme Co",
       workspaceId: WORKSPACE_ID,
+      assignedAdminEmail: null,
     });
     vi.mocked(ticketAdminRepository.createMessage).mockResolvedValue({ id: "message-1" } as never);
 
@@ -115,6 +123,7 @@ describe("ticketAdminService.replyToTicket", () => {
       ticket: makeTicket({ status: "open" }),
       workspaceName: "Acme Co",
       workspaceId: WORKSPACE_ID,
+      assignedAdminEmail: null,
     });
     vi.mocked(ticketAdminRepository.createMessage).mockResolvedValue({ id: "message-1" } as never);
     vi.mocked(emailService.sendNotificationEmail).mockRejectedValue(new Error("Resend sandboxed"));
@@ -122,6 +131,55 @@ describe("ticketAdminService.replyToTicket", () => {
     await ticketAdminService.replyToTicket(ADMIN_ID, ADMIN_EMAIL, "ticket-1", "Update");
 
     expect(notificationRepository.create).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips the notification, email, and status change entirely for an internal note", async () => {
+    vi.mocked(ticketAdminRepository.findById).mockResolvedValue({
+      ticket: makeTicket({ status: "open" }),
+      workspaceName: "Acme Co",
+      workspaceId: WORKSPACE_ID,
+      assignedAdminEmail: null,
+    });
+    vi.mocked(ticketAdminRepository.createMessage).mockResolvedValue({ id: "message-1" } as never);
+
+    await ticketAdminService.replyToTicket(ADMIN_ID, ADMIN_EMAIL, "ticket-1", "Internal note", true);
+
+    expect(ticketAdminRepository.createMessage).toHaveBeenCalledWith(expect.objectContaining({ isInternal: true }));
+    expect(ticketAdminRepository.updateStatus).not.toHaveBeenCalled();
+    expect(notificationRepository.create).not.toHaveBeenCalled();
+    expect(emailService.sendNotificationEmail).not.toHaveBeenCalled();
+    expect(auditLogRepository.log).toHaveBeenCalledWith(expect.objectContaining({ summary: expect.stringContaining("internal note") }));
+  });
+});
+
+describe("ticketAdminService.assignTicket", () => {
+  it("assigns the ticket and logs an audit event", async () => {
+    const ticket = makeTicket({ assignedAdminUserId: "admin-2" });
+    vi.mocked(ticketAdminRepository.assign).mockResolvedValue(ticket);
+
+    const result = await ticketAdminService.assignTicket(ADMIN_ID, ADMIN_EMAIL, "ticket-1", "admin-2");
+
+    expect(result).toBe(ticket);
+    expect(ticketAdminRepository.assign).toHaveBeenCalledWith("ticket-1", "admin-2");
+    expect(auditLogRepository.log).toHaveBeenCalledWith(expect.objectContaining({ action: "support_ticket_assigned" }));
+  });
+
+  it("throws when the ticket doesn't exist", async () => {
+    vi.mocked(ticketAdminRepository.assign).mockResolvedValue(null);
+
+    await expect(ticketAdminService.assignTicket(ADMIN_ID, ADMIN_EMAIL, "ticket-1", "admin-2")).rejects.toThrow(/not found/);
+  });
+});
+
+describe("ticketAdminService.setCategory", () => {
+  it("updates the category and logs an audit event", async () => {
+    const ticket = makeTicket({ category: "billing" });
+    vi.mocked(ticketAdminRepository.setCategory).mockResolvedValue(ticket);
+
+    const result = await ticketAdminService.setCategory(ADMIN_ID, ADMIN_EMAIL, "ticket-1", "billing");
+
+    expect(result).toBe(ticket);
+    expect(auditLogRepository.log).toHaveBeenCalledWith(expect.objectContaining({ action: "support_ticket_category_changed" }));
   });
 });
 

@@ -13,7 +13,7 @@ vi.mock("@/features/knowledge-base/repository/policy.repository", () => ({
 }));
 
 vi.mock("@/features/knowledge-base/repository/product.repository", () => ({
-  productRepository: { findByWorkspaceId: vi.fn() },
+  productRepository: { findByWorkspaceId: vi.fn(), findVisibleToAi: vi.fn() },
 }));
 
 vi.mock("@/features/knowledge-base/repository/service.repository", () => ({
@@ -34,6 +34,7 @@ vi.mock("../prompt/prompt-builder", () => ({
 
 vi.mock("../router/ai-router", () => ({
   DEFAULT_MODEL: "claude-haiku-4-5",
+  selectModel: vi.fn().mockReturnValue("claude-haiku-4-5"),
   selectProvider: vi.fn(),
 }));
 
@@ -77,7 +78,7 @@ beforeEach(() => {
   vi.mocked(contactRepository.findById).mockResolvedValue(null);
   vi.mocked(faqRepository.findByWorkspaceId).mockResolvedValue([]);
   vi.mocked(policyRepository.findByWorkspaceId).mockResolvedValue(null);
-  vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([]);
+  vi.mocked(productRepository.findVisibleToAi).mockResolvedValue([]);
   vi.mocked(serviceRepository.findByWorkspaceId).mockResolvedValue([]);
   vi.mocked(aiAgentRepository.findByWorkspaceId).mockResolvedValue({ id: "agent-1" } as never);
 });
@@ -158,5 +159,26 @@ describe("aiService.generateReply — platform-wide kill switch", () => {
     await aiService.generateReply(WORKSPACE_ID, []);
 
     expect(generateReply).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("aiService.generateReply — post-generation safety filter", () => {
+  it("replaces a reply that discloses it's an AI and forces a handover", async () => {
+    mockProviderText("I'm actually an AI assistant built by Anthropic!");
+
+    const result = await aiService.generateReply(WORKSPACE_ID, []);
+
+    expect(result.text).not.toContain("Anthropic");
+    expect(result.needsHumanHandover).toBe(true);
+    expect(result.handoverCategory).toBe("other");
+  });
+
+  it("leaves an ordinary safe reply untouched", async () => {
+    mockProviderText("Sure! We're open until 6pm today.");
+
+    const result = await aiService.generateReply(WORKSPACE_ID, []);
+
+    expect(result.text).toBe("Sure! We're open until 6pm today.");
+    expect(result.needsHumanHandover).toBe(false);
   });
 });

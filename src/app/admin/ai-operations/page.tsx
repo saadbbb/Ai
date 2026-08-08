@@ -3,14 +3,16 @@ import { AiEnabledToggle } from "@/features/platform-admin/components/ai-enabled
 import { aiUsageAdminRepository } from "@/features/platform-admin/repository/ai-usage-admin.repository";
 import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
 import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
+import { rateLimitRepository } from "@/lib/rate-limit/rate-limit.repository";
 
 export default async function AdminAiOperationsPage() {
   await requirePlatformAdmin();
   const t = await getTranslations("platformAdmin.aiOperations");
 
-  const [settings, byModel] = await Promise.all([
+  const [settings, byModel, rateLimits] = await Promise.all([
     platformSettingsRepository.get(),
     aiUsageAdminRepository.getByModel(),
+    rateLimitRepository.findMostActive(),
   ]);
 
   return (
@@ -47,6 +49,29 @@ export default async function AdminAiOperationsPage() {
                 </div>
               );
             })}
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-sm font-medium">{t("rateLimitsHeading")}</h2>
+          <p className="text-xs text-muted-foreground">{t("rateLimitsDescription")}</p>
+        </div>
+        {rateLimits.length === 0 ? (
+          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+            {t("rateLimitsEmpty")}
+          </p>
+        ) : (
+          <div className="divide-y rounded-lg border">
+            {rateLimits.map((bucket) => (
+              <div key={bucket.key} className="flex items-center justify-between gap-4 p-3 text-sm">
+                <span className="truncate font-mono text-xs">{bucket.key}</span>
+                <span className="shrink-0 text-muted-foreground">
+                  {t("rateLimitCount", { count: bucket.count })} · {new Date(bucket.windowStart).toLocaleTimeString()}
+                </span>
+              </div>
+            ))}
           </div>
         )}
       </div>

@@ -23,7 +23,7 @@ export async function generateWorkflowAction(input: unknown): Promise<ActionResu
   await requireWorkspacePermission(user.id, workspace.id, "automation.workflows.manage");
 
   try {
-    const isGeneratorEnabled = await featureFlagRepository.isEnabled(FEATURE_FLAG_KEYS.AI_WORKFLOW_GENERATOR);
+    const isGeneratorEnabled = await featureFlagRepository.isEnabled(FEATURE_FLAG_KEYS.AI_WORKFLOW_GENERATOR, workspace.id);
     if (!isGeneratorEnabled) {
       throw new AppError("SERVICE_UNAVAILABLE", "The AI Workflow Generator is temporarily disabled. Build the workflow manually below.");
     }

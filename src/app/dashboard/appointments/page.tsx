@@ -4,6 +4,7 @@ import { AppointmentStatusSelect } from "@/features/appointments/components/appo
 import { appointmentService } from "@/features/appointments/services/appointment.service";
 import { Button } from "@/components/ui/button";
 import { ExportButtons } from "@/components/export-buttons";
+import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
 export default async function AppointmentsPage() {
@@ -13,7 +14,11 @@ export default async function AppointmentsPage() {
   const t = await getTranslations("appointments");
   const tCommon = await getTranslations("common");
 
-  const appointments = await appointmentService.listAppointments(workspace.id);
+  const [appointments, members] = await Promise.all([
+    appointmentService.listAppointments(workspace.id),
+    membershipRepository.findMembersByWorkspaceId(workspace.id),
+  ]);
+  const memberNameById = new Map(members.map((item) => [item.user.id, item.user.email]));
   const formatter = new Intl.DateTimeFormat("en-GB", {
     timeZone: workspace.timezone,
     dateStyle: "medium",
@@ -44,20 +49,24 @@ export default async function AppointmentsPage() {
         </p>
       ) : (
         <div className="divide-y rounded-lg border">
-          {appointments.map(({ appointment, contact }) => (
+          {appointments.map(({ appointment, contact }) => {
+            const assignedToName = appointment.assignedToUserId ? memberNameById.get(appointment.assignedToUserId) : undefined;
+            return (
             <div key={appointment.id} className="flex items-center justify-between gap-4 p-4">
               <div className="min-w-0">
                 <p className="truncate font-medium">{contact.fullName}</p>
                 <p className="truncate text-sm text-muted-foreground">
                   {formatter.format(appointment.scheduledAt)}
                   {appointment.serviceName ? ` · ${appointment.serviceName}` : ""}
+                  {assignedToName ? ` · ${t("assignedTo", { name: assignedToName })}` : ""}
                 </p>
               </div>
               <div className="w-40 shrink-0">
                 <AppointmentStatusSelect appointmentId={appointment.id} initialStatus={appointment.status} />
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

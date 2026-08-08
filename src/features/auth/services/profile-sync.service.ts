@@ -14,7 +14,9 @@ import {
   workspaceAuditLogs,
   workspaceMembers,
 } from "@/db/schema";
+import { platformAdminService } from "@/features/platform-admin/services/platform-admin.service";
 import { workspaceService } from "@/features/workspace/services/workspace.service";
+import { emailService } from "@/lib/email";
 import { userRepository } from "../repository/user.repository";
 
 /**
@@ -52,6 +54,32 @@ async function reKeyUserId(oldId: string, newId: string, email: string): Promise
 }
 
 /**
+ * Best-effort platform-admin heads-up on every real new signup (PART 9's
+ * Admin Notifications example) — never blocks or fails registration; a
+ * broken email provider shouldn't stop someone from signing up. Not sent
+ * for the reKeyUserId migration path above, since that's an existing
+ * account being re-keyed, not a new one.
+ */
+async function notifyAdminsOfNewSignup(workspaceName: string, ownerEmail: string): Promise<void> {
+  try {
+    const admins = await platformAdminService.listAssignableAdmins();
+    await Promise.all(
+      admins.map((admin) =>
+        emailService
+          .sendNotificationEmail({
+            to: admin.email,
+            subject: `New signup: "${workspaceName}"`,
+            text: `A new workspace "${workspaceName}" was just created by ${ownerEmail}.`,
+          })
+          .catch((error) => console.error(`[profile-sync] admin signup email failed for ${admin.email}:`, error)),
+      ),
+    );
+  } catch (error) {
+    console.error("[profile-sync] admin signup notification failed:", error);
+  }
+}
+
+/**
  * The single place that turns "a Supabase-authenticated identity" into "a
  * public.users row workspace_members/roles/etc. can reference" — called by
  * requireUser() whenever a Supabase user has no matching local row yet.
@@ -67,7 +95,11 @@ async function ensureLocalUser(supabaseUserId: string, email: string): Promise<U
   }
 
   const user = await userRepository.createFromSupabase(supabaseUserId, email);
-  await workspaceService.createWorkspaceForNewUser(user.id, user.email);
+  const workspace = await workspaceService.createWorkspaceForNewUser(user.id, user.email);
+  // Awaited, not fire-and-forget — a serverless function can be frozen/killed
+  // right after returning, so a detached promise here risks silently never
+  // running. The try/catch inside already guarantees this can't fail registration.
+  await notifyAdminsOfNewSignup(workspace.name, user.email);
   return user;
 }
 

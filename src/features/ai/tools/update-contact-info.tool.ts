@@ -10,6 +10,9 @@ const schema = z
     fullName: z.string().trim().min(1).max(200).optional(),
     phone: z.string().trim().min(3).max(50).optional(),
     email: z.string().trim().email().optional(),
+    address: z.string().trim().min(1).max(500).optional(),
+    budget: z.string().trim().min(1).max(100).optional(),
+    preferredContactMethod: z.enum(["whatsapp", "instagram", "phone", "email"]).optional(),
   })
   .refine((data) => Object.keys(data).length > 0, "Provide at least one field to update.");
 
@@ -32,7 +35,8 @@ async function execute(context: ToolContext, input: z.infer<typeof schema>): Pro
 export const updateContactInfoTool: AiTool<z.infer<typeof schema>> = {
   name: "update_contact_info",
   description:
-    "Save or correct the customer's full name, phone number, or email as you learn it during the conversation.",
+    "Save or correct information about the customer as you learn it during the conversation: full name, phone " +
+    "number, email, address, a mentioned budget, or which contact method they said they prefer.",
   schema,
   jsonSchema: {
     type: "object",
@@ -40,6 +44,13 @@ export const updateContactInfoTool: AiTool<z.infer<typeof schema>> = {
       fullName: { type: "string", description: "The customer's full name." },
       phone: { type: "string", description: "The customer's phone number." },
       email: { type: "string", description: "The customer's email address." },
+      address: { type: "string", description: "The customer's address, if they mentioned one." },
+      budget: { type: "string", description: "A budget or price range the customer mentioned, in their own words." },
+      preferredContactMethod: {
+        type: "string",
+        enum: ["whatsapp", "instagram", "phone", "email"],
+        description: "Which way the customer said they'd prefer to be contacted.",
+      },
     },
     additionalProperties: false,
   },

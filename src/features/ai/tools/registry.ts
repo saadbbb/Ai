@@ -5,6 +5,7 @@ import { addTagTool } from "./add-tag.tool";
 import { bookAppointmentTool } from "./book-appointment.tool";
 import { createLeadTool } from "./create-lead.tool";
 import { createOrderTool } from "./create-order.tool";
+import { createTaskTool } from "./create-task.tool";
 import { requestHumanHandoverTool } from "./request-human-handover.tool";
 import type { AiTool, ToolContext, ToolSignals } from "./types";
 import { updateContactInfoTool } from "./update-contact-info.tool";
@@ -16,6 +17,7 @@ const TOOLS: AiTool[] = [
   updateContactInfoTool,
   bookAppointmentTool,
   createOrderTool,
+  createTaskTool,
   requestHumanHandoverTool,
 ];
 

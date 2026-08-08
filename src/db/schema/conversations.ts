@@ -1,4 +1,4 @@
-import { index, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { channels } from "./channels";
 import { contacts } from "./contacts";
 import { users } from "./users";
@@ -12,6 +12,8 @@ export const conversationStatusEnum = pgEnum("conversation_status", ["open", "cl
  * not reply further — see GenerateReplyResult.needsHumanHandover.
  */
 export const conversationAiStatusEnum = pgEnum("conversation_ai_status", ["active", "paused", "handed_over"]);
+
+export const conversationPriorityEnum = pgEnum("conversation_priority", ["normal", "high"]);
 
 export const conversations = pgTable(
   "conversations",
@@ -29,8 +31,19 @@ export const conversations = pgTable(
     status: conversationStatusEnum("status").notNull().default("open"),
     aiStatus: conversationAiStatusEnum("ai_status").notNull().default("active"),
     assignedUserId: uuid("assigned_user_id").references(() => users.id, { onDelete: "set null" }),
+    pinned: boolean("pinned").notNull().default(false),
+    priority: conversationPriorityEnum("priority").notNull().default("normal"),
     lastMessageAt: timestamp("last_message_at", { withTimezone: true }),
     lastMessagePreview: text("last_message_preview"),
+    // Denormalized from the last-created message, same reasoning as
+    // lastMessagePreview — lets the inbox list's "needs reply" filter (last
+    // message was from the customer, nobody's answered yet) run without a
+    // join to `messages` for every row. Plain text (not a shared enum
+    // reference) to avoid a circular schema import with messages.ts, which
+    // itself references `conversations`.
+    lastMessageSenderType: text("last_message_sender_type"),
+    /** Dedup marker for the daily missed-conversations cron — see missed-conversation.service.ts. */
+    missedNotifiedAt: timestamp("missed_notified_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -44,3 +57,4 @@ export type Conversation = typeof conversations.$inferSelect;
 export type NewConversation = typeof conversations.$inferInsert;
 export type ConversationStatus = (typeof conversationStatusEnum.enumValues)[number];
 export type ConversationAiStatus = (typeof conversationAiStatusEnum.enumValues)[number];
+export type ConversationPriority = (typeof conversationPriorityEnum.enumValues)[number];

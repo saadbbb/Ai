@@ -1,14 +1,20 @@
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
-import { csvResponse, toCsv } from "@/lib/csv";
+import { parseReportFormat, reportResponse } from "@/lib/report-response";
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
   await requireFeature(workspace, "inbox");
 
+  const url = new URL(request.url);
+  const format = parseReportFormat(url.searchParams.get("format"));
   const conversations = await conversationRepository.findByWorkspaceId(workspace.id);
-  const csv = toCsv(
+
+  return reportResponse(
+    format,
+    "conversations",
+    "Conversations",
     ["Contact", "Phone", "Channel", "Status", "AI Status", "Last Message", "Last Message At", "Created At"],
     conversations.map((item) => [
       item.contact.fullName,
@@ -21,6 +27,4 @@ export async function GET() {
       item.conversation.createdAt.toISOString(),
     ]),
   );
-
-  return csvResponse("conversations", csv);
 }

@@ -1,0 +1,2 @@
+CREATE TYPE "public"."message_intent" AS ENUM('greeting', 'question', 'complaint', 'purchase_intent', 'price_inquiry', 'appointment_request', 'cancellation', 'urgent', 'spam', 'other');--> statement-breakpoint
+ALTER TABLE "messages" ADD COLUMN "detected_intent" "message_intent";

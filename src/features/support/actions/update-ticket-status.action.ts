@@ -1,7 +1,7 @@
-"use server";
+﻿"use server";
 
 import type { SupportTicket } from "@/db/schema";
-import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
+import { requireWritePlatformAdmin } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { ticketAdminService } from "../services/ticket-admin.service";
 import { updateTicketStatusSchema } from "../validation/schemas";
@@ -12,7 +12,7 @@ export async function updateTicketStatusAction(input: unknown): Promise<ActionRe
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
 
-  const admin = await requirePlatformAdmin();
+  const admin = await requireWritePlatformAdmin();
 
   try {
     const ticket = await ticketAdminService.updateStatus(admin.id, admin.email, parsed.data.ticketId, parsed.data.status);

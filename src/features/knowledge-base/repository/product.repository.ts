@@ -7,6 +7,23 @@ export const productRepository = {
     return db.select().from(products).where(eq(products.workspaceId, workspaceId));
   },
 
+  async findById(id: string, workspaceId: string): Promise<Product | null> {
+    const [product] = await db
+      .select()
+      .from(products)
+      .where(and(eq(products.id, id), eq(products.workspaceId, workspaceId)))
+      .limit(1);
+    return product ?? null;
+  },
+
+  /** What the AI is allowed to see and mention — active AND not excluded via aiVisible (see that column's schema comment). */
+  async findVisibleToAi(workspaceId: string): Promise<Product[]> {
+    return db
+      .select()
+      .from(products)
+      .where(and(eq(products.workspaceId, workspaceId), eq(products.isActive, true), eq(products.aiVisible, true)));
+  },
+
   async createMany(data: NewProduct[]): Promise<Product[]> {
     if (data.length === 0) return [];
     return db.insert(products).values(data).returning();

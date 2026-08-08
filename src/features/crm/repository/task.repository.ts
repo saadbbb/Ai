@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNull, lte, or } from "drizzle-orm";
 import { db } from "@/db/client";
 import { type NewTask, type Task, tasks } from "@/db/schema";
 
@@ -45,5 +45,24 @@ export const taskRepository = {
 
   async delete(id: string, workspaceId: string): Promise<void> {
     await db.delete(tasks).where(and(eq(tasks.id, id), eq(tasks.workspaceId, workspaceId)));
+  },
+
+  /** Open tasks due today or earlier, not reminded yet or last reminded before `renotifyBefore` — feeds the daily task-reminders cron. */
+  async findDueForReminder(dueBefore: Date, renotifyBefore: Date): Promise<Task[]> {
+    return db
+      .select()
+      .from(tasks)
+      .where(
+        and(
+          eq(tasks.status, "open"),
+          lte(tasks.dueAt, dueBefore),
+          or(isNull(tasks.reminderSentAt), lte(tasks.reminderSentAt, renotifyBefore)),
+        ),
+      )
+      .orderBy(asc(tasks.dueAt));
+  },
+
+  async markReminderSent(id: string): Promise<void> {
+    await db.update(tasks).set({ reminderSentAt: new Date() }).where(eq(tasks.id, id));
   },
 };

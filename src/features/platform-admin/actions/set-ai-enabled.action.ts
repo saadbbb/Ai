@@ -1,8 +1,8 @@
-"use server";
+﻿"use server";
 
 import { z } from "zod";
 import type { PlatformSettings } from "@/db/schema";
-import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
+import { requireWritePlatformAdmin } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { auditLogRepository } from "../repository/audit-log.repository";
 import { platformSettingsRepository } from "../repository/platform-settings.repository";
@@ -15,7 +15,7 @@ export async function setAiEnabledAction(input: unknown): Promise<ActionResult<P
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
 
-  const admin = await requirePlatformAdmin();
+  const admin = await requireWritePlatformAdmin();
 
   try {
     const settings = await platformSettingsRepository.setAiEnabled(parsed.data.enabled);

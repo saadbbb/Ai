@@ -9,6 +9,7 @@ import type {
   workingHoursSchema,
 } from "@/features/ai/validation/schemas";
 import { faqRepository } from "@/features/knowledge-base/repository/faq.repository";
+import { parseGalleryImageUrls, parseVariantNames } from "@/features/knowledge-base/lib/product-input";
 import { policyRepository } from "@/features/knowledge-base/repository/policy.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
@@ -149,7 +150,14 @@ async function saveKnowledgeBase(
   await Promise.all([
     faqRepository.createMany(data.faqs.map((faq, index) => ({ ...faq, workspaceId, sortOrder: index }))),
     productRepository.createMany(
-      data.products.map((product) => ({ ...product, workspaceId, price: product.price?.toString() })),
+      data.products.map(({ galleryImageUrlsText, variantNamesText, discountedPrice, ...product }) => ({
+        ...product,
+        workspaceId,
+        price: product.price?.toString(),
+        discountedPrice: discountedPrice?.toString() ?? null,
+        galleryImageUrls: parseGalleryImageUrls(galleryImageUrlsText),
+        variants: parseVariantNames(variantNamesText),
+      })),
     ),
     serviceRepository.createMany(
       data.services.map((service) => ({ ...service, workspaceId, price: service.price?.toString() })),

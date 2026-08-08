@@ -74,6 +74,13 @@ export const contactRepository = {
         | "city"
         | "source"
         | "assignedAgentId"
+        | "address"
+        | "budget"
+        | "preferredContactMethod"
+        | "preferredProducts"
+        | "birthDate"
+        | "gender"
+        | "timezone"
       >
     >,
   ): Promise<Contact | null> {
@@ -85,11 +92,13 @@ export const contactRepository = {
     return contact ?? null;
   },
 
-  async updateLifecycleStage(id: string, workspaceId: string, lifecycleStage: ContactLifecycleStage): Promise<void> {
-    await db
+  async updateLifecycleStage(id: string, workspaceId: string, lifecycleStage: ContactLifecycleStage): Promise<Contact | null> {
+    const [contact] = await db
       .update(contacts)
       .set({ lifecycleStage, updatedAt: new Date() })
-      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
+      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)))
+      .returning();
+    return contact ?? null;
   },
 
   async updateAiSummary(id: string, workspaceId: string, aiSummary: string): Promise<void> {
@@ -99,32 +108,29 @@ export const contactRepository = {
       .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
   },
 
+  /**
+   * A single atomic UPDATE instead of read-modify-write — Postgres re-evaluates
+   * the SET expression against the row's current value under the row lock the
+   * UPDATE itself takes, so two concurrent addTag calls for the same contact
+   * can never silently drop one of them (the read-then-write version could).
+   */
   async addTag(id: string, workspaceId: string, tag: string): Promise<void> {
-    const [contact] = await db
-      .select({ tags: contacts.tags })
-      .from(contacts)
-      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)))
-      .limit(1);
-    if (!contact || contact.tags.includes(tag)) return;
-
-    await db
-      .update(contacts)
-      .set({ tags: [...contact.tags, tag], updatedAt: new Date() })
-      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
-  },
-
-  async removeTag(id: string, workspaceId: string, tag: string): Promise<void> {
-    const [contact] = await db
-      .select({ tags: contacts.tags })
-      .from(contacts)
-      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)))
-      .limit(1);
-    if (!contact || !contact.tags.includes(tag)) return;
-
+    const tagAsJsonArray = JSON.stringify([tag]);
     await db
       .update(contacts)
       .set({
-        tags: contact.tags.filter((existing) => existing !== tag),
+        tags: sql`case when ${contacts.tags} @> ${tagAsJsonArray}::jsonb then ${contacts.tags} else ${contacts.tags} || ${tagAsJsonArray}::jsonb end`,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));
+  },
+
+  /** Same atomicity rationale as addTag — the jsonb `-` operator removes a matching array element in one statement. */
+  async removeTag(id: string, workspaceId: string, tag: string): Promise<void> {
+    await db
+      .update(contacts)
+      .set({
+        tags: sql`${contacts.tags} - ${tag}::text`,
         updatedAt: new Date(),
       })
       .where(and(eq(contacts.id, id), eq(contacts.workspaceId, workspaceId)));

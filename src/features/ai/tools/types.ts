@@ -1,10 +1,21 @@
 import "server-only";
 import type { ZodType } from "zod";
 
+/** The handful of situations PART 2's Human Handover spec calls out by name, plus a catch-all. */
+export type HandoverCategory =
+  | "explicit_request"
+  | "complaint"
+  | "refund_request"
+  | "legal_or_medical"
+  | "payment_issue"
+  | "unable_to_help"
+  | "other";
+
 /** Set by a tool (e.g. request_human_handover) to signal ai.service after the tool loop ends. */
 export interface ToolSignals {
   handoverRequested: boolean;
   handoverReason?: string;
+  handoverCategory?: HandoverCategory;
 }
 
 export interface ToolContext {

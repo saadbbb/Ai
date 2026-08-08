@@ -24,7 +24,7 @@ export default async function WebsitePage() {
           {storeUrl}
         </Link>
       </div>
-      <StorefrontEditor storefront={storefront} storeUrl={storeUrl} />
+      <StorefrontEditor storefront={storefront} storeUrl={storeUrl} slug={workspace.slug} />
     </div>
   );
 }

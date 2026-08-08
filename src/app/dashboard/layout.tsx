@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { BLOCKED_SUBSCRIPTION_STATUSES } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/features/auth/components/logout-button";
@@ -60,10 +61,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
     permissionService.hasPermission(user.id, workspace.id, "campaigns.manage"),
     permissionService.hasPermission(user.id, workspace.id, "ads.manage"),
   ]);
-  const isSuspended = workspace.subscriptionStatus === "suspended";
+  const isBlocked = (BLOCKED_SUBSCRIPTION_STATUSES as readonly string[]).includes(workspace.subscriptionStatus);
+  const isOverdue = workspace.subscriptionStatus === "past_due" || workspace.subscriptionStatus === "grace";
   const [settings, enabledFeatures] = await Promise.all([
-    isSuspended ? platformSettingsRepository.get() : Promise.resolve(null),
-    isSuspended ? Promise.resolve([]) : featureAccessService.getEnabledFeatures(workspace),
+    isBlocked ? platformSettingsRepository.get() : Promise.resolve(null),
+    isBlocked ? Promise.resolve([]) : featureAccessService.getEnabledFeatures(workspace),
   ]);
 
   // PART 13B's 5-section IA: HOME and INBOX stand alone; CUSTOMERS, AI EMPLOYEE, and GROWTH
@@ -163,7 +165,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </DropdownMenu>
         </div>
       </header>
-      {isSuspended ? (
+      {isBlocked ? (
         <main className="flex flex-1 items-center justify-center p-6">
           <div className="max-w-sm space-y-3 rounded-lg border p-6 text-center">
             <h1 className="font-medium">{t("suspended.title")}</h1>
@@ -209,6 +211,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 </Link>
               ))}
             </nav>
+
+            {isOverdue && (
+              <div className="border-b bg-amber-50 px-6 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                {t(`overdue.${workspace.subscriptionStatus}`)}{" "}
+                <Link href="/dashboard/billing" className="font-medium underline underline-offset-2">
+                  {t("overdue.cta")}
+                </Link>
+              </div>
+            )}
 
             <main className="flex-1 p-6">{children}</main>
           </div>

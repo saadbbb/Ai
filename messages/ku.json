@@ -214,7 +214,15 @@
       "productNamePlaceholder": "ناوی بەرهەم",
       "descriptionPlaceholder": "وەسف (ئارەزوومەندانە)",
       "pricePlaceholder": "نرخ (ئارەزوومەندانە)",
+      "discountedPricePlaceholder": "نرخی داشکاندن (ئارەزوومەندانە)",
+      "categoryPlaceholder": "پۆل (ئارەزوومەندانە)",
       "imageUrlPlaceholder": "لینکی وێنە (ئارەزوومەندانە، لە دوکانەکەت دەردەکەوێت)",
+      "galleryImageUrlsPlaceholder": "لینکی وێنەی زیاتر، هەر لینکێک لە دێرێکی جیا (ئارەزوومەندانە)",
+      "variantNamesPlaceholder": "هەڵبژاردەکان، بە کۆما جیاکراونەتەوە، بۆ نموونە: بچووک، مامناوەند، گەورە (ئارەزوومەندانە)",
+      "aiVisibleLabel": "کارمەندە زیرەکەکە دەتوانێت ئەم بەرهەمە پێشنیار بکات",
+      "aiHiddenBadge": "لە کارمەندە زیرەکە شاردراوەتەوە",
+      "featuredLabel": "تایبەت لە فرۆشگادا",
+      "promotionEndsAtLabel": "کۆتایی پرۆمۆشن (ئارەزوومەندانە)",
       "addProduct": "زیادکردنی بەرهەم",
       "servicesHeading": "خزمەتگوزارییەکان",
       "serviceNamePlaceholder": "ناوی خزمەتگوزاری",
@@ -292,12 +300,26 @@
         "appointmentsCompleted": "کاتە تەواوبووەکان",
         "pipelineHeading": "هێڵی فرۆشتن",
         "pipelineEmpty": "هێشتا هیچ کڕیارێکی ئەگەری لە هێڵەکەدا نییە."
+      },
+      "business": {
+        "heading": "بازرگانی",
+        "subscriptionStatus": "بەشداربوون",
+        "plan": "پلان",
+        "noPlan": "پلان نییە",
+        "topChannel": "باشترین کەناڵ",
+        "topProduct": "باشترین بەرهەم",
+        "topAgent": "باشترین کارمەند"
       }
     },
     "suspended": {
       "title": "هەژمارەکەت وەستێنراوە",
       "description": "پەیوەندیمان پێوە بکە بۆ چارەسەرکردنی ئەمە و گەڕانەوە بۆ کار.",
       "whatsappCta": "لە ڕێگەی واتساپەوە پەیوەندیمان پێوە بکە"
+    },
+    "overdue": {
+      "past_due": "پارەدانی بەشداریکردنەکەت دواکەوتووە.",
+      "grace": "ئاگاداری کۆتایی — بەشداریکردنەکەت هێشتا دواکەوتووە و بەم زووانە دەوەستێنرێت.",
+      "cta": "ئێستا نوێی بکەرەوە"
     },
     "insights": {
       "heading": "تێڕوانینەکانی زیرەکی دەستکرد",
@@ -312,10 +334,14 @@
     "title": "شیکاری",
     "description": "دیمەنێکی خێرا لە چۆنیەتی کارەکەت.",
     "range": {
+      "today": "ئەمڕۆ",
+      "yesterday": "دوێنێ",
       "7d": "٧ ڕۆژی ڕابردوو",
       "30d": "٣٠ ڕۆژی ڕابردوو",
       "90d": "٩٠ ڕۆژی ڕابردوو",
-      "month": "ئەم مانگە"
+      "month": "ئەم مانگە",
+      "custom": "مەودای تایبەت",
+      "apply": "جێبەجێکردن"
     },
     "kpis": {
       "newLeads": "ئامانجی نوێ",
@@ -338,7 +364,11 @@
         "leadConversion": "گۆڕینی ئامانج",
         "orderCompletion": "تەواوکردنی داواکاری",
         "appointmentCompletion": "تەواوکردنی چاوپێکەوتن",
-        "aiSuccess": "سەرکەوتنی ژیریی دەستکرد"
+        "aiSuccess": "سەرکەوتنی ژیریی دەستکرد",
+        "responseTime": "کاتی وەڵامدانەوە",
+        "missedConversations": "گفتوگۆکانی چارەسەرکراو لەلایەن AI",
+        "automationSuccess": "ڕێژەی سەرکەوتنی ئۆتۆماتیک",
+        "revenueTrend": "ئاراستەی داهات"
       }
     },
     "charts": {
@@ -348,7 +378,32 @@
       "appointmentsByStatus": "چاوپێکەوتن بەپێی دۆخ",
       "conversationsByChannel": "گفتوگۆ بەپێی کەناڵ",
       "revenueByProduct": "داهات بەپێی بەرهەم",
+      "messagesByDay": "نامەکان",
+      "appointmentsByDay": "چاوپێکەوتنە خشتەکراوەکان",
+      "leadsByChannel": "ئامانج بەپێی کەناڵ",
+      "revenueByChannel": "داهات بەپێی کەناڵ",
+      "topServices": "باشترین خزمەتگوزاریەکان",
       "empty": "هێشتا زانیاری نییە بۆ ئەم ماوەیە."
+    },
+    "depth": {
+      "title": "پێوەرە قووڵترەکان",
+      "salesReport": "ڕاپۆرتی فرۆشتن:",
+      "customersReport": "ڕاپۆرتی کڕیاران:",
+      "channelsReport": "ڕاپۆرتی کەناڵەکان:",
+      "avgOrderValue": "تێکڕای نرخی داواکاری",
+      "salesGrowth": "گەشەی فرۆشتن",
+      "repeatCustomerRate": "کڕیارە دووبارەکان",
+      "winRate": "ڕێژەی بردنەوەی ئامانج",
+      "aiHandoffRate": "ڕێژەی گواستنەوە بۆ مرۆڤ",
+      "avgResponseAi": "تێکڕای وەڵامدانەوەی AI",
+      "avgResponseHuman": "تێکڕای وەڵامدانەوەی کارمەند",
+      "avgAppointmentLeadTime": "تێکڕای کاتی پێشوەختەی حیجزکردن",
+      "newCustomers": "کڕیاری نوێ",
+      "returningCustomers": "کڕیاری گەڕاوە",
+      "direct": "ڕاستەوخۆ / دەستی",
+      "seconds": "{count} چ",
+      "minutes": "{count} خ",
+      "hours": "{count} کاتژمێر"
     },
     "teamPerformance": {
       "title": "کارایی تیم",
@@ -448,7 +503,22 @@
       "channelInstagram": "ئینستاگرام",
       "aiActive": "کارمەندە زیرەکەکە وەڵام دەداتەوە",
       "aiPaused": "کارمەندە زیرەکەکە وەستاوە",
-      "aiHandedOver": "پێویستی بە کەسێکی مرۆڤە"
+      "aiHandedOver": "پێویستی بە کەسێکی مرۆڤە",
+      "searchPlaceholder": "گەڕان لە گفتوگۆکان...",
+      "filters": {
+        "pinned": "چەسپاوە",
+        "priority": "گرنگی",
+        "unassigned": "دەستنیشان نەکراوە",
+        "needsReply": "پێویستی بە وەڵامە",
+        "archived": "ئارشیفکراوە"
+      },
+      "pinnedMarker": "چەسپاوە",
+      "pin": "چەسپاندن",
+      "unpin": "لابردنی چەسپاندن",
+      "markPriority": "نیشانکردن بە گرنگی",
+      "unmarkPriority": "لابردنی نیشانی گرنگی",
+      "archive": "ئارشیفکردن",
+      "reopen": "کردنەوەی دووبارە"
     },
     "new": {
       "title": "گفتوگۆیەک دەست پێ بکە",
@@ -465,17 +535,30 @@
       "pauseAi": "وەستاندنی کارمەندە زیرەکە",
       "resumeAi": "دووبارە چالاککردنەوەی کارمەندە زیرەکە",
       "closeConversation": "داخستنی گفتوگۆ",
+      "handToHuman": "پێشکەشکردن بە مرۆڤ",
       "closedBadge": "داخراوە",
       "senderAi": "کارمەندە زیرەکە",
       "senderYou": "تۆ",
       "senderSystem": "سیستەم",
-      "switchToReply": "وەڵامدانەوە لە جیاتی ئەوە",
-      "logCustomerMessage": "لە جیاتی ئەوە پەیامی کڕیار تۆمار بکە",
+      "modeReply": "وەڵام",
+      "modeLog": "تۆمارکردنی پەیامی کڕیار",
+      "modeNote": "تێبینی ناوخۆیی",
       "logCustomerPlaceholder": "کڕیارەکە چی وت؟",
+      "notePlaceholder": "تێبینییەکی ناوخۆیی بۆ تیمەکە بنووسە...",
       "replyPlaceholder": "وەڵامەکەت بنووسە...",
       "sendReply": "ناردنی وەڵام",
       "sending": "دەنێردرێت...",
       "logSubmit": "تۆمارکردنی پەیام",
+      "saveNote": "پاشەکەوتکردنی تێبینی",
+      "noteSaved": "تێبینییەکە پاشەکەوت کرا.",
+      "suggestReply": "پێشنیارکردنی وەڵام",
+      "suggesting": "پێشنیار دەکرێت...",
+      "templates": "قاڵبەکان",
+      "noTemplates": "هێشتا هیچ قاڵبێک نییە.",
+      "deleteTemplate": "سڕینەوە",
+      "newTemplate": "+ قاڵبی نوێ",
+      "newTemplateNamePlaceholder": "ناوی قاڵب",
+      "saveTemplate": "پاشەکەوتکردن",
       "channel": {
         "manual": "دەستی",
         "whatsapp": "واتساپ",
@@ -483,7 +566,30 @@
       },
       "createLead": "دروستکردنی کڕیاری ئەگەری",
       "leadCreated": "کڕیارە ئەگەرییەکە دروست کرا.",
-      "viewInPipeline": "بینین لە هێڵی فرۆشتن ←"
+      "viewInPipeline": "بینین لە هێڵی فرۆشتن ←",
+      "unassigned": "دەستنیشان نەکراوە",
+      "context": {
+        "viewFullProfile": "بینینی پڕۆفایلی تەواو ←",
+        "leadStage": "قۆناغی کڕیاری ئەگەری",
+        "noLead": "هێشتا هیچ کڕیارێکی ئەگەری نییە.",
+        "ordersHeading": "داواکارییە دوایینەکان",
+        "noOrders": "هێشتا هیچ داواکارییەک نییە.",
+        "appointmentsHeading": "چاوپێکەوتنە داهاتووەکان",
+        "noAppointments": "هێشتا هیچ چاوپێکەوتنێک نییە.",
+        "activityHeading": "چالاکی دوایین",
+        "noActivity": "هێشتا هیچ چالاکییەک نییە."
+      },
+      "intents": {
+        "greeting": "سڵاو",
+        "question": "پرسیار",
+        "complaint": "سکاڵا",
+        "purchase_intent": "مەبەستی کڕین",
+        "price_inquiry": "پرسیاری نرخ",
+        "appointment_request": "داواکاری چاوپێکەوتن",
+        "cancellation": "هەڵوەشاندنەوە",
+        "urgent": "پەلە",
+        "spam": "سپام"
+      }
     }
   },
   "orders": {
@@ -494,6 +600,10 @@
     "itemCount": "{count} بەرهەم",
     "backLink": "← گەڕانەوە بۆ داواکارییەکان",
     "notesHeading": "تێبینییەکان",
+    "subtotalHeading": "کۆی لاوەکی",
+    "discountHeading": "داشکاندن",
+    "taxHeading": "باج",
+    "deliveryFeeHeading": "کرێی گەیاندن",
     "totalHeading": "کۆی گشتی",
     "noOrdersForContact": "هێشتا هیچ داواکارییەک بۆ ئەم پەیوەندییە نییە.",
     "statuses": {
@@ -522,6 +632,24 @@
       "addItem": "زیادکردنی بەرهەم",
       "itemRequired": "لانیکەم یەک بەرهەم زیاد بکە.",
       "notesLabel": "تێبینی (ئارەزوومەندانە)",
+      "discountLabel": "داشکاندن",
+      "taxLabel": "باج",
+      "deliveryFeeLabel": "کرێی گەیاندن",
+      "paymentMethodLabel": "شێوازی پارەدان",
+      "paymentMethodPlaceholder": "هەڵبژێرە (ئارەزوومەندانە)",
+      "paymentMethods": {
+        "cash": "نەقد",
+        "card": "کارت",
+        "bank_transfer": "گواستنەوەی بانکی",
+        "other": "هیتر"
+      },
+      "deliveryMethodLabel": "شێوازی گەیاندن",
+      "deliveryMethodPlaceholder": "هەڵبژێرە (ئارەزوومەندانە)",
+      "deliveryMethods": {
+        "pickup": "وەرگرتن لە شوێن",
+        "delivery": "گەیاندن"
+      },
+      "subtotal": "کۆی لاوەکی: {subtotal}",
       "total": "کۆی گشتی: {total}",
       "submit": "دروستکردنی داواکاری",
       "submitting": "دروست دەکرێت..."
@@ -534,15 +662,36 @@
     "statuses": {
       "trial": "تاقیکردنەوە",
       "active": "چالاک",
-      "suspended": "وەستێنراو"
+      "past_due": "پارەدان دواکەوتووە",
+      "grace": "ئاگاداری کۆتایی",
+      "suspended": "وەستێنراو",
+      "cancelled": "هەڵوەشێنراوە",
+      "expired": "بەسەرچووە"
     },
     "activeDescription": "تۆ بەشداریت کردووە. سوپاس بۆ ئەوەی کڕیارمانیت!",
+    "overdue": {
+      "past_due": "پارەدانی بەشداریکردنەکەت دواکەوتووە — نوێی بکەرەوە بۆ ڕێگریکردن لە وەستان.",
+      "grace": "ئاگاداری کۆتایی — بەشداریکردنەکەت هێشتا دواکەوتووە و بەم زووانە دەوەستێنرێت."
+    },
     "expiresOn": "نوێ دەبێتەوە/کۆتایی دێت لە {date}",
     "ctaDescription": "هێشتا پارە لە کارتەکان وەرناگرین — لە واتساپەوە پەیامان بۆ بنێرە و بەشداریکردنەکەت بە دەستی ئامادە دەکەین.",
     "whatsappCta": "بەشداری بکە لە ڕێگەی واتساپ",
     "fallbackWithEmail": "بەشداریکردن هێشتا ناکرێت. ئەگەر ئارەزوومەندیت ئیمەیل بنێرە بۆ {email}.",
     "fallbackNoContact": "بەشداریکردن هێشتا ناکرێت. دواتر سەردان بکەرەوە.",
-    "defaultMessage": "سڵاو! دەمەوێت بەشداری پلاتفۆرمی کارمەندی زیرەک بکەم بۆ '{{workspaceName}}'."
+    "defaultMessage": "سڵاو! دەمەوێت بەشداری پلاتفۆرمی کارمەندی زیرەک بکەم بۆ '{{workspaceName}}'.",
+    "usageHeading": "بەکارهێنانی ئەم پلانە",
+    "usageUnlimited": "هیچ سنوورێکی بەکارهێنان لەسەر پلانەکەت نییە.",
+    "usage": {
+      "users": "ئەندامانی تیم",
+      "aiAgents": "کارگێڕانی AI",
+      "channels": "کەناڵە پەیوەستکراوەکان",
+      "conversationsPerMonth": "گفتوگۆکانی ئەم مانگە",
+      "knowledgeFiles": "بەڵگەنامەکانی زانیاری",
+      "automationWorkflows": "ڕێڕەوەکانی ئۆتۆماتیک",
+      "integrations": "یەکخستنەکان"
+    },
+    "historyHeading": "مێژووی پارەدان",
+    "downloadPdf": "داگرتنی PDF"
   },
   "platformAdmin": {
     "badge": "بەڕێوەبردنی پلاتفۆرم",
@@ -550,10 +699,13 @@
     "homeLink": "سەرەکی",
     "workspacesLink": "بازنەکان",
     "plansLink": "پاکێجەکان",
+    "couponsLink": "کوپۆنەکان",
+    "refundsLink": "گەڕاندنەوەکان",
     "aiUsageLink": "بەکارهێنانی کارمەندە زیرەکە",
     "aiOperationsLink": "کردارەکانی کارمەندە زیرەکە",
     "ticketsLink": "تیکێتەکان",
     "featureFlagsLink": "ئاڵاکانی تایبەتمەندی",
+    "systemHealthLink": "تەندروستی سیستەم",
     "settingsLink": "ڕێکخستنەکان",
     "home": {
       "title": "گشتی",
@@ -570,7 +722,14 @@
       "aiRequests": "کۆی داواکارییەکان",
       "aiSuccessRate": "ڕێژەی سەرکەوتن",
       "aiAvgLatency": "تێمەڕی مامناوەند",
+      "aiInputTokens": "تۆکنی input",
+      "aiOutputTokens": "تۆکنی output",
       "msValue": "{ms}ms",
+      "openTickets": "تیکێتی کراوە",
+      "trendsHeading": "ئاراستەکان (٣٠ ڕۆژی ڕابردوو)",
+      "dailySignups": "تۆمارکردنی ڕۆژانە",
+      "activeWorkspacesPerDay": "بازنەی چالاک بۆ هەر ڕۆژێک",
+      "trendsEmpty": "هێشتا زانیاری نییە بۆ ئەم ماوەیە.",
       "recentSignupsHeading": "تۆمارکردنە نوێیەکان",
       "noSignups": "هێشتا هیچ بازنەیەک نییە.",
       "noOwner": "بێ خاوەن"
@@ -599,7 +758,11 @@
       "byModelHeading": "بەپێی مۆدێل",
       "emptyState": "هێشتا هیچ داواکارییەکی کارمەندە زیرەکە تۆمار نەکراوە.",
       "modelRequests": "{count} داواکاری",
-      "msValue": "{ms} چرکەی میلی"
+      "msValue": "{ms} چرکەی میلی",
+      "rateLimitsHeading": "چالاکی سنووری ڕێژە",
+      "rateLimitsDescription": "قەرەباڵغترین سنوورەکانی ڕێژە لە ئاستی پلاتفۆرمدا (چوونەژوورەوە، OTP، کلیلی API، هتد) لە کاتژمێری ڕابردوودا — تایبەت نییە بە AI، چونکە هێشتا سنووری ڕێژە بۆ وەڵامی AI نییە.",
+      "rateLimitsEmpty": "هیچ چالاکیەکی سنووری ڕێژە نییە لە کاتژمێری ڕابردوودا.",
+      "rateLimitCount": "{count} جار"
     },
     "adminsLink": "بەڕێوەبەران",
     "workspaces": {
@@ -612,17 +775,69 @@
       "statuses": {
         "trial": "تاقیکردنەوە",
         "active": "چالاک",
-        "suspended": "وەستێنراو"
+        "past_due": "پارەدان دواکەوتووە",
+        "grace": "ئاگاداری کۆتایی",
+        "suspended": "وەستێنراو",
+        "cancelled": "هەڵوەشێنراوە",
+        "expired": "بەسەرچووە"
       },
       "activate": "چالاککردن",
       "planLabel": "پاکێج",
       "planPlaceholder": "پاکێجێک هەڵبژێرە",
       "daysLabel": "ڕۆژەکان",
+      "couponLabel": "کوپۆن (ئارەزوومەندانە)",
+      "couponPlaceholder": "کۆد",
       "activating": "چالاک دەکرێت...",
       "confirmActivate": "پشتڕاستکردنەوە",
       "planSummary": "پاکێج: {plan}",
       "expiresOn": "کۆتایی دێت {date}",
-      "view": "بینین"
+      "view": "بینین",
+      "allStatuses": "هەموو دۆخەکان",
+      "allPlans": "هەموو پلانەکان",
+      "noPlanFilter": "بێ پلان",
+      "aiUsageSummary": "{requests} داواکاری AI · {tokens} تۆکن",
+      "delete": "سڕینەوە",
+      "deleteWarning": "ئەمە بە یەکجاری \"{slug}\" و هەموو ناوەڕۆکەکەی دەسڕێتەوە — پەیوەندیەکان، داواکاریەکان، گفتوگۆکان، هەموو شتێک. ناتوانرێت هەڵبوەشێنرێتەوە. slug ـەکە لە خوارەوە بنووسە بۆ پشتڕاستکردنەوە.",
+      "deleting": "دەسڕدرێتەوە...",
+      "confirmDelete": "سڕینەوەی هەمیشەیی"
+    },
+    "coupons": {
+      "title": "کوپۆنەکان",
+      "description": "کۆدی داشکاندن کە بەڕێوەبەر دەتوانێت بەکاریبهێنێت لە کاتی چالاککردنی بەشداریکردنی گەڕەکێک.",
+      "emptyState": "هێشتا هیچ کوپۆنێک نییە.",
+      "codePlaceholder": "کۆد، بۆ نموونە: WELCOME20",
+      "percentage": "داشکاندنی ڕێژەیی",
+      "fixed": "داشکاندنی جێگیر",
+      "valuePlaceholder": "بەها",
+      "maxRedemptionsPlaceholder": "زۆرترین بەکارهێنان (ئارەزوومەندانە)",
+      "addCoupon": "زیادکردنی کوپۆن",
+      "percentageOff": "داشکاندنی {value}%",
+      "fixedOff": "داشکاندنی {value}",
+      "redemptions": "{used}/{max} بەکارهاتووە",
+      "expiresOn": "کۆتایی دێت {date}",
+      "inactive": "ناچالاک",
+      "deactivate": "ناچالاککردن",
+      "reactivate": "دووبارە چالاککردن"
+    },
+    "refunds": {
+      "title": "گەڕاندنەوەکان",
+      "description": "داواکردن و شوێنکەوتنی گەڕاندنەوەی پارە بۆ پسوولە پارەدراوەکان.",
+      "emptyState": "هیچ گەڕاندنەوەیەک نییە هێشتا.",
+      "invoicePlaceholder": "پسوولەیەکی پارەدراو هەڵبژێرە",
+      "amountPlaceholder": "بڕی پارە",
+      "reasonPlaceholder": "هۆکار",
+      "createRefund": "داواکردنی گەڕاندنەوە",
+      "status": {
+        "requested": "داواکراوە",
+        "approved": "پەسەندکراوە",
+        "rejected": "ڕەتکراوەتەوە",
+        "completed": "تەواوبووە"
+      },
+      "action": {
+        "approved": "پەسەندکردن",
+        "rejected": "ڕەتکردنەوە",
+        "completed": "نیشانکردن وەک تەواوبوو"
+      }
     },
     "plans": {
       "title": "پاکێجەکان",
@@ -650,9 +865,23 @@
         "campaigns": "کەمپینەکان",
         "ads": "ڕیکلامەکان"
       },
-      "pricePlaceholder": "نرخ بە دیناری عێراقی (ئارەزوومەندانە)",
+      "pricePlaceholder": "نرخ (ئارەزوومەندانە)",
       "priceSummary": "{price} {currency}/مانگانە",
-      "noPriceSet": "نرخ هێشتا دانەنراوە — لە ژماردنی MRR/ARR دەرنراوە."
+      "noPriceSet": "نرخ هێشتا دانەنراوە — لە ژماردنی MRR/ARR دەرنراوە.",
+      "limitsHeading": "سنووری بەکارهێنان (ئارەزوومەندانە)",
+      "limitsHint": "بۆشی بهێڵەرەوە بۆ بێ سنوور. سنووری بیرگە و بانگکردنی API هەڵگیراون بەڵام هێشتا جێبەجێ نەکراون.",
+      "noLimitsSet": "هیچ سنوورێکی بەکارهێنان دانەنراوە — بێ سنوور.",
+      "limits": {
+        "maxUsers": "زۆرترین بەکارهێنەر",
+        "maxAiAgents": "زۆرترین کارگێڕی AI",
+        "maxChannels": "زۆرترین کەناڵ",
+        "maxConversationsPerMonth": "زۆرترین گفتوگۆ/مانگ",
+        "maxStorageMb": "زۆرترین بیرگە (MB)",
+        "maxKnowledgeFiles": "زۆرترین بەڵگەی زانیاری",
+        "maxAutomationWorkflows": "زۆرترین ڕێڕەوی ئۆتۆماتیک",
+        "maxApiCallsPerMonth": "زۆرترین بانگکردنی API/مانگ",
+        "maxIntegrations": "زۆرترین یەکخستن"
+      }
     },
     "settings": {
       "title": "ڕێکخستنەکانی پلاتفۆرم",
@@ -681,7 +910,14 @@
       "confirmRemove": "دەستگەیشتنی ئەم بەڕێوەبەرە لابردرێت؟",
       "emailPlaceholder": "email@example.com",
       "add": "زیادکردن",
-      "adding": "زیاد دەکرێت..."
+      "adding": "زیاد دەکرێت...",
+      "roles": {
+        "administrator": "بەڕێوەبەر",
+        "support_agent": "کارمەندی پشتگیری",
+        "finance": "دارایی",
+        "developer": "گەشەپێدەر",
+        "read_only": "تەنها خوێندنەوە"
+      }
     },
     "auditLogLink": "تۆماری پشکنین",
     "auditLog": {
@@ -706,10 +942,26 @@
         "high": "بەرز",
         "urgent": "پەلە"
       },
+      "categories": {
+        "billing": "فاتورە",
+        "technical": "تەکنیکی",
+        "account": "هەژمار",
+        "feature_request": "داواکاری تایبەتمەندی",
+        "other": "هیتر"
+      },
+      "unassigned": "دانەنراوە",
+      "avgResponseTime": "تێکڕای کاتی یەکەم وەڵام",
+      "avgResolutionTime": "تێکڕای کاتی چارەسەرکردن",
+      "underAnHour": "کەمتر لە کاتژمێرێک",
+      "hoursValue": "{count} کاتژمێر",
       "thread": {
         "supportTeam": "تیمی پشتگیری",
+        "internalNote": "تێبینی ناوخۆیی",
         "replyPlaceholder": "وەڵامێک بنووسە...",
+        "internalNotePlaceholder": "تێبینیەکی ناوخۆیی بنووسە (بۆ بەکارهێنەر دیار نییە)...",
+        "internalNoteToggle": "تێبینی ناوخۆیی",
         "submit": "ناردنی وەڵام",
+        "submitInternal": "پاشەکەوتکردنی تێبینی",
         "submitting": "لە ناردندایە..."
       }
     },
@@ -723,9 +975,32 @@
       "requiredHint": "کلیل و ناو پێویستن.",
       "create": "دروستکردنی ئاڵا",
       "creating": "لە دروستکردندایە...",
-      "emptyState": "هێشتا هیچ ئاڵایەکی تایبەتمەندی نییە."
+      "emptyState": "هێشتا هیچ ئاڵایەکی تایبەتمەندی نییە.",
+      "manageOverrides": "لادانەکانی بازنە",
+      "overrideCount": "{count} لادانی بازنە",
+      "noOverrides": "هیچ لادانێکی تایبەت بە بازنە نییە.",
+      "selectWorkspace": "بازنەیەک هەڵبژێرە",
+      "forcedOn": "بە زۆر چالاککراوە",
+      "forcedOff": "بە زۆر ناچالاککراوە",
+      "addOverride": "زیادکردنی لادان",
+      "removeOverride": "سڕینەوە"
+    },
+    "systemHealth": {
+      "title": "تەندروستی سیستەم",
+      "description": "پشکنینی پەیوەندی زیندوو بۆ بنەمای تەکنیکی سەرەکی پلاتفۆرم.",
+      "database": "بنکەدراوە",
+      "redis": "Redis",
+      "queue": "خشتەی ئۆتۆماتیک",
+      "email": "ئیمەیل",
+      "latency": "{ms} چرکەی میلی",
+      "statuses": {
+        "ok": "باشە",
+        "degraded": "لاواز بووە",
+        "not_configured": "ڕێکنەخراوە"
+      }
     },
     "revenueLink": "داهات",
+    "platformAnalyticsLink": "شیکاری پلاتفۆرم",
     "revenue": {
       "title": "داهات",
       "description": "داهاتی دووبارەبووی مانگانە و ساڵانە لە بەشداربوونە چالاک و نرخدارەکان.",
@@ -736,7 +1011,31 @@
       "unpricedHint": "هەندێک workspace ی چالاک لەسەر پلانێکن کە نرخی نییە — نرخێک بۆ ئەو پلانە دابنێ تا لە MRR/ARR بژمێردرێت.",
       "byPlanHeading": "بەپێی پلان",
       "emptyState": "هێشتا هیچ بەشداربوونی چالاک و نرخداری نییە.",
-      "planSubscriptions": "{count} بەشداربوون"
+      "planSubscriptions": "{count} بەشداربوون",
+      "arpu": "تێکڕای داهات بۆ هەر بەکارهێنەر",
+      "ltv": "بەهای ژیانی کڕیار",
+      "newSubscriptions": "نوێ ({days} ڕۆژ)",
+      "renewals": "نوێکردنەوە ({days} ڕۆژ)",
+      "cancellations": "هەڵوەشاندنەوە ({days} ڕۆژ)",
+      "churnRate": "ڕێژەی وازهێنان",
+      "trialConversionRate": "گۆڕینی تاقیکردنەوە",
+      "paymentFailures": "شکستی پارەدان ({days} ڕۆژ)",
+      "reports": {
+        "subscriptions": "ڕاپۆرتی بەشداربوونەکان",
+        "invoices": "ڕاپۆرتی پسوولەکان",
+        "refunds": "ڕاپۆرتی گەڕاندنەوەکان"
+      }
+    },
+    "platformAnalytics": {
+      "title": "شیکاری پلاتفۆرم",
+      "description": "پاراستنی کڕیار، پیشەسازی، جوگرافیا و بەکارهێنانی کەناڵ لە هەموو بازنەکاندا.",
+      "retentionCohort": "بازنەی تەمەن {days}+ ڕۆژ",
+      "retentionStillActive": "هێشتا لەگەڵماندان",
+      "retentionRate": "ڕێژەی پاراستن",
+      "topIndustries": "باشترین پیشەسازیەکان",
+      "geographicDistribution": "دابەشبوونی جوگرافی",
+      "channelUsage": "بەکارهێنانی کەناڵ",
+      "empty": "هێشتا زانیاری نییە."
     },
     "impersonation": {
       "banner": "🔒 ئێستا \"{workspace}\" وەک سوپەر ئەدمین دەبینیت — تەنها بینین، تۆمار کراوە لە تۆماری پشکنین.",
@@ -842,7 +1141,8 @@
         "tag_added": "نیشانەیەک زیاد دەکرێت بۆ پەیوەندییەک",
         "message_received": "کڕیار نامەیەک دەنێرێت",
         "message_replied": "وەڵامی نامەیەک دەدرێتەوە",
-        "ai_failed": "کارمەندە زیرەکە سەرکەوتوو نابێت لە وەڵامدانەوە"
+        "ai_failed": "کارمەندە زیرەکە سەرکەوتوو نابێت لە وەڵامدانەوە",
+        "conversation_assigned": "گفتوگۆیەک بۆ ئەندامێکی تیم دەستنیشان دەکرێت"
       },
       "stagePlaceholder": "قۆناغێک هەڵبژێرە",
       "statusPlaceholder": "دۆخێک هەڵبژێرە",
@@ -935,6 +1235,7 @@
     "newAppointment": "کاتی دیاریکراوی نوێ",
     "emptyState": "هێشتا هیچ کاتێکی دیاریکراو نییە. یەکێک لە لاپەڕەی پەیوەندییەکەوە دروست بکە.",
     "noAppointmentsForContact": "هێشتا هیچ کاتێکی دیاریکراو بۆ ئەم پەیوەندییە نییە.",
+    "assignedTo": "سپێردراوە بە {name}",
     "statuses": {
       "scheduled": "کاتی بۆ دانراوە",
       "confirmed": "پشتڕاستکراوە",
@@ -955,6 +1256,8 @@
       "serviceNamePlaceholder": "بۆ نموونە: ڕاوێژکاری",
       "dateTimeLabel": "ڕێکەوت و کات",
       "durationLabel": "ماوە (خولەک)",
+      "assignedToLabel": "سپاردن بە (ئارەزوومەندانە)",
+      "assignedToPlaceholder": "ئەندامێکی تیم هەڵبژێرە",
       "notesLabel": "تێبینی (ئارەزوومەندانە)",
       "submit": "دروستکردنی کاتی دیاریکراو",
       "submitting": "دروست دەکرێت..."
@@ -965,6 +1268,8 @@
     "description": "هەموو ئەو کەسانەی پەیوەندیان کردووە، لە یەک لیستدا.",
     "emptyState": "هێشتا هیچ پەیوەندییەک نییە. خۆکارانە لە سندوقی گفتوگۆکانەوە دروست دەبن.",
     "noContactInfo": "هیچ ژمارەی تەلەفۆن یان ئیمەیلێک تۆمار نەکراوە.",
+    "addTagPlaceholder": "+ زیادکردنی تاگ",
+    "removeTag": "سڕینەوەی تاگی \"{tag}\"",
     "noMessagesYet": "هێشتا هیچ پەیامێک نییە.",
     "backLink": "← گەڕانەوە بۆ پەیوەندییەکان",
     "leadsHeading": "کڕیارە ئەگەرییەکان",
@@ -973,10 +1278,40 @@
     "noConversations": "هێشتا هیچ گفتوگۆیەک نییە.",
     "lifecycle": {
       "lead": "کڕیارێکی ئەگەری",
+      "quotation": "نرخنامە نێردرا",
       "customer": "کڕیار",
       "repeat_customer": "کڕیاری دووبارە",
       "vip": "VIP",
       "loyal_customer": "کڕیاری دڵسۆز"
+    },
+    "languages": {
+      "ar": "عەرەبی",
+      "en": "ئینگلیزی",
+      "ku": "کوردی"
+    },
+    "preferredContactMethods": {
+      "whatsapp": "واتساپ",
+      "instagram": "ئینستاگرام",
+      "phone": "تەلەفۆن",
+      "email": "ئیمەیل"
+    },
+    "fields": {
+      "address": "ناونیشان: {value}",
+      "budget": "بودجە: {value}",
+      "preferredContactMethod": "پەسەندی: {value}",
+      "timezone": "کاتزۆن: {value}",
+      "birthDate": "ڕۆژی لەدایکبوون: {value}",
+      "gender": "ڕەگەز: {value}"
+    },
+    "lifetimeValue": "بەهای ژیانی کڕیار",
+    "favoriteProducts": "بەرهەمە پەسەندکراوەکان",
+    "nextAction": {
+      "heading": "هەنگاوی داهاتووی پێشنیارکراو",
+      "follow_up_draft_order": "دواتریی بکە بۆ داواکارییە چاوەڕوانەکەی تا تەواوی بکات.",
+      "complete_overdue_task": "ئەرکی دواکەوتوو: \"{detail}\" — ئێستا تەواوی بکە.",
+      "prepare_for_appointment": "چاوپێکەوتنێکی داهاتووی هەیە — دڵنیابە هەموو شتێک ئامادەیە.",
+      "reach_out_hot_lead": "ئەمە ئامانجێکی گەرمە — ئەمڕۆ پەیوەندی پێوە بکە.",
+      "check_in_vip": "ماوەیەکی زۆرە — پەیوەندی بکە لەگەڵ ئەم کڕیارە VIP یە."
     },
     "filters": {
       "lifecycleAll": "هەموو قۆناغەکان",
@@ -1034,6 +1369,101 @@
     "colorLabel": "ڕەنگی تایبەت",
     "saving": "لە پاشەکەوتکردندایە...",
     "save": "پاشەکەوتکردن",
+    "urlHeading": "بەستەری فرۆشگا",
+    "urlLabel": "بەستەری تایبەت",
+    "brandingHeading": "ناسنامە و دیزاین",
+    "secondaryColorLabel": "ڕەنگی دووەم",
+    "faviconLabel": "بەستەری ئایکۆنی وێبسایت (Favicon)",
+    "bannerLabel": "بەستەری وێنەی بانەر",
+    "themeLabel": "ڕووکار",
+    "themes": {
+      "modern": "مۆدێرن",
+      "minimal": "سادە",
+      "classic": "کلاسیک",
+      "bold": "بەهێز"
+    },
+    "fontLabel": "فۆنت",
+    "fonts": {
+      "inter": "Inter",
+      "poppins": "Poppins",
+      "playfair": "Playfair Display",
+      "roboto_mono": "Roboto Mono"
+    },
+    "buttonStyleLabel": "شێوازی دوگمەکان",
+    "buttonStyles": {
+      "rounded": "خڕ",
+      "square": "چوارگۆشە",
+      "pill": "هێلکەیی"
+    },
+    "cornerStyleLabel": "شێوازی گۆشەکان",
+    "cornerStyles": {
+      "sharp": "تیژ",
+      "soft": "نەرم",
+      "round": "خڕ"
+    },
+    "headerStyleLabel": "شێوازی سەرپەڕە",
+    "headerStyles": {
+      "standard": "ئاسایی",
+      "centered": "ناوەڕاست",
+      "minimal": "سادە"
+    },
+    "footerStyleLabel": "شێوازی خوارەوە",
+    "footerStyles": {
+      "standard": "ئاسایی",
+      "minimal": "سادە"
+    },
+    "darkModeLabel": "دۆخی تاریک",
+    "socialHeading": "بەستەرەکانی سۆشیال میدیا",
+    "social": {
+      "whatsapp": "واتساپ",
+      "instagram": "ئینستاگرام",
+      "facebook": "فەیسبووک",
+      "tiktok": "تیک تۆک",
+      "youtube": "یوتیوب",
+      "snapchat": "سناپچات",
+      "telegram": "تلێگرام"
+    },
+    "seoHeading": "باشترکردنی بۆ ماشێنی گەڕان (SEO)",
+    "seoTitleLabel": "ناونیشانی SEO",
+    "seoDescriptionLabel": "وەسفی SEO",
+    "trackingHeading": "شوێنکەوتن و شیکاری",
+    "tracking": {
+      "metaPixelId": "ناسنامەی Meta Pixel",
+      "googleAnalyticsId": "ناسنامەی Google Analytics",
+      "googleTagManagerId": "ناسنامەی Google Tag Manager",
+      "tiktokPixelId": "ناسنامەی TikTok Pixel"
+    },
+    "sectionsHeading": "بەشەکانی پەڕەی سەرەکی",
+    "sectionsHint": "بەشەکانی پەڕەی سەرەکی فرۆشگاکەت ڕیز بکەرەوە یان بیانشارەوە.",
+    "sections": {
+      "hero": "باننەری سەرەکی",
+      "about": "پێشبینینی دەربارە",
+      "featured": "بەرهەمە تایبەتەکان",
+      "products": "پێشبینینی کاتالۆگی بەرهەمەکان",
+      "services": "پێشبینینی خزمەتگوزارییەکان",
+      "contact": "فۆرمی پەیوەندی"
+    },
+    "hideSection": "شاردنەوە",
+    "showSection": "نیشاندان",
+    "legalHeading": "پەڕە یاساییەکان",
+    "privacyLabel": "سیاسەتی تایبەتمەندی",
+    "termsLabel": "مەرجەکانی خزمەتگوزاری",
+    "promotionsHeading": "پرۆمۆشنەکان",
+    "announcementBarLabel": "شریتی ڕاگەیاندن",
+    "announcementBarPlaceholder": "بۆ نموونە: گەیاندنی بەخۆڕایی بۆ داواکاری زیاتر لە 50$",
+    "announcementBarLinkLabel": "بەستەری شریتی ڕاگەیاندن",
+    "popupHeading": "پەنجەرەی دەرکەوتوو",
+    "popupTitlePlaceholder": "ناونیشانی پەنجەرەی دەرکەوتوو",
+    "popupMessagePlaceholder": "نامەی پەنجەرەی دەرکەوتوو",
+    "popupButtonTextPlaceholder": "دەقی دوگمە",
+    "popupButtonLinkPlaceholder": "بەستەری دوگمە",
+    "popupTriggerLabel": "نیشاندانی پەنجەرەی دەرکەوتوو",
+    "popupTriggers": {
+      "first_visit": "لە یەکەم سەردان",
+      "delay": "دوای ماوەیەک",
+      "exit_intent": "لە کاتی جێهێشتنی پەڕە"
+    },
+    "popupDelayLabel": "ماوە (چرکە)",
     "public": {
       "aboutHeading": "دەربارەمان",
       "productsHeading": "بەرهەمەکان",
@@ -1045,7 +1475,64 @@
       "requiredHint": "ناو و تەلەفۆن و پەیام پێویستن.",
       "submitting": "لە ناردندایە...",
       "submit": "ناردنی پرسیار",
-      "thankYou": "سوپاس! بەم زووانە پەیوەندیت پێوە دەکەینەوە."
+      "thankYou": "سوپاس! بەم زووانە پەیوەندیت پێوە دەکەینەوە.",
+      "readMore": "زیاتر بخوێنەرەوە ←",
+      "viewAll": "بینینی هەموو ←",
+      "noProducts": "هێشتا هیچ بەرهەمێک نییە.",
+      "faqHeading": "پرسیارە دووبارەکراوەکان",
+      "noFaqs": "هێشتا هیچ پرسیارێک وەڵام نەدراوەتەوە.",
+      "privacyHeading": "سیاسەتی تایبەتمەندی",
+      "termsHeading": "مەرجەکانی خزمەتگوزاری",
+      "searchPlaceholder": "گەڕان بۆ بەرهەمەکان...",
+      "allCategories": "هەموو پۆلەکان",
+      "sortOptions": {
+        "newest": "نوێترین",
+        "price_asc": "نرخ: لە کەمەوە بۆ زۆر",
+        "price_desc": "نرخ: لە زۆرەوە بۆ کەم",
+        "best_selling": "زۆرترین فرۆش",
+        "discounted": "داشکاندنی هەیە"
+      },
+      "applyFilters": "جێبەجێکردن",
+      "share": "هاوبەشکردن",
+      "linkCopied": "بەستەرەکە کۆپی کرا.",
+      "backToProducts": "← گەڕانەوە بۆ بەرهەمەکان",
+      "variantsLabel": "هەڵبژاردنەکان",
+      "askOnWhatsapp": "پرسیار بکە لە واتساپ",
+      "whatsappMessage": "سڵاو! من حەزم لە {product} هەیە.",
+      "interestedHeading": "حەزت لەمە هەیە؟",
+      "interestedMessage": "من حەزم لە {product} هەیە.",
+      "relatedHeading": "لەوانەیە حەزت لەمانەش بێت",
+      "addToCart": "زیادکردن بۆ سەبەتە",
+      "addedToCart": "{product} زیاد کرا بۆ سەبەتەکەت.",
+      "checkoutHeading": "تەواوکردنی داواکاری",
+      "checkoutRequiredHint": "ناو و تەلەفۆن و لانیکەم یەک بەرهەم پێویستن.",
+      "orderPlacedHeading": "داواکارییەکە نێردرا!",
+      "orderPlacedHint": "بەم زووانە پەیوەندیت پێوە دەکەین بۆ دڵنیابوونەوە لە داواکارییەکەت.",
+      "cartEmpty": "سەبەتەکەت بەتاڵە.",
+      "removeFromCart": "سڕینەوە",
+      "cartTotal": "کۆی گشتی",
+      "addressPlaceholder": "ناونیشانی گەیاندن (ئارەزوومەندانە)",
+      "notesPlaceholder": "تێبینی (ئارەزوومەندانە)",
+      "placeOrder": "ناردنی داواکاری",
+      "nav": {
+        "home": "سەرەکی",
+        "products": "بەرهەمەکان",
+        "about": "دەربارە",
+        "contact": "پەیوەندی",
+        "faq": "پرسیارە دووبارەکراوەکان"
+      },
+      "assistant": {
+        "title": "هەر شتێکت هەیە بپرسە",
+        "greeting": "سڵاو! پرسیار لەبارەی بەرهەمەکانمان، نرخەکان، یان هەر شتێکی تر بکە.",
+        "placeholder": "نامەیەک بنووسە...",
+        "send": "ناردن",
+        "open": "کردنەوەی یاریدەدەری چات",
+        "close": "داخستنی یاریدەدەری چات"
+      },
+      "promo": {
+        "dismiss": "نەخێر سوپاس"
+      },
+      "featuredHeading": "تایبەت"
     }
   },
   "integrations": {
@@ -1163,9 +1650,13 @@
     "pageDescription": "زانیاری بزنسەکەت و زمانی داشبۆرد."
   },
   "auditLog": {
-    "pageTitle": "تۆماری پشکنین",
-    "pageDescription": "هەموو کردارێکی بەڕێوەبردنی تیم لەم مکانی کارەدا — بانگهێشتەکان، گۆڕینی ڕۆڵ، لابردنی ئەندام.",
-    "emptyState": "هێشتا هیچ ڕووداوێک تۆمار نەکراوە."
+    "pageTitle": "تۆماری چالاکی",
+    "pageDescription": "هەموو ڕووداوێک لەم مکانی کارەدا — چالاکی کڕیار و کردارەکانی بەڕێوەبردنی تیم — لە یەک لیستدا.",
+    "emptyState": "هێشتا هیچ چالاکییەک تۆمار نەکراوە.",
+    "source": {
+      "crm": "کڕیاران",
+      "admin": "بەڕێوەبردن"
+    }
   },
   "knowledgeBasePage": {
     "pageTitle": "بنکەی زانیاری",
@@ -1192,7 +1683,12 @@
     "placeholder": "تێبینییەک دەربارەی ئەم کڕیارە بنووسە...",
     "add": "زیادکردنی تێبینی",
     "empty": "هیچ تێبینییەک بۆ ئەم کڕیارە نییە.",
-    "delete": "سڕینەوە"
+    "delete": "سڕینەوە",
+    "types": {
+      "team": "تیم",
+      "private": "تایبەت",
+      "ai": "زیرەکی دەستکرد"
+    }
   },
   "activity": {
     "title": "چالاکی",

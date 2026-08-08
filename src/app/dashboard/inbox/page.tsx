@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ExportButtons } from "@/components/export-buttons";
 import { InboxList } from "@/features/inbox/components/inbox-list";
 import { inboxService } from "@/features/inbox/services/inbox.service";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -11,6 +12,7 @@ export default async function InboxPage() {
   await requireFeature(workspace, "inbox");
   const t = await getTranslations("inbox.list");
   const tCommon = await getTranslations("common");
+  const exportLabels = { csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") };
 
   const conversations = await inboxService.listConversations(workspace.id);
 
@@ -22,9 +24,7 @@ export default async function InboxPage() {
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <a href="/api/reports/conversations">{tCommon("exportCsv")}</a>
-          </Button>
+          <ExportButtons reportPath="/api/reports/conversations" labels={exportLabels} />
           <Button asChild>
             <Link href="/dashboard/inbox/new">{t("newConversation")}</Link>
           </Button>

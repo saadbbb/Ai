@@ -27,7 +27,17 @@ vi.mock("../repository/activity.repository", () => ({
 }));
 
 vi.mock("../repository/lead.repository", () => ({
-  leadRepository: { findByConversationId: vi.fn(), findByWorkspaceId: vi.fn(), create: vi.fn(), updateStage: vi.fn() },
+  leadRepository: {
+    findByConversationId: vi.fn(),
+    findByWorkspaceId: vi.fn(),
+    findById: vi.fn(),
+    create: vi.fn(),
+    updateStage: vi.fn(),
+  },
+}));
+
+vi.mock("@/features/inbox/repository/contact.repository", () => ({
+  contactRepository: { findById: vi.fn(), updateLifecycleStage: vi.fn(), addTag: vi.fn(), removeTag: vi.fn() },
 }));
 
 const { automationService } = await import("@/features/automation/services/automation.service");
@@ -37,6 +47,7 @@ const { orderRepository } = await import("@/features/orders/repository/order.rep
 const { appointmentRepository } = await import("@/features/appointments/repository/appointment.repository");
 const { activityRepository } = await import("../repository/activity.repository");
 const { leadRepository } = await import("../repository/lead.repository");
+const { contactRepository } = await import("@/features/inbox/repository/contact.repository");
 const { crmService } = await import("./crm.service");
 
 const WORKSPACE_ID = "workspace-1";
@@ -77,6 +88,13 @@ function makeContact(overrides: Partial<Contact> = {}): Contact {
     lifecycleStage: "lead",
     assignedAgentId: null,
     lastContactAt: null,
+    address: null,
+    budget: null,
+    preferredContactMethod: null,
+    preferredProducts: [],
+    birthDate: null,
+    gender: null,
+    timezone: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
@@ -117,6 +135,7 @@ describe("crmService.createLeadFromConversation", () => {
 
 describe("crmService.updateLeadStage", () => {
   it("logs the new stage with the human actor who made the change", async () => {
+    vi.mocked(leadRepository.findById).mockResolvedValue(makeLead({ stage: "negotiation" }));
     vi.mocked(leadRepository.updateStage).mockResolvedValue(makeLead({ stage: "won" }));
 
     await crmService.updateLeadStage(WORKSPACE_ID, "lead-1", "won", { type: "human", userId: "user-1" });
@@ -128,6 +147,24 @@ describe("crmService.updateLeadStage", () => {
         actor: { type: "human", userId: "user-1" },
       }),
     );
+  });
+
+  it("throws NOT_FOUND when the lead doesn't exist in this workspace", async () => {
+    vi.mocked(leadRepository.findById).mockResolvedValue(null);
+
+    await expect(crmService.updateLeadStage(WORKSPACE_ID, "missing-lead", "won", { type: "human", userId: "user-1" })).rejects.toThrow(
+      "Lead not found.",
+    );
+    expect(leadRepository.updateStage).not.toHaveBeenCalled();
+  });
+
+  it("rejects reopening a closed lead (state machine guard)", async () => {
+    vi.mocked(leadRepository.findById).mockResolvedValue(makeLead({ stage: "won" }));
+
+    await expect(crmService.updateLeadStage(WORKSPACE_ID, "lead-1", "new", { type: "human", userId: "user-1" })).rejects.toThrow(
+      'A lead can\'t move from "won" to "new".',
+    );
+    expect(leadRepository.updateStage).not.toHaveBeenCalled();
   });
 });
 
@@ -170,5 +207,65 @@ describe("crmService.listLeads", () => {
 
     expect(messageRepository.countByConversationIds).toHaveBeenCalledWith([]);
     expect(result[0].score).toBe(0);
+  });
+});
+
+describe("crmService.setLifecycleStage", () => {
+  const ACTOR = { type: "human" as const, userId: "user-1" };
+
+  it("updates the stage and logs an activity", async () => {
+    vi.mocked(contactRepository.updateLifecycleStage).mockResolvedValue(makeContact({ lifecycleStage: "vip" }));
+
+    await crmService.setLifecycleStage(WORKSPACE_ID, CONTACT_ID, "vip", ACTOR);
+
+    expect(contactRepository.updateLifecycleStage).toHaveBeenCalledWith(CONTACT_ID, WORKSPACE_ID, "vip");
+    expect(activityRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, contactId: CONTACT_ID, type: "contact_updated" }),
+    );
+  });
+
+  it("throws when the contact doesn't exist in this workspace", async () => {
+    vi.mocked(contactRepository.updateLifecycleStage).mockResolvedValue(null);
+
+    await expect(crmService.setLifecycleStage(WORKSPACE_ID, CONTACT_ID, "vip", ACTOR)).rejects.toThrow("Contact not found.");
+    expect(activityRepository.log).not.toHaveBeenCalled();
+  });
+
+  it("allows moving backwards (e.g. demoting a vip), unlike the lead-stage guard", async () => {
+    vi.mocked(contactRepository.updateLifecycleStage).mockResolvedValue(makeContact({ lifecycleStage: "customer" }));
+
+    await expect(crmService.setLifecycleStage(WORKSPACE_ID, CONTACT_ID, "customer", ACTOR)).resolves.toBeUndefined();
+  });
+});
+
+describe("crmService.addTag", () => {
+  const ACTOR = { type: "human" as const, userId: "user-1" };
+
+  it("tags the contact, logs the activity, and dispatches a tag_added automation event — same as the AI tool", async () => {
+    await crmService.addTag(WORKSPACE_ID, CONTACT_ID, "VIP", ACTOR);
+
+    expect(contactRepository.addTag).toHaveBeenCalledWith(CONTACT_ID, WORKSPACE_ID, "VIP");
+    expect(activityRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, contactId: CONTACT_ID, type: "contact_tagged", actor: ACTOR }),
+    );
+    expect(automationService.dispatch).toHaveBeenCalledWith(WORKSPACE_ID, {
+      type: "tag_added",
+      contactId: CONTACT_ID,
+      tag: "VIP",
+    });
+  });
+});
+
+describe("crmService.removeTag", () => {
+  const ACTOR = { type: "human" as const, userId: "user-1" };
+
+  it("untags the contact and logs the activity without dispatching automation", async () => {
+    await crmService.removeTag(WORKSPACE_ID, CONTACT_ID, "VIP", ACTOR);
+
+    expect(contactRepository.removeTag).toHaveBeenCalledWith(CONTACT_ID, WORKSPACE_ID, "VIP");
+    expect(activityRepository.log).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: WORKSPACE_ID, contactId: CONTACT_ID, type: "contact_untagged", actor: ACTOR }),
+    );
+    expect(automationService.dispatch).not.toHaveBeenCalled();
   });
 });

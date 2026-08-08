@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
+import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import type { OrderListItem } from "../repository/order.repository";
 import { orderService } from "../services/order.service";
@@ -14,6 +14,7 @@ export async function createOrderAction(input: unknown): Promise<ActionResult<Or
 
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
+  await requireWorkspacePermission(user.id, workspace.id, "crm.records.manage");
 
   try {
     const order = await orderService.createOrder(workspace.id, parsed.data, { type: "human", userId: user.id });

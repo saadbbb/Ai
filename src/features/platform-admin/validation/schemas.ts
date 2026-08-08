@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { platformAdminRoleEnum } from "@/db/schema";
 
 export const updatePlatformSettingsSchema = z.object({
   whatsappNumber: z.string().trim().max(30).optional(),
@@ -8,10 +9,16 @@ export const updatePlatformSettingsSchema = z.object({
 
 export const addPlatformAdminSchema = z.object({
   email: z.string().trim().email(),
+  role: z.enum(platformAdminRoleEnum.enumValues).optional(),
 });
 
 export const removePlatformAdminSchema = z.object({
   id: z.string().uuid(),
+});
+
+export const setPlatformAdminRoleSchema = z.object({
+  id: z.string().uuid(),
+  role: z.enum(platformAdminRoleEnum.enumValues),
 });
 
 export const createFeatureFlagSchema = z.object({
@@ -29,4 +36,14 @@ export const createFeatureFlagSchema = z.object({
 export const setFeatureFlagEnabledSchema = z.object({
   id: z.string().uuid(),
   enabled: z.boolean(),
+});
+
+export const setFeatureFlagOverrideSchema = z.object({
+  featureFlagId: z.string().uuid(),
+  workspaceId: z.string().uuid(),
+  enabled: z.boolean(),
+});
+
+export const removeFeatureFlagOverrideSchema = z.object({
+  id: z.string().uuid(),
 });

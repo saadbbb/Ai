@@ -24,7 +24,7 @@ import { contactRepository } from "@/features/inbox/repository/contact.repositor
 import { conversationRepository } from "@/features/inbox/repository/conversation.repository";
 import { messageRepository } from "@/features/inbox/repository/message.repository";
 import { notificationRepository } from "@/features/notifications/repository/notification.repository";
-import { orderTotal } from "@/features/orders/lib/order-total";
+import { orderGrandTotal } from "@/features/orders/lib/order-total";
 import { orderRepository } from "@/features/orders/repository/order.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
@@ -32,6 +32,7 @@ import { membershipRepository } from "@/features/workspace/repository/membership
 import { userRepository } from "@/features/auth/repository/user.repository";
 import { emailService } from "@/lib/email";
 import { AppError } from "@/lib/errors/app-error";
+import { enqueueAutomationEvent } from "@/lib/queue/automation-queue";
 import { safeWebhookPost } from "../lib/safe-webhook-fetch";
 import { workflowApprovalRepository } from "../repository/workflow-approval.repository";
 import { workflowRepository } from "../repository/workflow.repository";
@@ -49,7 +50,8 @@ export type AutomationEvent =
   | { type: "tag_added"; contactId: string; tag: string }
   | { type: "message_received"; contactId: string }
   | { type: "message_replied"; contactId: string }
-  | { type: "ai_failed"; contactId: string };
+  | { type: "ai_failed"; contactId: string }
+  | { type: "conversation_assigned"; contactId: string };
 
 /** Lead stages that mean "this lead is no longer actionable" — see the create_lead action's dedup check. */
 const TERMINAL_LEAD_STAGES: readonly LeadStage[] = ["won", "lost", "cancelled"];
@@ -86,7 +88,8 @@ function matchesTrigger(workflow: Workflow, event: AutomationEvent): boolean {
     workflow.triggerType === "tag_added" ||
     workflow.triggerType === "message_received" ||
     workflow.triggerType === "message_replied" ||
-    workflow.triggerType === "ai_failed"
+    workflow.triggerType === "ai_failed" ||
+    workflow.triggerType === "conversation_assigned"
   ) {
     return workflow.triggerType === event.type;
   }
@@ -137,7 +140,7 @@ async function getContactLeadScore(workspaceId: string, contact: Contact): Promi
 async function getContactLatestOrderValue(workspaceId: string, contact: Contact): Promise<number> {
   const orders = await orderRepository.findByContactId(contact.id, workspaceId);
   if (orders.length === 0) return 0;
-  return orderTotal(orders[0].items);
+  return orderGrandTotal(orders[0].items, orders[0].order);
 }
 
 /**
@@ -285,6 +288,7 @@ async function runAction(
       contactId: event.contactId,
       content: content.replaceAll("{{contactName}}", contact?.fullName ?? ""),
       pinned: false,
+      type: "ai",
       authorUserId: null,
     });
     await activityRepository.log({
@@ -374,6 +378,13 @@ async function runAction(
       type: "conversation_assigned",
       actor: { type: "automation" },
       summary: `Conversation assigned to ${assigneeLabel} by automation "${workflow.name}".`,
+      link: `/dashboard/inbox/${targetConversation.conversation.id}`,
+    });
+    await notificationRepository.create({
+      workspaceId,
+      type: "assignment",
+      title: contact ? `Assigned: ${contact.fullName}` : "Conversation assigned",
+      message: `${contact ? `${contact.fullName}'s conversation` : "A conversation"} was assigned to ${assigneeLabel} by automation "${workflow.name}".`,
       link: `/dashboard/inbox/${targetConversation.conversation.id}`,
     });
 
@@ -507,7 +518,7 @@ async function runAction(
       senderType: "ai",
       content: result.text,
     });
-    await conversationRepository.touchLastMessage(openConversation.conversation.id, workspaceId, preview);
+    await conversationRepository.touchLastMessage(openConversation.conversation.id, workspaceId, preview, "ai");
 
     if (result.needsHumanHandover) {
       await conversationRepository.updateAiStatus(openConversation.conversation.id, workspaceId, "handed_over");
@@ -574,29 +585,59 @@ async function runAndLog(
   }
 
   console.error(`[automation] workflow "${workflow.name}" (${workflow.id}) failed after ${MAX_ACTION_ATTEMPTS} attempts:`, lastError);
+  const errorMessage = lastError instanceof Error ? lastError.message : "Unknown error";
   await workflowRepository.logExecution({
     workspaceId,
     workflowId: workflow.id,
     success: false,
-    errorMessage: lastError instanceof Error ? lastError.message : "Unknown error",
+    errorMessage,
     retryCount: MAX_ACTION_ATTEMPTS - 1,
   });
+
+  if (workflow.actionType === "webhook_call") {
+    await notificationRepository.create({
+      workspaceId,
+      type: "webhook_failure",
+      title: `Webhook failed: ${workflow.name}`,
+      message: `The webhook for automation "${workflow.name}" failed after ${MAX_ACTION_ATTEMPTS} attempts: ${errorMessage}`,
+      link: `/dashboard/automations/${workflow.id}`,
+    });
+  }
 }
 
 /**
  * Fires whenever something automation-relevant happens elsewhere in the app
  * (a lead's stage changes, an order's status changes, the AI hands a
  * conversation to a human). Never throws back to the caller — a broken
- * automation must never break the CRM action that triggered it. Conditions
- * (see evaluateConditions) are checked once, here, at trigger time — a
- * delayed workflow that didn't match the conditions when the event happened
- * is never queued, regardless of what the contact looks like later. A
- * workflow with delayDays set doesn't run yet — it's queued in
- * workflow_pending_runs for processDueRuns() to pick up once due. Every
- * immediate attempt (success or failure) is logged to workflow_executions
- * right away.
+ * automation must never break the CRM action that triggered it.
+ *
+ * Enqueues the event for the dedicated worker process (scripts/automation-worker.ts)
+ * instead of doing the work inline, so a slow action (a webhook call, an AI
+ * reply) never blocks the request that triggered it — see PART 2/6 of the
+ * spec. Falls back to running processEvent() inline when no Redis is
+ * configured (see DEFERRED_TASKS.md) or the enqueue itself doesn't complete
+ * quickly, so an event is never silently dropped.
  */
 async function dispatch(workspaceId: string, event: AutomationEvent): Promise<void> {
+  const queued = await enqueueAutomationEvent({ workspaceId, event });
+  if (!queued) {
+    await processEvent(workspaceId, event);
+  }
+}
+
+/**
+ * The actual work behind an automation event — condition matching, delay
+ * queuing, and running matched workflows' actions. Runs either inline (via
+ * dispatch(), when no queue is configured) or from the worker process after
+ * dispatch() enqueues the event. Conditions (see evaluateConditions) are
+ * checked once, here, at trigger time — a delayed workflow that didn't match
+ * the conditions when the event happened is never queued, regardless of what
+ * the contact looks like later. A workflow with delayDays set doesn't run
+ * yet — it's queued in workflow_pending_runs for processDueRuns() to pick up
+ * once due. Every immediate attempt (success or failure) is logged to
+ * workflow_executions right away.
+ */
+async function processEvent(workspaceId: string, event: AutomationEvent): Promise<void> {
   try {
     // Fires unconditionally, independent of whether any workflow matches below —
     // webhook subscriptions are an always-on notification channel, not a workflow.
@@ -759,6 +800,7 @@ async function decideApproval(
 
 export const automationService = {
   dispatch,
+  processEvent,
   processDueRuns,
   listWorkflows,
   getWorkflowWithExecutions,

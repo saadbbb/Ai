@@ -9,7 +9,8 @@ import { AppError } from "@/lib/errors/app-error";
 import { aiAgentRepository } from "../repository/ai-agent.repository";
 import { aiUsageRepository } from "../repository/ai-usage.repository";
 import { buildSystemPrompt } from "../prompt/prompt-builder";
-import { DEFAULT_MODEL, selectProvider } from "../router/ai-router";
+import { DEFAULT_MODEL, selectModel, selectProvider } from "../router/ai-router";
+import { containsUnsafeDisclosure, SAFE_FALLBACK_REPLY } from "../safety/output-filter";
 import { createToolDispatcher, getToolDefinitions } from "../tools/registry";
 import type { ChatMessage, GenerateReplyResult } from "../providers/types";
 
@@ -103,7 +104,7 @@ async function generateReply(
   const [agent, faqs, products, services, policy, contact] = await Promise.all([
     aiAgentRepository.findByWorkspaceId(workspaceId),
     faqRepository.findByWorkspaceId(workspaceId),
-    productRepository.findByWorkspaceId(workspaceId),
+    productRepository.findVisibleToAi(workspaceId),
     serviceRepository.findByWorkspaceId(workspaceId),
     policyRepository.findByWorkspaceId(workspaceId),
     context ? contactRepository.findById(context.contactId, workspaceId) : Promise.resolve(null),
@@ -122,7 +123,8 @@ async function generateReply(
     toolsEnabled: !!context,
     customerSummary: contact?.aiSummary,
   });
-  const provider = selectProvider();
+  const model = selectModel(history);
+  const provider = selectProvider(model);
   const startedAt = Date.now();
 
   const dispatcher = context
@@ -139,11 +141,21 @@ async function generateReply(
     });
     if (dispatcher?.signals.handoverRequested) {
       result.needsHumanHandover = true;
+      result.handoverCategory = dispatcher.signals.handoverCategory;
+      result.handoverReason = dispatcher.signals.handoverReason;
     }
+
+    if (containsUnsafeDisclosure(result.text)) {
+      result.text = SAFE_FALLBACK_REPLY;
+      result.needsHumanHandover = true;
+      result.handoverCategory = "other";
+      result.handoverReason = "AI safety filter caught a disclosure in the generated reply before it was sent.";
+    }
+
     await aiUsageRepository.create({
       workspaceId,
       provider: "claude",
-      model: DEFAULT_MODEL,
+      model,
       inputTokens: result.usage.inputTokens,
       outputTokens: result.usage.outputTokens,
       latencyMs: Date.now() - startedAt,
@@ -154,7 +166,7 @@ async function generateReply(
     await aiUsageRepository.create({
       workspaceId,
       provider: "claude",
-      model: DEFAULT_MODEL,
+      model,
       inputTokens: 0,
       outputTokens: 0,
       latencyMs: Date.now() - startedAt,

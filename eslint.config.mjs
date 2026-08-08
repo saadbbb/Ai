@@ -33,7 +33,7 @@ const eslintConfig = [
     },
   },
   {
-    files: ["src/features/ai/providers/claude.provider.ts"],
+    files: ["src/features/ai/providers/claude.provider.ts", "src/features/ai/providers/claude.provider.test.ts"],
     rules: {
       "no-restricted-imports": "off",
     },

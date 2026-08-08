@@ -1,13 +1,20 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { ticketAdminService } from "@/features/support/services/ticket-admin.service";
 import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
+
+function formatSeconds(seconds: number | null, t: (key: string, values?: Record<string, string | number>) => string): string {
+  if (seconds === null) return "—";
+  const hours = Math.round(seconds / 3600);
+  return hours < 1 ? t("underAnHour") : t("hoursValue", { count: hours });
+}
 
 export default async function AdminTicketsPage() {
   await requirePlatformAdmin();
   const t = await getTranslations("platformAdmin.tickets");
 
-  const tickets = await ticketAdminService.listTickets();
+  const [tickets, timing] = await Promise.all([ticketAdminService.listTickets(), ticketAdminService.getTimingStats()]);
 
   return (
     <div className="space-y-6">
@@ -16,11 +23,16 @@ export default async function AdminTicketsPage() {
         <p className="text-sm text-muted-foreground">{t("description")}</p>
       </div>
 
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+        <StatTile label={t("avgResponseTime")} value={formatSeconds(timing.avgResponseSeconds, t)} />
+        <StatTile label={t("avgResolutionTime")} value={formatSeconds(timing.avgResolutionSeconds, t)} />
+      </div>
+
       {tickets.length === 0 ? (
         <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">{t("emptyState")}</p>
       ) : (
         <div className="divide-y rounded-lg border">
-          {tickets.map(({ ticket, workspaceName }) => (
+          {tickets.map(({ ticket, workspaceName, assignedAdminEmail }) => (
             <Link
               key={ticket.id}
               href={`/admin/tickets/${ticket.id}`}
@@ -28,7 +40,10 @@ export default async function AdminTicketsPage() {
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{ticket.subject}</p>
-                <p className="truncate text-muted-foreground">{workspaceName}</p>
+                <p className="truncate text-muted-foreground">
+                  {workspaceName} · {t(`categories.${ticket.category}`)}
+                  {assignedAdminEmail && ` · ${assignedAdminEmail}`}
+                </p>
               </div>
               <div className="flex shrink-0 items-center gap-3 text-muted-foreground">
                 <span>{t(`priorities.${ticket.priority}`)}</span>
