@@ -30,7 +30,7 @@ export default async function SupportPage() {
       {tickets.length === 0 ? (
         <EmptyState icon={LifeBuoy} title={t("emptyState")} />
       ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
           {tickets.map((ticket) => (
             <Link
               key={ticket.id}

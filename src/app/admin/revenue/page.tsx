@@ -70,7 +70,7 @@ export default async function AdminRevenuePage() {
             const unpriced = summary.activeSubscriptionCount - summary.pricedSubscriptionCount;
 
             return (
-              <div key={summary.currency} className="space-y-3 rounded-xl border bg-card p-4">
+              <div key={summary.currency} className="space-y-3 rounded-xl border bg-card shadow-md shadow-foreground/[0.03] p-4">
                 <h2 className="text-sm font-semibold text-foreground">{summary.currency}</h2>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <StatTile label={t("mrr")} value={formatAmount(summary.mrr, summary.currency)} icon={DollarSign} tone="success" />
@@ -84,7 +84,7 @@ export default async function AdminRevenuePage() {
 
                 <div className="space-y-2">
                   <h3 className="text-xs font-medium text-muted-foreground">{t("byPlanHeading")}</h3>
-                  <div className="divide-y overflow-hidden rounded-xl border bg-card">
+                  <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
                     {summary.byPlan.map((row) => (
                       <div key={row.planName} className="flex items-center justify-between gap-4 p-3 text-sm">
                         <span className="truncate font-medium">{row.planName}</span>

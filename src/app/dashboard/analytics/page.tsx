@@ -246,7 +246,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
         {teamPerformance.length === 0 ? (
           <EmptyState icon={BarChart3} title={t("teamPerformance.empty")} />
         ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
             <div className="flex items-center justify-between gap-4 p-3 text-xs font-medium text-muted-foreground">
               <span className="flex-1">{t("teamPerformance.columns.agent")}</span>
               <span className="w-32 text-right">{t("teamPerformance.columns.conversations")}</span>

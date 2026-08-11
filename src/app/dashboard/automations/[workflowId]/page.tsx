@@ -60,7 +60,7 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
         {executions.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("noExecutions")}</p>
         ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
             {executions.map((execution) => (
               <div key={execution.id} className="flex items-center justify-between gap-4 p-3 text-sm">
                 <span className="text-muted-foreground">{formatter.format(execution.triggeredAt)}</span>

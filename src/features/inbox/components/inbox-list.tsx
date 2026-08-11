@@ -146,7 +146,7 @@ export function InboxList({
       {conversations.length === 0 ? (
         <EmptyState icon={InboxIcon} title={t("emptyState")} />
       ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
           {conversations.map(({ conversation, contact, channel }) => (
             <div
               key={conversation.id}

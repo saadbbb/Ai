@@ -55,7 +55,7 @@ export default async function AutomationsPage() {
       {workflows.length === 0 ? (
         <EmptyState icon={Workflow} title={t("emptyState")} />
       ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
           {workflows.map((workflow) => {
             const delay = describeDelay(workflow, translators);
             const conditions = describeConditions(workflow, translators);

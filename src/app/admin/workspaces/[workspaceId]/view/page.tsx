@@ -79,7 +79,7 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
           {conversations.length === 0 ? (
             <EmptyState icon={MessageSquare} title={t("empty")} />
           ) : (
-            <div className="divide-y overflow-hidden rounded-xl border bg-card">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
               {conversations.slice(0, LIST_LIMIT).map(({ conversation, contact }) => (
                 <div key={conversation.id} className="p-3 text-sm">
                   <p className="truncate font-medium">{contact.fullName}</p>
@@ -97,7 +97,7 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
           {contacts.length === 0 ? (
             <EmptyState icon={Users} title={t("empty")} />
           ) : (
-            <div className="divide-y overflow-hidden rounded-xl border bg-card">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
               {contacts.slice(0, LIST_LIMIT).map((contact) => (
                 <div key={contact.id} className="p-3 text-sm">
                   <p className="truncate font-medium">{contact.fullName}</p>
@@ -115,7 +115,7 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
           {leads.length === 0 ? (
             <EmptyState icon={Target} title={t("empty")} />
           ) : (
-            <div className="divide-y overflow-hidden rounded-xl border bg-card">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
               {leads.slice(0, LIST_LIMIT).map(({ lead, contact }) => (
                 <div key={lead.id} className="flex items-center justify-between p-3 text-sm">
                   <span className="truncate">{contact.fullName}</span>
@@ -131,7 +131,7 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
           {orders.length === 0 ? (
             <EmptyState icon={ShoppingCart} title={t("empty")} />
           ) : (
-            <div className="divide-y overflow-hidden rounded-xl border bg-card">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
               {orders.slice(0, LIST_LIMIT).map(({ order, contact, items }) => (
                 <div key={order.id} className="flex items-center justify-between p-3 text-sm">
                   <span className="truncate">{contact.fullName}</span>
@@ -149,7 +149,7 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
           {appointments.length === 0 ? (
             <EmptyState icon={CalendarDays} title={t("empty")} />
           ) : (
-            <div className="divide-y overflow-hidden rounded-xl border bg-card">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
               {appointments.slice(0, LIST_LIMIT).map(({ appointment, contact }) => (
                 <div key={appointment.id} className="flex items-center justify-between p-3 text-sm">
                   <span className="truncate">{contact.fullName}</span>

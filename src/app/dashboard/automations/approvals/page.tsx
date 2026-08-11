@@ -28,7 +28,7 @@ export default async function AutomationApprovalsPage() {
       {approvals.length === 0 ? (
         <EmptyState icon={ClipboardCheck} title={t("emptyState")} />
       ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
           {approvals.map(({ approval, workflowName, contactName }) => (
             <div key={approval.id} className="flex items-center justify-between gap-4 p-4">
               <div className="min-w-0">

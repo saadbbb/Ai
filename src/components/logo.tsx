@@ -43,9 +43,13 @@ interface LogoProps {
  */
 export function Logo({ className, variant = "mark" }: LogoProps) {
   if (variant === "tile") {
+    // The mark is sized as a percentage of the tile itself (not padding, which CSS
+    // resolves against the *parent's* width — that made this collapse whenever a
+    // flex ancestor stretched or shrank the tile's container, e.g. a flex-col panel
+    // with default align-items: stretch).
     return (
-      <div className={cn("flex aspect-square items-center justify-center rounded-2xl bg-[#F5A623] p-[18%]", className)}>
-        <LogoMark className="h-full w-full" />
+      <div className={cn("flex aspect-square items-center justify-center rounded-2xl bg-[#F5A623]", className)}>
+        <LogoMark className="h-[64%] w-[64%]" />
       </div>
     );
   }

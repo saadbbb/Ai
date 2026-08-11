@@ -166,7 +166,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex min-h-full flex-1 flex-col">
         {topBar}
         <main className="flex flex-1 items-center justify-center p-6">
-          <div className="max-w-sm space-y-4 rounded-xl border bg-card p-8 text-center shadow-sm">
+          <div className="max-w-sm space-y-4 rounded-xl border bg-card shadow-md shadow-foreground/[0.03] p-8 text-center">
             <Logo variant="tile" className="mx-auto h-12" />
             <div className="space-y-1.5">
               <h1 className="font-heading text-base font-semibold">{t("suspended.title")}</h1>

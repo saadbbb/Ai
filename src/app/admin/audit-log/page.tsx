@@ -17,7 +17,7 @@ export default async function AdminAuditLogPage() {
       {entries.length === 0 ? (
         <EmptyState icon={History} title={t("emptyState")} />
       ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
           {entries.map((entry) => (
             <div key={entry.id} className="flex items-center justify-between gap-4 p-3 text-sm">
               <div>

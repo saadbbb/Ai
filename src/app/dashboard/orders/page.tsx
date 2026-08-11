@@ -50,7 +50,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
       {orders.length === 0 ? (
         <EmptyState icon={ShoppingCart} title={t("emptyState")} />
       ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
           {orders.map(({ order, contact, items }) => (
             <div key={order.id} className="flex items-center justify-between gap-4 p-4">
               <Link href={`/dashboard/orders/${order.id}`} className="min-w-0 flex-1">

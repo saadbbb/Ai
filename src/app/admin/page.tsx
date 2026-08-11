@@ -140,7 +140,7 @@ export default async function AdminHomePage() {
         {recentSignups.length === 0 ? (
           <EmptyState icon={Building2} title={t("noSignups")} />
         ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
             {recentSignups.map(({ workspace, ownerEmail }) => (
               <Link
                 key={workspace.id}

@@ -49,7 +49,7 @@ export default async function AdminTicketsPage() {
       {tickets.length === 0 ? (
         <EmptyState icon={TicketIcon} title={t("emptyState")} />
       ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
           {tickets.map(({ ticket, workspaceName, assignedAdminEmail }) => (
             <Link
               key={ticket.id}

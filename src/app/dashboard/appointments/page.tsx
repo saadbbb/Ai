@@ -49,7 +49,7 @@ export default async function AppointmentsPage() {
       {appointments.length === 0 ? (
         <EmptyState icon={CalendarDays} title={t("emptyState")} />
       ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
           {appointments.map(({ appointment, contact }) => {
             const assignedToName = appointment.assignedToUserId ? memberNameById.get(appointment.assignedToUserId) : undefined;
             return (

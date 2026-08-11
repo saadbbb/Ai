@@ -63,7 +63,7 @@ export function VerifySignupOtpForm({ email }: { email: string }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("missingEmailTitle")}</CardTitle>
+          <CardTitle className="text-xl">{t("missingEmailTitle")}</CardTitle>
           <CardDescription>{t("missingEmailDescription")}</CardDescription>
         </CardHeader>
       </Card>
@@ -73,7 +73,7 @@ export function VerifySignupOtpForm({ email }: { email: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("otpTitle")}</CardTitle>
+        <CardTitle className="text-xl">{t("otpTitle")}</CardTitle>
         <CardDescription>{t("otpDescription", { email })}</CardDescription>
       </CardHeader>
       <CardContent>

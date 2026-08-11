@@ -47,7 +47,7 @@ export function ResetPasswordForm({ validLink }: { validLink: boolean }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("invalidLinkTitle")}</CardTitle>
+          <CardTitle className="text-xl">{t("invalidLinkTitle")}</CardTitle>
           <CardDescription>{t("invalidLinkDescription")}</CardDescription>
         </CardHeader>
       </Card>
@@ -57,7 +57,7 @@ export function ResetPasswordForm({ validLink }: { validLink: boolean }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
+        <CardTitle className="text-xl">{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>

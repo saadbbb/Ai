@@ -29,7 +29,7 @@ export default async function AdminAiOperationsPage() {
         {byModel.length === 0 ? (
           <EmptyState icon={Bot} title={t("emptyState")} />
         ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
             {byModel.map((row) => {
               const successRate = row.requests === 0 ? null : Math.round((row.successCount / row.requests) * 100);
               return (
@@ -59,7 +59,7 @@ export default async function AdminAiOperationsPage() {
         {rateLimits.length === 0 ? (
           <EmptyState icon={Gauge} title={t("rateLimitsEmpty")} />
         ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
             {rateLimits.map((bucket) => (
               <div key={bucket.key} className="flex items-center justify-between gap-4 p-3 text-sm">
                 <span className="truncate font-mono text-xs">{bucket.key}</span>

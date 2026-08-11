@@ -98,7 +98,7 @@ export default async function DashboardPage() {
             <StatTile label={t("bands.today.appointments")} value={myWork.appointmentsToday} />
           </div>
           {myWork.assignedConversations.length > 0 && (
-            <div className="divide-y overflow-hidden rounded-xl border bg-card">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
               {myWork.assignedConversations.map((item) => (
                 <Link key={item.id} href={item.href} className="flex items-center justify-between gap-4 p-3 text-sm hover:bg-muted">
                   <span className="truncate">{item.label}</span>
@@ -129,7 +129,7 @@ export default async function DashboardPage() {
             <p className="text-sm text-muted-foreground">{t("bands.attention.empty")}</p>
           </div>
         ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
             {attention.items.map((item) => {
               const style = ATTENTION_STYLE[item.type];
               const Icon = style.icon;
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
 
               <div className="space-y-2">
                 <h3 className="text-xs font-medium text-muted-foreground">{t("bands.growing.pipelineHeading")}</h3>
-                <div className="divide-y overflow-hidden rounded-xl border bg-card">
+                <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
                   {pipelineByStage
                     .filter(({ count }) => count > 0)
                     .map(({ stage, count }) => (

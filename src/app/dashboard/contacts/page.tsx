@@ -82,7 +82,7 @@ export default async function ContactsPage({ searchParams }: PageProps) {
       {contacts.length === 0 ? (
         <EmptyState icon={Users} title={t("emptyState")} />
       ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
           {contacts.map((contact) => (
             <Link
               key={contact.id}
