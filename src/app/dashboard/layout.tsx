@@ -124,7 +124,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const productName = tApp("name");
 
   const topBar = (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b bg-surface px-4 md:px-6">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-surface px-4 md:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
         <div className="md:hidden">
           <MobileNav
@@ -166,7 +166,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex min-h-full flex-1 flex-col">
         {topBar}
         <main className="flex flex-1 items-center justify-center p-6">
-          <div className="max-w-sm space-y-4 rounded-xl border bg-card shadow-md shadow-foreground/[0.03] p-8 text-center">
+          <div className="max-w-sm space-y-4 rounded-xl border bg-card shadow-sm p-8 text-center">
             <Logo variant="tile" className="mx-auto h-12" />
             <div className="space-y-1.5">
               <h1 className="font-heading text-base font-semibold">{t("suspended.title")}</h1>
@@ -194,11 +194,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="flex min-h-full flex-1">
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e bg-sidebar md:flex">
-        <Link href="/dashboard" className="flex items-center gap-2.5 border-b px-5 py-4">
+        <Link href="/dashboard" className="flex h-16 items-center gap-2.5 border-b px-5">
           <Logo className="h-7" />
           <span className="truncate font-heading text-base font-semibold text-sidebar-foreground">{productName}</span>
         </Link>
-        <div className="flex-1 overflow-y-auto px-3 py-4">
+        <div className="flex-1 overflow-y-auto px-3 py-5">
           <SidebarNav groups={groups} />
         </div>
         <div className="border-t p-2">
@@ -210,7 +210,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {topBar}
 
         {isOverdue && (
-          <div className="border-b bg-warning-soft px-4 py-2 text-sm text-warning-foreground md:px-6">
+          <div className="border-b bg-warning-soft px-4 py-2 text-sm text-warning-foreground md:px-6 lg:px-8">
             {t(`overdue.${workspace.subscriptionStatus}`)}{" "}
             <Link href="/dashboard/billing" className="font-medium underline underline-offset-2">
               {t("overdue.cta")}
@@ -218,7 +218,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         )}
 
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

@@ -2,7 +2,8 @@ import { Workflow } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/empty-state";
+import { RowList } from "@/components/data-table";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { DeleteWorkflowButton } from "@/features/automation/components/delete-workflow-button";
 import { WorkflowStatusToggle } from "@/features/automation/components/workflow-status-toggle";
@@ -29,7 +30,7 @@ export default async function AutomationsPage() {
   const workflows = await automationService.listWorkflows(workspace.id);
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader
         title={t("title")}
         description={t("description")}
@@ -52,34 +53,33 @@ export default async function AutomationsPage() {
         }
       />
 
-      {workflows.length === 0 ? (
-        <EmptyState icon={Workflow} title={t("emptyState")} />
-      ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
-          {workflows.map((workflow) => {
-            const delay = describeDelay(workflow, translators);
-            const conditions = describeConditions(workflow, translators);
-            return (
-              <div key={workflow.id} className="flex items-center justify-between gap-4 p-4">
-                <Link href={`/dashboard/automations/${workflow.id}`} className="min-w-0 flex-1">
-                  <p className="truncate font-medium hover:underline">{workflow.name}</p>
-                  <p className="truncate text-sm text-muted-foreground">
-                    {describeTrigger(workflow, translators)} → {delay ? `${delay} ` : ""}
-                    {describeAction(workflow, translators)}
-                  </p>
-                  {conditions && <p className="truncate text-xs text-muted-foreground">{conditions}</p>}
-                </Link>
-                {canManage && (
-                  <div className="flex shrink-0 items-center gap-2">
-                    <WorkflowStatusToggle workflowId={workflow.id} initialStatus={workflow.status} />
-                    <DeleteWorkflowButton workflowId={workflow.id} />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+      <RowList
+        items={workflows}
+        getRowKey={(workflow) => workflow.id}
+        emptyState={{ icon: Workflow, title: t("emptyState") }}
+        renderRow={(workflow) => {
+          const delay = describeDelay(workflow, translators);
+          const conditions = describeConditions(workflow, translators);
+          return (
+            <>
+              <Link href={`/dashboard/automations/${workflow.id}`} className="min-w-0 flex-1">
+                <p className="truncate font-medium hover:underline">{workflow.name}</p>
+                <p className="truncate text-sm text-muted-foreground">
+                  {describeTrigger(workflow, translators)} → {delay ? `${delay} ` : ""}
+                  {describeAction(workflow, translators)}
+                </p>
+                {conditions && <p className="truncate text-xs text-muted-foreground">{conditions}</p>}
+              </Link>
+              {canManage && (
+                <div className="flex shrink-0 items-center gap-2">
+                  <WorkflowStatusToggle workflowId={workflow.id} initialStatus={workflow.status} />
+                  <DeleteWorkflowButton workflowId={workflow.id} />
+                </div>
+              )}
+            </>
+          );
+        }}
+      />
+    </PageContainer>
   );
 }

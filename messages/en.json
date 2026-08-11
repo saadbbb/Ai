@@ -22,7 +22,13 @@
     "exportPdf": "Export PDF",
     "search": "Search",
     "searchPlaceholder": "Search by name...",
-    "gotIt": "Got it"
+    "gotIt": "Got it",
+    "theme": {
+      "label": "Appearance",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   },
   "auth": {
     "register": {
@@ -1628,7 +1634,13 @@
         "quote": "Request a quote",
         "support": "Support"
       }
-    }
+    },
+    "tabs": {
+      "storefront": "Storefront",
+      "reviews": "Reviews",
+      "blog": "Blog"
+    },
+    "notPublished": "Not published"
   },
   "integrations": {
     "title": "Integrations",
@@ -1770,7 +1782,9 @@
     "workingHoursTitle": "Working Hours",
     "workingHoursDescription": "Let your AI employee know when your team is available.",
     "handoverTitle": "Transfer to Human",
-    "handoverDescription": "Control when your AI employee hands a conversation over to your team."
+    "handoverDescription": "Control when your AI employee hands a conversation over to your team.",
+    "handoverOn": "Handover on",
+    "handoverOff": "Handover off"
   },
   "workspaceProfile": {
     "pageTitle": "Workspace Profile",

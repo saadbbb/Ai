@@ -1,7 +1,7 @@
 import { History } from "lucide-react";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { EmptyState } from "@/components/empty-state";
+import { RowList } from "@/components/data-table";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
@@ -27,37 +27,27 @@ export default async function AuditLogPage() {
   });
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <PageContainer className="mx-auto max-w-2xl">
       <PageHeader title={t("pageTitle")} description={t("pageDescription")} />
 
-      {events.length === 0 ? (
-        <EmptyState icon={History} title={t("emptyState")} />
-      ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
-          {events.map((event) => {
-            const row = (
-              <div className="flex items-center justify-between gap-4 p-3 text-sm">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{t(`source.${event.source}`)}</Badge>
-                    <p className="truncate">{event.summary}</p>
-                  </div>
-                  {event.actorLabel && <p className="truncate text-xs text-muted-foreground">{event.actorLabel}</p>}
-                </div>
-                <span className="shrink-0 text-xs text-muted-foreground">{formatter.format(event.createdAt)}</span>
+      <RowList
+        items={events}
+        getRowKey={(event) => event.id}
+        getRowHref={(event) => event.link}
+        emptyState={{ icon: History, title: t("emptyState") }}
+        renderRow={(event) => (
+          <>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">{t(`source.${event.source}`)}</Badge>
+                <p className="truncate">{event.summary}</p>
               </div>
-            );
-
-            return event.link ? (
-              <Link key={event.id} href={event.link} className="block hover:bg-muted/50">
-                {row}
-              </Link>
-            ) : (
-              <div key={event.id}>{row}</div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+              {event.actorLabel && <p className="truncate text-xs text-muted-foreground">{event.actorLabel}</p>}
+            </div>
+            <span className="shrink-0 text-xs text-muted-foreground">{formatter.format(event.createdAt)}</span>
+          </>
+        )}
+      />
+    </PageContainer>
   );
 }

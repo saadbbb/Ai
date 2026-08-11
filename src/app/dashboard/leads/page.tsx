@@ -4,6 +4,7 @@ import { CoachMark } from "@/components/coach-mark";
 import { Button } from "@/components/ui/button";
 import { ExportButtons } from "@/components/export-buttons";
 import { Input } from "@/components/ui/input";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { LeadBoard } from "@/features/crm/components/lead-board";
 import { crmService } from "@/features/crm/services/crm.service";
@@ -30,7 +31,7 @@ export default async function LeadsPage({ searchParams }: PageProps) {
   const hasActiveFilters = Boolean(q || tag || language);
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader
         title={t("title")}
         description={t("description")}
@@ -68,6 +69,6 @@ export default async function LeadsPage({ searchParams }: PageProps) {
       </form>
       <CoachMark id="leads-board" title={tCoach("title")} description={tCoach("description")} />
       <LeadBoard initialLeads={leads} />
-    </div>
+    </PageContainer>
   );
 }

@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { AdminList } from "@/features/platform-admin/components/admin-list";
 import { platformAdminRepository } from "@/features/platform-admin/repository/platform-admin.repository";
@@ -13,9 +14,9 @@ export default async function PlatformAdminsPage() {
   const bootstrapEmails = platformAdminService.listBootstrapEmails();
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader title={t("title")} description={t("description")} />
       <AdminList initialAdmins={admins} bootstrapEmails={bootstrapEmails} currentUserEmail={admin.email} />
-    </div>
+    </PageContainer>
   );
 }

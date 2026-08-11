@@ -22,7 +22,13 @@
     "exportPdf": "هەناردەکردنی PDF",
     "search": "گەڕان",
     "searchPlaceholder": "بە ناو بگەڕێ...",
-    "gotIt": "تێگەیشتم"
+    "gotIt": "تێگەیشتم",
+    "theme": {
+      "label": "ڕووکار",
+      "light": "ڕووناک",
+      "dark": "تاریک",
+      "system": "سیستەم"
+    }
   },
   "auth": {
     "register": {
@@ -1628,7 +1634,13 @@
         "quote": "داواکاری نرخ",
         "support": "پشتگیری"
       }
-    }
+    },
+    "tabs": {
+      "storefront": "فرۆشگا",
+      "reviews": "هەڵسەنگاندنەکان",
+      "blog": "بلۆگ"
+    },
+    "notPublished": "بڵاونەکراوەتەوە"
   },
   "integrations": {
     "title": "پەیوەندییەکان",
@@ -1770,7 +1782,9 @@
     "workingHoursTitle": "کاتەکانی کارکردن",
     "workingHoursDescription": "کارمەندە زیرەکەکەت ئاگادار بکەوە کە تیمەکەت کەی بەردەستە.",
     "handoverTitle": "گواستنەوە بۆ کەسی مرۆڤ",
-    "handoverDescription": "کۆنترۆڵی ئەوە بکە کە کارمەندە زیرەکەکەت کەی گفتوگۆکە دەگوازێتەوە بۆ تیمەکەت."
+    "handoverDescription": "کۆنترۆڵی ئەوە بکە کە کارمەندە زیرەکەکەت کەی گفتوگۆکە دەگوازێتەوە بۆ تیمەکەت.",
+    "handoverOn": "گواستنەوە چالاکە",
+    "handoverOff": "گواستنەوە ناچالاکە"
   },
   "workspaceProfile": {
     "pageTitle": "پرۆفایلی مکانی کار",

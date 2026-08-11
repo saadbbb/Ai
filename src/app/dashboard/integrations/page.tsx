@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { ApiKeyManager } from "@/features/integrations/components/api-key-manager";
 import { WebhookSubscriptionManager } from "@/features/integrations/components/webhook-subscription-manager";
@@ -18,10 +19,10 @@ export default async function IntegrationsPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <PageContainer className="mx-auto max-w-2xl">
       <PageHeader title={t("title")} description={t("description")} />
       <ApiKeyManager initialApiKeys={apiKeys} />
       <WebhookSubscriptionManager initialSubscriptions={webhookSubscriptions} />
-    </div>
+    </PageContainer>
   );
 }

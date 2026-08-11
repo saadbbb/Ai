@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { FeatureFlagManager } from "@/features/platform-admin/components/feature-flag-manager";
 import { featureFlagRepository } from "@/features/platform-admin/repository/feature-flag.repository";
@@ -14,13 +15,13 @@ export default async function AdminFeatureFlagsPage() {
   const workspaceOptions = workspaces.map(({ workspace }) => ({ id: workspace.id, name: workspace.name }));
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader title={t("title")} description={t("description")} />
       <FeatureFlagManager
         initialFlags={flags}
         initialOverrides={Object.fromEntries(flags.map((flag, index) => [flag.id, overridesByFlag[index]]))}
         workspaceOptions={workspaceOptions}
       />
-    </div>
+    </PageContainer>
   );
 }

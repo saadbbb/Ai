@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,7 +25,7 @@ export default async function AdminSystemHealthPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader title={t("title")} description={t("description")} />
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -48,6 +49,6 @@ export default async function AdminSystemHealthPage() {
           );
         })}
       </div>
-    </div>
+    </PageContainer>
   );
 }

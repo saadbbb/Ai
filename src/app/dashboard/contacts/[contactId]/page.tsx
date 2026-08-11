@@ -263,7 +263,7 @@ export default async function ContactDetailPage({ params }: PageProps) {
         {timeline.length === 0 ? (
           <p className="text-sm text-muted-foreground">{tActivity("empty")}</p>
         ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-sm">
             {timeline.map((item) => {
               const row = (
                 <div className="flex items-center justify-between gap-3 p-3 text-sm">

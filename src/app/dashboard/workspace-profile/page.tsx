@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { BusinessInfoSettingsForm } from "@/features/ai/components/business-info-settings-form";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -9,7 +10,7 @@ export default async function WorkspaceProfilePage() {
   const t = await getTranslations("workspaceProfile");
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader title={t("pageTitle")} description={t("pageDescription")} />
 
       <BusinessInfoSettingsForm
@@ -22,6 +23,6 @@ export default async function WorkspaceProfilePage() {
           logoUrl: workspace.logoUrl ?? "",
         }}
       />
-    </div>
+    </PageContainer>
   );
 }

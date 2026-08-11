@@ -15,11 +15,13 @@ import {
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { CoachMark } from "@/components/coach-mark";
+import { PageContainer, Section } from "@/components/page-container";
+import { PageHeader } from "@/components/page-header";
 import { HealthScoreCard } from "@/features/analytics/components/health-score-card";
 import { resolveAnalyticsRange } from "@/features/analytics/lib/date-range";
 import { analyticsService } from "@/features/analytics/services/analytics.service";
 import { InsightsPanel } from "@/features/ai/components/insights-panel";
-import { StatTile } from "@/features/dashboard/components/stat-tile";
+import { StatGrid } from "@/components/stat-grid";
 import { dashboardService, type AttentionItem } from "@/features/dashboard/services/dashboard.service";
 import { planRepository } from "@/features/platform-admin/repository/plan.repository";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
@@ -81,24 +83,23 @@ export default async function DashboardPage() {
   const topAgent = teamPerformance.length > 0 ? teamPerformance[0] : undefined;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-heading text-2xl font-semibold text-foreground">{t("welcomeBack")}</h1>
-        <p className="text-text-secondary">{t("signedInAs", { email: user.email })}</p>
-      </div>
+    <PageContainer className="space-y-8">
+      <PageHeader title={t("welcomeBack")} description={t("signedInAs", { email: user.email })} />
 
       <InsightsPanel />
 
       {myWork ? (
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">{t("bands.myWork.heading")}</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <StatTile label={t("bands.myWork.assignedConversations")} value={myWork.assignedConversationsCount} />
-            <StatTile label={t("bands.myWork.assignedTasks")} value={myWork.assignedOpenTasksCount} />
-            <StatTile label={t("bands.today.appointments")} value={myWork.appointmentsToday} />
-          </div>
+        <Section title={t("bands.myWork.heading")}>
+          <StatGrid
+            className="sm:grid-cols-3 lg:grid-cols-3"
+            stats={[
+              { label: t("bands.myWork.assignedConversations"), value: myWork.assignedConversationsCount },
+              { label: t("bands.myWork.assignedTasks"), value: myWork.assignedOpenTasksCount },
+              { label: t("bands.today.appointments"), value: myWork.appointmentsToday },
+            ]}
+          />
           {myWork.assignedConversations.length > 0 && (
-            <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-sm">
               {myWork.assignedConversations.map((item) => (
                 <Link key={item.id} href={item.href} className="flex items-center justify-between gap-4 p-3 text-sm hover:bg-muted">
                   <span className="truncate">{item.label}</span>
@@ -106,22 +107,23 @@ export default async function DashboardPage() {
               ))}
             </div>
           )}
-        </section>
+        </Section>
       ) : (
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">{t("bands.today.heading")}</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-            <StatTile label={t("bands.today.conversations")} value={today.conversationsToday} icon={MessageSquare} />
-            <StatTile label={t("bands.today.newLeads")} value={today.newLeadsToday} icon={UserPlus} />
-            <StatTile label={t("bands.today.orders")} value={today.ordersToday} icon={ListChecks} />
-            <StatTile label={t("bands.today.appointments")} value={today.appointmentsToday} icon={CalendarCheck} />
-            <StatTile label={t("bands.today.revenue")} value={today.revenueToday.toFixed(2)} icon={DollarSign} tone="success" />
-          </div>
-        </section>
+        <Section title={t("bands.today.heading")}>
+          <StatGrid
+            className="sm:grid-cols-5 lg:grid-cols-5"
+            stats={[
+              { label: t("bands.today.conversations"), value: today.conversationsToday, icon: MessageSquare },
+              { label: t("bands.today.newLeads"), value: today.newLeadsToday, icon: UserPlus },
+              { label: t("bands.today.orders"), value: today.ordersToday, icon: ListChecks },
+              { label: t("bands.today.appointments"), value: today.appointmentsToday, icon: CalendarCheck },
+              { label: t("bands.today.revenue"), value: today.revenueToday.toFixed(2), icon: DollarSign, tone: "success" },
+            ]}
+          />
+        </Section>
       )}
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-foreground">{t("bands.attention.heading")}</h2>
+      <Section title={t("bands.attention.heading")}>
         <CoachMark id="dashboard-attention" title={tCoach("title")} description={tCoach("description")} />
         {attention.items.length === 0 ? (
           <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-8 text-center">
@@ -129,7 +131,7 @@ export default async function DashboardPage() {
             <p className="text-sm text-muted-foreground">{t("bands.attention.empty")}</p>
           </div>
         ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-sm">
             {attention.items.map((item) => {
               const style = ATTENTION_STYLE[item.type];
               const Icon = style.icon;
@@ -148,14 +150,14 @@ export default async function DashboardPage() {
             })}
           </div>
         )}
-      </section>
+      </Section>
 
       {growth && (
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <TrendingUp className="size-4 text-primary" />
             <div>
-              <h2 className="text-sm font-semibold text-foreground">{t("bands.growing.heading")}</h2>
+              <h2 className="font-heading text-sm font-semibold text-foreground">{t("bands.growing.heading")}</h2>
               <p className="text-xs text-muted-foreground">{t("bands.growing.subheading")}</p>
             </div>
           </div>
@@ -184,15 +186,18 @@ export default async function DashboardPage() {
             />
 
             <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-3">
-                <StatTile label={t("bands.growing.revenue")} value={growth.kpis.revenueTotal.toFixed(2)} icon={DollarSign} tone="success" />
-                <StatTile label={t("bands.growing.ordersCompleted")} value={growth.kpis.ordersCompleted} icon={ListChecks} />
-                <StatTile label={t("bands.growing.appointmentsCompleted")} value={growth.kpis.appointmentsCompleted} icon={CalendarCheck} />
-              </div>
+              <StatGrid
+                className="grid-cols-3 sm:grid-cols-3 lg:grid-cols-3"
+                stats={[
+                  { label: t("bands.growing.revenue"), value: growth.kpis.revenueTotal.toFixed(2), icon: DollarSign, tone: "success" },
+                  { label: t("bands.growing.ordersCompleted"), value: growth.kpis.ordersCompleted, icon: ListChecks },
+                  { label: t("bands.growing.appointmentsCompleted"), value: growth.kpis.appointmentsCompleted, icon: CalendarCheck },
+                ]}
+              />
 
               <div className="space-y-2">
                 <h3 className="text-xs font-medium text-muted-foreground">{t("bands.growing.pipelineHeading")}</h3>
-                <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
+                <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-sm">
                   {pipelineByStage
                     .filter(({ count }) => count > 0)
                     .map(({ stage, count }) => (
@@ -212,25 +217,27 @@ export default async function DashboardPage() {
       )}
 
       {isOwner && (
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">{t("bands.business.heading")}</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatTile
-              label={t("bands.business.subscriptionStatus")}
-              value={tBilling(`statuses.${workspace.subscriptionStatus}`)}
-              icon={Building2}
-            />
-            <StatTile label={t("bands.business.plan")} value={plan?.name ?? t("bands.business.noPlan")} icon={Award} />
-            <StatTile
-              label={t("bands.business.topChannel")}
-              value={topChannel ? tChannel(topChannel.status) : "—"}
-              icon={MessageSquare}
-            />
-            <StatTile label={t("bands.business.topProduct")} value={topProduct?.productName ?? "—"} />
-            <StatTile label={t("bands.business.topAgent")} value={topAgent?.email ?? "—"} />
-          </div>
-        </section>
+        <Section title={t("bands.business.heading")}>
+          <StatGrid
+            className="sm:grid-cols-4 lg:grid-cols-4"
+            stats={[
+              {
+                label: t("bands.business.subscriptionStatus"),
+                value: tBilling(`statuses.${workspace.subscriptionStatus}`),
+                icon: Building2,
+              },
+              { label: t("bands.business.plan"), value: plan?.name ?? t("bands.business.noPlan"), icon: Award },
+              {
+                label: t("bands.business.topChannel"),
+                value: topChannel ? tChannel(topChannel.status) : "—",
+                icon: MessageSquare,
+              },
+              { label: t("bands.business.topProduct"), value: topProduct?.productName ?? "—" },
+              { label: t("bands.business.topAgent"), value: topAgent?.email ?? "—" },
+            ]}
+          />
+        </Section>
       )}
-    </div>
+    </PageContainer>
   );
 }

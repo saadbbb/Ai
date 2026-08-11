@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { TeamManager } from "@/features/workspace/components/team-manager";
 import { permissionService } from "@/features/workspace/services/permission.service";
@@ -18,7 +19,7 @@ export default async function TeamPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <PageContainer className="mx-auto max-w-2xl">
       <PageHeader title={t("title")} description={t("description")} />
       <TeamManager
         initialMembers={members}
@@ -28,6 +29,6 @@ export default async function TeamPage() {
         canManage={canManage}
         currentUserId={user.id}
       />
-    </div>
+    </PageContainer>
   );
 }

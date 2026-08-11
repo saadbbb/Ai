@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { RefundManager } from "@/features/platform-admin/components/refund-manager";
 import { invoiceRepository } from "@/features/platform-admin/repository/invoice.repository";
@@ -12,9 +13,9 @@ export default async function AdminRefundsPage() {
   ]);
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader title={t("title")} description={t("description")} />
       <RefundManager initialRefunds={refunds} invoices={invoices} />
-    </div>
+    </PageContainer>
   );
 }

@@ -45,7 +45,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
         }
       />
 
-      <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
+      <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-sm">
         {items.map((item) => (
           <div key={item.id} className="flex items-center justify-between p-3 text-sm">
             <span>

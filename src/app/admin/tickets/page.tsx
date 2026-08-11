@@ -1,11 +1,11 @@
 import { CheckCircle2, Clock3, Ticket as TicketIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
-import { EmptyState } from "@/components/empty-state";
+import { RowList } from "@/components/data-table";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { StatTile } from "@/features/dashboard/components/stat-tile";
+import { StatGrid } from "@/components/stat-grid";
 import { ticketAdminService } from "@/features/support/services/ticket-admin.service";
 import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
 
@@ -33,48 +33,42 @@ export default async function AdminTicketsPage() {
   const [tickets, timing] = await Promise.all([ticketAdminService.listTickets(), ticketAdminService.getTimingStats()]);
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader title={t("title")} description={t("description")} />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
-        <StatTile label={t("avgResponseTime")} value={formatSeconds(timing.avgResponseSeconds, t)} icon={Clock3} />
-        <StatTile
-          label={t("avgResolutionTime")}
-          value={formatSeconds(timing.avgResolutionSeconds, t)}
-          icon={CheckCircle2}
-          tone="success"
-        />
-      </div>
+      <StatGrid
+        className="sm:grid-cols-2 lg:grid-cols-2"
+        stats={[
+          { label: t("avgResponseTime"), value: formatSeconds(timing.avgResponseSeconds, t), icon: Clock3 },
+          { label: t("avgResolutionTime"), value: formatSeconds(timing.avgResolutionSeconds, t), icon: CheckCircle2, tone: "success" },
+        ]}
+      />
 
-      {tickets.length === 0 ? (
-        <EmptyState icon={TicketIcon} title={t("emptyState")} />
-      ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
-          {tickets.map(({ ticket, workspaceName, assignedAdminEmail }) => (
-            <Link
-              key={ticket.id}
-              href={`/admin/tickets/${ticket.id}`}
-              className="flex items-center justify-between gap-4 p-3 text-sm hover:bg-muted/50"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{ticket.subject}</p>
-                <p className="truncate text-muted-foreground">
-                  {workspaceName} · {t(`categories.${ticket.category}`)}
-                  {assignedAdminEmail && ` · ${assignedAdminEmail}`}
-                </p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <Badge variant="secondary" className={cn(PRIORITY_TONE[ticket.priority])}>
-                  {t(`priorities.${ticket.priority}`)}
-                </Badge>
-                <Badge variant="secondary" className={cn(STATUS_TONE[ticket.status])}>
-                  {t(`statuses.${ticket.status}`)}
-                </Badge>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+      <RowList
+        items={tickets}
+        getRowKey={({ ticket }) => ticket.id}
+        getRowHref={({ ticket }) => `/admin/tickets/${ticket.id}`}
+        emptyState={{ icon: TicketIcon, title: t("emptyState") }}
+        renderRow={({ ticket, workspaceName, assignedAdminEmail }) => (
+          <>
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-medium">{ticket.subject}</p>
+              <p className="truncate text-muted-foreground">
+                {workspaceName} · {t(`categories.${ticket.category}`)}
+                {assignedAdminEmail && ` · ${assignedAdminEmail}`}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <Badge variant="secondary" className={cn(PRIORITY_TONE[ticket.priority])}>
+                {t(`priorities.${ticket.priority}`)}
+              </Badge>
+              <Badge variant="secondary" className={cn(STATUS_TONE[ticket.status])}>
+                {t(`statuses.${ticket.status}`)}
+              </Badge>
+            </div>
+          </>
+        )}
+      />
+    </PageContainer>
   );
 }

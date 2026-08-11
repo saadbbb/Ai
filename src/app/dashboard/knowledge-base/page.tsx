@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { FaqManager } from "@/features/knowledge-base/components/faq-manager";
 import { PolicySettingsForm } from "@/features/knowledge-base/components/policy-settings-form";
@@ -24,7 +25,7 @@ export default async function KnowledgeBasePage() {
   ]);
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader title={t("pageTitle")} description={t("pageDescription")} />
 
       <FaqManager initialFaqs={faqs} />
@@ -37,6 +38,6 @@ export default async function KnowledgeBasePage() {
           paymentsPolicy: policy?.paymentsPolicy ?? "",
         }}
       />
-    </div>
+    </PageContainer>
   );
 }

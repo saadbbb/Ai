@@ -1,9 +1,10 @@
 import { BarChart3 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { EmptyState } from "@/components/empty-state";
+import { DataTable } from "@/components/data-table";
 import { ExportButtons } from "@/components/export-buttons";
+import { PageContainer, Section } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
-import { StatTile } from "@/features/dashboard/components/stat-tile";
+import { StatGrid } from "@/components/stat-grid";
 import { BarChartCard } from "@/features/analytics/components/bar-chart-card";
 import { DateRangeSelect } from "@/features/analytics/components/date-range-select";
 import { LineChartCard } from "@/features/analytics/components/line-chart-card";
@@ -59,7 +60,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
       : `range=${range.key}`;
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader
         title={t("title")}
         description={t("description")}
@@ -68,17 +69,20 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <StatTile label={t("kpis.newLeads")} value={summary.kpis.newLeads} />
-        <StatTile label={t("kpis.revenue")} value={currency(summary.kpis.revenueTotal)} />
-        <StatTile label={t("kpis.ordersCompleted")} value={summary.kpis.ordersCompleted} />
-        <StatTile label={t("kpis.appointmentsCompleted")} value={summary.kpis.appointmentsCompleted} />
-        <StatTile label={t("kpis.aiRequests")} value={summary.kpis.aiRequests} />
-        <StatTile
-          label={t("kpis.aiSuccessRate")}
-          value={summary.kpis.aiSuccessRate === null ? "—" : `${Math.round(summary.kpis.aiSuccessRate * 100)}%`}
-        />
-      </div>
+      <StatGrid
+        className="sm:grid-cols-3 lg:grid-cols-6"
+        stats={[
+          { label: t("kpis.newLeads"), value: summary.kpis.newLeads },
+          { label: t("kpis.revenue"), value: currency(summary.kpis.revenueTotal) },
+          { label: t("kpis.ordersCompleted"), value: summary.kpis.ordersCompleted },
+          { label: t("kpis.appointmentsCompleted"), value: summary.kpis.appointmentsCompleted },
+          { label: t("kpis.aiRequests"), value: summary.kpis.aiRequests },
+          {
+            label: t("kpis.aiSuccessRate"),
+            value: summary.kpis.aiSuccessRate === null ? "—" : `${Math.round(summary.kpis.aiSuccessRate * 100)}%`,
+          },
+        ]}
+      />
 
       <HealthScoreCard
         healthScore={summary.healthScore}
@@ -140,9 +144,9 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
         />
       </div>
 
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold text-foreground">{t("depth.title")}</h2>
+      <Section
+        title={t("depth.title")}
+        actions={
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("depth.salesReport")}</span>
@@ -157,41 +161,50 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
               <ExportButtons reportPath={`/api/reports/channels?${rangeQuery}`} labels={exportLabels} />
             </div>
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          <StatTile label={t("depth.avgOrderValue")} value={summary.sales.avgOrderValue === null ? "—" : currency(summary.sales.avgOrderValue)} />
-          <StatTile
-            label={t("depth.salesGrowth")}
-            value={summary.sales.growthPercent === null ? "—" : `${Math.round(summary.sales.growthPercent)}%`}
-          />
-          <StatTile
-            label={t("depth.repeatCustomerRate")}
-            value={summary.sales.repeatCustomerRate === null ? "—" : `${Math.round(summary.sales.repeatCustomerRate * 100)}%`}
-          />
-          <StatTile label={t("depth.winRate")} value={summary.leads.winRate === null ? "—" : `${Math.round(summary.leads.winRate * 100)}%`} />
-          <StatTile
-            label={t("depth.aiHandoffRate")}
-            value={summary.ai.handoffRate === null ? "—" : `${Math.round(summary.ai.handoffRate * 100)}%`}
-          />
-          <StatTile
-            label={t("depth.avgResponseAi")}
-            value={summary.conversations.avgResponseSecondsAi === null ? "—" : t("depth.seconds", { count: Math.round(summary.conversations.avgResponseSecondsAi) })}
-          />
-          <StatTile
-            label={t("depth.avgResponseHuman")}
-            value={
-              summary.conversations.avgResponseSecondsHuman === null
-                ? "—"
-                : t("depth.minutes", { count: Math.round(summary.conversations.avgResponseSecondsHuman / 60) })
-            }
-          />
-          <StatTile
-            label={t("depth.avgAppointmentLeadTime")}
-            value={summary.appointments.avgLeadTimeHours === null ? "—" : t("depth.hours", { count: Math.round(summary.appointments.avgLeadTimeHours) })}
-          />
-          <StatTile label={t("depth.newCustomers")} value={summary.customers.newCount} />
-          <StatTile label={t("depth.returningCustomers")} value={summary.customers.returningCount} />
-        </div>
+        }
+      >
+        <StatGrid
+          className="sm:grid-cols-3 lg:grid-cols-5"
+          stats={[
+            { label: t("depth.avgOrderValue"), value: summary.sales.avgOrderValue === null ? "—" : currency(summary.sales.avgOrderValue) },
+            {
+              label: t("depth.salesGrowth"),
+              value: summary.sales.growthPercent === null ? "—" : `${Math.round(summary.sales.growthPercent)}%`,
+            },
+            {
+              label: t("depth.repeatCustomerRate"),
+              value: summary.sales.repeatCustomerRate === null ? "—" : `${Math.round(summary.sales.repeatCustomerRate * 100)}%`,
+            },
+            { label: t("depth.winRate"), value: summary.leads.winRate === null ? "—" : `${Math.round(summary.leads.winRate * 100)}%` },
+            {
+              label: t("depth.aiHandoffRate"),
+              value: summary.ai.handoffRate === null ? "—" : `${Math.round(summary.ai.handoffRate * 100)}%`,
+            },
+            {
+              label: t("depth.avgResponseAi"),
+              value:
+                summary.conversations.avgResponseSecondsAi === null
+                  ? "—"
+                  : t("depth.seconds", { count: Math.round(summary.conversations.avgResponseSecondsAi) }),
+            },
+            {
+              label: t("depth.avgResponseHuman"),
+              value:
+                summary.conversations.avgResponseSecondsHuman === null
+                  ? "—"
+                  : t("depth.minutes", { count: Math.round(summary.conversations.avgResponseSecondsHuman / 60) }),
+            },
+            {
+              label: t("depth.avgAppointmentLeadTime"),
+              value:
+                summary.appointments.avgLeadTimeHours === null
+                  ? "—"
+                  : t("depth.hours", { count: Math.round(summary.appointments.avgLeadTimeHours) }),
+            },
+            { label: t("depth.newCustomers"), value: summary.customers.newCount },
+            { label: t("depth.returningCustomers"), value: summary.customers.returningCount },
+          ]}
+        />
 
         <div className="grid gap-4 lg:grid-cols-2">
           <LineChartCard
@@ -227,11 +240,11 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
             emptyMessage={t("charts.empty")}
           />
         </div>
-      </div>
+      </Section>
 
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold text-foreground">{t("teamPerformance.title")}</h2>
+      <Section
+        title={t("teamPerformance.title")}
+        actions={
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("teamPerformance.revenueReport")}</span>
@@ -242,39 +255,46 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
               <ExportButtons reportPath={`/api/reports/team-performance?${rangeQuery}`} labels={exportLabels} />
             </div>
           </div>
-        </div>
-        {teamPerformance.length === 0 ? (
-          <EmptyState icon={BarChart3} title={t("teamPerformance.empty")} />
-        ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
-            <div className="flex items-center justify-between gap-4 p-3 text-xs font-medium text-muted-foreground">
-              <span className="flex-1">{t("teamPerformance.columns.agent")}</span>
-              <span className="w-32 text-right">{t("teamPerformance.columns.conversations")}</span>
-              <span className="w-32 text-right">{t("teamPerformance.columns.tasksCompleted")}</span>
-              <span className="w-40 text-right">{t("teamPerformance.columns.avgResponseTime")}</span>
-            </div>
-            {teamPerformance.map((row) => (
-              <div key={row.userId} className="flex items-center justify-between gap-4 p-3 text-sm">
-                <span className="flex-1 truncate">{row.email}</span>
-                <span className="w-32 text-right">{row.conversationsHandled}</span>
-                <span className="w-32 text-right">{row.tasksCompleted}</span>
-                <span className="w-40 text-right text-muted-foreground">
-                  {row.avgResponseMinutes === null ? "—" : t("teamPerformance.minutes", { count: row.avgResponseMinutes })}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        }
+      >
+        <DataTable
+          rows={teamPerformance}
+          getRowKey={(row) => row.userId}
+          emptyState={{ icon: BarChart3, title: t("teamPerformance.empty") }}
+          columns={[
+            { key: "agent", header: t("teamPerformance.columns.agent"), cell: (row) => row.email },
+            {
+              key: "conversations",
+              header: t("teamPerformance.columns.conversations"),
+              cell: (row) => row.conversationsHandled,
+              className: "text-end",
+            },
+            {
+              key: "tasks",
+              header: t("teamPerformance.columns.tasksCompleted"),
+              cell: (row) => row.tasksCompleted,
+              className: "text-end",
+            },
+            {
+              key: "avgResponse",
+              header: t("teamPerformance.columns.avgResponseTime"),
+              cell: (row) => (row.avgResponseMinutes === null ? "—" : t("teamPerformance.minutes", { count: row.avgResponseMinutes })),
+              className: "text-end text-muted-foreground",
+            },
+          ]}
+        />
+      </Section>
 
       {websiteSummary && (
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">{t("website.title")}</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <StatTile label={t("website.pageViews")} value={websiteSummary.pageViews} />
-            <StatTile label={t("website.productViews")} value={websiteSummary.productViews} />
-            <StatTile label={t("website.formSubmissions")} value={websiteSummary.formSubmissions} />
-          </div>
+        <Section title={t("website.title")}>
+          <StatGrid
+            className="sm:grid-cols-3 lg:grid-cols-3"
+            stats={[
+              { label: t("website.pageViews"), value: websiteSummary.pageViews },
+              { label: t("website.productViews"), value: websiteSummary.productViews },
+              { label: t("website.formSubmissions"), value: websiteSummary.formSubmissions },
+            ]}
+          />
           <div className="grid gap-4 lg:grid-cols-2">
             <BarChartCard
               title={t("website.topProducts")}
@@ -287,8 +307,8 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
               emptyMessage={t("charts.empty")}
             />
           </div>
-        </div>
+        </Section>
       )}
-    </div>
+    </PageContainer>
   );
 }

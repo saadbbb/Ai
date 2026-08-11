@@ -55,7 +55,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex min-h-full flex-1">
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e bg-sidebar md:flex">
-        <Link href="/admin" className="flex items-center gap-2.5 border-b px-5 py-4">
+        <Link href="/admin" className="flex items-center gap-2.5 border-b px-5 py-5">
           <Logo className="h-7" />
           <div className="flex min-w-0 flex-col">
             <span className="truncate font-heading text-base font-semibold text-sidebar-foreground">{productName}</span>
@@ -65,7 +65,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </span>
           </div>
         </Link>
-        <div className="flex-1 overflow-y-auto px-3 py-4">
+        <div className="flex-1 overflow-y-auto px-3 py-5">
           <SidebarNav groups={groups} />
         </div>
         <div className="border-t p-2">
@@ -74,7 +74,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b bg-surface px-4 md:px-6">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-surface px-4 md:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <div className="md:hidden">
               <MobileNav
@@ -102,7 +102,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

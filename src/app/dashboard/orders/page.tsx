@@ -2,9 +2,10 @@ import { ShoppingCart } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/empty-state";
+import { RowList } from "@/components/data-table";
 import { ExportButtons } from "@/components/export-buttons";
 import { Input } from "@/components/ui/input";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { OrderStatusSelect } from "@/features/orders/components/order-status-select";
 import { orderGrandTotal } from "@/features/orders/lib/order-total";
@@ -26,7 +27,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
   const orders = await orderService.listOrders(workspace.id, q);
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader
         title={t("title")}
         description={t("description")}
@@ -47,25 +48,24 @@ export default async function OrdersPage({ searchParams }: PageProps) {
         <Input type="search" name="q" defaultValue={q ?? ""} placeholder={tCommon("searchPlaceholder")} aria-label={tCommon("search")} />
       </form>
 
-      {orders.length === 0 ? (
-        <EmptyState icon={ShoppingCart} title={t("emptyState")} />
-      ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
-          {orders.map(({ order, contact, items }) => (
-            <div key={order.id} className="flex items-center justify-between gap-4 p-4">
-              <Link href={`/dashboard/orders/${order.id}`} className="min-w-0 flex-1">
-                <p className="truncate font-medium hover:underline">{contact.fullName}</p>
-                <p className="text-sm text-muted-foreground">
-                  {t("itemCount", { count: items.length })} · {orderGrandTotal(items, order).toFixed(2)}
-                </p>
-              </Link>
-              <div className="w-40 shrink-0">
-                <OrderStatusSelect orderId={order.id} initialStatus={order.status} />
-              </div>
+      <RowList
+        items={orders}
+        getRowKey={({ order }) => order.id}
+        emptyState={{ icon: ShoppingCart, title: t("emptyState") }}
+        renderRow={({ order, contact, items }) => (
+          <>
+            <Link href={`/dashboard/orders/${order.id}`} className="min-w-0 flex-1">
+              <p className="truncate font-medium hover:underline">{contact.fullName}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("itemCount", { count: items.length })} · {orderGrandTotal(items, order).toFixed(2)}
+              </p>
+            </Link>
+            <div className="w-40 shrink-0">
+              <OrderStatusSelect orderId={order.id} initialStatus={order.status} />
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+          </>
+        )}
+      />
+    </PageContainer>
   );
 }

@@ -47,7 +47,7 @@ export function TestChat() {
   }
 
   return (
-    <div className="flex h-[70vh] flex-col overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
+    <div className="flex h-[70vh] flex-col overflow-hidden rounded-xl border bg-card shadow-sm">
       <div className="flex-1 space-y-3 overflow-y-auto p-4">
         {messages.length === 0 && (
           <div className="flex h-full items-center justify-center">

@@ -8,7 +8,15 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="flex min-h-full flex-1">
-      <div className="relative hidden w-full max-w-md shrink-0 flex-col items-start justify-between overflow-hidden bg-primary p-10 text-primary-foreground md:flex lg:max-w-lg">
+      <div className="relative hidden w-full max-w-md shrink-0 flex-col items-start justify-between overflow-hidden bg-gradient-to-br from-primary to-primary-active p-12 text-primary-foreground md:flex lg:max-w-lg">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -end-24 -top-24 size-96 rounded-full bg-primary-foreground/10 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-32 -start-16 size-96 rounded-full bg-accent/20 blur-3xl"
+        />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-[0.06]"

@@ -22,7 +22,7 @@ export function InboxShell({ initialConversations, listHeader, children }: Inbox
   const hasDetail = pathname !== "/dashboard/inbox";
 
   return (
-    <div className="flex h-[calc(100dvh-5.5rem)] gap-4 md:h-[calc(100dvh-6.5rem)]">
+    <div className="flex h-[calc(100dvh-6rem)] gap-4 md:h-[calc(100dvh-7rem)] lg:h-[calc(100dvh-8rem)]">
       <div
         className={cn(
           "flex w-full shrink-0 flex-col gap-3 overflow-y-auto md:w-96",

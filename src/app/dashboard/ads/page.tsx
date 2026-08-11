@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdAccountCard } from "@/features/ads/components/ad-account-card";
@@ -27,7 +28,7 @@ export default async function AdsPage() {
   const storefront = canManageTracking ? await storefrontService.getOrCreateForWorkspace(workspace.id) : null;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <PageContainer className="mx-auto max-w-2xl">
       <PageHeader title={t("title")} description={t("description")} />
 
       <Tabs defaultValue="performance">
@@ -51,6 +52,6 @@ export default async function AdsPage() {
           {storefront && <TrackingSettingsForm storefront={storefront} />}
         </TabsContent>
       </Tabs>
-    </div>
+    </PageContainer>
   );
 }

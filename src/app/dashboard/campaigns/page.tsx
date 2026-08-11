@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { CampaignManager } from "@/features/campaigns/components/campaign-manager";
 import { ChurnRiskList } from "@/features/campaigns/components/churn-risk-list";
@@ -20,10 +21,10 @@ export default async function CampaignsPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <PageContainer className="mx-auto max-w-2xl">
       <PageHeader title={t("title")} description={t("description")} />
       <ChurnRiskList rows={churnRisk} />
       <CampaignManager initialCampaigns={campaigns} templates={templates} />
-    </div>
+    </PageContainer>
   );
 }

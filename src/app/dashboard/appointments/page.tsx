@@ -4,8 +4,9 @@ import Link from "next/link";
 import { AppointmentStatusSelect } from "@/features/appointments/components/appointment-status-select";
 import { appointmentService } from "@/features/appointments/services/appointment.service";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/empty-state";
+import { RowList } from "@/components/data-table";
 import { ExportButtons } from "@/components/export-buttons";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -29,7 +30,7 @@ export default async function AppointmentsPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader
         title={t("title")}
         description={t("description")}
@@ -46,14 +47,14 @@ export default async function AppointmentsPage() {
         }
       />
 
-      {appointments.length === 0 ? (
-        <EmptyState icon={CalendarDays} title={t("emptyState")} />
-      ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
-          {appointments.map(({ appointment, contact }) => {
-            const assignedToName = appointment.assignedToUserId ? memberNameById.get(appointment.assignedToUserId) : undefined;
-            return (
-            <div key={appointment.id} className="flex items-center justify-between gap-4 p-4">
+      <RowList
+        items={appointments}
+        getRowKey={({ appointment }) => appointment.id}
+        emptyState={{ icon: CalendarDays, title: t("emptyState") }}
+        renderRow={({ appointment, contact }) => {
+          const assignedToName = appointment.assignedToUserId ? memberNameById.get(appointment.assignedToUserId) : undefined;
+          return (
+            <>
               <div className="min-w-0">
                 <p className="truncate font-medium">{contact.fullName}</p>
                 <p className="truncate text-sm text-muted-foreground">
@@ -65,11 +66,10 @@ export default async function AppointmentsPage() {
               <div className="w-40 shrink-0">
                 <AppointmentStatusSelect appointmentId={appointment.id} initialStatus={appointment.status} />
               </div>
-            </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+            </>
+          );
+        }}
+      />
+    </PageContainer>
   );
 }

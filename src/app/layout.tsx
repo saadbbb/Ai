@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { dirFor } from "@/i18n/config";
@@ -10,6 +11,7 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -52,14 +54,17 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={dirFor(locale)}
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${notoSansArabic.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
-          <TooltipProvider delayDuration={300}>
-            {children}
-            <Toaster />
-          </TooltipProvider>
+          <ThemeProvider>
+            <TooltipProvider delayDuration={300}>
+              {children}
+              <Toaster />
+            </TooltipProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

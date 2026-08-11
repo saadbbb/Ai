@@ -2,10 +2,11 @@ import { Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/empty-state";
+import { RowList } from "@/components/data-table";
 import { ExportButtons } from "@/components/export-buttons";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { contactLifecycleStageEnum, type ContactLifecycleStage } from "@/db/schema";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
@@ -35,7 +36,7 @@ export default async function ContactsPage({ searchParams }: PageProps) {
   const hasActiveFilters = Boolean(q || validLifecycleStage || tag);
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
       <PageHeader
         title={t("title")}
         description={t("description")}
@@ -79,39 +80,35 @@ export default async function ContactsPage({ searchParams }: PageProps) {
         )}
       </form>
 
-      {contacts.length === 0 ? (
-        <EmptyState icon={Users} title={t("emptyState")} />
-      ) : (
-        <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-md shadow-foreground/[0.03]">
-          {contacts.map((contact) => (
-            <Link
-              key={contact.id}
-              href={`/dashboard/contacts/${contact.id}`}
-              className="flex items-center justify-between gap-4 p-4 hover:bg-muted"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-medium">{contact.fullName}</p>
-                <p className="truncate text-sm text-muted-foreground">
-                  {[contact.phone, contact.email, contact.country].filter(Boolean).join(" · ") || t("noContactInfo")}
-                </p>
-                <div className="mt-1.5 flex flex-wrap items-center gap-1">
-                  <Badge variant="secondary">{t(`lifecycle.${contact.lifecycleStage}`)}</Badge>
-                  {contact.tags.map((contactTag) => (
-                    <Badge key={contactTag} variant="outline">
-                      {contactTag}
-                    </Badge>
-                  ))}
-                </div>
+      <RowList
+        items={contacts}
+        getRowKey={(contact) => contact.id}
+        getRowHref={(contact) => `/dashboard/contacts/${contact.id}`}
+        emptyState={{ icon: Users, title: t("emptyState") }}
+        renderRow={(contact) => (
+          <>
+            <div className="min-w-0">
+              <p className="truncate font-medium">{contact.fullName}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                {[contact.phone, contact.email, contact.country].filter(Boolean).join(" · ") || t("noContactInfo")}
+              </p>
+              <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                <Badge variant="secondary">{t(`lifecycle.${contact.lifecycleStage}`)}</Badge>
+                {contact.tags.map((contactTag) => (
+                  <Badge key={contactTag} variant="outline">
+                    {contactTag}
+                  </Badge>
+                ))}
               </div>
-              {contact.lastContactAt && (
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {new Date(contact.lastContactAt).toISOString().slice(0, 10)}
-                </span>
-              )}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+            </div>
+            {contact.lastContactAt && (
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {new Date(contact.lastContactAt).toISOString().slice(0, 10)}
+              </span>
+            )}
+          </>
+        )}
+      />
+    </PageContainer>
   );
 }

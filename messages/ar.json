@@ -22,7 +22,13 @@
     "exportPdf": "تصدير PDF",
     "search": "بحث",
     "searchPlaceholder": "ابحث بالاسم...",
-    "gotIt": "فهمت"
+    "gotIt": "فهمت",
+    "theme": {
+      "label": "المظهر",
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام"
+    }
   },
   "auth": {
     "register": {
@@ -1628,7 +1634,13 @@
         "quote": "طلب عرض سعر",
         "support": "الدعم"
       }
-    }
+    },
+    "tabs": {
+      "storefront": "المتجر",
+      "reviews": "التقييمات",
+      "blog": "المدونة"
+    },
+    "notPublished": "غير منشور"
   },
   "integrations": {
     "title": "التكاملات",
@@ -1770,7 +1782,9 @@
     "workingHoursTitle": "ساعات العمل",
     "workingHoursDescription": "أخبر موظفك الذكي بأوقات توفر فريقك.",
     "handoverTitle": "التحويل إلى موظف بشري",
-    "handoverDescription": "تحكّم بمتى يحوّل موظفك الذكي المحادثة إلى فريقك."
+    "handoverDescription": "تحكّم بمتى يحوّل موظفك الذكي المحادثة إلى فريقك.",
+    "handoverOn": "التحويل مفعّل",
+    "handoverOff": "التحويل معطّل"
   },
   "workspaceProfile": {
     "pageTitle": "ملف مساحة العمل",

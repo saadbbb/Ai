@@ -1,7 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 import { IN_GOOD_STANDING_STATUSES } from "@/db/schema";
 import { planRepository } from "@/features/platform-admin/repository/plan.repository";
 import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
@@ -49,7 +52,7 @@ export default async function BillingPage() {
     : null;
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <PageContainer className="mx-auto max-w-lg">
       <PageHeader title={t("title")} description={t("description")} />
 
       <Card>
@@ -92,12 +95,17 @@ export default async function BillingPage() {
                             {metric.used}/{metric.limit}
                           </span>
                         </div>
-                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                          <div
-                            className={`h-full rounded-full ${(metric.percentUsed ?? 0) >= 100 ? "bg-destructive" : (metric.percentUsed ?? 0) >= 80 ? "bg-warning" : "bg-primary"}`}
-                            style={{ width: `${Math.min(metric.percentUsed ?? 0, 100)}%` }}
-                          />
-                        </div>
+                        <Progress
+                          value={Math.min(metric.percentUsed ?? 0, 100)}
+                          className="h-1.5"
+                          indicatorClassName={cn(
+                            (metric.percentUsed ?? 0) >= 100
+                              ? "bg-destructive"
+                              : (metric.percentUsed ?? 0) >= 80
+                                ? "bg-warning"
+                                : "bg-primary"
+                          )}
+                        />
                       </div>
                     );
                   })}
@@ -149,6 +157,6 @@ export default async function BillingPage() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }
