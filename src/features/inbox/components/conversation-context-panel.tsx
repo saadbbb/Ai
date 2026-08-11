@@ -28,7 +28,7 @@ export async function ConversationContextPanel({
   const upcomingAppointments = appointments.filter((item) => item.appointment.scheduledAt.getTime() > Date.now());
 
   return (
-    <div className="w-72 shrink-0 space-y-4 overflow-y-auto rounded-lg border p-4 text-sm">
+    <div className="w-full space-y-4 overflow-y-auto rounded-lg border p-4 text-sm lg:h-full lg:w-72 lg:shrink-0">
       <Link href={`/dashboard/contacts/${contactId}`} className="text-xs text-primary hover:underline">
         {t("viewFullProfile")}
       </Link>

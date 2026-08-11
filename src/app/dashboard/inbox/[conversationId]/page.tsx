@@ -6,6 +6,7 @@ import { CreateLeadButton } from "@/features/crm/components/create-lead-button";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { noteRepository } from "@/features/crm/repository/note.repository";
+import { ContextPanelSheetTrigger } from "@/features/inbox/components/context-panel-responsive";
 import { ConversationContextPanel } from "@/features/inbox/components/conversation-context-panel";
 import { ConversationThread } from "@/features/inbox/components/conversation-thread";
 import { messageTemplateRepository } from "@/features/inbox/repository/message-template.repository";
@@ -38,16 +39,30 @@ export default async function ConversationPage({ params }: PageProps) {
     messageTemplateRepository.findByWorkspaceId(workspace.id),
   ]);
 
+  const contextPanel = (
+    <ConversationContextPanel
+      contactId={contactId}
+      lead={existingLead}
+      orders={orders}
+      appointments={appointments}
+      notes={notes}
+      activitySummaries={activities.map((activity) => activity.summary)}
+    />
+  );
+
   return (
-    <div className="mx-auto max-w-5xl space-y-4">
-      <div className="flex items-center justify-between">
-        <Link href="/dashboard/inbox" className="text-sm text-muted-foreground hover:text-foreground">
-          {t("backLink")}
-        </Link>
-        <CreateLeadButton conversationId={conversationId} initialLeadId={existingLead?.id ?? null} />
-      </div>
-      <div className="flex items-start gap-4">
-        <div className="min-w-0 flex-1">
+    <div className="flex h-full items-start gap-4">
+      <div className="flex h-full min-w-0 flex-1 flex-col gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <Link href="/dashboard/inbox" className="text-sm text-muted-foreground hover:text-foreground md:hidden">
+            {t("backLink")}
+          </Link>
+          <CreateLeadButton conversationId={conversationId} initialLeadId={existingLead?.id ?? null} />
+          <div className="lg:hidden">
+            <ContextPanelSheetTrigger triggerLabel={t("customerInfo")}>{contextPanel}</ContextPanelSheetTrigger>
+          </div>
+        </div>
+        <div className="min-h-0 flex-1">
           <ConversationThread
             conversation={data.conversation}
             contact={data.contact}
@@ -57,15 +72,8 @@ export default async function ConversationPage({ params }: PageProps) {
             initialTemplates={templates}
           />
         </div>
-        <ConversationContextPanel
-          contactId={contactId}
-          lead={existingLead}
-          orders={orders}
-          appointments={appointments}
-          notes={notes}
-          activitySummaries={activities.map((activity) => activity.summary)}
-        />
       </div>
+      <div className="hidden h-full lg:block">{contextPanel}</div>
     </div>
   );
 }

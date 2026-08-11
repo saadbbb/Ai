@@ -39,7 +39,13 @@ function toRepositoryFilters(search: string, active: Set<QuickFilter>): Conversa
   };
 }
 
-export function InboxList({ initialConversations }: { initialConversations: ConversationListItem[] }) {
+export function InboxList({
+  initialConversations,
+  selectedId,
+}: {
+  initialConversations: ConversationListItem[];
+  selectedId?: string;
+}) {
   const t = useTranslations("inbox.list");
   const [conversations, setConversations] = useState(initialConversations);
   const [search, setSearch] = useState("");
@@ -112,7 +118,7 @@ export function InboxList({ initialConversations }: { initialConversations: Conv
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2 bg-background py-1">
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
@@ -142,7 +148,14 @@ export function InboxList({ initialConversations }: { initialConversations: Conv
       ) : (
         <div className="divide-y overflow-hidden rounded-xl border bg-card">
           {conversations.map(({ conversation, contact, channel }) => (
-            <div key={conversation.id} className="flex items-center justify-between gap-4 p-4 hover:bg-muted">
+            <div
+              key={conversation.id}
+              aria-current={conversation.id === selectedId ? "true" : undefined}
+              className={cn(
+                "flex items-center justify-between gap-4 border-s-2 p-4 hover:bg-muted",
+                conversation.id === selectedId ? "border-s-primary bg-primary-soft" : "border-s-transparent",
+              )}
+            >
               <Link href={`/dashboard/inbox/${conversation.id}`} className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   {conversation.pinned && <Pin className="size-3.5 shrink-0 text-primary" />}

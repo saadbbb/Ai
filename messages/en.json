@@ -259,7 +259,7 @@
     "ordersLink": "Orders",
     "appointmentsLink": "Appointments",
     "aiEmployeeSection": "AI Employee",
-    "settingsLink": "Settings",
+    "settingsLink": "Overview",
     "knowledgeBaseLink": "Knowledge Base",
     "testAiLink": "Test your AI employee",
     "growthSection": "Growth",
@@ -541,7 +541,9 @@
       "markPriority": "Mark priority",
       "unmarkPriority": "Unmark priority",
       "archive": "Archive",
-      "reopen": "Reopen"
+      "reopen": "Reopen",
+      "selectConversationTitle": "Select a conversation",
+      "selectConversationDescription": "Choose a conversation from the list to view the thread and customer context here."
     },
     "new": {
       "title": "Start a conversation",
@@ -555,6 +557,7 @@
     },
     "thread": {
       "backLink": "← Back to Inbox",
+      "customerInfo": "Customer info",
       "pauseAi": "Pause AI",
       "resumeAi": "Resume AI",
       "closeConversation": "Close conversation",
@@ -741,6 +744,9 @@
     "systemHealthLink": "System Health",
     "settingsLink": "Settings",
     "adminsLink": "Admins",
+    "billingSection": "Billing",
+    "analyticsSection": "Analytics",
+    "platformSection": "Platform",
     "home": {
       "title": "Overview",
       "description": "Everything running on the platform, at a glance.",
@@ -1232,6 +1238,8 @@
       "noOtherWorkflows": "You don't have any other automations to trigger yet.",
       "delayLabel": "Wait before running (optional)",
       "delayPlaceholder": "Days, e.g. 3 — leave empty to run immediately",
+      "switchToAdvanced": "Prefer a visual diagram? Switch to the advanced canvas →",
+      "switchToSimple": "← Back to the simple form",
       "submit": "Create automation",
       "submitting": "Creating...",
       "conditionsLabel": "Only run if (optional)",
@@ -1459,6 +1467,7 @@
     "seoHeading": "Search engine optimization",
     "seoTitleLabel": "SEO title",
     "seoDescriptionLabel": "SEO description",
+    "trackingMovedHint": "Looking for Meta Pixel, Google Analytics, Google Tag Manager, or TikTok Pixel? Manage those from Ads → Account & Tracking.",
     "trackingHeading": "Tracking & analytics",
     "tracking": {
       "metaPixelId": "Meta Pixel ID",
@@ -1698,6 +1707,14 @@
     "metaAccountLabel": "Meta Ads account",
     "connected": "Connected",
     "notConnectedHint": "Not connected yet — this activates once Meta Ads integration is available.",
+    "tabs": {
+      "performance": "Performance",
+      "campaigns": "Campaigns",
+      "account": "Account & tracking"
+    },
+    "tracking": {
+      "description": "Pixels let ad platforms measure which of your ads actually turn into customers."
+    },
     "campaigns": {
       "heading": "Campaigns",
       "description": "Log a campaign you're running, and tag it with the value customers will mention or that appears as their contact source.",

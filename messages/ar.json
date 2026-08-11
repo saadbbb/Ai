@@ -259,7 +259,7 @@
     "ordersLink": "الطلبات",
     "appointmentsLink": "المواعيد",
     "aiEmployeeSection": "الموظف الذكي",
-    "settingsLink": "الإعدادات",
+    "settingsLink": "نظرة عامة",
     "knowledgeBaseLink": "قاعدة المعرفة",
     "testAiLink": "جرّب موظفك الذكي",
     "growthSection": "النمو",
@@ -541,7 +541,9 @@
       "markPriority": "وضع علامة أولوية",
       "unmarkPriority": "إزالة علامة الأولوية",
       "archive": "أرشفة",
-      "reopen": "إعادة فتح"
+      "reopen": "إعادة فتح",
+      "selectConversationTitle": "اختر محادثة",
+      "selectConversationDescription": "اختر محادثة من القائمة لعرض سجل الرسائل ومعلومات العميل هنا."
     },
     "new": {
       "title": "ابدأ محادثة",
@@ -555,6 +557,7 @@
     },
     "thread": {
       "backLink": "← الرجوع إلى صندوق المحادثات",
+      "customerInfo": "معلومات العميل",
       "pauseAi": "إيقاف الذكاء الاصطناعي مؤقتاً",
       "resumeAi": "استئناف الذكاء الاصطناعي",
       "closeConversation": "إغلاق المحادثة",
@@ -798,6 +801,9 @@
       "rateLimitCount": "{count} محاولة"
     },
     "adminsLink": "المسؤولون",
+    "billingSection": "الفوترة",
+    "analyticsSection": "التحليلات",
+    "platformSection": "المنصة",
     "workspaces": {
       "title": "المساحات",
       "description": "كل نشاط تجاري على المنصة. فعّل اشتراكاً يدوياً لحد ما يصير عندنا نظام فوترة حقيقي.",
@@ -1232,6 +1238,8 @@
       "noOtherWorkflows": "ما عندك أتمتة ثانية تقدر تشغّلها بعد.",
       "delayLabel": "الانتظار قبل التنفيذ (اختياري)",
       "delayPlaceholder": "عدد الأيام، مثال: 3 — اتركه فارغاً للتنفيذ الفوري",
+      "switchToAdvanced": "تفضّل رسماً بيانياً؟ التبديل إلى اللوحة المتقدمة →",
+      "switchToSimple": "← العودة إلى النموذج البسيط",
       "submit": "إنشاء الأتمتة",
       "submitting": "جارٍ الإنشاء...",
       "conditionsLabel": "شغّل بس إذا (اختياري)",
@@ -1459,6 +1467,7 @@
     "seoHeading": "تحسين محركات البحث (SEO)",
     "seoTitleLabel": "عنوان SEO",
     "seoDescriptionLabel": "وصف SEO",
+    "trackingMovedHint": "تبحث عن Meta Pixel أو Google Analytics أو Google Tag Manager أو TikTok Pixel؟ يمكنك إدارتها من الإعلانات ← الحساب والتتبّع.",
     "trackingHeading": "التتبّع والتحليلات",
     "tracking": {
       "metaPixelId": "معرّف Meta Pixel",
@@ -1698,6 +1707,14 @@
     "metaAccountLabel": "حساب Meta Ads",
     "connected": "متصل",
     "notConnectedHint": "غير متصل بعد — سيُفعّل هذا عند توفر تكامل Meta Ads.",
+    "tabs": {
+      "performance": "الأداء",
+      "campaigns": "الحملات",
+      "account": "الحساب والتتبّع"
+    },
+    "tracking": {
+      "description": "تتيح البكسلات لمنصات الإعلانات قياس أي إعلاناتك تتحول فعلاً إلى عملاء."
+    },
     "campaigns": {
       "heading": "الحملات",
       "description": "سجّل حملة تديرها، وضع لها وسماً بالقيمة التي سيذكرها العملاء أو التي تظهر كمصدر جهة الاتصال.",

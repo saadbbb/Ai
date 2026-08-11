@@ -22,6 +22,7 @@ import { createWorkflowAction } from "../../actions/create-workflow.action";
 import { generateWorkflowAction } from "../../actions/generate-workflow.action";
 import { ActionNode } from "./action-node";
 import { ConditionsNode } from "./conditions-node";
+import { SimpleActionFields, SimpleConditionsFields, SimpleTriggerFields } from "./simple-workflow-fields";
 import { TriggerNode } from "./trigger-node";
 import type {
   ActionNodeData,
@@ -175,6 +176,7 @@ export function WorkflowCanvas({ memberOptions, workflowOptions, productOptions,
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [generatorDescription, setGeneratorDescription] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [viewMode, setViewMode] = useState<"simple" | "advanced">("simple");
 
   function applyTemplate(template: WorkflowTemplate) {
     setName(t(`templates.${template.key}`));
@@ -239,70 +241,75 @@ export function WorkflowCanvas({ memberOptions, workflowOptions, productOptions,
     toast.success(t("generatorSuccess"));
   }
 
+  const triggerData: TriggerNodeData = {
+    triggerType,
+    triggerStage,
+    triggerStatus,
+    onChange: (patch) => {
+      if (patch.triggerType !== undefined) setTriggerType(patch.triggerType);
+      if (patch.triggerStage !== undefined) setTriggerStage(patch.triggerStage);
+      if (patch.triggerStatus !== undefined) setTriggerStatus(patch.triggerStatus);
+    },
+  };
+
+  const conditionsData: ConditionsNodeData = {
+    conditions,
+    matchType: conditionsMatchType,
+    onAdd: () => setConditions((current) => [...current, { field: "tag", value: "" }]),
+    onRemove: (index) => setConditions((current) => current.filter((_, i) => i !== index)),
+    onUpdate: (index, patch) =>
+      setConditions((current) => current.map((row, i) => (i === index ? { ...row, ...patch } : row))),
+    onMatchTypeChange: setConditionsMatchType,
+  };
+
+  const actionData: ActionNodeData = {
+    actionType,
+    actionTag,
+    actionSubject,
+    actionMessage,
+    actionTaskTitle,
+    actionTaskPriority,
+    actionTaskDueInDays,
+    actionNoteContent,
+    actionContactLanguage,
+    actionAssignedUserId,
+    actionWebhookUrl,
+    actionTargetWorkflowId,
+    actionProductId,
+    actionQuantity,
+    actionServiceId,
+    actionDaysFromNow,
+    delayDays,
+    memberOptions,
+    workflowOptions,
+    productOptions,
+    serviceOptions,
+    onChange: (patch) => {
+      if (patch.actionType !== undefined) setActionType(patch.actionType);
+      if (patch.actionTag !== undefined) setActionTag(patch.actionTag);
+      if (patch.actionSubject !== undefined) setActionSubject(patch.actionSubject);
+      if (patch.actionMessage !== undefined) setActionMessage(patch.actionMessage);
+      if (patch.actionTaskTitle !== undefined) setActionTaskTitle(patch.actionTaskTitle);
+      if (patch.actionTaskPriority !== undefined) setActionTaskPriority(patch.actionTaskPriority);
+      if (patch.actionTaskDueInDays !== undefined) setActionTaskDueInDays(patch.actionTaskDueInDays);
+      if (patch.actionNoteContent !== undefined) setActionNoteContent(patch.actionNoteContent);
+      if (patch.actionContactLanguage !== undefined) setActionContactLanguage(patch.actionContactLanguage);
+      if (patch.actionAssignedUserId !== undefined) setActionAssignedUserId(patch.actionAssignedUserId);
+      if (patch.actionWebhookUrl !== undefined) setActionWebhookUrl(patch.actionWebhookUrl);
+      if (patch.actionTargetWorkflowId !== undefined) setActionTargetWorkflowId(patch.actionTargetWorkflowId);
+      if (patch.actionProductId !== undefined) setActionProductId(patch.actionProductId);
+      if (patch.actionQuantity !== undefined) setActionQuantity(patch.actionQuantity);
+      if (patch.actionServiceId !== undefined) setActionServiceId(patch.actionServiceId);
+      if (patch.actionDaysFromNow !== undefined) setActionDaysFromNow(patch.actionDaysFromNow);
+      if (patch.delayDays !== undefined) setDelayDays(patch.delayDays);
+    },
+  };
+
+  // The canvas is an alternate view over this same state — only mounted (and only fed
+  // into React Flow's node graph) once the user opts into "advanced", so its layout
+  // measurement quirks (see class doc above) never run for the simple-mode default path.
   useEffect(() => {
-    const triggerData: TriggerNodeData = {
-      triggerType,
-      triggerStage,
-      triggerStatus,
-      onChange: (patch) => {
-        if (patch.triggerType !== undefined) setTriggerType(patch.triggerType);
-        if (patch.triggerStage !== undefined) setTriggerStage(patch.triggerStage);
-        if (patch.triggerStatus !== undefined) setTriggerStatus(patch.triggerStatus);
-      },
-    };
-
-    const conditionsData: ConditionsNodeData = {
-      conditions,
-      matchType: conditionsMatchType,
-      onAdd: () => setConditions((current) => [...current, { field: "tag", value: "" }]),
-      onRemove: (index) => setConditions((current) => current.filter((_, i) => i !== index)),
-      onUpdate: (index, patch) =>
-        setConditions((current) => current.map((row, i) => (i === index ? { ...row, ...patch } : row))),
-      onMatchTypeChange: setConditionsMatchType,
-    };
-
-    const actionData: ActionNodeData = {
-      actionType,
-      actionTag,
-      actionSubject,
-      actionMessage,
-      actionTaskTitle,
-      actionTaskPriority,
-      actionTaskDueInDays,
-      actionNoteContent,
-      actionContactLanguage,
-      actionAssignedUserId,
-      actionWebhookUrl,
-      actionTargetWorkflowId,
-      actionProductId,
-      actionQuantity,
-      actionServiceId,
-      actionDaysFromNow,
-      delayDays,
-      memberOptions,
-      workflowOptions,
-      productOptions,
-      serviceOptions,
-      onChange: (patch) => {
-        if (patch.actionType !== undefined) setActionType(patch.actionType);
-        if (patch.actionTag !== undefined) setActionTag(patch.actionTag);
-        if (patch.actionSubject !== undefined) setActionSubject(patch.actionSubject);
-        if (patch.actionMessage !== undefined) setActionMessage(patch.actionMessage);
-        if (patch.actionTaskTitle !== undefined) setActionTaskTitle(patch.actionTaskTitle);
-        if (patch.actionTaskPriority !== undefined) setActionTaskPriority(patch.actionTaskPriority);
-        if (patch.actionTaskDueInDays !== undefined) setActionTaskDueInDays(patch.actionTaskDueInDays);
-        if (patch.actionNoteContent !== undefined) setActionNoteContent(patch.actionNoteContent);
-        if (patch.actionContactLanguage !== undefined) setActionContactLanguage(patch.actionContactLanguage);
-        if (patch.actionAssignedUserId !== undefined) setActionAssignedUserId(patch.actionAssignedUserId);
-        if (patch.actionWebhookUrl !== undefined) setActionWebhookUrl(patch.actionWebhookUrl);
-        if (patch.actionTargetWorkflowId !== undefined) setActionTargetWorkflowId(patch.actionTargetWorkflowId);
-        if (patch.actionProductId !== undefined) setActionProductId(patch.actionProductId);
-        if (patch.actionQuantity !== undefined) setActionQuantity(patch.actionQuantity);
-        if (patch.actionServiceId !== undefined) setActionServiceId(patch.actionServiceId);
-        if (patch.actionDaysFromNow !== undefined) setActionDaysFromNow(patch.actionDaysFromNow);
-        if (patch.delayDays !== undefined) setDelayDays(patch.delayDays);
-      },
-    };
+    if (viewMode !== "advanced") return;
 
     setNodes((current) =>
       current.map((node) => {
@@ -316,6 +323,7 @@ export function WorkflowCanvas({ memberOptions, workflowOptions, productOptions,
     // effect scoped to "form state changed", not "a setter's identity changed" (it never does).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    viewMode,
     triggerType,
     triggerStage,
     triggerStatus,
@@ -432,13 +440,27 @@ export function WorkflowCanvas({ memberOptions, workflowOptions, productOptions,
         <Input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("namePlaceholder")} />
       </div>
 
-      <div className="h-[420px] rounded-lg border">
-        <ReactFlow nodes={nodes} edges={STATIC_EDGES} nodeTypes={NODE_TYPES} onNodesChange={onNodesChange} fitView>
-          <Background />
-          <Controls />
-          <MiniMap pannable zoomable />
-        </ReactFlow>
+      <div className="flex justify-end">
+        <button type="button" className="text-xs text-primary hover:underline" onClick={() => setViewMode(viewMode === "simple" ? "advanced" : "simple")}>
+          {viewMode === "simple" ? t("switchToAdvanced") : t("switchToSimple")}
+        </button>
       </div>
+
+      {viewMode === "simple" ? (
+        <div className="space-y-4">
+          <SimpleTriggerFields data={triggerData} />
+          <SimpleConditionsFields data={conditionsData} />
+          <SimpleActionFields data={actionData} />
+        </div>
+      ) : (
+        <div className="h-[420px] rounded-lg border">
+          <ReactFlow nodes={nodes} edges={STATIC_EDGES} nodeTypes={NODE_TYPES} onNodesChange={onNodesChange} fitView>
+            <Background />
+            <Controls />
+            <MiniMap pannable zoomable />
+          </ReactFlow>
+        </div>
+      )}
 
       <div className="flex justify-end">
         <Button type="button" disabled={isSubmitting || !name} onClick={handleSubmit}>

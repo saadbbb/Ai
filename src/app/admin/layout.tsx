@@ -15,18 +15,29 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const [t, tApp] = await Promise.all([getTranslations("platformAdmin"), getTranslations("app")]);
 
   const groups: NavGroupItem[] = [
+    { links: [{ href: "/admin", label: t("homeLink") }] },
+    { links: [{ href: "/admin/workspaces", label: t("workspacesLink") }] },
     {
+      heading: t("billingSection"),
       links: [
-        { href: "/admin", label: t("homeLink") },
-        { href: "/admin/workspaces", label: t("workspacesLink") },
         { href: "/admin/plans", label: t("plansLink") },
         { href: "/admin/coupons", label: t("couponsLink") },
         { href: "/admin/refunds", label: t("refundsLink") },
         { href: "/admin/revenue", label: t("revenueLink") },
+      ],
+    },
+    {
+      heading: t("analyticsSection"),
+      links: [
         { href: "/admin/platform-analytics", label: t("platformAnalyticsLink") },
         { href: "/admin/ai-usage", label: t("aiUsageLink") },
         { href: "/admin/ai-operations", label: t("aiOperationsLink") },
-        { href: "/admin/tickets", label: t("ticketsLink") },
+      ],
+    },
+    { links: [{ href: "/admin/tickets", label: t("ticketsLink") }] },
+    {
+      heading: t("platformSection"),
+      links: [
         { href: "/admin/feature-flags", label: t("featureFlagsLink") },
         { href: "/admin/system-health", label: t("systemHealthLink") },
         { href: "/admin/settings", label: t("settingsLink") },

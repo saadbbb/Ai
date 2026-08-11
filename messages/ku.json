@@ -259,7 +259,7 @@
     "ordersLink": "داواکارییەکان",
     "appointmentsLink": "کاتە دیاریکراوەکان",
     "aiEmployeeSection": "کارمەندە زیرەکە",
-    "settingsLink": "ڕێکخستنەکان",
+    "settingsLink": "گشتی",
     "knowledgeBaseLink": "بنکەی زانیاری",
     "testAiLink": "کارمەندە زیرەکەکەت تاقی بکەرەوە",
     "growthSection": "گەشەکردن",
@@ -541,7 +541,9 @@
       "markPriority": "نیشانکردن بە گرنگی",
       "unmarkPriority": "لابردنی نیشانی گرنگی",
       "archive": "ئارشیفکردن",
-      "reopen": "کردنەوەی دووبارە"
+      "reopen": "کردنەوەی دووبارە",
+      "selectConversationTitle": "گفتوگۆیەک هەڵبژێرە",
+      "selectConversationDescription": "گفتوگۆیەک لە لیستەکە هەڵبژێرە بۆ بینینی گفتوگۆکە و زانیاری کڕیار لێرە."
     },
     "new": {
       "title": "گفتوگۆیەک دەست پێ بکە",
@@ -555,6 +557,7 @@
     },
     "thread": {
       "backLink": "← گەڕانەوە بۆ سندوقی گفتوگۆکان",
+      "customerInfo": "زانیاری کڕیار",
       "pauseAi": "وەستاندنی کارمەندە زیرەکە",
       "resumeAi": "دووبارە چالاککردنەوەی کارمەندە زیرەکە",
       "closeConversation": "داخستنی گفتوگۆ",
@@ -798,6 +801,9 @@
       "rateLimitCount": "{count} جار"
     },
     "adminsLink": "بەڕێوەبەران",
+    "billingSection": "پارەدان",
+    "analyticsSection": "شیکاری",
+    "platformSection": "پلاتفۆرم",
     "workspaces": {
       "title": "بازنەکان",
       "description": "هەموو بزنسێک لەسەر پلاتفۆرمەکە. بەشداریکردنێک بە دەستی چالاک بکە تا سیستەمی پارەدانی ڕاستەقینە دروست دەبێت.",
@@ -1232,6 +1238,8 @@
       "noOtherWorkflows": "هێشتا هیچ خۆکارکردنێکی تر نییە بۆ کارپێکردنی.",
       "delayLabel": "چاوەڕوانبوون پێش جێبەجێکردن (ئارەزوومەندانە)",
       "delayPlaceholder": "ژمارەی ڕۆژ، بۆ نموونە: 3 — بەتاڵی بهێڵەرەوە بۆ جێبەجێکردنی خێرا",
+      "switchToAdvanced": "پێتویستە بە نەخشەی بینراو؟ بگۆڕە بۆ تابلۆی پێشکەوتوو →",
+      "switchToSimple": "← گەڕانەوە بۆ فۆرمی سادە",
       "submit": "دروستکردنی خۆکارکردن",
       "submitting": "دروست دەکرێت...",
       "conditionsLabel": "تەنها کاتێک کار بکات ئەگەر (ئارەزوومەندانە)",
@@ -1459,6 +1467,7 @@
     "seoHeading": "باشترکردنی بۆ ماشێنی گەڕان (SEO)",
     "seoTitleLabel": "ناونیشانی SEO",
     "seoDescriptionLabel": "وەسفی SEO",
+    "trackingMovedHint": "بەدوای Meta Pixel، Google Analytics، Google Tag Manager یان TikTok Pixel دەگەڕێیت؟ ئەمانە لە ڕیکلامەکان ← هەژمار و شوێنکەوتن بەڕێوەببە.",
     "trackingHeading": "شوێنکەوتن و شیکاری",
     "tracking": {
       "metaPixelId": "ناسنامەی Meta Pixel",
@@ -1698,6 +1707,14 @@
     "metaAccountLabel": "هەژماری Meta Ads",
     "connected": "بەستراوە",
     "notConnectedHint": "هێشتا نەبەستراوەتەوە — ئەمە چالاک دەبێت کاتێک یەکخستنی Meta Ads بەردەست بێت.",
+    "tabs": {
+      "performance": "کارایی",
+      "campaigns": "کەمپینەکان",
+      "account": "هەژمار و شوێنکەوتن"
+    },
+    "tracking": {
+      "description": "پیکسڵەکان ڕێگە بە پلاتفۆرمی ڕیکلامەکان دەدەن بزانن کام لە ڕیکلامەکانت ڕاستەوخۆ دەبنە کڕیار."
+    },
     "campaigns": {
       "heading": "کەمپینەکان",
       "description": "کەمپینێک کە بەڕێوەی دەبەیت تۆمار بکە، و تاگێکی بۆ دابنێ بەو نرخەی کڕیارەکان باسی دەکەن یان وەک سەرچاوەی پەیوەندییان دەردەکەوێت.",

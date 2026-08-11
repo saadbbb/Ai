@@ -31,7 +31,6 @@ const HEADER_STYLES: StorefrontHeaderStyle[] = ["standard", "centered", "minimal
 const FOOTER_STYLES: StorefrontFooterStyle[] = ["standard", "minimal"];
 const POPUP_TRIGGERS: StorefrontPopupTrigger[] = ["first_visit", "delay", "exit_intent"];
 const SOCIAL_KEYS = ["whatsapp", "instagram", "facebook", "tiktok", "youtube", "snapchat", "telegram"] as const;
-const TRACKING_KEYS = ["metaPixelId", "googleAnalyticsId", "googleTagManagerId", "tiktokPixelId"] as const;
 const ALL_SECTION_KEYS = ["hero", "about", "featured", "products", "services", "testimonials", "contact"] as const;
 const CONTENT_LOCALES = ["en", "ar", "ku"] as const;
 const CONTENT_LOCALE_LABELS: Record<(typeof CONTENT_LOCALES)[number], string> = { en: "English", ar: "العربية", ku: "کوردی" };
@@ -82,7 +81,8 @@ export function StorefrontEditor({
   const [footerStyle, setFooterStyle] = useState<StorefrontFooterStyle>(storefront.footerStyle);
   const [darkMode, setDarkMode] = useState(storefront.darkMode);
   const [socialLinks, setSocialLinks] = useState<Record<string, string>>(storefront.socialLinks ?? {});
-  const [trackingIds, setTrackingIds] = useState<Record<string, string>>(storefront.trackingIds ?? {});
+  // Tracking pixel IDs are edited from Ads → Account & Tracking now; carried through unchanged so saving other fields here doesn't wipe them.
+  const trackingIds = storefront.trackingIds ?? {};
   const [seoTitle, setSeoTitle] = useState(storefront.seoTitle ?? "");
   const [seoDescription, setSeoDescription] = useState(storefront.seoDescription ?? "");
   const [sections, setSections] = useState<string[]>(storefront.sections);
@@ -430,23 +430,7 @@ export function StorefrontEditor({
             <label className="text-sm text-muted-foreground">{t("seoDescriptionLabel")}</label>
             <Textarea value={seoDescription} onChange={(event) => setSeoDescription(event.target.value)} rows={2} maxLength={200} />
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="space-y-3">
-          <p className="text-sm font-medium">{t("trackingHeading")}</p>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {TRACKING_KEYS.map((key) => (
-              <div key={key} className="space-y-2">
-                <label className="text-sm text-muted-foreground">{t(`tracking.${key}`)}</label>
-                <Input
-                  value={trackingIds[key] ?? ""}
-                  onChange={(event) => setTrackingIds((current) => ({ ...current, [key]: event.target.value }))}
-                />
-              </div>
-            ))}
-          </div>
+          <p className="text-xs text-muted-foreground">{t("trackingMovedHint")}</p>
         </CardContent>
       </Card>
 

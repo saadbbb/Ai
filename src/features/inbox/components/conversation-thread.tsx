@@ -123,7 +123,7 @@ export function ConversationThread({
   }
 
   return (
-    <div className="flex h-[75vh] flex-col rounded-lg border">
+    <div className="flex h-full flex-col rounded-lg border">
       <div className="flex items-center justify-between gap-4 border-b p-4">
         <div className="flex min-w-0 items-center gap-3">
           <ContactAvatar fullName={contact.fullName} avatarUrl={contact.avatarUrl} />
