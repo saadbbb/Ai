@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronsUpDown, type LucideIcon } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -16,7 +16,8 @@ import {
 export interface AccountMenuItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  /** A rendered icon element (e.g. `<Building2 className="size-4" />`), not a component reference — this crosses the Server→Client boundary, and bare component references aren't serializable there. */
+  icon: ReactNode;
 }
 
 export function AccountMenu({
@@ -47,7 +48,7 @@ export function AccountMenu({
         {items.map((item) => (
           <DropdownMenuItem key={item.href} asChild>
             <Link href={item.href}>
-              <item.icon className="size-4" />
+              {item.icon}
               {item.label}
             </Link>
           </DropdownMenuItem>

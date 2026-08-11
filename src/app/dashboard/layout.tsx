@@ -114,11 +114,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .filter((group) => group.links.length > 0);
 
   const accountItems: AccountMenuItem[] = [
-    { href: "/dashboard/workspace-profile", label: t("workspaceProfileLink"), icon: Building2 },
-    ...(canViewTeam ? [{ href: "/dashboard/team", label: t("teamLink"), icon: Users2 }] : []),
-    { href: "/dashboard/billing", label: t("billingLink"), icon: CreditCard },
-    ...(canViewTeam ? [{ href: "/dashboard/audit-log", label: t("auditLogLink"), icon: History }] : []),
-    ...(canViewSupport ? [{ href: "/dashboard/support", label: t("supportLink"), icon: LifeBuoy }] : []),
+    { href: "/dashboard/workspace-profile", label: t("workspaceProfileLink"), icon: <Building2 className="size-4 shrink-0" /> },
+    ...(canViewTeam ? [{ href: "/dashboard/team", label: t("teamLink"), icon: <Users2 className="size-4 shrink-0" /> }] : []),
+    { href: "/dashboard/billing", label: t("billingLink"), icon: <CreditCard className="size-4 shrink-0" /> },
+    ...(canViewTeam ? [{ href: "/dashboard/audit-log", label: t("auditLogLink"), icon: <History className="size-4 shrink-0" /> }] : []),
+    ...(canViewSupport ? [{ href: "/dashboard/support", label: t("supportLink"), icon: <LifeBuoy className="size-4 shrink-0" /> }] : []),
   ];
 
   const productName = tApp("name");

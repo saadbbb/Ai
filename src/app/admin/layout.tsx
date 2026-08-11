@@ -36,7 +36,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     },
   ];
 
-  const accountItems: AccountMenuItem[] = [{ href: "/dashboard", label: t("backToDashboard"), icon: LayoutDashboard }];
+  const accountItems: AccountMenuItem[] = [
+    { href: "/dashboard", label: t("backToDashboard"), icon: <LayoutDashboard className="size-4 shrink-0" /> },
+  ];
   const productName = tApp("name");
 
   return (

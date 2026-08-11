@@ -100,7 +100,7 @@ export function MobileNav({
               onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary hover:bg-muted hover:text-foreground"
             >
-              <item.icon className="size-4 shrink-0" />
+              {item.icon}
               <span className="truncate">{item.label}</span>
             </Link>
           ))}
