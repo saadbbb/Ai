@@ -1,8 +1,12 @@
+import { Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/empty-state";
 import { ExportButtons } from "@/components/export-buttons";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { PageHeader } from "@/components/page-header";
 import { contactLifecycleStageEnum, type ContactLifecycleStage } from "@/db/schema";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -32,16 +36,16 @@ export default async function ContactsPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("description")}</p>
-        </div>
-        <ExportButtons
-          reportPath="/api/reports/contacts"
-          labels={{ csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") }}
-        />
-      </div>
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <ExportButtons
+            reportPath="/api/reports/contacts"
+            labels={{ csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") }}
+          />
+        }
+      />
 
       <form className="flex flex-wrap items-end gap-2">
         <Input
@@ -55,7 +59,7 @@ export default async function ContactsPage({ searchParams }: PageProps) {
         <select
           name="lifecycleStage"
           defaultValue={validLifecycleStage ?? ""}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <option value="">{t("filters.lifecycleAll")}</option>
           {contactLifecycleStageEnum.enumValues.map((stage) => (
@@ -76,11 +80,9 @@ export default async function ContactsPage({ searchParams }: PageProps) {
       </form>
 
       {contacts.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-          {t("emptyState")}
-        </p>
+        <EmptyState icon={Users} title={t("emptyState")} />
       ) : (
-        <div className="divide-y rounded-lg border">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card">
           {contacts.map((contact) => (
             <Link
               key={contact.id}
@@ -92,14 +94,12 @@ export default async function ContactsPage({ searchParams }: PageProps) {
                 <p className="truncate text-sm text-muted-foreground">
                   {[contact.phone, contact.email, contact.country].filter(Boolean).join(" · ") || t("noContactInfo")}
                 </p>
-                <div className="mt-1 flex flex-wrap items-center gap-1">
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                    {t(`lifecycle.${contact.lifecycleStage}`)}
-                  </span>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                  <Badge variant="secondary">{t(`lifecycle.${contact.lifecycleStage}`)}</Badge>
                   {contact.tags.map((contactTag) => (
-                    <span key={contactTag} className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                    <Badge key={contactTag} variant="outline">
                       {contactTag}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </div>

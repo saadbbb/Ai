@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/page-header";
 import { AgentProfileSettingsForm } from "@/features/ai/components/agent-profile-settings-form";
 import { HandoverSettingsForm } from "@/features/ai/components/handover-settings-form";
 import { PersonalitySettingsForm } from "@/features/ai/components/personality-settings-form";
@@ -21,15 +22,15 @@ export default async function AiEmployeePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
-          <p className="text-sm text-muted-foreground">{t("pageDescription")}</p>
-        </div>
-        <Button asChild variant="outline" size="sm">
-          <a href="/api/reports/ai-usage">{tCommon("exportCsv")}</a>
-        </Button>
-      </div>
+      <PageHeader
+        title={t("pageTitle")}
+        description={t("pageDescription")}
+        actions={
+          <Button asChild variant="outline" size="sm">
+            <a href="/api/reports/ai-usage">{tCommon("exportCsv")}</a>
+          </Button>
+        }
+      />
 
       <AgentProfileSettingsForm
         defaultValues={{ name: agent.name, businessDescription: agent.businessDescription ?? "" }}

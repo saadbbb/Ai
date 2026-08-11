@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
 import { AdminTicketReplyForm } from "@/features/support/components/admin-ticket-reply-form";
 import { TicketAssigneeSelect } from "@/features/support/components/ticket-assignee-select";
 import { TicketCategorySelect } from "@/features/support/components/ticket-category-select";
@@ -36,12 +37,12 @@ export default async function AdminTicketDetailPage({ params }: PageProps) {
         <Link href="/admin/tickets" className="text-sm text-muted-foreground hover:underline">
           {t("backLink")}
         </Link>
-        <div className="mt-1 flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-semibold">{ticket.subject}</h1>
-            <p className="text-sm text-muted-foreground">{workspaceName}</p>
-          </div>
-          <TicketStatusSelect ticketId={ticket.id} initialStatus={ticket.status} />
+        <div className="mt-1">
+          <PageHeader
+            title={ticket.subject}
+            description={workspaceName}
+            actions={<TicketStatusSelect ticketId={ticket.id} initialStatus={ticket.status} />}
+          />
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <TicketCategorySelect ticketId={ticket.id} initialCategory={ticket.category} />

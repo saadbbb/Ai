@@ -1,4 +1,7 @@
+import { Bot, Gauge } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import { AiEnabledToggle } from "@/features/platform-admin/components/ai-enabled-toggle";
 import { aiUsageAdminRepository } from "@/features/platform-admin/repository/ai-usage-admin.repository";
 import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
@@ -17,21 +20,16 @@ export default async function AdminAiOperationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
-      </div>
+      <PageHeader title={t("title")} description={t("description")} />
 
       <AiEnabledToggle initialEnabled={settings?.aiEnabled ?? true} />
 
       <div className="space-y-3">
-        <h2 className="text-sm font-medium">{t("byModelHeading")}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{t("byModelHeading")}</h2>
         {byModel.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            {t("emptyState")}
-          </p>
+          <EmptyState icon={Bot} title={t("emptyState")} />
         ) : (
-          <div className="divide-y rounded-lg border">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card">
             {byModel.map((row) => {
               const successRate = row.requests === 0 ? null : Math.round((row.successCount / row.requests) * 100);
               return (
@@ -55,15 +53,13 @@ export default async function AdminAiOperationsPage() {
 
       <div className="space-y-3">
         <div>
-          <h2 className="text-sm font-medium">{t("rateLimitsHeading")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("rateLimitsHeading")}</h2>
           <p className="text-xs text-muted-foreground">{t("rateLimitsDescription")}</p>
         </div>
         {rateLimits.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            {t("rateLimitsEmpty")}
-          </p>
+          <EmptyState icon={Gauge} title={t("rateLimitsEmpty")} />
         ) : (
-          <div className="divide-y rounded-lg border">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card">
             {rateLimits.map((bucket) => (
               <div key={bucket.key} className="flex items-center justify-between gap-4 p-3 text-sm">
                 <span className="truncate font-mono text-xs">{bucket.key}</span>

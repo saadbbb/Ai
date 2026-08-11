@@ -1,5 +1,8 @@
+import { CalendarDays, MessageSquare, ShoppingCart, Target, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { dashboardService } from "@/features/dashboard/services/dashboard.service";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
@@ -61,25 +64,22 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
     <div className="space-y-6">
       <ImpersonationBanner workspaceName={workspace.name} />
 
-      <div>
-        <h1 className="text-xl font-semibold">{workspace.name}</h1>
-        <p className="text-sm text-muted-foreground">{t("readOnlyNotice")}</p>
-      </div>
+      <PageHeader title={workspace.name} description={t("readOnlyNotice")} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatTile label={t("stats.contacts")} value={summary.totalContacts} />
-        <StatTile label={t("stats.activePipeline")} value={summary.activePipelineCount} />
-        <StatTile label={t("stats.activeOrders")} value={summary.activeOrdersCount} />
-        <StatTile label={t("stats.needsHuman")} value={summary.needsHumanCount} />
+        <StatTile label={t("stats.contacts")} value={summary.totalContacts} icon={Users} />
+        <StatTile label={t("stats.activePipeline")} value={summary.activePipelineCount} icon={Target} />
+        <StatTile label={t("stats.activeOrders")} value={summary.activeOrdersCount} icon={ShoppingCart} />
+        <StatTile label={t("stats.needsHuman")} value={summary.needsHumanCount} icon={MessageSquare} tone="warning" />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-3">
-          <h2 className="text-sm font-medium">{t("conversationsHeading")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("conversationsHeading")}</h2>
           {conversations.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("empty")}</p>
+            <EmptyState icon={MessageSquare} title={t("empty")} />
           ) : (
-            <div className="divide-y rounded-lg border">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card">
               {conversations.slice(0, LIST_LIMIT).map(({ conversation, contact }) => (
                 <div key={conversation.id} className="p-3 text-sm">
                   <p className="truncate font-medium">{contact.fullName}</p>
@@ -93,11 +93,11 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-sm font-medium">{t("contactsHeading")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("contactsHeading")}</h2>
           {contacts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("empty")}</p>
+            <EmptyState icon={Users} title={t("empty")} />
           ) : (
-            <div className="divide-y rounded-lg border">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card">
               {contacts.slice(0, LIST_LIMIT).map((contact) => (
                 <div key={contact.id} className="p-3 text-sm">
                   <p className="truncate font-medium">{contact.fullName}</p>
@@ -111,11 +111,11 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-sm font-medium">{t("leadsHeading")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("leadsHeading")}</h2>
           {leads.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("empty")}</p>
+            <EmptyState icon={Target} title={t("empty")} />
           ) : (
-            <div className="divide-y rounded-lg border">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card">
               {leads.slice(0, LIST_LIMIT).map(({ lead, contact }) => (
                 <div key={lead.id} className="flex items-center justify-between p-3 text-sm">
                   <span className="truncate">{contact.fullName}</span>
@@ -127,11 +127,11 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-sm font-medium">{t("ordersHeading")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("ordersHeading")}</h2>
           {orders.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("empty")}</p>
+            <EmptyState icon={ShoppingCart} title={t("empty")} />
           ) : (
-            <div className="divide-y rounded-lg border">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card">
               {orders.slice(0, LIST_LIMIT).map(({ order, contact, items }) => (
                 <div key={order.id} className="flex items-center justify-between p-3 text-sm">
                   <span className="truncate">{contact.fullName}</span>
@@ -145,11 +145,11 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-sm font-medium">{t("appointmentsHeading")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("appointmentsHeading")}</h2>
           {appointments.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("empty")}</p>
+            <EmptyState icon={CalendarDays} title={t("empty")} />
           ) : (
-            <div className="divide-y rounded-lg border">
+            <div className="divide-y overflow-hidden rounded-xl border bg-card">
               {appointments.slice(0, LIST_LIMIT).map(({ appointment, contact }) => (
                 <div key={appointment.id} className="flex items-center justify-between p-3 text-sm">
                   <span className="truncate">{contact.fullName}</span>

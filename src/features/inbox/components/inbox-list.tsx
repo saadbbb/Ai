@@ -1,9 +1,14 @@
 "use client";
 
+import { Archive, ArchiveRestore, Flag, Inbox as InboxIcon, Pin, PinOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/empty-state";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { AiStatusBadge } from "./ai-status-badge";
 import { listConversationsAction } from "../actions/list-conversations.action";
 import { reopenConversationAction, closeConversationAction } from "../actions/set-ai-status.action";
@@ -108,11 +113,11 @@ export function InboxList({ initialConversations }: { initialConversations: Conv
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <input
+        <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder={t("searchPlaceholder")}
-          className="h-8 min-w-48 flex-1 rounded-md border bg-transparent px-3 text-sm outline-none focus:border-foreground"
+          className="min-w-48 flex-1"
         />
         {QUICK_FILTERS.map((filter) => (
           <button
@@ -120,9 +125,12 @@ export function InboxList({ initialConversations }: { initialConversations: Conv
             type="button"
             onClick={() => toggleFilter(filter)}
             aria-pressed={activeFilters.has(filter)}
-            className={`h-8 shrink-0 rounded-full border px-3 text-xs font-medium ${
-              activeFilters.has(filter) ? "border-primary bg-primary/10 text-primary" : "text-muted-foreground"
-            }`}
+            className={cn(
+              "h-8 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors",
+              activeFilters.has(filter)
+                ? "border-primary bg-primary-soft text-primary"
+                : "text-muted-foreground hover:bg-muted",
+            )}
           >
             {t(`filters.${filter}`)}
           </button>
@@ -130,22 +138,20 @@ export function InboxList({ initialConversations }: { initialConversations: Conv
       </div>
 
       {conversations.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-          {t("emptyState")}
-        </p>
+        <EmptyState icon={InboxIcon} title={t("emptyState")} />
       ) : (
-        <div className="divide-y rounded-lg border">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card">
           {conversations.map(({ conversation, contact, channel }) => (
             <div key={conversation.id} className="flex items-center justify-between gap-4 p-4 hover:bg-muted">
               <Link href={`/dashboard/inbox/${conversation.id}`} className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  {conversation.pinned && <span className="text-xs text-primary">{t("pinnedMarker")}</span>}
+                  {conversation.pinned && <Pin className="size-3.5 shrink-0 text-primary" />}
                   <p className="truncate font-medium">{contact.fullName}</p>
                   <span className="shrink-0 text-xs text-muted-foreground">{t(CHANNEL_LABEL_KEY[channel.type])}</span>
                   {conversation.priority === "high" && (
-                    <span className="shrink-0 rounded-full bg-destructive/10 px-1.5 py-0.5 text-[10px] text-destructive">
+                    <Badge variant="destructive" className="shrink-0">
                       {t("filters.priority")}
-                    </span>
+                    </Badge>
                   )}
                 </div>
                 <p className="truncate text-sm text-muted-foreground">
@@ -160,23 +166,32 @@ export function InboxList({ initialConversations }: { initialConversations: Conv
                 <button
                   type="button"
                   onClick={() => handleTogglePin(conversation.id, !conversation.pinned)}
-                  className="text-xs text-muted-foreground hover:text-foreground"
+                  aria-label={conversation.pinned ? t("unpin") : t("pin")}
+                  title={conversation.pinned ? t("unpin") : t("pin")}
+                  className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
                 >
-                  {conversation.pinned ? t("unpin") : t("pin")}
+                  {conversation.pinned ? <PinOff className="size-3.5" /> : <Pin className="size-3.5" />}
                 </button>
                 <button
                   type="button"
                   onClick={() => handleTogglePriority(conversation.id, conversation.priority !== "high")}
-                  className="text-xs text-muted-foreground hover:text-foreground"
+                  aria-label={conversation.priority === "high" ? t("unmarkPriority") : t("markPriority")}
+                  title={conversation.priority === "high" ? t("unmarkPriority") : t("markPriority")}
+                  className={cn(
+                    "flex size-7 items-center justify-center rounded-md hover:bg-muted",
+                    conversation.priority === "high" ? "text-destructive" : "text-muted-foreground hover:text-foreground",
+                  )}
                 >
-                  {conversation.priority === "high" ? t("unmarkPriority") : t("markPriority")}
+                  <Flag className="size-3.5" />
                 </button>
                 <button
                   type="button"
                   onClick={() => handleToggleArchive(conversation.id, conversation.status !== "closed")}
-                  className="text-xs text-muted-foreground hover:text-foreground"
+                  aria-label={conversation.status === "closed" ? t("reopen") : t("archive")}
+                  title={conversation.status === "closed" ? t("reopen") : t("archive")}
+                  className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
                 >
-                  {conversation.status === "closed" ? t("reopen") : t("archive")}
+                  {conversation.status === "closed" ? <ArchiveRestore className="size-3.5" /> : <Archive className="size-3.5" />}
                 </button>
               </div>
             </div>

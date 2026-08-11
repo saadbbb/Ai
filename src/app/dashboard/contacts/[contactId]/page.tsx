@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { LifecycleStageSelect } from "@/features/crm/components/lifecycle-stage-select";
@@ -171,58 +173,59 @@ export default async function ContactDetailPage({ params }: PageProps) {
         {t("backLink")}
       </Link>
 
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">{contact.fullName}</h1>
-          <p className="text-sm text-muted-foreground">
+      <PageHeader
+        title={contact.fullName}
+        description={
+          [
+            contact.phone,
+            contact.email,
+            contact.instagramId ? `@${contact.instagramId}` : null,
+            contact.country,
+            contact.city,
+            contact.language ? t(`languages.${contact.language}`) : null,
+          ]
+            .filter(Boolean)
+            .join(" · ") || t("noContactInfo")
+        }
+        actions={
+          <>
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/dashboard/appointments/new?contactId=${contact.id}`}>{tAppointments("newAppointment")}</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/dashboard/orders/new?contactId=${contact.id}`}>{tOrders("newOrder")}</Link>
+            </Button>
+          </>
+        }
+      />
+
+      <div>
+        <div className="flex flex-wrap items-center gap-1">
+          <LifecycleStageSelect contactId={contact.id} initialStage={contact.lifecycleStage} />
+          {contact.source && <Badge variant="secondary">{contact.source}</Badge>}
+        </div>
+        <div className="mt-1">
+          <TagManager contactId={contact.id} initialTags={contact.tags} />
+        </div>
+        {(contact.address || contact.budget || contact.preferredContactMethod || contact.timezone || contact.birthDate || contact.gender) && (
+          <p className="mt-1 text-xs text-muted-foreground">
             {[
-              contact.phone,
-              contact.email,
-              contact.instagramId ? `@${contact.instagramId}` : null,
-              contact.country,
-              contact.city,
-              contact.language ? t(`languages.${contact.language}`) : null,
+              contact.address ? t("fields.address", { value: contact.address }) : null,
+              contact.budget ? t("fields.budget", { value: contact.budget }) : null,
+              contact.preferredContactMethod
+                ? t("fields.preferredContactMethod", { value: t(`preferredContactMethods.${contact.preferredContactMethod}`) })
+                : null,
+              contact.timezone ? t("fields.timezone", { value: contact.timezone }) : null,
+              contact.birthDate ? t("fields.birthDate", { value: contact.birthDate }) : null,
+              contact.gender ? t("fields.gender", { value: contact.gender }) : null,
             ]
               .filter(Boolean)
-              .join(" · ") || t("noContactInfo")}
+              .join(" · ")}
           </p>
-          <div className="mt-1 flex flex-wrap items-center gap-1">
-            <LifecycleStageSelect contactId={contact.id} initialStage={contact.lifecycleStage} />
-            {contact.source && (
-              <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{contact.source}</span>
-            )}
-          </div>
-          <div className="mt-1">
-            <TagManager contactId={contact.id} initialTags={contact.tags} />
-          </div>
-          {(contact.address || contact.budget || contact.preferredContactMethod || contact.timezone || contact.birthDate || contact.gender) && (
-            <p className="mt-1 text-xs text-muted-foreground">
-              {[
-                contact.address ? t("fields.address", { value: contact.address }) : null,
-                contact.budget ? t("fields.budget", { value: contact.budget }) : null,
-                contact.preferredContactMethod
-                  ? t("fields.preferredContactMethod", { value: t(`preferredContactMethods.${contact.preferredContactMethod}`) })
-                  : null,
-                contact.timezone ? t("fields.timezone", { value: contact.timezone }) : null,
-                contact.birthDate ? t("fields.birthDate", { value: contact.birthDate }) : null,
-                contact.gender ? t("fields.gender", { value: contact.gender }) : null,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
-          )}
-          {contact.aiSummary && (
-            <p className="mt-2 max-w-md rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">{contact.aiSummary}</p>
-          )}
-        </div>
-        <div className="flex shrink-0 gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/dashboard/appointments/new?contactId=${contact.id}`}>{tAppointments("newAppointment")}</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/dashboard/orders/new?contactId=${contact.id}`}>{tOrders("newOrder")}</Link>
-          </Button>
-        </div>
+        )}
+        {contact.aiSummary && (
+          <p className="mt-2 max-w-md rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">{contact.aiSummary}</p>
+        )}
       </div>
 
       {nextAction && (
@@ -256,11 +259,11 @@ export default async function ContactDetailPage({ params }: PageProps) {
       <NotePanel contactId={contact.id} initialNotes={notes} />
 
       <div className="space-y-3">
-        <h2 className="text-sm font-medium">{t("timelineHeading")}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{t("timelineHeading")}</h2>
         {timeline.length === 0 ? (
           <p className="text-sm text-muted-foreground">{tActivity("empty")}</p>
         ) : (
-          <div className="divide-y rounded-lg border">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card">
             {timeline.map((item) => {
               const row = (
                 <div className="flex items-center justify-between gap-3 p-3 text-sm">

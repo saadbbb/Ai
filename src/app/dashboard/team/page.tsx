@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { TeamManager } from "@/features/workspace/components/team-manager";
 import { permissionService } from "@/features/workspace/services/permission.service";
 import { teamService } from "@/features/workspace/services/team.service";
@@ -18,10 +19,7 @@ export default async function TeamPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
-      </div>
+      <PageHeader title={t("title")} description={t("description")} />
       <TeamManager
         initialMembers={members}
         initialInvitations={invitations}

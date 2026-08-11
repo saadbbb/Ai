@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { TestChat } from "@/features/ai/components/test-chat";
 
 export default async function TestAiPage() {
@@ -6,10 +7,7 @@ export default async function TestAiPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
-      </div>
+      <PageHeader title={t("title")} description={t("description")} />
       <TestChat />
     </div>
   );

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
 import { OrderStatusSelect } from "@/features/orders/components/order-status-select";
 import { ShippingForm } from "@/features/orders/components/shipping-form";
 import { orderGrandTotal, orderSubtotal } from "@/features/orders/lib/order-total";
@@ -34,17 +35,17 @@ export default async function OrderDetailPage({ params }: PageProps) {
         {t("backLink")}
       </Link>
 
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">{contact.fullName}</h1>
-          {contact.phone && <p className="text-sm text-muted-foreground">{contact.phone}</p>}
-        </div>
-        <div className="w-44">
-          <OrderStatusSelect orderId={order.id} initialStatus={order.status} />
-        </div>
-      </div>
+      <PageHeader
+        title={contact.fullName}
+        description={contact.phone ?? undefined}
+        actions={
+          <div className="w-44">
+            <OrderStatusSelect orderId={order.id} initialStatus={order.status} />
+          </div>
+        }
+      />
 
-      <div className="divide-y rounded-lg border">
+      <div className="divide-y overflow-hidden rounded-xl border bg-card">
         {items.map((item) => (
           <div key={item.id} className="flex items-center justify-between p-3 text-sm">
             <span>
@@ -92,7 +93,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
 
       {order.notes && (
         <div className="space-y-1">
-          <h2 className="text-sm font-medium">{t("notesHeading")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("notesHeading")}</h2>
           <p className="text-sm text-muted-foreground whitespace-pre-wrap">{order.notes}</p>
         </div>
       )}

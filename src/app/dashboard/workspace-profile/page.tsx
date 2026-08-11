@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { BusinessInfoSettingsForm } from "@/features/ai/components/business-info-settings-form";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
@@ -9,10 +10,7 @@ export default async function WorkspaceProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
-        <p className="text-sm text-muted-foreground">{t("pageDescription")}</p>
-      </div>
+      <PageHeader title={t("pageTitle")} description={t("pageDescription")} />
 
       <BusinessInfoSettingsForm
         defaultValues={{

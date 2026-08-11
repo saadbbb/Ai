@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { dirFor } from "@/i18n/config";
 import "./globals.css";
 
@@ -16,10 +17,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "AI Employee Platform",
-  description: "Your AI employee that works 24/7.",
-};
+const notoSansArabic = Noto_Sans_Arabic({
+  variable: "--font-noto-sans-arabic",
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("app");
+  return {
+    title: t("name"),
+    description: t("tagline"),
+  };
+}
 
 /**
  * Every page's HTML depends on the NEXT_LOCALE cookie (see src/i18n/request.ts). Pages
@@ -42,12 +52,14 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={dirFor(locale)}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoSansArabic.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
-          {children}
-          <Toaster />
+          <TooltipProvider delayDuration={300}>
+            {children}
+            <Toaster />
+          </TooltipProvider>
         </NextIntlClientProvider>
       </body>
     </html>

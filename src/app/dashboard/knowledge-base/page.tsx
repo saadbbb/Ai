@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { FaqManager } from "@/features/knowledge-base/components/faq-manager";
 import { PolicySettingsForm } from "@/features/knowledge-base/components/policy-settings-form";
 import { ProductManager } from "@/features/knowledge-base/components/product-manager";
@@ -24,10 +25,7 @@ export default async function KnowledgeBasePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
-        <p className="text-sm text-muted-foreground">{t("pageDescription")}</p>
-      </div>
+      <PageHeader title={t("pageTitle")} description={t("pageDescription")} />
 
       <FaqManager initialFaqs={faqs} />
       <ProductManager initialProducts={products} />

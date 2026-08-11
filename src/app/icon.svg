@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="14" fill="#F5A623" />
+  <g transform="translate(8, 10) scale(0.30)">
+    <path d="M20 55 Q 82 6 144 55" stroke="#2454E5" stroke-width="21" stroke-linecap="round" fill="none" />
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      fill="#2454E5"
+      d="M 82 28 a 38 38 0 1 0 0 76 a 38 38 0 1 0 0 -76 Z M 104 24 a 33 33 0 1 0 0 66 a 33 33 0 1 0 0 -66 Z"
+    />
+  </g>
+</svg>

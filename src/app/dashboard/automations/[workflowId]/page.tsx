@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
 import { describeAction, describeConditions, describeDelay, describeTrigger } from "@/features/automation/lib/describe-workflow";
 import { automationService } from "@/features/automation/services/automation.service";
 import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
@@ -46,21 +47,20 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
         {t("backLink")}
       </Link>
 
-      <div>
-        <h1 className="text-xl font-semibold">{workflow.name}</h1>
-        <p className="text-sm text-muted-foreground">
-          {describeTrigger(workflow, translators)} → {delay ? `${delay} ` : ""}
-          {describeAction(workflow, translators)}
-        </p>
+      <div className="space-y-1">
+        <PageHeader
+          title={workflow.name}
+          description={`${describeTrigger(workflow, translators)} → ${delay ? `${delay} ` : ""}${describeAction(workflow, translators)}`}
+        />
         {conditions && <p className="text-sm text-muted-foreground">{conditions}</p>}
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-sm font-medium">{t("executionsHeading")}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{t("executionsHeading")}</h2>
         {executions.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("noExecutions")}</p>
         ) : (
-          <div className="divide-y rounded-lg border">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card">
             {executions.map((execution) => (
               <div key={execution.id} className="flex items-center justify-between gap-4 p-3 text-sm">
                 <span className="text-muted-foreground">{formatter.format(execution.triggeredAt)}</span>

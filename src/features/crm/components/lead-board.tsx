@@ -1,9 +1,11 @@
 "use client";
 
+import { Target } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/empty-state";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { leadStageEnum, type LeadStage } from "@/db/schema";
@@ -15,15 +17,15 @@ import type { LeadListItemWithScore } from "../services/crm.service";
 const STAGES = leadStageEnum.enumValues;
 
 const STAGE_ACCENT: Partial<Record<LeadStage, string>> = {
-  won: "border-t-primary",
+  won: "border-t-success",
   lost: "border-t-destructive",
   cancelled: "border-t-destructive",
 };
 
 const TEMPERATURE_COLOR: Record<string, string> = {
-  priority: "bg-destructive/10 text-destructive",
-  hot: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-  warm: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  priority: "bg-error-soft text-error",
+  hot: "bg-warning-soft text-warning-foreground",
+  warm: "bg-accent-soft text-accent-foreground",
   cold: "bg-muted text-muted-foreground",
 };
 
@@ -43,11 +45,7 @@ export function LeadBoard({ initialLeads }: { initialLeads: LeadListItemWithScor
   }
 
   if (leads.length === 0) {
-    return (
-      <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-        {t("emptyBoard")}
-      </p>
-    );
+    return <EmptyState icon={Target} title={t("emptyBoard")} />;
   }
 
   return (

@@ -1,8 +1,11 @@
+import { ShoppingCart } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/empty-state";
 import { ExportButtons } from "@/components/export-buttons";
 import { Input } from "@/components/ui/input";
+import { PageHeader } from "@/components/page-header";
 import { OrderStatusSelect } from "@/features/orders/components/order-status-select";
 import { orderGrandTotal } from "@/features/orders/lib/order-total";
 import { orderService } from "@/features/orders/services/order.service";
@@ -24,32 +27,30 @@ export default async function OrdersPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("description")}</p>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <ExportButtons
-            reportPath="/api/reports/orders"
-            labels={{ csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") }}
-          />
-          <Button asChild>
-            <Link href="/dashboard/orders/new">{t("newOrder")}</Link>
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <>
+            <ExportButtons
+              reportPath="/api/reports/orders"
+              labels={{ csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") }}
+            />
+            <Button asChild>
+              <Link href="/dashboard/orders/new">{t("newOrder")}</Link>
+            </Button>
+          </>
+        }
+      />
 
       <form className="max-w-sm">
         <Input type="search" name="q" defaultValue={q ?? ""} placeholder={tCommon("searchPlaceholder")} aria-label={tCommon("search")} />
       </form>
 
       {orders.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-          {t("emptyState")}
-        </p>
+        <EmptyState icon={ShoppingCart} title={t("emptyState")} />
       ) : (
-        <div className="divide-y rounded-lg border">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card">
           {orders.map(({ order, contact, items }) => (
             <div key={order.id} className="flex items-center justify-between gap-4 p-4">
               <Link href={`/dashboard/orders/${order.id}`} className="min-w-0 flex-1">

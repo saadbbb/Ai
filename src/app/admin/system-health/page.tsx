@@ -1,12 +1,14 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { systemHealthService, type SystemHealthCheck } from "@/features/platform-admin/services/system-health.service";
 import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
 
-const STATUS_COLOR: Record<SystemHealthCheck["status"], string> = {
-  ok: "var(--status-good)",
-  degraded: "var(--status-critical)",
-  not_configured: "var(--status-warning)",
+const STATUS_TONE: Record<SystemHealthCheck["status"], string> = {
+  ok: "bg-success-soft text-success",
+  degraded: "bg-error-soft text-error",
+  not_configured: "bg-warning-soft text-warning-foreground",
 };
 
 export default async function AdminSystemHealthPage() {
@@ -23,10 +25,7 @@ export default async function AdminSystemHealthPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
-      </div>
+      <PageHeader title={t("title")} description={t("description")} />
 
       <div className="grid gap-4 sm:grid-cols-2">
         {rows.map(({ key, label }) => {
@@ -36,12 +35,9 @@ export default async function AdminSystemHealthPage() {
               <CardContent className="space-y-1">
                 <div className="flex items-center justify-between">
                   <p className="font-medium">{label}</p>
-                  <span
-                    className="rounded-full px-2.5 py-1 text-xs font-medium text-white"
-                    style={{ backgroundColor: STATUS_COLOR[check.status] }}
-                  >
+                  <Badge variant="secondary" className={STATUS_TONE[check.status]}>
                     {t(`statuses.${check.status}`)}
-                  </span>
+                  </Badge>
                 </div>
                 {check.latencyMs !== null && (
                   <p className="text-xs text-muted-foreground">{t("latency", { ms: check.latencyMs })}</p>

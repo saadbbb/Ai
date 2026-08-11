@@ -1,5 +1,8 @@
+import { LifeBuoy } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { ticketService } from "@/features/support/services/ticket.service";
 import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
@@ -14,20 +17,20 @@ export default async function SupportPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("description")}</p>
-        </div>
-        <Button asChild>
-          <Link href="/dashboard/support/new">{t("newTicket")}</Link>
-        </Button>
-      </div>
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <Button asChild>
+            <Link href="/dashboard/support/new">{t("newTicket")}</Link>
+          </Button>
+        }
+      />
 
       {tickets.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">{t("emptyState")}</p>
+        <EmptyState icon={LifeBuoy} title={t("emptyState")} />
       ) : (
-        <div className="divide-y rounded-lg border">
+        <div className="divide-y overflow-hidden rounded-xl border bg-card">
           {tickets.map((ticket) => (
             <Link
               key={ticket.id}

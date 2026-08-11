@@ -72,7 +72,7 @@ export function RegisterForm() {
               </Field>
               <div className="space-y-2">
                 <label className="flex items-start gap-2 text-sm text-muted-foreground">
-                  <input type="checkbox" className="mt-1" {...register("acceptTerms")} />
+                  <input type="checkbox" className="mt-1 size-4 accent-primary" {...register("acceptTerms")} />
                   <span>{t("acceptTerms")}</span>
                 </label>
                 {errors.acceptTerms && <p className="text-sm text-destructive">{errors.acceptTerms.message}</p>}

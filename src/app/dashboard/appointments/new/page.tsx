@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { NewAppointmentForm } from "@/features/appointments/components/new-appointment-form";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
@@ -23,10 +24,7 @@ export default async function NewAppointmentPage({ searchParams }: PageProps) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
-      </div>
+      <PageHeader title={t("title")} description={t("description")} />
       <NewAppointmentForm
         contacts={contacts}
         services={services}

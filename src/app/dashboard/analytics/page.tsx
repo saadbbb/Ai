@@ -1,5 +1,8 @@
+import { BarChart3 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { EmptyState } from "@/components/empty-state";
 import { ExportButtons } from "@/components/export-buttons";
+import { PageHeader } from "@/components/page-header";
 import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { BarChartCard } from "@/features/analytics/components/bar-chart-card";
 import { DateRangeSelect } from "@/features/analytics/components/date-range-select";
@@ -57,13 +60,13 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("description")}</p>
-        </div>
-        <DateRangeSelect value={range.key} labels={rangeLabels} applyLabel={t("range.apply")} from={fromParam} to={toParam} />
-      </div>
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <DateRangeSelect value={range.key} labels={rangeLabels} applyLabel={t("range.apply")} from={fromParam} to={toParam} />
+        }
+      />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatTile label={t("kpis.newLeads")} value={summary.kpis.newLeads} />
@@ -139,7 +142,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
 
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-medium">{t("depth.title")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("depth.title")}</h2>
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("depth.salesReport")}</span>
@@ -228,7 +231,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
 
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-medium">{t("teamPerformance.title")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("teamPerformance.title")}</h2>
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("teamPerformance.revenueReport")}</span>
@@ -241,11 +244,9 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           </div>
         </div>
         {teamPerformance.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            {t("teamPerformance.empty")}
-          </p>
+          <EmptyState icon={BarChart3} title={t("teamPerformance.empty")} />
         ) : (
-          <div className="divide-y rounded-lg border">
+          <div className="divide-y overflow-hidden rounded-xl border bg-card">
             <div className="flex items-center justify-between gap-4 p-3 text-xs font-medium text-muted-foreground">
               <span className="flex-1">{t("teamPerformance.columns.agent")}</span>
               <span className="w-32 text-right">{t("teamPerformance.columns.conversations")}</span>
@@ -268,7 +269,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
 
       {websiteSummary && (
         <div className="space-y-3">
-          <h2 className="text-sm font-medium">{t("website.title")}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{t("website.title")}</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <StatTile label={t("website.pageViews")} value={websiteSummary.pageViews} />
             <StatTile label={t("website.productViews")} value={websiteSummary.productViews} />

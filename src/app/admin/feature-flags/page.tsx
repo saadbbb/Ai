@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { FeatureFlagManager } from "@/features/platform-admin/components/feature-flag-manager";
 import { featureFlagRepository } from "@/features/platform-admin/repository/feature-flag.repository";
 import { workspaceAdminRepository } from "@/features/platform-admin/repository/workspace-admin.repository";
@@ -14,10 +15,7 @@ export default async function AdminFeatureFlagsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
-      </div>
+      <PageHeader title={t("title")} description={t("description")} />
       <FeatureFlagManager
         initialFlags={flags}
         initialOverrides={Object.fromEntries(flags.map((flag, index) => [flag.id, overridesByFlag[index]]))}

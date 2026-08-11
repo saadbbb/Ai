@@ -1,4 +1,6 @@
+import { Percent, UserCheck, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { BarChartCard } from "@/features/analytics/components/bar-chart-card";
 import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { workspaceAdminRepository } from "@/features/platform-admin/repository/workspace-admin.repository";
@@ -25,15 +27,17 @@ export default async function AdminPlatformAnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
-      </div>
+      <PageHeader title={t("title")} description={t("description")} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <StatTile label={t("retentionCohort", { days: RETENTION_COHORT_DAYS })} value={retention.cohortSize} />
-        <StatTile label={t("retentionStillActive")} value={retention.stillActiveCount} />
-        <StatTile label={t("retentionRate")} value={retentionRate === null ? "—" : `${retentionRate}%`} />
+        <StatTile label={t("retentionCohort", { days: RETENTION_COHORT_DAYS })} value={retention.cohortSize} icon={Users} />
+        <StatTile label={t("retentionStillActive")} value={retention.stillActiveCount} icon={UserCheck} tone="success" />
+        <StatTile
+          label={t("retentionRate")}
+          value={retentionRate === null ? "—" : `${retentionRate}%`}
+          icon={Percent}
+          tone="success"
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

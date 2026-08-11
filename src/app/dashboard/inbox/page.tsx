@@ -1,7 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { CoachMark } from "@/components/coach-mark";
 import { Button } from "@/components/ui/button";
 import { ExportButtons } from "@/components/export-buttons";
+import { PageHeader } from "@/components/page-header";
 import { InboxList } from "@/features/inbox/components/inbox-list";
 import { inboxService } from "@/features/inbox/services/inbox.service";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -12,25 +14,27 @@ export default async function InboxPage() {
   await requireFeature(workspace, "inbox");
   const t = await getTranslations("inbox.list");
   const tCommon = await getTranslations("common");
+  const tCoach = await getTranslations("coachMarks.inbox");
   const exportLabels = { csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") };
 
   const conversations = await inboxService.listConversations(workspace.id);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("description")}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <ExportButtons reportPath="/api/reports/conversations" labels={exportLabels} />
-          <Button asChild>
-            <Link href="/dashboard/inbox/new">{t("newConversation")}</Link>
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <>
+            <ExportButtons reportPath="/api/reports/conversations" labels={exportLabels} />
+            <Button asChild>
+              <Link href="/dashboard/inbox/new">{t("newConversation")}</Link>
+            </Button>
+          </>
+        }
+      />
 
+      <CoachMark id="inbox-list" title={tCoach("title")} description={tCoach("description")} />
       <InboxList initialConversations={conversations} />
     </div>
   );

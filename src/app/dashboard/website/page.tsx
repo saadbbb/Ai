@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { PageHeader } from "@/components/page-header";
 import { StorefrontEditor } from "@/features/storefront/components/storefront-editor";
 import { ReviewManager } from "@/features/storefront/components/review-manager";
 import { BlogManager } from "@/features/storefront/components/blog-manager";
@@ -25,9 +26,8 @@ export default async function WebsitePage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
+      <div className="space-y-1">
+        <PageHeader title={t("title")} description={t("description")} />
         <Link href={storeUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
           {storeUrl}
         </Link>

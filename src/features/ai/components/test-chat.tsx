@@ -1,7 +1,9 @@
 "use client";
 
+import { Bot, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { generateTestReplyAction } from "../actions/generate-test-reply.action";
@@ -45,16 +47,20 @@ export function TestChat() {
   }
 
   return (
-    <div className="flex h-[70vh] flex-col rounded-lg border">
+    <div className="flex h-[70vh] flex-col overflow-hidden rounded-xl border bg-card">
       <div className="flex-1 space-y-3 overflow-y-auto p-4">
-        {messages.length === 0 && <p className="text-sm text-muted-foreground">{t("emptyState")}</p>}
+        {messages.length === 0 && (
+          <div className="flex h-full items-center justify-center">
+            <EmptyState icon={Bot} title={t("emptyState")} className="border-none" />
+          </div>
+        )}
         {messages.map((message, index) => (
           <div key={index} className={message.role === "user" ? "flex justify-end" : "flex justify-start"}>
             <div
               className={
                 message.role === "user"
-                  ? "max-w-[80%] rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground"
-                  : "max-w-[80%] rounded-lg bg-muted px-3 py-2 text-sm"
+                  ? "max-w-[80%] rounded-2xl rounded-ee-sm bg-primary px-3.5 py-2 text-sm text-primary-foreground"
+                  : "max-w-[80%] rounded-2xl rounded-ss-sm bg-muted px-3.5 py-2 text-sm"
               }
             >
               <p className="whitespace-pre-wrap">{message.content}</p>
@@ -80,6 +86,7 @@ export function TestChat() {
           }}
         />
         <Button type="button" onClick={handleSend} disabled={isSending}>
+          <Send className="size-4" />
           {isSending ? t("sending") : t("send")}
         </Button>
       </div>

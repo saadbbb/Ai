@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
 import { TicketReplyForm } from "@/features/support/components/ticket-reply-form";
 import { TicketThread } from "@/features/support/components/ticket-thread";
 import { ticketService } from "@/features/support/services/ticket.service";
@@ -33,10 +34,11 @@ export default async function SupportTicketDetailPage({ params }: PageProps) {
         <Link href="/dashboard/support" className="text-sm text-muted-foreground hover:underline">
           {t("backLink")}
         </Link>
-        <div className="mt-1 flex items-center justify-between gap-4">
-          <h1 className="text-xl font-semibold">{ticket.subject}</h1>
-          <span className="shrink-0 text-sm text-muted-foreground">{t(`statuses.${ticket.status}`)}</span>
-        </div>
+        <PageHeader
+          className="mt-1"
+          title={ticket.subject}
+          actions={<span className="shrink-0 text-sm text-muted-foreground">{t(`statuses.${ticket.status}`)}</span>}
+        />
       </div>
 
       <TicketThread messages={messages} tenantLabel={t("thread.you")} adminLabel={t("thread.supportTeam")} />

@@ -1,4 +1,8 @@
 {
+  "app": {
+    "name": "Yaqiz",
+    "tagline": "Your AI employee that works 24/7."
+  },
   "common": {
     "continue": "Continue",
     "back": "Back",
@@ -17,7 +21,8 @@
     "exportExcel": "Export Excel",
     "exportPdf": "Export PDF",
     "search": "Search",
-    "searchPlaceholder": "Search by name..."
+    "searchPlaceholder": "Search by name...",
+    "gotIt": "Got it"
   },
   "auth": {
     "register": {
@@ -328,7 +333,8 @@
       "empty": "Nothing stands out today — business looks steady.",
       "refresh": "Refresh",
       "refreshing": "Refreshing..."
-    }
+    },
+    "menuLabel": "Open menu"
   },
   "analytics": {
     "title": "Analytics",
@@ -722,6 +728,7 @@
   "platformAdmin": {
     "badge": "Platform Admin",
     "backToDashboard": "Back to your dashboard",
+    "menuLabel": "Open menu",
     "homeLink": "Home",
     "workspacesLink": "Workspaces",
     "plansLink": "Plans",
@@ -1797,5 +1804,19 @@
     "title": "Activity",
     "empty": "No activity recorded for this contact yet.",
     "channelActivity": "Conversation"
+  },
+  "coachMarks": {
+    "attention": {
+      "title": "Stay on top of what matters",
+      "description": "Hot leads, cold leads, and conversations waiting on you show up here automatically — check it first thing."
+    },
+    "inbox": {
+      "title": "Yaqiz replies automatically",
+      "description": "Each conversation shows whether your AI Employee is handling it or waiting on you. Open one to see the full thread."
+    },
+    "leads": {
+      "title": "Track deals by stage",
+      "description": "Change a lead's stage from the dropdown on its card as the deal progresses. Score and temperature update automatically."
+    }
   }
 }

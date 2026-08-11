@@ -1,10 +1,13 @@
+import { Building2, CreditCard, History, LifeBuoy, ShieldCheck, Users2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AccountMenu, type AccountMenuItem } from "@/components/app-shell/account-menu";
+import { MobileNav } from "@/components/app-shell/mobile-nav";
+import { SidebarNav } from "@/components/app-shell/sidebar-nav";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { Logo } from "@/components/logo";
 import { BLOCKED_SUBSCRIPTION_STATUSES } from "@/db/schema";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { NotificationBell } from "@/features/notifications/components/notification-bell";
 import { notificationService } from "@/features/notifications/services/notification.service";
@@ -38,6 +41,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const [
     t,
+    tApp,
     isPlatformAdmin,
     { notifications, unreadCount },
     memberships,
@@ -50,6 +54,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     canManageAds,
   ] = await Promise.all([
     getTranslations("dashboard"),
+    getTranslations("app"),
     platformAdminService.isPlatformAdmin(user.email),
     notificationService.getForWorkspace(workspace.id),
     membershipRepository.findWorkspacesForUser(user.id),
@@ -107,69 +112,66 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const groups = rawGroups
     .map((group) => ({ ...group, links: group.links.filter((link) => !link.feature || enabledFeatures.includes(link.feature)) }))
     .filter((group) => group.links.length > 0);
-  const flatLinks = groups.flatMap((group) => group.links);
 
-  return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <header className="flex items-center justify-between border-b px-6 py-4">
-        <div className="flex items-center gap-3">
-          <span className="font-medium">{user.email}</span>
-          {memberships.length > 1 && (
+  const accountItems: AccountMenuItem[] = [
+    { href: "/dashboard/workspace-profile", label: t("workspaceProfileLink"), icon: Building2 },
+    ...(canViewTeam ? [{ href: "/dashboard/team", label: t("teamLink"), icon: Users2 }] : []),
+    { href: "/dashboard/billing", label: t("billingLink"), icon: CreditCard },
+    ...(canViewTeam ? [{ href: "/dashboard/audit-log", label: t("auditLogLink"), icon: History }] : []),
+    ...(canViewSupport ? [{ href: "/dashboard/support", label: t("supportLink"), icon: LifeBuoy }] : []),
+  ];
+
+  const productName = tApp("name");
+
+  const topBar = (
+    <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b bg-surface px-4 md:px-6">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="md:hidden">
+          <MobileNav
+            groups={groups}
+            productName={productName}
+            accountItems={accountItems}
+            navLabel={t("menuLabel")}
+            logoutSlot={<LogoutButton />}
+          />
+        </div>
+        <Link href="/dashboard" className="flex items-center gap-2 md:hidden">
+          <Logo className="h-6" />
+          <span className="truncate text-sm font-semibold">{productName}</span>
+        </Link>
+        {memberships.length > 1 && (
+          <div className="hidden md:block">
             <WorkspaceSwitcher workspaces={memberships.map((m) => m.workspace)} currentWorkspaceId={workspace.id} />
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          <NotificationBell initialNotifications={notifications} initialUnreadCount={unreadCount} />
-          {isPlatformAdmin && (
-            <Link
-              href="/admin/settings"
-              className="rounded-full bg-foreground px-3 py-1 text-xs font-semibold text-background hover:opacity-90"
-            >
-              {t("platformAdminLink")}
-            </Link>
-          )}
-          <LocaleSwitcher />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button type="button" variant="outline" size="sm">
-                {t("accountMenuLabel")}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem asChild>
-                <Link href="/dashboard/workspace-profile">{t("workspaceProfileLink")}</Link>
-              </DropdownMenuItem>
-              {canViewTeam && (
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/team">{t("teamLink")}</Link>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem asChild>
-                <Link href="/dashboard/billing">{t("billingLink")}</Link>
-              </DropdownMenuItem>
-              {canViewTeam && (
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/audit-log">{t("auditLogLink")}</Link>
-                </DropdownMenuItem>
-              )}
-              {canViewSupport && (
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/support">{t("supportLink")}</Link>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
-              <div className="px-1 py-1">
-                <LogoutButton />
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
-      {isBlocked ? (
+          </div>
+        )}
+      </div>
+      <div className="flex shrink-0 items-center gap-1.5">
+        <NotificationBell initialNotifications={notifications} initialUnreadCount={unreadCount} />
+        {isPlatformAdmin && (
+          <Link
+            href="/admin/settings"
+            className="hidden items-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:opacity-90 sm:flex"
+          >
+            <ShieldCheck className="size-3.5" />
+            {t("platformAdminLink")}
+          </Link>
+        )}
+        <LocaleSwitcher />
+      </div>
+    </header>
+  );
+
+  if (isBlocked) {
+    return (
+      <div className="flex min-h-full flex-1 flex-col">
+        {topBar}
         <main className="flex flex-1 items-center justify-center p-6">
-          <div className="max-w-sm space-y-3 rounded-lg border p-6 text-center">
-            <h1 className="font-medium">{t("suspended.title")}</h1>
-            <p className="text-sm text-muted-foreground">{t("suspended.description")}</p>
+          <div className="max-w-sm space-y-4 rounded-xl border bg-card p-8 text-center shadow-sm">
+            <Logo variant="tile" className="mx-auto h-12" />
+            <div className="space-y-1.5">
+              <h1 className="font-heading text-base font-semibold">{t("suspended.title")}</h1>
+              <p className="text-sm text-text-secondary">{t("suspended.description")}</p>
+            </div>
             {settings?.whatsappNumber && (
               <a
                 href={`https://wa.me/${settings.whatsappNumber.replace(/[^0-9]/g, "")}`}
@@ -180,51 +182,44 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 {t("suspended.whatsappCta")}
               </a>
             )}
+            <div className="pt-2">
+              <LogoutButton />
+            </div>
           </div>
         </main>
-      ) : (
-        <div className="flex flex-1">
-          <aside className="hidden w-56 shrink-0 space-y-6 overflow-y-auto border-e px-4 py-6 md:block">
-            {groups.map((group) => (
-              <div key={group.heading ?? group.links[0]?.href} className="space-y-1">
-                {group.heading && (
-                  <p className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">{group.heading}</p>
-                )}
-                {group.links.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="block rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            ))}
-          </aside>
+      </div>
+    );
+  }
 
-          <div className="flex min-w-0 flex-1 flex-col">
-            <nav className="flex items-center gap-4 overflow-x-auto border-b px-6 py-2 text-sm md:hidden">
-              {flatLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="shrink-0 text-muted-foreground hover:text-foreground">
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-
-            {isOverdue && (
-              <div className="border-b bg-amber-50 px-6 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
-                {t(`overdue.${workspace.subscriptionStatus}`)}{" "}
-                <Link href="/dashboard/billing" className="font-medium underline underline-offset-2">
-                  {t("overdue.cta")}
-                </Link>
-              </div>
-            )}
-
-            <main className="flex-1 p-6">{children}</main>
-          </div>
+  return (
+    <div className="flex min-h-full flex-1">
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e bg-sidebar md:flex">
+        <Link href="/dashboard" className="flex items-center gap-2.5 border-b px-5 py-4">
+          <Logo className="h-7" />
+          <span className="truncate font-heading text-base font-semibold text-sidebar-foreground">{productName}</span>
+        </Link>
+        <div className="flex-1 overflow-y-auto px-3 py-4">
+          <SidebarNav groups={groups} />
         </div>
-      )}
+        <div className="border-t p-2">
+          <AccountMenu email={user.email} items={accountItems} logoutSlot={<LogoutButton />} />
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        {topBar}
+
+        {isOverdue && (
+          <div className="border-b bg-warning-soft px-4 py-2 text-sm text-warning-foreground md:px-6">
+            {t(`overdue.${workspace.subscriptionStatus}`)}{" "}
+            <Link href="/dashboard/billing" className="font-medium underline underline-offset-2">
+              {t("overdue.cta")}
+            </Link>
+          </div>
+        )}
+
+        <main className="flex-1 p-4 md:p-6">{children}</main>
+      </div>
     </div>
   );
 }

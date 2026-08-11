@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { IN_GOOD_STANDING_STATUSES } from "@/db/schema";
@@ -49,10 +50,7 @@ export default async function BillingPage() {
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
-      </div>
+      <PageHeader title={t("title")} description={t("description")} />
 
       <Card>
         <CardContent className="space-y-4 text-center">
@@ -96,7 +94,7 @@ export default async function BillingPage() {
                         </div>
                         <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                           <div
-                            className={`h-full rounded-full ${(metric.percentUsed ?? 0) >= 100 ? "bg-destructive" : (metric.percentUsed ?? 0) >= 80 ? "bg-amber-500" : "bg-primary"}`}
+                            className={`h-full rounded-full ${(metric.percentUsed ?? 0) >= 100 ? "bg-destructive" : (metric.percentUsed ?? 0) >= 80 ? "bg-warning" : "bg-primary"}`}
                             style={{ width: `${Math.min(metric.percentUsed ?? 0, 100)}%` }}
                           />
                         </div>
