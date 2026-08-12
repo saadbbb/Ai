@@ -6,7 +6,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { onboardingService } from "../services/onboarding.service";
 
 /** No existing upload infra in the app — this is the first Supabase Storage consumer. Public bucket: logos are shown to storefront customers. */
-export const LOGO_BUCKET = "workspace-logos";
+const LOGO_BUCKET = "workspace-logos";
 const MAX_LOGO_BYTES = 5 * 1024 * 1024;
 const ALLOWED_LOGO_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
