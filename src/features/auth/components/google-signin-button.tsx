@@ -55,7 +55,7 @@ export function GoogleSignInButton() {
   }
 
   return (
-    <Button type="button" variant="outline" className="w-full" disabled={isRedirecting} onClick={handleClick}>
+    <Button type="button" variant="secondary" className="w-full" disabled={isRedirecting} onClick={handleClick}>
       {!isRedirecting && <GoogleIcon />}
       {isRedirecting ? t("redirecting") : t("continueWithGoogle")}
     </Button>

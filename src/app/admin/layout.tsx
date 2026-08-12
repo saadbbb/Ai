@@ -1,10 +1,11 @@
-import { LayoutDashboard, ShieldCheck } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { AccountMenu, type AccountMenuItem } from "@/components/app-shell/account-menu";
 import { MobileNav } from "@/components/app-shell/mobile-nav";
 import type { NavGroupItem } from "@/components/app-shell/sidebar-nav";
 import { SidebarNav } from "@/components/app-shell/sidebar-nav";
+import { TopbarTitle } from "@/components/app-shell/topbar-title";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Logo } from "@/components/logo";
 import { LogoutButton } from "@/features/auth/components/logout-button";
@@ -54,15 +55,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="flex min-h-full flex-1">
-      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e bg-sidebar md:flex">
-        <Link href="/admin" className="flex items-center gap-2.5 border-b px-5 py-5">
-          <Logo className="h-7" />
-          <div className="flex min-w-0 flex-col">
-            <span className="truncate font-heading text-base font-semibold text-sidebar-foreground">{productName}</span>
-            <span className="flex items-center gap-1 text-[0.6875rem] font-semibold tracking-wide text-muted-foreground uppercase">
-              <ShieldCheck className="size-3" />
-              {t("badge")}
-            </span>
+      <aside className="sticky top-0 hidden h-dvh w-[17rem] shrink-0 flex-col border-e bg-sidebar md:flex">
+        <Link href="/admin" className="flex items-center gap-2.5 border-b px-5 py-4">
+          <Logo className="h-8" />
+          <div className="min-w-0">
+            <div className="truncate font-heading text-base font-extrabold text-sidebar-foreground">{productName}</div>
+            <div className="truncate text-[11px] font-medium text-text-muted">{t("badge")}</div>
           </div>
         </Link>
         <div className="flex-1 overflow-y-auto px-3 py-5">
@@ -89,6 +87,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <Logo className="h-6" />
               <span className="truncate text-sm font-semibold">{productName}</span>
             </Link>
+            <div className="hidden md:block">
+              <TopbarTitle groups={groups} />
+            </div>
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
             <Link

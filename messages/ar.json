@@ -22,13 +22,7 @@
     "exportPdf": "تصدير PDF",
     "search": "بحث",
     "searchPlaceholder": "ابحث بالاسم...",
-    "gotIt": "فهمت",
-    "theme": {
-      "label": "المظهر",
-      "light": "فاتح",
-      "dark": "داكن",
-      "system": "النظام"
-    }
+    "gotIt": "فهمت"
   },
   "auth": {
     "register": {
@@ -340,7 +334,8 @@
       "refresh": "تحديث",
       "refreshing": "جارٍ التحديث..."
     },
-    "menuLabel": "فتح القائمة"
+    "menuLabel": "فتح القائمة",
+    "shellSubtitle": "لوحة التحكم"
   },
   "analytics": {
     "title": "التحليلات",

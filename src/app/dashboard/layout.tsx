@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { AccountMenu, type AccountMenuItem } from "@/components/app-shell/account-menu";
 import { MobileNav } from "@/components/app-shell/mobile-nav";
 import { SidebarNav } from "@/components/app-shell/sidebar-nav";
+import { TopbarTitle } from "@/components/app-shell/topbar-title";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Logo } from "@/components/logo";
 import { BLOCKED_SUBSCRIPTION_STATUSES } from "@/db/schema";
@@ -139,6 +140,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <Logo className="h-6" />
           <span className="truncate text-sm font-semibold">{productName}</span>
         </Link>
+        <div className="hidden md:block">
+          <TopbarTitle groups={groups} />
+        </div>
         {memberships.length > 1 && (
           <div className="hidden md:block">
             <WorkspaceSwitcher workspaces={memberships.map((m) => m.workspace)} currentWorkspaceId={workspace.id} />
@@ -193,10 +197,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex min-h-full flex-1">
-      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e bg-sidebar md:flex">
-        <Link href="/dashboard" className="flex h-16 items-center gap-2.5 border-b px-5">
-          <Logo className="h-7" />
-          <span className="truncate font-heading text-base font-semibold text-sidebar-foreground">{productName}</span>
+      <aside className="sticky top-0 hidden h-dvh w-[17rem] shrink-0 flex-col border-e bg-sidebar md:flex">
+        <Link href="/dashboard" className="flex items-center gap-2.5 border-b px-5 py-4">
+          <Logo className="h-8" />
+          <div className="min-w-0">
+            <div className="truncate font-heading text-base font-extrabold text-sidebar-foreground">{productName}</div>
+            <div className="truncate text-[11px] font-medium text-text-muted">{t("shellSubtitle")}</div>
+          </div>
         </Link>
         <div className="flex-1 overflow-y-auto px-3 py-5">
           <SidebarNav groups={groups} />

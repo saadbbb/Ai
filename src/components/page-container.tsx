@@ -27,7 +27,7 @@ export function Section({
       {(title || actions) && (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
-            {title && <h2 className="font-heading text-sm font-semibold text-foreground">{title}</h2>}
+            {title && <h2 className="font-heading text-sm font-extrabold text-foreground">{title}</h2>}
             {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>
           {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}

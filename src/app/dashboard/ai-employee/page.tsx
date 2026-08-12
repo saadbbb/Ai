@@ -32,27 +32,33 @@ export default async function AiEmployeePage() {
 
   return (
     <PageContainer>
-      <Card className="flex-row items-start justify-between gap-4 p-5">
+      <Card
+        className="flex-row items-start justify-between gap-4 border-border-strong p-6"
+        style={{
+          backgroundImage:
+            "radial-gradient(500px 260px at 100% -20%, rgba(42,217,168,.2), transparent 60%), linear-gradient(135deg, #23204a 0%, #171b25 60%)",
+        }}
+      >
         <div className="flex min-w-0 items-start gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
-            <Bot className="size-6" />
+          <span className="flex size-[72px] shrink-0 items-center justify-center rounded-[22px] bg-gradient-to-br from-primary to-accent shadow-glow">
+            <Bot className="size-7 text-white" />
           </span>
           <div className="min-w-0 space-y-1.5">
-            <h1 className="font-heading text-xl font-semibold text-foreground">{agent.name || t("pageTitle")}</h1>
+            <h1 className="font-heading text-xl font-extrabold text-foreground">{agent.name || t("pageTitle")}</h1>
             {agent.businessDescription && (
-              <p className="line-clamp-2 text-sm text-muted-foreground">{agent.businessDescription}</p>
+              <p className="line-clamp-2 text-sm text-text-secondary">{agent.businessDescription}</p>
             )}
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
               <Badge variant="secondary">{tLanguages(agent.language)}</Badge>
               <Badge variant="secondary">{tTone(agent.tone)}</Badge>
               <Badge variant="secondary">{tCreativity(`${agent.creativity}.label`)}</Badge>
-              <Badge variant={agent.handoverEnabled ? "secondary" : "outline"}>
+              <Badge variant={agent.handoverEnabled ? "success" : "outline"}>
                 {agent.handoverEnabled ? t("handoverOn") : t("handoverOff")}
               </Badge>
             </div>
           </div>
         </div>
-        <Button asChild variant="outline" size="sm" className="shrink-0">
+        <Button asChild variant="secondary" size="sm" className="shrink-0">
           <a href="/api/reports/ai-usage">{tCommon("exportCsv")}</a>
         </Button>
       </Card>

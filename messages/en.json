@@ -22,13 +22,7 @@
     "exportPdf": "Export PDF",
     "search": "Search",
     "searchPlaceholder": "Search by name...",
-    "gotIt": "Got it",
-    "theme": {
-      "label": "Appearance",
-      "light": "Light",
-      "dark": "Dark",
-      "system": "System"
-    }
+    "gotIt": "Got it"
   },
   "auth": {
     "register": {
@@ -340,7 +334,8 @@
       "refresh": "Refresh",
       "refreshing": "Refreshing..."
     },
-    "menuLabel": "Open menu"
+    "menuLabel": "Open menu",
+    "shellSubtitle": "Dashboard"
   },
   "analytics": {
     "title": "Analytics",

@@ -7,30 +7,30 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
   const t = await getTranslations("app");
 
   return (
-    <div className="flex min-h-full flex-1">
-      <div className="relative hidden w-full max-w-md shrink-0 flex-col items-start justify-between overflow-hidden bg-gradient-to-br from-primary to-primary-active p-12 text-primary-foreground md:flex lg:max-w-lg">
+    <div className="flex min-h-full flex-1 flex-col md:flex-row">
+      <div
+        className="relative flex w-full shrink-0 flex-col items-start justify-between overflow-hidden p-6 text-white md:max-w-md md:p-12 lg:max-w-lg"
+        style={{
+          backgroundImage:
+            "radial-gradient(700px 500px at 20% 0%, rgba(255,255,255,.12), transparent 60%), linear-gradient(160deg, #221bb8 0%, #6d63f6 55%, #2ad9a8 130%)",
+        }}
+      >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -end-24 -top-24 size-96 rounded-full bg-primary-foreground/10 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-32 -start-16 size-96 rounded-full bg-accent/20 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          className="pointer-events-none absolute inset-0 opacity-[0.12]"
           style={{
             backgroundImage: "radial-gradient(currentColor 1.5px, transparent 1.5px)",
             backgroundSize: "22px 22px",
           }}
         />
         <Link href="/login" className="relative flex items-center gap-2.5">
-          <Logo variant="tile" className="h-10 shrink-0" />
-          <span className="font-heading text-lg font-semibold">{t("name")}</span>
+          <Logo className="h-9 shrink-0" />
+          <span className="font-heading text-lg font-extrabold">{t("name")}</span>
         </Link>
-        <p className="relative font-heading text-3xl leading-tight font-semibold text-balance">{t("tagline")}</p>
-        <p className="relative text-xs text-primary-foreground/60">
+        <p className="relative mt-6 font-heading text-2xl leading-tight font-extrabold text-balance md:mt-0 md:text-4xl">
+          {t("tagline")}
+        </p>
+        <p className="relative hidden text-xs text-white/70 md:block">
           © {new Date().getFullYear()} {t("name")}
         </p>
       </div>
@@ -39,11 +39,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
         <div className="flex justify-end p-4">
           <LocaleSwitcher />
         </div>
-        <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4 pb-16">
-          <Link href="/login" className="flex flex-col items-center gap-2.5 md:hidden">
-            <Logo variant="tile" className="h-14" />
-            <span className="font-heading text-lg font-semibold text-foreground">{t("name")}</span>
-          </Link>
+        <div className="flex flex-1 flex-col items-center justify-center px-4 pb-16">
           <div className="w-full max-w-sm">{children}</div>
         </div>
       </div>

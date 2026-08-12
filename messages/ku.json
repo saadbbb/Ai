@@ -22,13 +22,7 @@
     "exportPdf": "هەناردەکردنی PDF",
     "search": "گەڕان",
     "searchPlaceholder": "بە ناو بگەڕێ...",
-    "gotIt": "تێگەیشتم",
-    "theme": {
-      "label": "ڕووکار",
-      "light": "ڕووناک",
-      "dark": "تاریک",
-      "system": "سیستەم"
-    }
+    "gotIt": "تێگەیشتم"
   },
   "auth": {
     "register": {
@@ -340,7 +334,8 @@
       "refresh": "نوێکردنەوە",
       "refreshing": "نوێ دەکرێتەوە..."
     },
-    "menuLabel": "کردنەوەی لیستە"
+    "menuLabel": "کردنەوەی لیستە",
+    "shellSubtitle": "داشبۆرد"
   },
   "analytics": {
     "title": "شیکاری",

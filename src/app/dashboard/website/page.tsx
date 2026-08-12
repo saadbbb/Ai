@@ -29,16 +29,22 @@ export default async function WebsitePage() {
   const storeUrl = `${getAppUrl()}/store/${workspace.slug}`;
 
   return (
-    <PageContainer className="mx-auto max-w-2xl">
-      <Card className="flex-row items-center justify-between gap-4 p-5">
+    <PageContainer>
+      <Card
+        className="flex-row items-center justify-between gap-4 border-border-strong p-6"
+        style={{
+          backgroundImage:
+            "radial-gradient(500px 260px at 100% -20%, rgba(42,217,168,.2), transparent 60%), linear-gradient(135deg, #23204a 0%, #171b25 60%)",
+        }}
+      >
         <div className="flex min-w-0 items-center gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
-            <Globe className="size-6" />
+          <span className="flex size-[72px] shrink-0 items-center justify-center rounded-[22px] bg-gradient-to-br from-primary to-accent shadow-glow">
+            <Globe className="size-7 text-white" />
           </span>
-          <div className="min-w-0 space-y-1">
+          <div className="min-w-0 space-y-1.5">
             <div className="flex items-center gap-2">
-              <h1 className="font-heading text-xl font-semibold text-foreground">{t("title")}</h1>
-              <Badge variant={storefront.isPublished ? "secondary" : "outline"}>
+              <h1 className="font-heading text-xl font-extrabold text-foreground">{t("title")}</h1>
+              <Badge variant={storefront.isPublished ? "success" : "outline"}>
                 {storefront.isPublished ? t("publishLabel") : t("notPublished")}
               </Badge>
             </div>
@@ -47,7 +53,7 @@ export default async function WebsitePage() {
             </a>
           </div>
         </div>
-        <Button asChild variant="outline" size="sm" className="shrink-0">
+        <Button asChild variant="secondary" size="sm" className="shrink-0">
           <a href={storeUrl} target="_blank" rel="noopener noreferrer">
             {t("urlHeading")}
             <ExternalLink className="size-3.5" />

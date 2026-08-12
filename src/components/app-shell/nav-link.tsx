@@ -33,12 +33,23 @@ export function NavLink({
       onClick={onClick}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex items-center gap-2.5 rounded-lg px-3 text-sm font-medium transition-colors",
+        "flex items-center gap-2.5 rounded-sm border-s-[3px] ps-2.5 pe-3 text-[13.5px] font-semibold transition-colors",
         size === "mobile" ? "py-2.5" : "py-2",
-        active ? "bg-primary-soft text-primary" : "text-text-secondary hover:bg-muted hover:text-foreground"
+        active
+          ? "border-primary bg-gradient-to-r from-primary-soft to-transparent text-foreground"
+          : "border-transparent text-text-secondary hover:bg-muted hover:text-foreground"
       )}
     >
-      {Icon && <Icon className="size-4 shrink-0" strokeWidth={2} />}
+      {Icon && (
+        <span
+          className={cn(
+            "flex size-[30px] shrink-0 items-center justify-center rounded-[9px]",
+            active ? "bg-primary shadow-glow" : "bg-white/5"
+          )}
+        >
+          <Icon className={cn("size-4", active ? "text-white" : "text-text-secondary")} strokeWidth={2} />
+        </span>
+      )}
       <span className="truncate">{label}</span>
     </Link>
   );
