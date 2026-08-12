@@ -5,6 +5,7 @@ import { AccountMenu, type AccountMenuItem } from "@/components/app-shell/accoun
 import { MobileNav } from "@/components/app-shell/mobile-nav";
 import type { NavGroupItem } from "@/components/app-shell/sidebar-nav";
 import { SidebarNav } from "@/components/app-shell/sidebar-nav";
+import { ThemeSync } from "@/components/theme-sync";
 import { TopbarTitle } from "@/components/app-shell/topbar-title";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Logo } from "@/components/logo";
@@ -55,6 +56,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="flex min-h-full flex-1">
+      <ThemeSync accountTheme={admin.theme} />
       <aside className="sticky top-0 hidden h-dvh w-[17rem] shrink-0 flex-col border-e bg-sidebar md:flex">
         <Link href="/admin" className="flex items-center gap-2.5 border-b px-5 py-4">
           <Logo className="h-8" />
@@ -67,7 +69,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <SidebarNav groups={groups} />
         </div>
         <div className="border-t p-2">
-          <AccountMenu email={admin.name ?? admin.email ?? ""} items={accountItems} logoutSlot={<LogoutButton />} />
+          <AccountMenu email={admin.name ?? admin.email ?? ""} items={accountItems} logoutSlot={<LogoutButton />} theme={admin.theme} />
         </div>
       </aside>
 

@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { Theme } from "@/lib/theme/config";
 
 /**
  * Replaces the old sidebar-bottom AccountMenu (name/email + Workspace Profile/
@@ -25,10 +26,12 @@ export function ProfileMenu({
   name,
   identifier,
   logoutSlot,
+  theme,
 }: {
   name: string;
   identifier: string;
   logoutSlot: ReactNode;
+  theme: Theme;
 }) {
   const t = useTranslations("dashboard");
   const initial = name.charAt(0).toUpperCase();
@@ -57,7 +60,7 @@ export function ProfileMenu({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <div className="px-1 py-1">
-          <ThemeToggle />
+          <ThemeToggle theme={theme} />
         </div>
         <DropdownMenuSeparator />
         <div className="px-1 py-1">{logoutSlot}</div>

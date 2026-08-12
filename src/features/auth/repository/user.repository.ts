@@ -3,7 +3,7 @@ import { db } from "@/db/client";
 import { type NewUser, type User, users } from "@/db/schema";
 
 export const userRepository = {
-  async update(id: string, data: Partial<Pick<NewUser, "name">>): Promise<User> {
+  async update(id: string, data: Partial<Pick<NewUser, "name" | "theme">>): Promise<User> {
     const [user] = await db
       .update(users)
       .set({ ...data, updatedAt: new Date() })

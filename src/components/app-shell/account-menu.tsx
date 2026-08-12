@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { Theme } from "@/lib/theme/config";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,11 +26,13 @@ export function AccountMenu({
   email,
   items,
   logoutSlot,
+  theme,
   side = "top",
 }: {
   email: string;
   items: AccountMenuItem[];
   logoutSlot: ReactNode;
+  theme: Theme;
   side?: "top" | "bottom" | "right";
 }) {
   const initial = email.charAt(0).toUpperCase();
@@ -58,7 +61,7 @@ export function AccountMenu({
         ))}
         <DropdownMenuSeparator />
         <div className="px-1 py-1">
-          <ThemeToggle />
+          <ThemeToggle theme={theme} />
         </div>
         <DropdownMenuSeparator />
         <div className="px-1 py-1">{logoutSlot}</div>

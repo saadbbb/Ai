@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cairo, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
-import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { dirFor } from "@/i18n/config";
+import { resolveThemeFromCookie } from "@/lib/theme/resolve";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -34,13 +34,36 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * Every page's HTML depends on the NEXT_LOCALE cookie (see src/i18n/request.ts). Pages
- * that don't also read the session cookie (the public auth pages) don't get Next's
- * strong no-store cache-control by default, so Vercel's edge was caching one visitor's
- * locale and serving it publicly to everyone else. Forcing dynamic rendering everywhere
- * guarantees every response is private and locale-correct.
+ * Every page's HTML depends on the NEXT_LOCALE/theme cookies (see
+ * src/i18n/request.ts and below). Pages that don't also read the session
+ * cookie (the public auth pages) don't get Next's strong no-store
+ * cache-control by default, so Vercel's edge was caching one visitor's
+ * locale/theme and serving it publicly to everyone else. Forcing dynamic
+ * rendering everywhere guarantees every response is private and correct.
  */
 export const dynamic = "force-dynamic";
+
+/**
+ * Theme resolution (2026-08-12 rewrite): dark is the fixed default, light is
+ * an explicit opt-in — never the OS/browser's prefers-color-scheme. Resolved
+ * server-side from a cookie (fast, works for every visitor including logged-
+ * out ones) so the correct class and `color-scheme` are present in the very
+ * first byte of HTML, before any JS runs. This isn't just for FOUC — Android
+ * Chrome's "Auto Dark Theme for Web Contents" algorithmically re-darkens
+ * pages that don't declare their color-scheme in the initial server response
+ * (a JS-only fix, e.g. next-themes' old localStorage approach, runs too late
+ * for it), which was the actual root cause of the Android-only bug report.
+ *
+ * For a logged-in user, dashboard/onboarding layouts additionally reconcile
+ * this cookie against users.theme (the account-level, cross-device source of
+ * truth) client-side on mount — see components/theme-sync.tsx — since this
+ * root layout has no user context of its own and must stay fast for every
+ * public page (marketing, storefronts) that never call requireUser().
+ */
+export async function generateViewport(): Promise<Viewport> {
+  const theme = await resolveThemeFromCookie();
+  return { colorScheme: theme };
+}
 
 export default async function RootLayout({
   children,
@@ -49,22 +72,21 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const theme = await resolveThemeFromCookie();
 
   return (
     <html
       lang={locale}
       dir={dirFor(locale)}
-      className={`${jakarta.variable} ${geistMono.variable} ${cairo.variable} h-full antialiased`}
-      suppressHydrationWarning
+      className={`${jakarta.variable} ${geistMono.variable} ${cairo.variable} h-full antialiased ${theme === "light" ? "light" : ""}`}
+      style={{ colorScheme: theme }}
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
-          <ThemeProvider>
-            <TooltipProvider delayDuration={300}>
-              {children}
-              <Toaster />
-            </TooltipProvider>
-          </ThemeProvider>
+          <TooltipProvider delayDuration={300}>
+            {children}
+            <Toaster theme={theme} />
+          </TooltipProvider>
         </NextIntlClientProvider>
       </body>
     </html>

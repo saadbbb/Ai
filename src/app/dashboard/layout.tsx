@@ -6,6 +6,7 @@ import { AgentPicker, WorkspacePicker } from "@/components/app-shell/sidebar-swi
 import { MobileNav } from "@/components/app-shell/mobile-nav";
 import { ProfileMenu } from "@/components/app-shell/profile-menu";
 import { SidebarNav } from "@/components/app-shell/sidebar-nav";
+import { ThemeSync } from "@/components/theme-sync";
 import { TopbarTitle } from "@/components/app-shell/topbar-title";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Logo } from "@/components/logo";
@@ -120,6 +121,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const topBar = (
     <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-surface px-4 md:px-6 lg:px-8">
+      <ThemeSync accountTheme={user.theme} />
       <div className="flex min-w-0 items-center gap-3">
         <div className="md:hidden">
           <MobileNav
@@ -155,7 +157,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </Link>
         )}
         <LocaleSwitcher />
-        <ProfileMenu name={profileName} identifier={profileIdentifier} logoutSlot={<LogoutButton />} />
+        <ProfileMenu name={profileName} identifier={profileIdentifier} logoutSlot={<LogoutButton />} theme={user.theme} />
       </div>
     </header>
   );

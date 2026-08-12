@@ -1,30 +1,30 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { setThemeAction } from "@/lib/theme/actions";
+import type { Theme } from "@/lib/theme/config";
 
-/** Standalone, reusable — used from the account menu today and the Profile dropdown once that's rebuilt. */
-export function ThemeToggle() {
+/** Standalone, reusable — used from the topbar Profile menu today. Current theme comes from the server (see layout.tsx), never guessed client-side. */
+export function ThemeToggle({ theme }: { theme: Theme }) {
   const t = useTranslations("common");
-  const { resolvedTheme, setTheme } = useTheme();
-  // next-themes only knows the real theme after mount (it reads localStorage client-side) —
-  // rendering a guess before that would mismatch and could itself cause a flash.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [isSaving, setIsSaving] = useState(false);
+  const isDark = theme === "dark";
 
-  const isDark = mounted ? resolvedTheme === "dark" : true;
+  async function handleClick() {
+    setIsSaving(true);
+    await setThemeAction(isDark ? "light" : "dark");
+    // A soft router.refresh() re-runs Server Components but the App Router does
+    // not re-apply attributes the root layout puts on <html> (class, style,
+    // color-scheme) during a client-side transition — only a full navigation
+    // does. A hard reload is what actually makes the new theme take effect.
+    window.location.reload();
+  }
 
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className="w-full justify-start gap-2"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-    >
+    <Button type="button" variant="ghost" size="sm" className="w-full justify-start gap-2" onClick={handleClick} disabled={isSaving}>
       {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
       {isDark ? t("lightModeToggle") : t("darkModeToggle")}
     </Button>
