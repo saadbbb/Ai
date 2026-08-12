@@ -15,7 +15,8 @@ const INVITATION_TTL_DAYS = 7;
 /** Who performed a team-management action — logged to the workspace's own audit trail. */
 interface AuditActor {
   userId: string;
-  email: string;
+  name: string | null;
+  email: string | null;
 }
 
 function hashToken(token: string): string {
@@ -84,7 +85,7 @@ async function inviteMember(
   await workspaceAuditLogRepository.log({
     workspaceId: workspace.id,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "member_invited",
     targetType: "invitation",
     targetId: invitation.id,
@@ -102,7 +103,7 @@ async function revokeInvitation(workspaceId: string, invitationId: string, actor
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "invitation_revoked",
     targetType: "invitation",
     targetId: invitationId,
@@ -126,7 +127,7 @@ async function updateMemberRole(workspaceId: string, memberId: string, roleId: s
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "member_role_changed",
     targetType: "workspace_member",
     targetId: memberId,
@@ -146,7 +147,7 @@ async function removeMember(workspaceId: string, memberId: string, actor: AuditA
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "member_removed",
     targetType: "workspace_member",
     targetId: memberId,
@@ -190,7 +191,7 @@ async function acceptInvitation(token: string, user: User): Promise<{ workspaceI
   if (invitation.expiresAt.getTime() < Date.now()) {
     throw new AppError("VALIDATION_ERROR", "This invitation has expired.");
   }
-  if (invitation.email.toLowerCase() !== user.email.toLowerCase()) {
+  if (!user.email || invitation.email.toLowerCase() !== user.email.toLowerCase()) {
     throw new AppError("VALIDATION_ERROR", "This invitation was sent to a different email address.");
   }
 

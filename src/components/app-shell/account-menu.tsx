@@ -4,6 +4,7 @@ import { ChevronsUpDown } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,6 +56,10 @@ export function AccountMenu({
             </Link>
           </DropdownMenuItem>
         ))}
+        <DropdownMenuSeparator />
+        <div className="px-1 py-1">
+          <ThemeToggle />
+        </div>
         <DropdownMenuSeparator />
         <div className="px-1 py-1">{logoutSlot}</div>
       </DropdownMenuContent>

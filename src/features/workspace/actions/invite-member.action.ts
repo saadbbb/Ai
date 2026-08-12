@@ -17,7 +17,7 @@ export async function inviteMemberAction(input: unknown): Promise<ActionResult<{
   await requireWorkspacePermission(user.id, workspace.id, "workspace.members.invite");
 
   try {
-    const result = await teamService.inviteMember(workspace, { userId: user.id, email: user.email }, parsed.data.email, parsed.data.roleId);
+    const result = await teamService.inviteMember(workspace, { userId: user.id, name: user.name, email: user.email }, parsed.data.email, parsed.data.roleId);
     return actionOk(result);
   } catch (error) {
     return actionFail(error);

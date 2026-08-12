@@ -39,7 +39,7 @@ const { selectProvider } = await import("@/features/ai/router/ai-router");
 const { adsService } = await import("./ads.service");
 
 const WORKSPACE_ID = "workspace-1";
-const ACTOR = { userId: "user-1", email: "owner@example.com" };
+const ACTOR = { userId: "user-1", name: null, email: "owner@example.com" };
 
 function makeAttributionStat(overrides: Partial<{ contactCount: number; revenue: number; spend: number | null; cpl: number | null; roas: number | null }> = {}) {
   return {

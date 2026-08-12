@@ -24,7 +24,7 @@ export async function updatePlatformSettingsAction(input: unknown): Promise<Acti
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "platform_settings_updated",
       targetType: "platform_settings",
       summary: "Updated platform settings.",

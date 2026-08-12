@@ -20,7 +20,7 @@ export async function decideRefundAction(input: unknown): Promise<ActionResult<R
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "refund_status_changed",
       targetType: "refund",
       targetId: refund.id,

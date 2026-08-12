@@ -53,14 +53,14 @@ async function notifyMentionedMembers(workspaceId: string, contactId: string, co
   if (tokens.length === 0) return;
 
   const members = await membershipRepository.findMembersByWorkspaceId(workspaceId);
-  const mentioned = members.filter(({ user }) => tokens.includes(user.email.split("@")[0].toLowerCase()));
+  const mentioned = members.filter(({ user }) => user.email && tokens.includes(user.email.split("@")[0].toLowerCase()));
 
   for (const { user } of mentioned) {
     await notificationRepository.create({
       workspaceId,
       type: "mention",
       title: `You were mentioned: ${contactName}`,
-      message: `${user.email} was mentioned in a note about ${contactName}.`,
+      message: `${user.name ?? user.email} was mentioned in a note about ${contactName}.`,
       link: `/dashboard/contacts/${contactId}`,
     });
   }

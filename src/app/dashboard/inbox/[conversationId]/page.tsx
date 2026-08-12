@@ -68,7 +68,7 @@ export default async function ConversationPage({ params }: PageProps) {
             contact={data.contact}
             channel={data.channel}
             initialMessages={data.messages}
-            members={members.map(({ user: member }) => ({ id: member.id, email: member.email }))}
+            members={members.map(({ user: member }) => ({ id: member.id, email: member.name ?? member.email ?? member.phone ?? "" }))}
             initialTemplates={templates}
           />
         </div>

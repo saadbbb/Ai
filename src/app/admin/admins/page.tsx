@@ -16,7 +16,7 @@ export default async function PlatformAdminsPage() {
   return (
     <PageContainer>
       <PageHeader title={t("title")} description={t("description")} />
-      <AdminList initialAdmins={admins} bootstrapEmails={bootstrapEmails} currentUserEmail={admin.email} />
+      <AdminList initialAdmins={admins} bootstrapEmails={bootstrapEmails} currentUserEmail={admin.email ?? ""} />
     </PageContainer>
   );
 }

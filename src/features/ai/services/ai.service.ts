@@ -122,6 +122,7 @@ async function generateReply(
     policy,
     toolsEnabled: !!context,
     customerSummary: contact?.aiSummary,
+    creativity: platformSettings?.defaultCreativity ?? "medium",
   });
   const model = selectModel(history);
   const provider = selectProvider(model);

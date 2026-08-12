@@ -5,7 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { WorkflowConditionField, WorkflowConditionMatchType } from "@/db/schema";
 import type { ConditionsNodeData } from "./types";
 
-const CONDITION_FIELDS: WorkflowConditionField[] = ["tag", "language", "lead_score", "order_value", "working_hours"];
+// "working_hours" was dropped from the product (the AI replies 24/7 now) — no longer
+// selectable for new automations, but existing saved ones still evaluate fine (fails open).
+const CONDITION_FIELDS: WorkflowConditionField[] = ["tag", "language", "lead_score", "order_value"];
 const NUMERIC_FIELDS = new Set<WorkflowConditionField>(["lead_score", "order_value"]);
 const MAX_CONDITIONS = 5;
 

@@ -29,7 +29,7 @@ export async function saveCouponAction(input: unknown): Promise<ActionResult<Cou
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "coupon_created",
       targetType: "coupon",
       targetId: coupon.id,

@@ -1,5 +1,35 @@
 import { z } from "zod";
 import type { TranslateFn } from "@/i18n/config";
+import { normalizeIraqiPhone } from "../lib/phone";
+
+/** Accepts the local 07XXXXXXXXX format merchants actually type; normalizeIraqiPhone also accepts an already-international one. */
+function phoneField(t: TranslateFn) {
+  return z
+    .string()
+    .trim()
+    .refine((value) => normalizeIraqiPhone(value) !== null, t("phoneInvalid"));
+}
+
+export function createPhoneSignUpSchema(t: TranslateFn) {
+  return z
+    .object({
+      phone: phoneField(t),
+      password: z.string().min(8, t("passwordMin")),
+      confirmPassword: z.string().min(1, t("passwordRequired")),
+      acceptTerms: z.literal(true, { message: t("acceptTermsRequired") }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("passwordsMustMatch"),
+      path: ["confirmPassword"],
+    });
+}
+
+export function createPhoneLoginSchema(t: TranslateFn) {
+  return z.object({
+    phone: phoneField(t),
+    password: z.string().min(1, t("passwordRequired")),
+  });
+}
 
 export function createSignUpSchema(t: TranslateFn) {
   return z.object({
@@ -47,6 +77,8 @@ export function createVerifyOtpSchema(t: TranslateFn) {
 }
 
 export type SignUpInput = z.infer<ReturnType<typeof createSignUpSchema>>;
+export type PhoneSignUpInput = z.infer<ReturnType<typeof createPhoneSignUpSchema>>;
+export type PhoneLoginInput = z.infer<ReturnType<typeof createPhoneLoginSchema>>;
 export type LoginInput = z.infer<ReturnType<typeof createLoginSchema>>;
 export type RequestPasswordResetInput = z.infer<ReturnType<typeof createRequestPasswordResetSchema>>;
 export type SetNewPasswordInput = z.infer<ReturnType<typeof createSetNewPasswordSchema>>;

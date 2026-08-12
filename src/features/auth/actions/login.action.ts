@@ -44,10 +44,10 @@ export async function loginAction(input: unknown): Promise<ActionResult> {
           await workspaceAuditLogRepository.log({
             workspaceId: workspace.id,
             actorUserId: user.id,
-            actorEmail: user.email,
+            actorEmail: user.name ?? user.email ?? "Unknown",
             action: "login",
             targetType: "session",
-            summary: `${user.email} logged in.`,
+            summary: `${user.name ?? user.email} logged in.`,
           });
         } catch (error) {
           console.error("[login] failed to write audit log:", error);

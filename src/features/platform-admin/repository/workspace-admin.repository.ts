@@ -193,19 +193,6 @@ export const workspaceAdminRepository = {
     return rows.map((row) => ({ businessType: row.businessType as string, count: Number(row.count) }));
   },
 
-  /** Top self-reported countries from onboarding — feeds the Platform Analytics geographic-distribution chart. */
-  async countByCountry(limit = 10): Promise<{ country: string; count: number }[]> {
-    const countExpr = sql<number>`count(*)`;
-    const rows = await db
-      .select({ country: workspaces.country, count: countExpr })
-      .from(workspaces)
-      .where(isNotNull(workspaces.country))
-      .groupBy(workspaces.country)
-      .orderBy(desc(countExpr))
-      .limit(limit);
-    return rows.map((row) => ({ country: row.country as string, count: Number(row.count) }));
-  },
-
   /** Connected channels (not just created — every workspace gets a "manual" row by default) across every workspace, grouped by type — feeds the Platform Analytics "channel usage" chart. */
   async countConnectedChannelsByType(): Promise<{ channelType: ChannelType; count: number }[]> {
     const rows = await db

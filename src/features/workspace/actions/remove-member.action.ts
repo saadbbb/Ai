@@ -16,7 +16,7 @@ export async function removeMemberAction(input: unknown): Promise<ActionResult<u
   await requireWorkspacePermission(user.id, workspace.id, "workspace.members.manage");
 
   try {
-    await teamService.removeMember(workspace.id, parsed.data.memberId, { userId: user.id, email: user.email });
+    await teamService.removeMember(workspace.id, parsed.data.memberId, { userId: user.id, name: user.name, email: user.email });
     return actionOk(undefined);
   } catch (error) {
     return actionFail(error);

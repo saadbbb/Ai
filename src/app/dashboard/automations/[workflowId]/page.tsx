@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
+import { WORKSPACE_TIMEZONE } from "@/db/schema";
 import { describeAction, describeConditions, describeDelay, describeTrigger } from "@/features/automation/lib/describe-workflow";
 import { automationService } from "@/features/automation/services/automation.service";
 import { requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
@@ -34,7 +35,7 @@ export default async function WorkflowDetailPage({ params }: PageProps) {
 
   const { workflow, executions } = data;
   const formatter = new Intl.DateTimeFormat("en-GB", {
-    timeZone: workspace.timezone,
+    timeZone: WORKSPACE_TIMEZONE,
     dateStyle: "medium",
     timeStyle: "short",
   });

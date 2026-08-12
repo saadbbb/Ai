@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { StatTile } from "@/components/stat-grid";
+import { WORKSPACE_TIMEZONE } from "@/db/schema";
 import { dashboardService } from "@/features/dashboard/services/dashboard.service";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
@@ -12,7 +13,10 @@ import { contactRepository } from "@/features/inbox/repository/contact.repositor
 import { orderGrandTotal } from "@/features/orders/lib/order-total";
 import { orderRepository } from "@/features/orders/repository/order.repository";
 import { ImpersonationBanner } from "@/features/platform-admin/components/impersonation-banner";
+import { ResetPasswordButton } from "@/features/platform-admin/components/reset-password-button";
 import { auditLogRepository } from "@/features/platform-admin/repository/audit-log.repository";
+import { userRepository } from "@/features/auth/repository/user.repository";
+import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { workspaceRepository } from "@/features/workspace/repository/workspace.repository";
 import { requirePrimaryPlatformAdmin } from "@/lib/auth/auth-guard";
 
@@ -38,24 +42,26 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
   // trail exists for, regardless of how many times they've viewed it before.
   await auditLogRepository.log({
     actorUserId: admin.id,
-    actorEmail: admin.email,
+    actorEmail: admin.name ?? admin.email ?? "Unknown",
     action: "impersonation_started",
     targetType: "workspace",
     targetId: workspace.id,
     summary: `Viewed workspace "${workspace.name}" as Super Admin (read-only).`,
   });
 
-  const [summary, contacts, conversations, leads, orders, appointments] = await Promise.all([
+  const [summary, contacts, conversations, leads, orders, appointments, ownerUserId] = await Promise.all([
     dashboardService.getSummary(workspaceId),
     contactRepository.findByWorkspaceId(workspaceId),
     conversationRepository.findByWorkspaceId(workspaceId),
     leadRepository.findByWorkspaceId(workspaceId),
     orderRepository.findByWorkspaceId(workspaceId),
     appointmentRepository.findByWorkspaceId(workspaceId),
+    membershipRepository.findOwnerUserId(workspaceId),
   ]);
+  const owner = ownerUserId ? await userRepository.findById(ownerUserId) : null;
 
   const formatter = new Intl.DateTimeFormat("en-GB", {
-    timeZone: workspace.timezone,
+    timeZone: WORKSPACE_TIMEZONE,
     dateStyle: "medium",
     timeStyle: "short",
   });
@@ -65,6 +71,17 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
       <ImpersonationBanner workspaceName={workspace.name} />
 
       <PageHeader title={workspace.name} description={t("readOnlyNotice")} />
+
+      {owner && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4 shadow-sm">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-muted-foreground">{t("ownerHeading")}</p>
+            <p className="truncate text-sm font-semibold">{owner.name ?? "—"}</p>
+            <p className="truncate text-xs text-muted-foreground">{[owner.email, owner.phone].filter(Boolean).join(" · ")}</p>
+          </div>
+          <ResetPasswordButton userId={owner.id} />
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile label={t("stats.contacts")} value={summary.totalContacts} icon={Users} />

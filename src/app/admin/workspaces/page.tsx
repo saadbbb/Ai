@@ -16,7 +16,7 @@ export default async function AdminWorkspacesPage() {
     planRepository.findAll(),
     aiUsageAdminRepository.getByWorkspace(),
   ]);
-  const canImpersonate = platformAdminService.isBootstrapAdmin(admin.email);
+  const canImpersonate = platformAdminService.isBootstrapAdmin(admin.email ?? "");
 
   return (
     <PageContainer>

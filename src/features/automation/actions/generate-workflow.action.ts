@@ -33,7 +33,7 @@ export async function generateWorkflowAction(input: unknown): Promise<ActionResu
     await workspaceAuditLogRepository.log({
       workspaceId: workspace.id,
       actorUserId: user.id,
-      actorEmail: user.email,
+      actorEmail: user.name ?? user.email ?? "Unknown",
       action: "workflow_ai_generated",
       targetType: "workflow_draft",
       summary: `Generated an automation draft from: "${parsed.data.description}"`,

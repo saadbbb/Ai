@@ -46,7 +46,7 @@ const { checkRateLimit } = await import("@/lib/rate-limit/rate-limit");
 const { campaignService } = await import("./campaign.service");
 
 const WORKSPACE_ID = "workspace-1";
-const ACTOR = { userId: "user-1", email: "owner@example.com" };
+const ACTOR = { userId: "user-1", name: null, email: "owner@example.com" };
 
 function makeCampaign(overrides: Partial<Campaign> = {}): Campaign {
   return {

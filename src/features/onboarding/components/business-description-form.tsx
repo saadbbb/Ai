@@ -40,16 +40,16 @@ export function BusinessDescriptionForm({ defaultValues }: { defaultValues: Part
       return;
     }
 
-    router.push("/onboarding/language");
+    router.push("/onboarding/tone");
   });
 
   return (
-    <StepShell step={3} title={t("title")} description={t("description")}>
+    <StepShell step={6} title={t("title")} description={t("description")}>
       <form onSubmit={onSubmit} className="space-y-4">
         <Field label={t("label")} htmlFor="businessDescription" error={errors.businessDescription}>
           <Textarea id="businessDescription" rows={8} {...register("businessDescription")} />
         </Field>
-        <StepFooter backHref="/onboarding/agent-name" isSubmitting={isSubmitting} skipHref="/onboarding/language" />
+        <StepFooter backHref="/onboarding/agent-name" isSubmitting={isSubmitting} skipHref="/onboarding/tone" />
       </form>
     </StepShell>
   );

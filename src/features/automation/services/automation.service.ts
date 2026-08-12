@@ -16,7 +16,6 @@ import { calculateLeadScore } from "@/features/crm/lib/lead-score";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
 import { noteRepository } from "@/features/crm/repository/note.repository";
 import { taskRepository } from "@/features/crm/repository/task.repository";
-import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
 import { isWithinWorkingHours } from "@/features/ai/lib/working-hours";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { integrationService } from "@/features/integrations/services/integration.service";
@@ -175,8 +174,10 @@ async function evaluateConditions(
         return (await getContactLatestOrderValue(workspaceId, contact)) >= threshold;
       }
       if (rule.field === "working_hours") {
-        const agent = await aiAgentRepository.findByWorkspaceId(workspaceId);
-        return isWithinWorkingHours(agent?.workingHours);
+        // Working hours were removed from the product (the AI replies 24/7) — this
+        // condition can no longer be created, but existing saved automations that
+        // still reference it keep working exactly as if the business were always open.
+        return isWithinWorkingHours(undefined);
       }
       return false;
     }),
@@ -242,6 +243,7 @@ async function runAction(
       const ownerUserId = await membershipRepository.findOwnerUserId(workspaceId);
       const owner = ownerUserId ? await userRepository.findById(ownerUserId) : null;
       if (!owner) throw new AppError("INTERNAL_ERROR", "Workspace has no owner to email.");
+      if (!owner.email) return "Notified owner (in-app only — owner has no email on file)";
 
       await emailService.sendNotificationEmail({ to: owner.email, subject, text: message });
       return `Notified owner (in-app + emailed ${owner.email})`;

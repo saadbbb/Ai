@@ -31,6 +31,7 @@ export const auditActionEnum = pgEnum("audit_action", [
   "refund_created",
   "refund_status_changed",
   "workspace_deleted",
+  "user_password_reset",
 ]);
 
 export const auditLogs = pgTable(

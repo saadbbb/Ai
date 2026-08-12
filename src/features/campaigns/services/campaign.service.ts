@@ -22,7 +22,8 @@ interface CreateCampaignInput {
 
 interface CampaignActor {
   userId: string;
-  email: string;
+  name: string | null;
+  email: string | null;
 }
 
 /** {{contactName}} is the one variable supported today — the same "small, real, no over-engineering" bar as automation's own message actions. */
@@ -125,7 +126,7 @@ async function sendCampaign(workspaceId: string, campaignId: string, actor: Camp
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "campaign_sent",
     targetType: "campaign",
     targetId: campaignId,

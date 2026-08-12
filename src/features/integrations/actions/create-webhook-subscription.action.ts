@@ -20,6 +20,7 @@ export async function createWebhookSubscriptionAction(input: unknown): Promise<A
   try {
     const subscription = await integrationService.createWebhookSubscription(workspace.id, parsed.data.url, parsed.data.eventTypes, {
       userId: user.id,
+      name: user.name,
       email: user.email,
     });
     return actionOk(subscription);

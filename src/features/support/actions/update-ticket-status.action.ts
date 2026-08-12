@@ -15,7 +15,7 @@ export async function updateTicketStatusAction(input: unknown): Promise<ActionRe
   const admin = await requireWritePlatformAdmin();
 
   try {
-    const ticket = await ticketAdminService.updateStatus(admin.id, admin.email, parsed.data.ticketId, parsed.data.status);
+    const ticket = await ticketAdminService.updateStatus(admin.id, admin.name ?? admin.email ?? "Unknown", parsed.data.ticketId, parsed.data.status);
     return actionOk(ticket);
   } catch (error) {
     return actionFail(error);

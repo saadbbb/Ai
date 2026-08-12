@@ -23,7 +23,7 @@ export async function savePlanAction(input: unknown): Promise<ActionResult<Plan>
 
       await auditLogRepository.log({
         actorUserId: admin.id,
-        actorEmail: admin.email,
+        actorEmail: admin.name ?? admin.email ?? "Unknown",
         action: "plan_saved",
         targetType: "plan",
         targetId: updated.id,
@@ -37,7 +37,7 @@ export async function savePlanAction(input: unknown): Promise<ActionResult<Plan>
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "plan_saved",
       targetType: "plan",
       targetId: created.id,

@@ -14,7 +14,8 @@ import { generateWebhookSecret, signWebhookPayload } from "../lib/webhook-signat
 
 interface IntegrationActor {
   userId: string;
-  email: string;
+  name: string | null;
+  email: string | null;
 }
 
 async function listApiKeys(workspaceId: string): Promise<ApiKey[]> {
@@ -34,7 +35,7 @@ async function createApiKey(workspaceId: string, name: string, actor: Integratio
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "api_key_created",
     targetType: "api_key",
     targetId: apiKey.id,
@@ -51,7 +52,7 @@ async function revokeApiKey(workspaceId: string, id: string, actor: IntegrationA
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "api_key_revoked",
     targetType: "api_key",
     targetId: id,
@@ -87,7 +88,7 @@ async function createWebhookSubscription(
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "webhook_created",
     targetType: "webhook_subscription",
     targetId: subscription.id,
@@ -109,7 +110,7 @@ async function deleteWebhookSubscription(workspaceId: string, id: string, actor:
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "webhook_revoked",
     targetType: "webhook_subscription",
     targetId: id,

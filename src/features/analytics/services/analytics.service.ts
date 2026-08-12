@@ -105,7 +105,8 @@ export interface AnalyticsSummary {
 
 export interface TeamPerformanceRow {
   userId: string;
-  email: string;
+  name: string | null;
+  email: string | null;
   conversationsHandled: number;
   tasksCompleted: number;
   avgResponseMinutes: number | null;
@@ -342,6 +343,7 @@ async function getTeamPerformance(workspaceId: string, range: AnalyticsRange): P
   return members
     .map(({ user }) => ({
       userId: user.id,
+      name: user.name,
       email: user.email,
       conversationsHandled: conversationsByUser.get(user.id) ?? 0,
       tasksCompleted: tasksByUser.get(user.id) ?? 0,

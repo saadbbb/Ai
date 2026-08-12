@@ -17,9 +17,8 @@ export default async function AdminPlatformAnalyticsPage() {
   ]);
 
   const since = new Date(Date.now() - RETENTION_COHORT_DAYS * 24 * 60 * 60 * 1000);
-  const [byBusinessType, byCountry, byChannel, retention] = await Promise.all([
+  const [byBusinessType, byChannel, retention] = await Promise.all([
     workspaceAdminRepository.countByBusinessType(),
-    workspaceAdminRepository.countByCountry(),
     workspaceAdminRepository.countConnectedChannelsByType(),
     workspaceAdminRepository.retentionStats(since),
   ]);
@@ -43,11 +42,6 @@ export default async function AdminPlatformAnalyticsPage() {
         <BarChartCard
           title={t("topIndustries")}
           data={byBusinessType.map((row) => ({ label: row.businessType, value: row.count }))}
-          emptyMessage={t("empty")}
-        />
-        <BarChartCard
-          title={t("geographicDistribution")}
-          data={byCountry.map((row) => ({ label: row.country, value: row.count }))}
           emptyMessage={t("empty")}
         />
         <BarChartCard

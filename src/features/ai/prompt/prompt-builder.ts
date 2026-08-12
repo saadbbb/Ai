@@ -1,6 +1,5 @@
 import "server-only";
-import type { AiAgent, BusinessPolicy, Faq, Product, Service } from "@/db/schema";
-import { isWithinWorkingHours } from "../lib/working-hours";
+import type { AiAgent, AiCreativity, BusinessPolicy, Faq, Product, Service } from "@/db/schema";
 
 /** Keeps prompt size bounded regardless of how large a workspace's catalog grows. */
 const MAX_CATALOG_ITEMS = 50;
@@ -25,12 +24,6 @@ const CREATIVITY_DESCRIPTIONS: Record<string, string> = {
   high: "Be more conversational, expressive, and varied in phrasing, while staying accurate to the information provided below.",
 };
 
-const LANGUAGE_NAMES: Record<string, string> = {
-  ar: "Arabic",
-  en: "English",
-  ku: "Kurdish",
-};
-
 interface BuildSystemPromptInput {
   agent: AiAgent;
   faqs: Faq[];
@@ -40,12 +33,23 @@ interface BuildSystemPromptInput {
   toolsEnabled?: boolean;
   /** Long-term memory (PART 4 Layer 4) — the returning customer's stored contacts.aiSummary, if any. */
   customerSummary?: string | null;
+  /**
+   * Platform-wide, not per-merchant (see platform_settings.defaultCreativity —
+   * PART 3 follow-up, 2026-08-12: merchants no longer choose this themselves).
+   */
+  creativity: AiCreativity;
 }
 
-export function buildSystemPrompt(
-  { agent, faqs, products, services, policy, toolsEnabled, customerSummary }: BuildSystemPromptInput,
-  now: Date = new Date(),
-): string {
+export function buildSystemPrompt({
+  agent,
+  faqs,
+  products,
+  services,
+  policy,
+  toolsEnabled,
+  customerSummary,
+  creativity,
+}: BuildSystemPromptInput): string {
   const sections: string[] = [];
 
   sections.push(
@@ -63,10 +67,10 @@ export function buildSystemPrompt(
   }
 
   sections.push(
-    `Always reply in ${LANGUAGE_NAMES[agent.language] ?? agent.language}, regardless of what language the customer writes in.`,
+    "Always reply in the same language the customer's most recent message is written in — match them, don't ask which language to use.",
   );
   sections.push(`Tone: ${TONE_DESCRIPTIONS[agent.tone] ?? agent.tone}`);
-  sections.push(`Style: ${CREATIVITY_DESCRIPTIONS[agent.creativity] ?? agent.creativity}`);
+  sections.push(`Style: ${CREATIVITY_DESCRIPTIONS[creativity] ?? creativity}`);
 
   if (faqs.length > 0) {
     const faqText = faqs
@@ -105,16 +109,6 @@ export function buildSystemPrompt(
       })
       .join("\n");
     sections.push(`Services:\n${serviceText}`);
-  }
-
-  if (agent.workingHours) {
-    sections.push(
-      isWithinWorkingHours(agent.workingHours, now)
-        ? "The business is currently open."
-        : `The business is currently closed right now.${
-            agent.workingHours.holidayNotes ? ` (${agent.workingHours.holidayNotes})` : ""
-          } You can still answer questions and take down what the customer needs, but let them know a team member will follow up once the business reopens if their request needs a person.`,
-    );
   }
 
   const policyLines: string[] = [];

@@ -526,6 +526,27 @@
       "when": 1786212294896,
       "tag": "0074_yummy_red_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1786549016832,
+      "tag": "0075_slippery_sue_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1786551802326,
+      "tag": "0076_tiresome_nightshade",
+      "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1786556759689,
+      "tag": "0077_normal_maverick",
+      "breakpoints": true
     }
   ]
 }

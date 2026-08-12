@@ -21,7 +21,7 @@ export async function setCouponActiveAction(input: unknown): Promise<ActionResul
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "coupon_status_changed",
       targetType: "coupon",
       targetId: coupon.id,

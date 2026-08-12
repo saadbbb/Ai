@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     format,
     "team-performance",
     "Team Performance",
-    ["Email", "Conversations Handled", "Tasks Completed", "Avg Response Time (minutes)"],
-    rows.map((row) => [row.email, row.conversationsHandled, row.tasksCompleted, row.avgResponseMinutes ?? ""]),
+    ["Agent", "Conversations Handled", "Tasks Completed", "Avg Response Time (minutes)"],
+    rows.map((row) => [row.name ?? row.email ?? "", row.conversationsHandled, row.tasksCompleted, row.avgResponseMinutes ?? ""]),
   );
 }

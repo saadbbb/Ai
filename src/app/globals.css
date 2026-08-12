@@ -86,10 +86,11 @@
 }
 
 /*
- * Yaqiz — "Vigilant" design system. Dark-only by design: the approved
- * reference (design PDF) defines a single dark visual identity with no
- * light-mode variant and no theme toggle, so this app intentionally has
- * only one theme.
+ * Yaqiz — "Vigilant" design system. Dark is the fixed, unconditional base
+ * look — :root itself holds the dark palette so there's never a flash of an
+ * unstyled/wrong theme before JS hydrates. Light mode (below, `.light`) is a
+ * genuine second palette reached only through an explicit user toggle (see
+ * ThemeProvider / next-themes) — never the OS/browser preference.
  */
 :root {
   --background: #0a0c11;
@@ -178,6 +179,94 @@
   --sidebar-ring: rgba(109, 99, 246, 0.5);
 
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Genuine light palette — light surfaces, dark text, same violet/mint brand colors. */
+.light {
+  --background: #f7f7fb;
+  --foreground: #14161f;
+  --card: #ffffff;
+  --card-foreground: #14161f;
+  --card-hover: #f4f4f9;
+  --popover: #ffffff;
+  --popover-foreground: #14161f;
+
+  --primary: #6d63f6;
+  --primary-hover: #5a51e0;
+  --primary-active: #4a42c4;
+  --primary-soft: rgba(109, 99, 246, 0.1);
+  --primary-glow: rgba(109, 99, 246, 0.25);
+  --primary-foreground: #ffffff;
+
+  --secondary: #f0f1f5;
+  --secondary-hover: #e6e8ee;
+  --secondary-foreground: #14161f;
+
+  --muted: #f0f1f5;
+  --muted-foreground: #6b7280;
+
+  --accent: #2ad9a8;
+  --accent-hover: #22c296;
+  --accent-soft: rgba(42, 217, 168, 0.12);
+  --accent-foreground: #06120e;
+
+  --surface: #f7f7fb;
+  --surface-elevated: #ffffff;
+  --text-primary: #14161f;
+  --text-secondary: #565c6b;
+  --text-muted: #8a8f9c;
+
+  --destructive: #e0435c;
+  --error: #e0435c;
+  --error-soft: rgba(224, 67, 92, 0.1);
+  --error-foreground: #ffffff;
+
+  --success: #2ad9a8;
+  --success-soft: rgba(42, 217, 168, 0.12);
+  --success-foreground: #06120e;
+
+  --warning: #f5b942;
+  --warning-soft: rgba(245, 185, 66, 0.14);
+  --warning-foreground: #241a02;
+
+  --info: #4fb6f0;
+  --info-soft: rgba(79, 182, 240, 0.14);
+  --info-foreground: #ffffff;
+
+  --disabled: #e2e4ea;
+
+  --border: rgba(20, 22, 31, 0.1);
+  --border-strong: rgba(20, 22, 31, 0.16);
+  --input: rgba(20, 22, 31, 0.16);
+  --ring: rgba(109, 99, 246, 0.5);
+
+  --chart-1: #6d63f6;
+  --chart-2: #2ad9a8;
+  --chart-3: #4fb6f0;
+  --chart-4: #f5b942;
+  --chart-5: #f1596b;
+
+  --status-good: #2ad9a8;
+  --status-warning: #f5b942;
+  --status-serious: #f08a4b;
+  --status-critical: #f1596b;
+
+  --card-ring: rgba(20, 22, 31, 0.08);
+
+  --elevation-xs: 0 1px 1px rgba(20, 22, 31, 0.06);
+  --elevation-sm: 0 1px 2px rgba(20, 22, 31, 0.08);
+  --elevation-md: 0 8px 24px rgba(20, 22, 31, 0.1);
+  --elevation-lg: 0 20px 50px rgba(20, 22, 31, 0.14);
+  --elevation-glow: 0 0 0 1px rgba(109, 99, 246, 0.2), 0 8px 30px rgba(109, 99, 246, 0.14);
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #14161f;
+  --sidebar-primary: #6d63f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(109, 99, 246, 0.1);
+  --sidebar-accent-foreground: #14161f;
+  --sidebar-border: rgba(20, 22, 31, 0.1);
+  --sidebar-ring: rgba(109, 99, 246, 0.5);
 }
 
 html[dir="rtl"] {

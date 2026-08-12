@@ -1,11 +1,10 @@
 import { z } from "zod";
 import type { TranslateFn } from "@/i18n/config";
 
-export function createAgentNameSchema(t: TranslateFn) {
-  return z.object({
-    name: z.string().trim().min(1, t("agentNameRequired")).max(100),
-  });
-}
+/** Onboarding's agent-name step is optional — a blank name falls back to a default (see onboardingService.saveAgentName). */
+export const agentNameSchema = z.object({
+  name: z.string().trim().max(100),
+});
 
 export function createBusinessDescriptionSchema(t: TranslateFn) {
   return z.object({
@@ -82,7 +81,7 @@ export const personalitySchema = z.object({
   creativity: creativityEnumSchema,
 });
 
-export type AgentNameInput = z.infer<ReturnType<typeof createAgentNameSchema>>;
+export type AgentNameInput = z.infer<typeof agentNameSchema>;
 export type BusinessDescriptionInput = z.infer<ReturnType<typeof createBusinessDescriptionSchema>>;
 export type AgentProfileInput = z.infer<ReturnType<typeof createAgentProfileSchema>>;
 export type PersonalityInput = z.infer<typeof personalitySchema>;

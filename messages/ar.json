@@ -18,6 +18,8 @@
     "skip": "تخطي",
     "confirmDelete": "هل أنت متأكد من حذف هذا؟",
     "exportCsv": "تصدير CSV",
+    "lightModeToggle": "الوضع النهاري",
+    "darkModeToggle": "الوضع الليلي",
     "exportExcel": "تصدير Excel",
     "exportPdf": "تصدير PDF",
     "search": "بحث",
@@ -35,7 +37,9 @@
       "submit": "إنشاء الحساب",
       "submitting": "جارٍ إنشاء الحساب...",
       "haveAccount": "لديك حساب بالفعل؟",
-      "login": "تسجيل الدخول"
+      "login": "تسجيل الدخول",
+      "phoneLabel": "رقم الهاتف",
+      "confirmPasswordLabel": "تأكيد كلمة المرور"
     },
     "google": {
       "continueWithGoogle": "المتابعة باستخدام Google",
@@ -56,7 +60,7 @@
     },
     "login": {
       "title": "تسجيل الدخول",
-      "description": "مرحباً بعودتك.",
+      "description": "سعداء برجوعك! سجّل الدخول لمتابعة العمل مع موظفك الذكي.",
       "emailLabel": "البريد الإلكتروني",
       "passwordLabel": "كلمة المرور",
       "forgotPassword": "نسيت كلمة المرور؟",
@@ -64,7 +68,8 @@
       "submit": "تسجيل الدخول",
       "submitting": "جارٍ تسجيل الدخول...",
       "noAccount": "ليس لديك حساب؟",
-      "signUp": "إنشاء حساب"
+      "signUp": "إنشاء حساب",
+      "phoneLabel": "رقم الهاتف"
     },
     "forgotPassword": {
       "title": "نسيت كلمة المرور",
@@ -89,7 +94,14 @@
       "invalidLinkTitle": "انتهت صلاحية هذا الرمز",
       "invalidLinkDescription": "اطلب رمز إعادة تعيين جديداً وحاول مرة أخرى."
     },
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "forgotPasswordPhone": {
+      "title": "نسيت كلمة المرور؟",
+      "description": "حسابات الهاتف لا تستخدم رمز تحقق — تواصل مع الدعم وراح نعيد تعيينها لك.",
+      "contactSupport": "تواصل مع الدعم عبر واتساب",
+      "noContactConfigured": "وسيلة التواصل مع الدعم غير مُعدّة بعد. يرجى التواصل معنا بأي طريقة أخرى متاحة لديك.",
+      "backToLogin": "رجوع لتسجيل الدخول"
+    }
   },
   "validation": {
     "emailInvalid": "أدخل بريداً إلكترونياً صحيحاً.",
@@ -98,11 +110,12 @@
     "acceptTermsRequired": "يجب الموافقة على الشروط للمتابعة.",
     "passwordRequired": "كلمة المرور مطلوبة.",
     "nameRequired": "اسم النشاط التجاري مطلوب.",
+    "ownerNameRequired": "اسمك مطلوب.",
     "businessTypeRequired": "نوع النشاط التجاري مطلوب.",
-    "countryRequired": "الدولة مطلوبة.",
-    "timezoneRequired": "المنطقة الزمنية مطلوبة.",
     "agentNameRequired": "أعطِ موظفك الذكي اسماً.",
-    "businessDescriptionRequired": "أخبرنا عن نشاطك التجاري."
+    "businessDescriptionRequired": "أخبرنا عن نشاطك التجاري.",
+    "phoneInvalid": "ادخل رقم هاتف عراقي صحيح (07XXXXXXXXX).",
+    "passwordsMustMatch": "كلمتا المرور غير متطابقتين."
   },
   "onboarding": {
     "languages": {
@@ -110,17 +123,23 @@
       "en": "الإنجليزية",
       "ku": "الكردية"
     },
+    "ownerName": {
+      "title": "قبل أن نبدأ، من أنت؟",
+      "description": "هذا الاسم سيظهر في حسابك ولوحة التحكم.",
+      "nameLabel": "اسمك الكامل",
+      "namePlaceholder": "مثال: أحمد محمد"
+    },
     "business": {
       "title": "أخبرنا عن نشاطك التجاري",
       "description": "هذا يساعد موظفك الذكي على تقديم نشاطك التجاري بشكل صحيح.",
-      "nameLabel": "اسم النشاط التجاري",
-      "businessTypeLabel": "نوع النشاط التجاري",
-      "businessTypePlaceholder": "اختر نوع النشاط التجاري",
-      "countryLabel": "الدولة",
-      "timezoneLabel": "المنطقة الزمنية",
-      "languageLabel": "لغة لوحة التحكم",
-      "logoLabel": "رابط الشعار (اختياري)",
-      "businessTypes": {
+      "nameLabel": "اسم النشاط التجاري"
+    },
+    "businessType": {
+      "title": "ما نوع نشاطك التجاري؟",
+      "description": "هذا يساعدنا على تخصيص تجربتك بشكل أفضل.",
+      "fieldLabel": "نوع النشاط التجاري",
+      "placeholder": "اختر نوع النشاط التجاري",
+      "options": {
         "smallBusiness": "مشروع صغير",
         "clinic": "عيادة",
         "restaurant": "مطعم",
@@ -136,6 +155,14 @@
         "other": "أخرى"
       }
     },
+    "logo": {
+      "title": "أضف شعار نشاطك",
+      "description": "سيظهر هذا الشعار لعملائك. يمكنك تخطي هذه الخطوة وإضافته لاحقاً.",
+      "uploadLabel": "رفع صورة",
+      "changeLabel": "تغيير الصورة",
+      "removeLabel": "إزالة",
+      "uploadHint": "PNG أو JPG، بحد أقصى 5 ميجابايت"
+    },
     "agentName": {
       "title": "أنشئ موظفك الذكي",
       "description": "أعطِ موظفك الذكي اسماً — هذا من سيتحدث معه عملاؤك.",
@@ -146,10 +173,6 @@
       "title": "صف نشاطك التجاري",
       "description": "من أنتم؟ ماذا تبيعون؟ كيف يجب أن يتصرف الذكاء الاصطناعي؟ ما الذي يميز شركتكم؟",
       "label": "وصف النشاط التجاري"
-    },
-    "language": {
-      "title": "بأي لغة يجب أن يرد ذكاؤك الاصطناعي؟",
-      "description": "هذه هي اللغة التي يستخدمها موظفك الذكي عند التحدث مع العملاء."
     },
     "tone": {
       "title": "اختر أسلوب ذكائك الاصطناعي",
@@ -162,41 +185,6 @@
         "casual": "غير رسمي",
         "medical": "طبي",
         "corporate": "مؤسسي"
-      }
-    },
-    "creativity": {
-      "title": "ما مدى إبداع ذكائك الاصطناعي؟",
-      "description": "هذا يتحكم في مدى تنوّع ردود ذكائك الاصطناعي.",
-      "options": {
-        "low": {
-          "label": "منخفض",
-          "description": "يلتزم بالحقائق والردود الجاهزة."
-        },
-        "medium": {
-          "label": "متوسط",
-          "description": "متوازن — طبيعي لكن يمكن توقعه."
-        },
-        "high": {
-          "label": "عالٍ",
-          "description": "أكثر حيوية وتعبيراً في المحادثة."
-        }
-      }
-    },
-    "hours": {
-      "title": "حدّد ساعات العمل",
-      "description": "يمكن لذكائك الاصطناعي إخبار العملاء بأوقات توفر الفريق.",
-      "timezoneLabel": "المنطقة الزمنية",
-      "closedLabel": "مغلق",
-      "holidayNotesLabel": "ملاحظات العطلات / أيام الإغلاق (اختياري)",
-      "holidayNotesPlaceholder": "مثال: مغلق في العطلات الرسمية",
-      "weekdays": {
-        "mon": "الاثنين",
-        "tue": "الثلاثاء",
-        "wed": "الأربعاء",
-        "thu": "الخميس",
-        "fri": "الجمعة",
-        "sat": "السبت",
-        "sun": "الأحد"
       }
     },
     "handover": {
@@ -269,12 +257,9 @@
     "integrationsLink": "التكاملات",
     "campaignsLink": "الحملات",
     "adsLink": "الإعلانات",
-    "accountMenuLabel": "إعدادات مساحة العمل",
-    "workspaceProfileLink": "ملف مساحة العمل",
-    "billingLink": "الفوترة",
-    "teamLink": "الفريق",
-    "auditLogLink": "سجل التدقيق",
-    "supportLink": "الدعم",
+    "manageBusinessLink": "إدارة نشاطك",
+    "workspaceSwitcherLabel": "اختر المشروع",
+    "agentSwitcherLabel": "اختر موظفك الذكاء الاصطناعي",
     "platformAdminLink": "لوحة الإدارة",
     "bands": {
       "today": {
@@ -792,6 +777,23 @@
       "killSwitchOffHint": "الردود الذكية معطّلة — يتم تحويل محادثات جميع مساحات العمل إلى موظف بشري تلقائياً.",
       "enabledToast": "تم إعادة تفعيل الردود الذكية.",
       "disabledToast": "تم تعطيل الردود الذكية على مستوى المنصة.",
+      "defaultCreativityLabel": "إبداع الذكاء الاصطناعي الافتراضي",
+      "defaultCreativityHint": "يتحكم في مدى تنوّع ردود الذكاء الاصطناعي في جميع مساحات العمل — لم يعد هذا خياراً لكل تاجر.",
+      "defaultCreativitySavedToast": "تم حفظ مستوى الإبداع الافتراضي.",
+      "creativity": {
+        "low": {
+          "label": "منخفض",
+          "description": "يلتزم بالحقائق والردود الجاهزة."
+        },
+        "medium": {
+          "label": "متوسط",
+          "description": "متوازن — طبيعي لكن يمكن توقعه."
+        },
+        "high": {
+          "label": "عالٍ",
+          "description": "أكثر حيوية وتعبيراً في المحادثة."
+        }
+      },
       "byModelHeading": "حسب النموذج",
       "emptyState": "لا توجد طلبات ذكاء اصطناعي مسجّلة بعد.",
       "modelRequests": "{count} طلب",
@@ -1092,7 +1094,14 @@
       "ordersHeading": "الطلبات",
       "appointmentsHeading": "المواعيد",
       "empty": "لا يوجد شيء هنا بعد.",
-      "noMessages": "لا توجد رسائل بعد."
+      "noMessages": "لا توجد رسائل بعد.",
+      "ownerHeading": "حساب المالك"
+    },
+    "workspaceDetail": {
+      "resetPassword": "إعادة تعيين كلمة المرور",
+      "resettingPassword": "جارٍ إعادة التعيين...",
+      "passwordResetDone": "تمت إعادة تعيين كلمة المرور. شارك كلمة المرور الجديدة مع المالك.",
+      "passwordResetInstructions": "كلمة مرور مؤقتة جديدة — شاركها مع صاحب الحساب مباشرة. لن تظهر مرة أخرى."
     }
   },
   "automations": {
@@ -1769,7 +1778,7 @@
     "pageTitle": "الموظف الذكي",
     "pageDescription": "أدر كيف يتصرف موظفك الذكي ويرد على العملاء.",
     "businessInfoTitle": "معلومات النشاط التجاري",
-    "businessInfoDescription": "تفاصيل نشاطك التجاري ولغة لوحة التحكم.",
+    "businessInfoDescription": "تفاصيل نشاطك التجاري.",
     "agentProfileTitle": "الموظف الذكي",
     "agentProfileDescription": "اسم موظفك الذكي ووصف نشاطك التجاري.",
     "personalityTitle": "الشخصية",
@@ -1782,8 +1791,10 @@
     "handoverOff": "التحويل معطّل"
   },
   "workspaceProfile": {
-    "pageTitle": "ملف مساحة العمل",
-    "pageDescription": "تفاصيل نشاطك التجاري ولغة لوحة التحكم."
+    "pageTitle": "إدارة نشاطك",
+    "pageDescription": "تفاصيل نشاطك التجاري.",
+    "logoUrlLabel": "رابط الشعار (اختياري)",
+    "profileTabLabel": "معلومات النشاط"
   },
   "auditLog": {
     "pageTitle": "سجل النشاط",

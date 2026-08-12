@@ -16,7 +16,7 @@ export async function updateMemberRoleAction(input: unknown): Promise<ActionResu
   await requireWorkspacePermission(user.id, workspace.id, "workspace.members.manage");
 
   try {
-    await teamService.updateMemberRole(workspace.id, parsed.data.memberId, parsed.data.roleId, { userId: user.id, email: user.email });
+    await teamService.updateMemberRole(workspace.id, parsed.data.memberId, parsed.data.roleId, { userId: user.id, name: user.name, email: user.email });
     return actionOk(undefined);
   } catch (error) {
     return actionFail(error);

@@ -20,7 +20,7 @@ export async function createRefundAction(input: unknown): Promise<ActionResult<R
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "refund_created",
       targetType: "refund",
       targetId: refund.id,

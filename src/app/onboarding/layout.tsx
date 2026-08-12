@@ -21,7 +21,9 @@ export default async function OnboardingLayout({ children }: { children: React.R
           <span className="font-heading text-sm font-semibold">{t("name")}</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden text-sm text-muted-foreground sm:inline">{user.email}</span>
+          <span className="hidden text-sm text-muted-foreground sm:inline">
+            {user.name ?? user.email ?? user.phone}
+          </span>
           <LogoutButton />
         </div>
       </div>

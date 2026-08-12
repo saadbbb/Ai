@@ -26,9 +26,11 @@ export const requireUser = cache(async (): Promise<User> => {
   const {
     data: { user: supabaseUser },
   } = await supabase.auth.getUser();
-  if (!supabaseUser || !supabaseUser.email) redirect("/login");
+  if (!supabaseUser || (!supabaseUser.email && !supabaseUser.phone)) redirect("/login");
 
-  const user = (await userRepository.findById(supabaseUser.id)) ?? (await profileSyncService.ensureLocalUser(supabaseUser.id, supabaseUser.email));
+  const user =
+    (await userRepository.findById(supabaseUser.id)) ??
+    (await profileSyncService.ensureLocalUser(supabaseUser.id, { email: supabaseUser.email, phone: supabaseUser.phone }));
 
   return user;
 });
@@ -62,7 +64,9 @@ export const requireWorkspaceForUser = cache(async (userId: string): Promise<Wor
  */
 export const requirePlatformAdmin = cache(async (): Promise<User> => {
   const user = await requireUser();
-  const isAdmin = await platformAdminService.isPlatformAdmin(user.email);
+  // Platform admins are always email-identified (Yaqiz staff) — a phone-only user
+  // (empty string here) can never match and is correctly always rejected.
+  const isAdmin = await platformAdminService.isPlatformAdmin(user.email ?? "");
   if (!isAdmin) redirect("/dashboard");
 
   return user;
@@ -78,7 +82,7 @@ export const requirePlatformAdmin = cache(async (): Promise<User> => {
  */
 export const requireWritePlatformAdmin = cache(async (): Promise<User> => {
   const user = await requirePlatformAdmin();
-  if (await platformAdminService.isReadOnly(user.email)) redirect("/admin");
+  if (await platformAdminService.isReadOnly(user.email ?? "")) redirect("/admin");
   return user;
 });
 
@@ -90,7 +94,7 @@ export const requireWritePlatformAdmin = cache(async (): Promise<User> => {
  */
 export const requirePrimaryPlatformAdmin = cache(async (): Promise<User> => {
   const user = await requirePlatformAdmin();
-  if (!platformAdminService.isBootstrapAdmin(user.email)) redirect("/admin/workspaces");
+  if (!platformAdminService.isBootstrapAdmin(user.email ?? "")) redirect("/admin/workspaces");
 
   return user;
 });

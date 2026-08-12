@@ -15,6 +15,6 @@ export async function createRecoveryWorkspaceAction(): Promise<void> {
   const existing = await workspaceService.getPrimaryWorkspaceForUser(user.id);
   if (existing) redirect("/dashboard");
 
-  await workspaceService.createWorkspaceForNewUser(user.id, user.email);
-  redirect("/onboarding/business");
+  await workspaceService.createWorkspaceForNewUser(user.id, user.email ?? user.phone ?? user.id);
+  redirect("/onboarding/owner-name");
 }

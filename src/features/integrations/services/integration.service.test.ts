@@ -64,7 +64,7 @@ const { automationService } = await import("@/features/automation/services/autom
 const { integrationService } = await import("./integration.service");
 
 const WORKSPACE_ID = "workspace-1";
-const ACTOR = { userId: "user-1", email: "owner@example.com" };
+const ACTOR = { userId: "user-1", name: null, email: "owner@example.com" };
 
 beforeEach(() => {
   vi.clearAllMocks();

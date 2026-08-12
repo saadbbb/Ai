@@ -18,6 +18,8 @@
     "skip": "پەڕاندن",
     "confirmDelete": "دڵنیایت لە سڕینەوەی ئەمە؟",
     "exportCsv": "هەناردەکردنی CSV",
+    "lightModeToggle": "دۆخی ڕووناکی",
+    "darkModeToggle": "دۆخی تاریکی",
     "exportExcel": "هەناردەکردنی Excel",
     "exportPdf": "هەناردەکردنی PDF",
     "search": "گەڕان",
@@ -35,7 +37,9 @@
       "submit": "هەژمار دروست بکە",
       "submitting": "هەژمار دروست دەکرێت...",
       "haveAccount": "هەژمارت هەیە؟",
-      "login": "چوونەژوورەوە"
+      "login": "چوونەژوورەوە",
+      "phoneLabel": "ژمارەی مۆبایل",
+      "confirmPasswordLabel": "دووپاتکردنەوەی وشەی نهێنی"
     },
     "google": {
       "continueWithGoogle": "بەردەوامبوون بە Google",
@@ -56,7 +60,7 @@
     },
     "login": {
       "title": "چوونەژوورەوە",
-      "description": "بەخێربێیتەوە.",
+      "description": "دڵخۆشین بە گەڕانەوەت! چوونەژوورەوە بکە بۆ بەردەوامبوون لەگەڵ کارمەندە زیرەکەکەت.",
       "emailLabel": "ئیمەیل",
       "passwordLabel": "وشەی نهێنی",
       "forgotPassword": "وشەی نهێنیت لەبیرچووە؟",
@@ -64,7 +68,8 @@
       "submit": "چوونەژوورەوە",
       "submitting": "چوونەژوورەوە...",
       "noAccount": "هەژمارت نییە؟",
-      "signUp": "هەژمار دروست بکە"
+      "signUp": "هەژمار دروست بکە",
+      "phoneLabel": "ژمارەی مۆبایل"
     },
     "forgotPassword": {
       "title": "وشەی نهێنی لەبیرچووە",
@@ -89,7 +94,14 @@
       "invalidLinkTitle": "کاتی ئەم کۆدە بەسەرچووە",
       "invalidLinkDescription": "داوای کۆدێکی نوێی ڕێکخستنەوە بکە و دووبارە هەوڵ بدەرەوە."
     },
-    "logout": "چوونەدەرەوە"
+    "logout": "چوونەدەرەوە",
+    "forgotPasswordPhone": {
+      "title": "وشەی نهێنیت لەبیرچووە؟",
+      "description": "هەژمارە مۆبایلەکان کۆدی پشتڕاستکردنەوە بەکارناهێنن — پەیوەندی بە پشتگیری بکە و ئێمە بۆت ڕێکی دەخەینەوە.",
+      "contactSupport": "پەیوەندی بە پشتگیری بکە لە WhatsApp",
+      "noContactConfigured": "ڕێگای پەیوەندی بە پشتگیری هێشتا ئامادە نەکراوە. تکایە بە هەر ڕێگایەکی تر پەیوەندیمان پێوە بکە.",
+      "backToLogin": "گەڕانەوە بۆ چوونەژوورەوە"
+    }
   },
   "validation": {
     "emailInvalid": "ئیمەیلێکی دروست بنووسە.",
@@ -98,11 +110,12 @@
     "acceptTermsRequired": "بۆ بەردەوامبوون دەبێت ڕازیبیت لەسەر مەرجەکان.",
     "passwordRequired": "وشەی نهێنی پێویستە.",
     "nameRequired": "ناوی بزنس پێویستە.",
+    "ownerNameRequired": "ناوت پێویستە.",
     "businessTypeRequired": "جۆری بزنس پێویستە.",
-    "countryRequired": "وڵات پێویستە.",
-    "timezoneRequired": "ناوچەی کاتی پێویستە.",
     "agentNameRequired": "ناوێک بدە بە کارمەندە زیرەکەکەت.",
-    "businessDescriptionRequired": "دەربارەی بزنسەکەت پێمان بڵێ."
+    "businessDescriptionRequired": "دەربارەی بزنسەکەت پێمان بڵێ.",
+    "phoneInvalid": "ژمارەیەکی مۆبایلی دروستی عێراقی بنووسە (07XXXXXXXXX).",
+    "passwordsMustMatch": "وشەی نهێنیەکان وەک یەک نین."
   },
   "onboarding": {
     "languages": {
@@ -110,17 +123,23 @@
       "en": "ئینگلیزی",
       "ku": "کوردی"
     },
+    "ownerName": {
+      "title": "پێش دەستپێکردن، تۆ کێیت؟",
+      "description": "ئەم ناوە لە هەژمار و داشبۆردەکەت دەردەکەوێت.",
+      "nameLabel": "ناوی تەواوت",
+      "namePlaceholder": "بۆ نموونە: ئەحمەد محەمەد"
+    },
     "business": {
       "title": "دەربارەی بزنسەکەت پێمان بڵێ",
       "description": "ئەمە یارمەتی کارمەندە زیرەکەکەت دەدات تا بزنسەکەت بە دروستی پێشکەش بکات.",
-      "nameLabel": "ناوی بزنس",
-      "businessTypeLabel": "جۆری بزنس",
-      "businessTypePlaceholder": "جۆری بزنس هەڵبژێرە",
-      "countryLabel": "وڵات",
-      "timezoneLabel": "ناوچەی کاتی",
-      "languageLabel": "زمانی داشبۆرد",
-      "logoLabel": "بەستەری لۆگۆ (ئارەزوومەندانە)",
-      "businessTypes": {
+      "nameLabel": "ناوی بزنس"
+    },
+    "businessType": {
+      "title": "بزنسەکەت چ جۆرێکە؟",
+      "description": "ئەمە یارمەتیمان دەدات ئەزموونەکەت باشتر بگونجێنین.",
+      "fieldLabel": "جۆری بزنس",
+      "placeholder": "جۆری بزنس هەڵبژێرە",
+      "options": {
         "smallBusiness": "بزنسی بچووک",
         "clinic": "کلینیک",
         "restaurant": "چێشتخانە",
@@ -136,6 +155,14 @@
         "other": "هیتر"
       }
     },
+    "logo": {
+      "title": "لۆگۆی بزنسەکەت زیاد بکە",
+      "description": "ئەمە بۆ کڕیارەکانت دەردەکەوێت. دەتوانیت ئەم هەنگاوە بپەڕێنیت و دواتر زیادی بکەیت.",
+      "uploadLabel": "وێنە باربکە",
+      "changeLabel": "گۆڕینی وێنە",
+      "removeLabel": "سڕینەوە",
+      "uploadHint": "PNG یان JPG، هەتا 5 مێگابایت"
+    },
     "agentName": {
       "title": "کارمەندە زیرەکەکەت دروست بکە",
       "description": "ناوێک بدە بە کارمەندە زیرەکەکەت — ئەمە ئەو کەسەیە کە کڕیارەکانت قسەی لەگەڵ دەکەن.",
@@ -146,10 +173,6 @@
       "title": "بزنسەکەت باس بکە",
       "description": "ئێوە کێن؟ چی دەفرۆشن؟ زیرەکی دەستکرد چۆن دەبێت ڕەفتار بکات؟ چی کۆمپانیاکەتان جیاواز دەکات؟",
       "label": "وەسفی بزنس"
-    },
-    "language": {
-      "title": "زیرەکی دەستکردت بە چ زمانێک وەڵام بداتەوە؟",
-      "description": "ئەمە ئەو زمانەیە کە کارمەندە زیرەکەکەت لە قسەکردن لەگەڵ کڕیاران بەکاری دەهێنێت."
     },
     "tone": {
       "title": "شێوازی قسەکردنی زیرەکی دەستکردت هەڵبژێرە",
@@ -162,41 +185,6 @@
         "casual": "ئاسایی",
         "medical": "پزیشکی",
         "corporate": "کۆمپانیایی"
-      }
-    },
-    "creativity": {
-      "title": "زیرەکی دەستکردت چەند داهێنەر بێت؟",
-      "description": "ئەمە کۆنترۆڵی ئەوە دەکات کە وەڵامەکانی زیرەکی دەستکردت چەند جیاواز بن.",
-      "options": {
-        "low": {
-          "label": "کەم",
-          "description": "پابەندە بە ڕاستییەکان و وەڵامە ئامادەکراوەکان."
-        },
-        "medium": {
-          "label": "مامناوەند",
-          "description": "بالانسکراو — سروشتی بەڵام پێشبینیکراو."
-        },
-        "high": {
-          "label": "زۆر",
-          "description": "زیاتر گفتوگۆیی و دەربڕی هەستە."
-        }
-      }
-    },
-    "hours": {
-      "title": "کاتەکانی کارکردن دیاری بکە",
-      "description": "زیرەکی دەستکردت دەتوانێت کڕیاران ئاگادار بکاتەوە کە تیمەکەت کەی بەردەستە.",
-      "timezoneLabel": "ناوچەی کاتی",
-      "closedLabel": "داخراوە",
-      "holidayNotesLabel": "تێبینی پشوو / ڕۆژانی داخستن (ئارەزوومەندانە)",
-      "holidayNotesPlaceholder": "بۆ نموونە: لە پشووە فەرمییەکاندا داخراوین",
-      "weekdays": {
-        "mon": "دووشەممە",
-        "tue": "سێشەممە",
-        "wed": "چوارشەممە",
-        "thu": "پێنجشەممە",
-        "fri": "هەینی",
-        "sat": "شەممە",
-        "sun": "یەکشەممە"
       }
     },
     "handover": {
@@ -269,12 +257,9 @@
     "integrationsLink": "پەیوەندییەکان",
     "campaignsLink": "کەمپینەکان",
     "adsLink": "ڕیکلامەکان",
-    "accountMenuLabel": "ڕێکخستنەکانی مکان‌ی کار",
-    "workspaceProfileLink": "پرۆفایلی مکانی کار",
-    "billingLink": "پارەدان",
-    "teamLink": "تیم",
-    "auditLogLink": "تۆماری پشکنین",
-    "supportLink": "پشتگیری",
+    "manageBusinessLink": "بەڕێوەبردنی بزنسەکەت",
+    "workspaceSwitcherLabel": "پرۆژە هەڵبژێرە",
+    "agentSwitcherLabel": "کارمەندە زیرەکەکەت هەڵبژێرە",
     "platformAdminLink": "پانێڵی بەڕێوەبردن",
     "bands": {
       "today": {
@@ -792,6 +777,23 @@
       "killSwitchOffHint": "وەڵامدانەوەی زیرەکانە ناچالاکە — گفتوگۆکانی هەموو بازنەکان بەشێوەیەکی خۆکار دەگوازرێنەوە بۆ مرۆڤ.",
       "enabledToast": "وەڵامدانەوەی زیرەکانە دووبارە چالاککرایەوە.",
       "disabledToast": "وەڵامدانەوەی زیرەکانە لە ئاستی پلاتفۆرمدا ناچالاککرا.",
+      "defaultCreativityLabel": "داهێنانی بنەڕەتی کارمەندە زیرەکە",
+      "defaultCreativityHint": "کۆنترۆڵی ئەوە دەکات کە وەڵامەکانی زیرەکی دەستکرد لە هەموو بازنەکاندا چەند جیاواز بن — چیتر هەڵبژاردنێکی تایبەت بە هەر بازرگانێک نییە.",
+      "defaultCreativitySavedToast": "داهێنانی بنەڕەتی پاشەکەوت کرا.",
+      "creativity": {
+        "low": {
+          "label": "کەم",
+          "description": "پابەندە بە ڕاستییەکان و وەڵامە ئامادەکراوەکان."
+        },
+        "medium": {
+          "label": "مامناوەند",
+          "description": "بالانسکراو — سروشتی بەڵام پێشبینیکراو."
+        },
+        "high": {
+          "label": "زۆر",
+          "description": "زیاتر گفتوگۆیی و دەربڕی هەستە."
+        }
+      },
       "byModelHeading": "بەپێی مۆدێل",
       "emptyState": "هێشتا هیچ داواکارییەکی کارمەندە زیرەکە تۆمار نەکراوە.",
       "modelRequests": "{count} داواکاری",
@@ -1092,7 +1094,14 @@
       "ordersHeading": "داواکارییەکان",
       "appointmentsHeading": "چاوپێکەوتنەکان",
       "empty": "هێشتا هیچ شتێک لێرە نییە.",
-      "noMessages": "هێشتا هیچ نامەیەک نییە."
+      "noMessages": "هێشتا هیچ نامەیەک نییە.",
+      "ownerHeading": "هەژماری خاوەن"
+    },
+    "workspaceDetail": {
+      "resetPassword": "ڕێکخستنەوەی وشەی نهێنی",
+      "resettingPassword": "ڕێکخستنەوە...",
+      "passwordResetDone": "وشەی نهێنی ڕێکخرایەوە. وشەی نهێنی نوێ لەگەڵ خاوەنی هەژمار هاوبەش بکە.",
+      "passwordResetInstructions": "وشەی نهێنی کاتیی نوێ — ئەمە ڕاستەوخۆ لەگەڵ خاوەنی هەژمار هاوبەش بکە. جارێکی تر نیشان نادرێتەوە."
     }
   },
   "automations": {
@@ -1769,7 +1778,7 @@
     "pageTitle": "کارمەندە زیرەکە",
     "pageDescription": "بەڕێوەبردنی چۆنیەتی هەڵسوکەوت و وەڵامدانەوەی کارمەندە زیرەکەکەت بۆ کڕیاران.",
     "businessInfoTitle": "زانیاری بزنس",
-    "businessInfoDescription": "زانیاری بزنسەکەت و زمانی داشبۆرد.",
+    "businessInfoDescription": "زانیاری بزنسەکەت.",
     "agentProfileTitle": "کارمەندە زیرەکە",
     "agentProfileDescription": "ناوی کارمەندە زیرەکەکەت و وەسفی بزنسەکەت.",
     "personalityTitle": "کەسایەتی",
@@ -1782,8 +1791,10 @@
     "handoverOff": "گواستنەوە ناچالاکە"
   },
   "workspaceProfile": {
-    "pageTitle": "پرۆفایلی مکانی کار",
-    "pageDescription": "زانیاری بزنسەکەت و زمانی داشبۆرد."
+    "pageTitle": "بەڕێوەبردنی بزنسەکەت",
+    "pageDescription": "زانیاری بزنسەکەت.",
+    "logoUrlLabel": "بەستەری لۆگۆ (ئارەزوومەندانە)",
+    "profileTabLabel": "زانیاری بزنس"
   },
   "auditLog": {
     "pageTitle": "تۆماری چالاکی",

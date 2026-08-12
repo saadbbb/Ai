@@ -113,7 +113,7 @@ export function TeamManager({
           {members.map(({ member, user, role }) => (
             <div key={member.id} className="flex items-center justify-between gap-4 p-3 text-sm">
               <span className="truncate">
-                {user.email}
+                {user.name ?? user.email ?? user.phone}
                 {user.id === currentUserId && <span className="text-muted-foreground"> ({t("you")})</span>}
               </span>
               <div className="flex shrink-0 items-center gap-2">

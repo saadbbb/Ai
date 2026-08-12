@@ -1,14 +1,16 @@
-import { Building2, CreditCard, History, LifeBuoy, ShieldCheck, Users2 } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AccountMenu, type AccountMenuItem } from "@/components/app-shell/account-menu";
+import { AgentPicker, WorkspacePicker } from "@/components/app-shell/sidebar-switchers";
 import { MobileNav } from "@/components/app-shell/mobile-nav";
+import { ProfileMenu } from "@/components/app-shell/profile-menu";
 import { SidebarNav } from "@/components/app-shell/sidebar-nav";
 import { TopbarTitle } from "@/components/app-shell/topbar-title";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Logo } from "@/components/logo";
 import { BLOCKED_SUBSCRIPTION_STATUSES } from "@/db/schema";
+import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { NotificationBell } from "@/features/notifications/components/notification-bell";
 import { notificationService } from "@/features/notifications/services/notification.service";
@@ -16,7 +18,6 @@ import type { FeatureKey } from "@/features/platform-admin/lib/features";
 import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
 import { featureAccessService } from "@/features/platform-admin/services/feature-access.service";
 import { platformAdminService } from "@/features/platform-admin/services/platform-admin.service";
-import { WorkspaceSwitcher } from "@/features/workspace/components/workspace-switcher";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { permissionService } from "@/features/workspace/services/permission.service";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -37,7 +38,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const workspace = await requireWorkspaceForUser(user.id);
 
   if (!workspace.onboardingCompletedAt) {
-    redirect("/onboarding/business");
+    redirect("/onboarding/owner-name");
   }
 
   const [
@@ -46,23 +47,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
     isPlatformAdmin,
     { notifications, unreadCount },
     memberships,
-    canViewTeam,
+    agent,
     canViewAnalytics,
     canViewAutomations,
-    canViewSupport,
     canManageIntegrations,
     canManageCampaigns,
     canManageAds,
   ] = await Promise.all([
     getTranslations("dashboard"),
     getTranslations("app"),
-    platformAdminService.isPlatformAdmin(user.email),
+    platformAdminService.isPlatformAdmin(user.email ?? ""),
     notificationService.getForWorkspace(workspace.id),
     membershipRepository.findWorkspacesForUser(user.id),
-    permissionService.hasPermission(user.id, workspace.id, "workspace.members.view"),
+    aiAgentRepository.findByWorkspaceId(workspace.id),
     permissionService.hasPermission(user.id, workspace.id, "analytics.view"),
     permissionService.hasPermission(user.id, workspace.id, "automation.workflows.view"),
-    permissionService.hasPermission(user.id, workspace.id, "support.tickets.view"),
     permissionService.hasPermission(user.id, workspace.id, "integrations.manage"),
     permissionService.hasPermission(user.id, workspace.id, "campaigns.manage"),
     permissionService.hasPermission(user.id, workspace.id, "ads.manage"),
@@ -75,8 +74,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   ]);
 
   // PART 13B's 5-section IA: HOME and INBOX stand alone; CUSTOMERS, AI EMPLOYEE, and GROWTH
-  // are groups. Team/Billing/Workspace Profile/Audit Log move to the account menu below,
-  // not the main sidebar — that's WORKSPACE SETTINGS, reached less often than daily work.
+  // are groups. Team/Billing/Workspace Profile/Audit Log/Support live behind the topbar
+  // Profile menu's "Manage your business" hub (/dashboard/workspace-profile) instead of
+  // the main sidebar — that's WORKSPACE SETTINGS, reached less often than daily work.
   const rawGroups: NavGroup[] = [
     { links: [{ href: "/dashboard", label: t("homeLink") }] },
     { links: [{ href: "/dashboard/inbox", label: t("inboxLink"), feature: "inbox" }] },
@@ -114,15 +114,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .map((group) => ({ ...group, links: group.links.filter((link) => !link.feature || enabledFeatures.includes(link.feature)) }))
     .filter((group) => group.links.length > 0);
 
-  const accountItems: AccountMenuItem[] = [
-    { href: "/dashboard/workspace-profile", label: t("workspaceProfileLink"), icon: <Building2 className="size-4 shrink-0" /> },
-    ...(canViewTeam ? [{ href: "/dashboard/team", label: t("teamLink"), icon: <Users2 className="size-4 shrink-0" /> }] : []),
-    { href: "/dashboard/billing", label: t("billingLink"), icon: <CreditCard className="size-4 shrink-0" /> },
-    ...(canViewTeam ? [{ href: "/dashboard/audit-log", label: t("auditLogLink"), icon: <History className="size-4 shrink-0" /> }] : []),
-    ...(canViewSupport ? [{ href: "/dashboard/support", label: t("supportLink"), icon: <LifeBuoy className="size-4 shrink-0" /> }] : []),
-  ];
-
   const productName = tApp("name");
+  const profileName = user.name ?? user.email ?? user.phone ?? "";
+  const profileIdentifier = [user.email, user.phone].filter(Boolean).join(" · ");
 
   const topBar = (
     <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-surface px-4 md:px-6 lg:px-8">
@@ -131,9 +125,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <MobileNav
             groups={groups}
             productName={productName}
-            accountItems={accountItems}
             navLabel={t("menuLabel")}
-            logoutSlot={<LogoutButton />}
+            switchers={{
+              workspaces: memberships.map((m) => m.workspace),
+              currentWorkspaceId: workspace.id,
+              workspaceSwitcherLabel: t("workspaceSwitcherLabel"),
+              agentName: agent?.name ?? null,
+              agentSwitcherLabel: t("agentSwitcherLabel"),
+            }}
           />
         </div>
         <Link href="/dashboard" className="flex items-center gap-2 md:hidden">
@@ -143,11 +142,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="hidden md:block">
           <TopbarTitle groups={groups} />
         </div>
-        {memberships.length > 1 && (
-          <div className="hidden md:block">
-            <WorkspaceSwitcher workspaces={memberships.map((m) => m.workspace)} currentWorkspaceId={workspace.id} />
-          </div>
-        )}
       </div>
       <div className="flex shrink-0 items-center gap-1.5">
         <NotificationBell initialNotifications={notifications} initialUnreadCount={unreadCount} />
@@ -161,6 +155,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </Link>
         )}
         <LocaleSwitcher />
+        <ProfileMenu name={profileName} identifier={profileIdentifier} logoutSlot={<LogoutButton />} />
       </div>
     </header>
   );
@@ -205,11 +200,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <div className="truncate text-[11px] font-medium text-text-muted">{t("shellSubtitle")}</div>
           </div>
         </Link>
+        <div className="space-y-2 border-b px-3 py-3">
+          <WorkspacePicker
+            workspaces={memberships.map((m) => m.workspace)}
+            currentWorkspaceId={workspace.id}
+            label={t("workspaceSwitcherLabel")}
+          />
+          <AgentPicker agentName={agent?.name ?? null} label={t("agentSwitcherLabel")} />
+        </div>
         <div className="flex-1 overflow-y-auto px-3 py-5">
           <SidebarNav groups={groups} />
-        </div>
-        <div className="border-t p-2">
-          <AccountMenu email={user.email} items={accountItems} logoutSlot={<LogoutButton />} />
         </div>
       </aside>
 

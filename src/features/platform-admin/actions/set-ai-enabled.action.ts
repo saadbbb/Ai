@@ -22,7 +22,7 @@ export async function setAiEnabledAction(input: unknown): Promise<ActionResult<P
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "ai_enabled_changed",
       targetType: "platform_settings",
       summary: parsed.data.enabled ? "Re-enabled AI replies platform-wide." : "Disabled AI replies platform-wide.",

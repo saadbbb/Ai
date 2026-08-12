@@ -41,7 +41,7 @@ describe("profileSyncService.ensureLocalUser — new signup admin notification",
       { userId: "admin-2", email: "admin2@example.com" },
     ]);
 
-    await profileSyncService.ensureLocalUser("supabase-1", "new@example.com");
+    await profileSyncService.ensureLocalUser("supabase-1", { email: "new@example.com" });
 
     expect(emailService.sendNotificationEmail).toHaveBeenCalledTimes(2);
     expect(emailService.sendNotificationEmail).toHaveBeenCalledWith(
@@ -55,7 +55,7 @@ describe("profileSyncService.ensureLocalUser — new signup admin notification",
     vi.mocked(workspaceService.createWorkspaceForNewUser).mockResolvedValue(WORKSPACE);
     vi.mocked(platformAdminService.listAssignableAdmins).mockResolvedValue([]);
 
-    await expect(profileSyncService.ensureLocalUser("supabase-1", "new@example.com")).resolves.toBe(NEW_USER);
+    await expect(profileSyncService.ensureLocalUser("supabase-1", { email: "new@example.com" })).resolves.toBe(NEW_USER);
     expect(emailService.sendNotificationEmail).not.toHaveBeenCalled();
   });
 
@@ -65,13 +65,13 @@ describe("profileSyncService.ensureLocalUser — new signup admin notification",
     vi.mocked(workspaceService.createWorkspaceForNewUser).mockResolvedValue(WORKSPACE);
     vi.mocked(platformAdminService.listAssignableAdmins).mockRejectedValue(new Error("db down"));
 
-    await expect(profileSyncService.ensureLocalUser("supabase-1", "new@example.com")).resolves.toBe(NEW_USER);
+    await expect(profileSyncService.ensureLocalUser("supabase-1", { email: "new@example.com" })).resolves.toBe(NEW_USER);
   });
 
   it("does not notify anyone when the user already exists (returning early)", async () => {
     vi.mocked(userRepository.findByEmail).mockResolvedValue({ ...NEW_USER, id: "supabase-1" });
 
-    await profileSyncService.ensureLocalUser("supabase-1", "new@example.com");
+    await profileSyncService.ensureLocalUser("supabase-1", { email: "new@example.com" });
 
     expect(workspaceService.createWorkspaceForNewUser).not.toHaveBeenCalled();
     expect(platformAdminService.listAssignableAdmins).not.toHaveBeenCalled();

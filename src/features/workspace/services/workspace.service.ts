@@ -57,8 +57,10 @@ async function updateSlug(workspaceId: string, slug: string): Promise<Workspace>
   return workspaceRepository.update(workspaceId, { slug });
 }
 
-function defaultWorkspaceName(email: string): string {
-  const localPart = email.split("@")[0] || "My";
+/** `identifier` is whichever of email/phone the new user signed up with — a placeholder, overwritten by onboarding's business-name step regardless. */
+function defaultWorkspaceName(identifier: string): string {
+  if (!identifier.includes("@")) return "My Business";
+  const localPart = identifier.split("@")[0] || "My";
   const capitalized = localPart.charAt(0).toUpperCase() + localPart.slice(1);
   return `${capitalized}'s Workspace`;
 }
@@ -68,19 +70,19 @@ function defaultWorkspaceName(email: string): string {
  * Called right after registration completes — every user always has at least one workspace,
  * with a placeholder name refined later during onboarding step 1 (Business Name).
  */
-async function createWorkspaceForNewUser(userId: string, email: string): Promise<Workspace> {
+async function createWorkspaceForNewUser(userId: string, identifier: string): Promise<Workspace> {
   const ownerRole = await roleRepository.findByKey("owner");
   if (!ownerRole) {
     throw new AppError("INTERNAL_ERROR", "Default roles are not seeded. Run the database seed script.");
   }
 
-  const slug = await generateUniqueSlug(defaultWorkspaceName(email));
+  const slug = await generateUniqueSlug(defaultWorkspaceName(identifier));
 
   return db.transaction(async (tx) => {
     const [workspace] = await tx
       .insert(workspaces)
       .values({
-        name: defaultWorkspaceName(email),
+        name: defaultWorkspaceName(identifier),
         slug,
         subscriptionExpiresAt: new Date(Date.now() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000),
       })

@@ -26,7 +26,7 @@ export async function decideApprovalAction(input: unknown): Promise<ActionResult
     await workspaceAuditLogRepository.log({
       workspaceId: workspace.id,
       actorUserId: user.id,
-      actorEmail: user.email,
+      actorEmail: user.name ?? user.email ?? "Unknown",
       action: "workflow_approval_decided",
       targetType: "workflow_approval",
       targetId: parsed.data.approvalId,

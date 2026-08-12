@@ -262,7 +262,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           getRowKey={(row) => row.userId}
           emptyState={{ icon: BarChart3, title: t("teamPerformance.empty") }}
           columns={[
-            { key: "agent", header: t("teamPerformance.columns.agent"), cell: (row) => row.email },
+            { key: "agent", header: t("teamPerformance.columns.agent"), cell: (row) => row.name ?? row.email ?? "—" },
             {
               key: "conversations",
               header: t("teamPerformance.columns.conversations"),

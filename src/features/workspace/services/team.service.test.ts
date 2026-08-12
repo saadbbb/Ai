@@ -46,7 +46,7 @@ const { workspaceAuditLogRepository } = await import("../repository/workspace-au
 const { teamService } = await import("./team.service");
 
 const WORKSPACE: Workspace = { id: "workspace-1" } as Workspace;
-const ACTOR = { userId: "actor-1", email: "actor@example.com" };
+const ACTOR = { userId: "actor-1", name: null, email: "actor@example.com" };
 
 function makeRole(overrides: Partial<Role> = {}): Role {
   return {

@@ -15,7 +15,7 @@ export async function assignTicketAction(input: unknown): Promise<ActionResult<S
   const admin = await requireWritePlatformAdmin();
 
   try {
-    const ticket = await ticketAdminService.assignTicket(admin.id, admin.email, parsed.data.ticketId, parsed.data.assignToUserId);
+    const ticket = await ticketAdminService.assignTicket(admin.id, admin.name ?? admin.email ?? "Unknown", parsed.data.ticketId, parsed.data.assignToUserId);
     return actionOk(ticket);
   } catch (error) {
     return actionFail(error);

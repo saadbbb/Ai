@@ -9,8 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AgentProfileSettingsForm } from "@/features/ai/components/agent-profile-settings-form";
 import { HandoverSettingsForm } from "@/features/ai/components/handover-settings-form";
 import { PersonalitySettingsForm } from "@/features/ai/components/personality-settings-form";
-import { WorkingHoursSettingsForm } from "@/features/ai/components/working-hours-settings-form";
-import { DEFAULT_WORKING_HOURS } from "@/features/ai/constants";
 import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
@@ -18,16 +16,14 @@ export default async function AiEmployeePage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
   const agent = await aiAgentRepository.findByWorkspaceId(workspace.id);
-  const [t, tCommon, tLanguages, tTone, tCreativity] = await Promise.all([
+  const [t, tCommon, tTone] = await Promise.all([
     getTranslations("settings"),
     getTranslations("common"),
-    getTranslations("onboarding.languages"),
     getTranslations("onboarding.tone.options"),
-    getTranslations("onboarding.creativity.options"),
   ]);
 
   if (!agent) {
-    redirect("/onboarding/business");
+    redirect("/onboarding/owner-name");
   }
 
   return (
@@ -49,9 +45,7 @@ export default async function AiEmployeePage() {
               <p className="line-clamp-2 text-sm text-text-secondary">{agent.businessDescription}</p>
             )}
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <Badge variant="secondary">{tLanguages(agent.language)}</Badge>
               <Badge variant="secondary">{tTone(agent.tone)}</Badge>
-              <Badge variant="secondary">{tCreativity(`${agent.creativity}.label`)}</Badge>
               <Badge variant={agent.handoverEnabled ? "success" : "outline"}>
                 {agent.handoverEnabled ? t("handoverOn") : t("handoverOff")}
               </Badge>
@@ -67,7 +61,6 @@ export default async function AiEmployeePage() {
         <TabsList>
           <TabsTrigger value="profile">{t("agentProfileTitle")}</TabsTrigger>
           <TabsTrigger value="personality">{t("personalityTitle")}</TabsTrigger>
-          <TabsTrigger value="hours">{t("workingHoursTitle")}</TabsTrigger>
           <TabsTrigger value="handover">{t("handoverTitle")}</TabsTrigger>
         </TabsList>
 
@@ -78,13 +71,7 @@ export default async function AiEmployeePage() {
         </TabsContent>
 
         <TabsContent value="personality" className="pt-4">
-          <PersonalitySettingsForm
-            defaultValues={{ language: agent.language, tone: agent.tone, creativity: agent.creativity }}
-          />
-        </TabsContent>
-
-        <TabsContent value="hours" className="pt-4">
-          <WorkingHoursSettingsForm defaultValues={agent.workingHours ?? DEFAULT_WORKING_HOURS} />
+          <PersonalitySettingsForm defaultValues={{ tone: agent.tone }} />
         </TabsContent>
 
         <TabsContent value="handover" className="pt-4">

@@ -11,21 +11,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateBusinessInfoAction } from "@/features/ai/actions/update-business-info.action";
-import { languageEnumSchema } from "@/features/ai/validation/schemas";
-import { RadioOptionGroup } from "@/features/onboarding/components/radio-option-group";
 import { BUSINESS_TYPE_KEYS } from "@/features/onboarding/constants";
-import { createBusinessInfoSchema } from "@/features/onboarding/validation/schemas";
+import { createWorkspaceProfileSchema } from "@/features/workspace/validation/profile-schemas";
 import { SettingsCard } from "./settings-card";
 
-type BusinessInfoInput = z.infer<ReturnType<typeof createBusinessInfoSchema>>;
+type WorkspaceProfileInput = z.infer<ReturnType<typeof createWorkspaceProfileSchema>>;
 
 interface BusinessInfoSettingsFormProps {
-  defaultValues: BusinessInfoInput;
+  defaultValues: WorkspaceProfileInput;
 }
 
 export function BusinessInfoSettingsForm({ defaultValues }: BusinessInfoSettingsFormProps) {
   const t = useTranslations("onboarding.business");
-  const tLanguages = useTranslations("onboarding.languages");
+  const tType = useTranslations("onboarding.businessType");
+  const tProfile = useTranslations("workspaceProfile");
   const tSettings = useTranslations("settings");
   const tCommon = useTranslations("common");
   const tValidation = useTranslations("validation");
@@ -35,12 +34,10 @@ export function BusinessInfoSettingsForm({ defaultValues }: BusinessInfoSettings
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<BusinessInfoInput>({
-    resolver: zodResolver(createBusinessInfoSchema(tValidation)),
+  } = useForm<WorkspaceProfileInput>({
+    resolver: zodResolver(createWorkspaceProfileSchema(tValidation)),
     defaultValues,
   });
-
-  const languageOptions = languageEnumSchema.options.map((value) => ({ value, label: tLanguages(value) }));
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -62,19 +59,19 @@ export function BusinessInfoSettingsForm({ defaultValues }: BusinessInfoSettings
           <Input id="name" {...register("name")} />
         </Field>
 
-        <Field label={t("businessTypeLabel")} htmlFor="businessType" error={errors.businessType}>
+        <Field label={tType("fieldLabel")} htmlFor="businessType" error={errors.businessType}>
           <Controller
             control={control}
             name="businessType"
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger id="businessType" className="w-full">
-                  <SelectValue placeholder={t("businessTypePlaceholder")} />
+                  <SelectValue placeholder={tType("placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {BUSINESS_TYPE_KEYS.map((key) => (
                     <SelectItem key={key} value={key}>
-                      {t(`businessTypes.${key}`)}
+                      {tType(`options.${key}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -83,26 +80,7 @@ export function BusinessInfoSettingsForm({ defaultValues }: BusinessInfoSettings
           />
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Field label={t("countryLabel")} htmlFor="country" error={errors.country}>
-            <Input id="country" {...register("country")} />
-          </Field>
-          <Field label={t("timezoneLabel")} htmlFor="timezone" error={errors.timezone}>
-            <Input id="timezone" {...register("timezone")} />
-          </Field>
-        </div>
-
-        <Field label={t("languageLabel")} htmlFor="language" error={errors.language}>
-          <Controller
-            control={control}
-            name="language"
-            render={({ field }) => (
-              <RadioOptionGroup name="language" value={field.value} onValueChange={field.onChange} options={languageOptions} />
-            )}
-          />
-        </Field>
-
-        <Field label={t("logoLabel")} htmlFor="logoUrl" error={errors.logoUrl}>
+        <Field label={tProfile("logoUrlLabel")} htmlFor="logoUrl" error={errors.logoUrl}>
           <Input id="logoUrl" placeholder="https://..." {...register("logoUrl")} />
         </Field>
 

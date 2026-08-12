@@ -1,12 +1,14 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
-import { aiAgentRepository } from "../repository/ai-agent.repository";
-import { workingHoursSchema } from "../validation/schemas";
+import { createBusinessTypeSchema } from "../validation/schemas";
+import { onboardingService } from "../services/onboarding.service";
 
-export async function updateWorkingHoursAction(input: unknown): Promise<ActionResult> {
-  const parsed = workingHoursSchema.safeParse(input);
+export async function saveBusinessTypeAction(input: unknown): Promise<ActionResult> {
+  const t = await getTranslations("validation");
+  const parsed = createBusinessTypeSchema(t).safeParse(input);
   if (!parsed.success) {
     return actionValidationError(parsed.error.issues[0]?.message ?? "Invalid input.");
   }
@@ -15,9 +17,7 @@ export async function updateWorkingHoursAction(input: unknown): Promise<ActionRe
   const workspace = await requireWorkspaceForUser(user.id);
 
   try {
-    await aiAgentRepository.update(workspace.id, {
-      workingHours: { ...parsed.data, holidayNotes: parsed.data.holidayNotes ?? null },
-    });
+    await onboardingService.saveBusinessType(workspace.id, workspace, parsed.data.businessType);
     return actionOk(undefined);
   } catch (error) {
     return actionFail(error);

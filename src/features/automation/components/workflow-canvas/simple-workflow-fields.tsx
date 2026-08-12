@@ -19,7 +19,9 @@ import {
 import type { ActionNodeData, ConditionsNodeData, TriggerNodeData } from "./types";
 
 const STATUS_TRIGGERS = new Set<WorkflowTrigger>(["order_status_changed", "appointment_status_changed"]);
-const CONDITION_FIELDS: WorkflowConditionField[] = ["tag", "language", "lead_score", "order_value", "working_hours"];
+// "working_hours" was dropped from the product (the AI replies 24/7 now) — no longer
+// selectable for new automations, but existing saved ones still evaluate fine (fails open).
+const CONDITION_FIELDS: WorkflowConditionField[] = ["tag", "language", "lead_score", "order_value"];
 const NUMERIC_FIELDS = new Set<WorkflowConditionField>(["lead_score", "order_value"]);
 const MAX_CONDITIONS = 5;
 const TAG_ACTIONS = new Set<WorkflowAction>(["add_contact_tag", "remove_contact_tag"]);

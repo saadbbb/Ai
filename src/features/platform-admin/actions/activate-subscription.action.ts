@@ -41,7 +41,7 @@ export async function activateSubscriptionAction(input: unknown): Promise<Action
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "subscription_activated",
       targetType: "workspace",
       targetId: workspace.id,

@@ -8,6 +8,7 @@ import { RowList } from "@/components/data-table";
 import { ExportButtons } from "@/components/export-buttons";
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
+import { WORKSPACE_TIMEZONE } from "@/db/schema";
 import { membershipRepository } from "@/features/workspace/repository/membership.repository";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
 
@@ -22,9 +23,11 @@ export default async function AppointmentsPage() {
     appointmentService.listAppointments(workspace.id),
     membershipRepository.findMembersByWorkspaceId(workspace.id),
   ]);
-  const memberNameById = new Map(members.map((item) => [item.user.id, item.user.email]));
+  const memberNameById = new Map(
+    members.map((item) => [item.user.id, item.user.name ?? item.user.email ?? item.user.phone ?? ""]),
+  );
   const formatter = new Intl.DateTimeFormat("en-GB", {
-    timeZone: workspace.timezone,
+    timeZone: WORKSPACE_TIMEZONE,
     dateStyle: "medium",
     timeStyle: "short",
   });

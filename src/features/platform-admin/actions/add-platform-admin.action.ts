@@ -29,7 +29,7 @@ export async function addPlatformAdminAction(input: unknown): Promise<ActionResu
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "platform_admin_added",
       targetType: "platform_admin",
       targetId: created.id,

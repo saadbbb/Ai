@@ -1,6 +1,7 @@
 import "server-only";
 import { AppError } from "@/lib/errors/app-error";
 import { checkRateLimit } from "@/lib/rate-limit/rate-limit";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
@@ -81,6 +82,50 @@ async function login(email: string, password: string): Promise<void> {
   }
 }
 
+/**
+ * No SMS provider configured (same underlying constraint as email confirmation —
+ * see DEFERRED_TASKS.md), so instead of Supabase's normal phone-OTP signup flow
+ * we create the account server-side via the Admin API with phone_confirm: true,
+ * which marks it verified without ever sending a code, then sign in normally to
+ * establish a real session. Rate-limited the same as email signup.
+ *
+ * Needs one Supabase dashboard step before it actually works — Authentication ->
+ * Providers -> Phone must be enabled, same category of blocker as Google OAuth
+ * (see google-signin-button.tsx's comment). Verified live: without it, Supabase
+ * returns "Phone logins are disabled" — see DEFERRED_TASKS.md item 10.
+ */
+async function signUpWithPhone(phone: string, password: string): Promise<void> {
+  const allowed = await checkRateLimit(`signup-phone:${phone}`, { windowSeconds: 60, max: 3 });
+  if (!allowed) {
+    throw new AppError("RATE_LIMITED", "Please wait a moment before trying again.");
+  }
+
+  const admin = createSupabaseAdminClient();
+  const { error: createError } = await admin.auth.admin.createUser({ phone, password, phone_confirm: true });
+  if (createError) {
+    throw new AppError("VALIDATION_ERROR", createError.message);
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { error: signInError } = await supabase.auth.signInWithPassword({ phone, password });
+  if (signInError) {
+    throw new AppError("VALIDATION_ERROR", signInError.message);
+  }
+}
+
+async function loginWithPhone(phone: string, password: string): Promise<void> {
+  const allowed = await checkRateLimit(`login-phone:${phone}`, { windowSeconds: 15 * 60, max: 5 });
+  if (!allowed) {
+    throw new AppError("RATE_LIMITED", "Too many login attempts. Please try again in a few minutes.");
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.signInWithPassword({ phone, password });
+  if (error) {
+    throw new AppError("INVALID_CREDENTIALS", "Invalid phone number or password.");
+  }
+}
+
 async function logout(): Promise<void> {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
@@ -116,9 +161,11 @@ async function verifyRecoveryOtp(email: string, code: string): Promise<void> {
 
 export const authService = {
   signUp,
+  signUpWithPhone,
   verifySignupOtp,
   resendSignupOtp,
   login,
+  loginWithPhone,
   logout,
   requestPasswordReset,
   verifyRecoveryOtp,

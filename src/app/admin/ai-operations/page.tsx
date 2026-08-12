@@ -4,6 +4,7 @@ import { RowList } from "@/components/data-table";
 import { PageContainer, Section } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { AiEnabledToggle } from "@/features/platform-admin/components/ai-enabled-toggle";
+import { DefaultCreativityControl } from "@/features/platform-admin/components/default-creativity-control";
 import { aiUsageAdminRepository } from "@/features/platform-admin/repository/ai-usage-admin.repository";
 import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
 import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
@@ -24,6 +25,7 @@ export default async function AdminAiOperationsPage() {
       <PageHeader title={t("title")} description={t("description")} />
 
       <AiEnabledToggle initialEnabled={settings?.aiEnabled ?? true} />
+      <DefaultCreativityControl initialCreativity={settings?.defaultCreativity ?? "medium"} />
 
       <Section title={t("byModelHeading")}>
         <RowList

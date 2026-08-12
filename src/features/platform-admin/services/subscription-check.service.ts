@@ -27,7 +27,7 @@ async function emailOwnerBestEffort(workspace: Workspace, subject: string, body:
   try {
     const ownerUserId = await membershipRepository.findOwnerUserId(workspace.id);
     const owner = ownerUserId ? await userRepository.findById(ownerUserId) : null;
-    if (!owner) return;
+    if (!owner?.email) return;
 
     const settings = await platformSettingsRepository.get();
     const contactLine = settings?.whatsappNumber

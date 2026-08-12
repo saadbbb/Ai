@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { IN_GOOD_STANDING_STATUSES } from "@/db/schema";
+import { IN_GOOD_STANDING_STATUSES, WORKSPACE_TIMEZONE } from "@/db/schema";
 import { planRepository } from "@/features/platform-admin/repository/plan.repository";
 import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
 import { invoiceService } from "@/features/platform-admin/services/invoice.service";
@@ -70,7 +70,7 @@ export default async function BillingPage() {
                     <p className="text-muted-foreground">
                       {t("expiresOn", {
                         date: new Intl.DateTimeFormat("en-GB", {
-                          timeZone: workspace.timezone,
+                          timeZone: WORKSPACE_TIMEZONE,
                           dateStyle: "medium",
                         }).format(new Date(workspace.subscriptionExpiresAt)),
                       })}

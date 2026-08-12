@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { type NewPlatformSettings, type PlatformSettings, platformSettings } from "@/db/schema";
+import { type AiCreativity, type NewPlatformSettings, type PlatformSettings, platformSettings } from "@/db/schema";
 
 export const platformSettingsRepository = {
   async get(): Promise<PlatformSettings | null> {
@@ -35,6 +35,22 @@ export const platformSettingsRepository = {
     const [row] = await db
       .update(platformSettings)
       .set({ aiEnabled: enabled, updatedAt: new Date() })
+      .where(eq(platformSettings.id, existing.id))
+      .returning();
+    return row;
+  },
+
+  async setDefaultCreativity(creativity: AiCreativity): Promise<PlatformSettings> {
+    const existing = await platformSettingsRepository.get();
+
+    if (!existing) {
+      const [row] = await db.insert(platformSettings).values({ defaultCreativity: creativity }).returning();
+      return row;
+    }
+
+    const [row] = await db
+      .update(platformSettings)
+      .set({ defaultCreativity: creativity, updatedAt: new Date() })
       .where(eq(platformSettings.id, existing.id))
       .returning();
     return row;

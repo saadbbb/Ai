@@ -36,11 +36,11 @@ export function ToneForm({ defaultValues }: { defaultValues: Partial<ToneInput> 
       return;
     }
 
-    router.push("/onboarding/creativity");
+    router.push("/onboarding/handover");
   });
 
   return (
-    <StepShell step={5} title={t("title")} description={t("description")}>
+    <StepShell step={7} title={t("title")} description={t("description")}>
       <form onSubmit={onSubmit} className="space-y-4">
         <Controller
           control={control}
@@ -49,7 +49,7 @@ export function ToneForm({ defaultValues }: { defaultValues: Partial<ToneInput> 
             <RadioOptionGroup name="tone" value={field.value} onValueChange={field.onChange} options={toneOptions} />
           )}
         />
-        <StepFooter backHref="/onboarding/language" isSubmitting={isSubmitting} />
+        <StepFooter backHref="/onboarding/description" isSubmitting={isSubmitting} />
       </form>
     </StepShell>
   );

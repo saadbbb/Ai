@@ -26,7 +26,7 @@ export async function setFeatureFlagOverrideAction(input: unknown): Promise<Acti
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "feature_flag_override_set",
       targetType: "feature_flag",
       targetId: flag.id,

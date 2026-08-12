@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { WORKSPACE_TIMEZONE } from "@/db/schema";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { LifecycleStageSelect } from "@/features/crm/components/lifecycle-stage-select";
 import { NotePanel } from "@/features/crm/components/note-panel";
@@ -51,7 +52,7 @@ export default async function ContactDetailPage({ params }: PageProps) {
   ]);
 
   const formatter = new Intl.DateTimeFormat("en-GB", {
-    timeZone: workspace.timezone,
+    timeZone: WORKSPACE_TIMEZONE,
     dateStyle: "medium",
     timeStyle: "short",
   });

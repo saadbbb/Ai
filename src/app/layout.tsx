@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cairo, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { dirFor } from "@/i18n/config";
@@ -54,13 +55,16 @@ export default async function RootLayout({
       lang={locale}
       dir={dirFor(locale)}
       className={`${jakarta.variable} ${geistMono.variable} ${cairo.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
-          <TooltipProvider delayDuration={300}>
-            {children}
-            <Toaster />
-          </TooltipProvider>
+          <ThemeProvider>
+            <TooltipProvider delayDuration={300}>
+              {children}
+              <Toaster />
+            </TooltipProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -18,6 +18,8 @@
     "skip": "Skip",
     "confirmDelete": "Are you sure you want to delete this?",
     "exportCsv": "Export CSV",
+    "lightModeToggle": "Light mode",
+    "darkModeToggle": "Dark mode",
     "exportExcel": "Export Excel",
     "exportPdf": "Export PDF",
     "search": "Search",
@@ -35,7 +37,9 @@
       "submit": "Create account",
       "submitting": "Creating account...",
       "haveAccount": "Already have an account?",
-      "login": "Log in"
+      "login": "Log in",
+      "phoneLabel": "Phone number",
+      "confirmPasswordLabel": "Confirm password"
     },
     "google": {
       "continueWithGoogle": "Continue with Google",
@@ -56,7 +60,7 @@
     },
     "login": {
       "title": "Log in",
-      "description": "Welcome back.",
+      "description": "Great to have you back — log in to keep working with your AI employee.",
       "emailLabel": "Email",
       "passwordLabel": "Password",
       "forgotPassword": "Forgot password?",
@@ -64,7 +68,8 @@
       "submit": "Log in",
       "submitting": "Logging in...",
       "noAccount": "Don't have an account?",
-      "signUp": "Sign up"
+      "signUp": "Sign up",
+      "phoneLabel": "Phone number"
     },
     "forgotPassword": {
       "title": "Forgot password",
@@ -89,7 +94,14 @@
       "invalidLinkTitle": "This code has expired",
       "invalidLinkDescription": "Request a new password reset code and try again."
     },
-    "logout": "Log out"
+    "logout": "Log out",
+    "forgotPasswordPhone": {
+      "title": "Forgot your password?",
+      "description": "Phone accounts don't use a verification code — contact support and we'll reset it for you.",
+      "contactSupport": "Contact support on WhatsApp",
+      "noContactConfigured": "Support contact isn't set up yet. Please reach out through any other channel you have for us.",
+      "backToLogin": "Back to log in"
+    }
   },
   "validation": {
     "emailInvalid": "Enter a valid email address.",
@@ -98,11 +110,12 @@
     "acceptTermsRequired": "You must accept the terms to continue.",
     "passwordRequired": "Password is required.",
     "nameRequired": "Business name is required.",
+    "ownerNameRequired": "Your name is required.",
     "businessTypeRequired": "Business type is required.",
-    "countryRequired": "Country is required.",
-    "timezoneRequired": "Timezone is required.",
     "agentNameRequired": "Give your AI employee a name.",
-    "businessDescriptionRequired": "Tell us about your business."
+    "businessDescriptionRequired": "Tell us about your business.",
+    "phoneInvalid": "Enter a valid Iraqi mobile number (07XXXXXXXXX).",
+    "passwordsMustMatch": "Passwords do not match."
   },
   "onboarding": {
     "languages": {
@@ -110,17 +123,23 @@
       "en": "English",
       "ku": "Kurdish"
     },
+    "ownerName": {
+      "title": "Before we start, who are you?",
+      "description": "This name will appear on your account and dashboard.",
+      "nameLabel": "Your full name",
+      "namePlaceholder": "e.g. Ahmed Mohammed"
+    },
     "business": {
       "title": "Tell us about your business",
       "description": "This helps your AI employee introduce your business correctly.",
-      "nameLabel": "Business name",
-      "businessTypeLabel": "Business type",
-      "businessTypePlaceholder": "Select a business type",
-      "countryLabel": "Country",
-      "timezoneLabel": "Timezone",
-      "languageLabel": "Dashboard language",
-      "logoLabel": "Logo URL (optional)",
-      "businessTypes": {
+      "nameLabel": "Business name"
+    },
+    "businessType": {
+      "title": "What type of business is this?",
+      "description": "This helps us tailor your experience.",
+      "fieldLabel": "Business type",
+      "placeholder": "Select a business type",
+      "options": {
         "smallBusiness": "Small Business",
         "clinic": "Clinic",
         "restaurant": "Restaurant",
@@ -136,6 +155,14 @@
         "other": "Other"
       }
     },
+    "logo": {
+      "title": "Add your business logo",
+      "description": "This will be shown to your customers. You can skip this and add it later.",
+      "uploadLabel": "Upload photo",
+      "changeLabel": "Change photo",
+      "removeLabel": "Remove",
+      "uploadHint": "PNG or JPG, up to 5MB"
+    },
     "agentName": {
       "title": "Create your AI employee",
       "description": "Give your AI employee a name — this is who your customers will be talking to.",
@@ -146,10 +173,6 @@
       "title": "Describe your business",
       "description": "Who are you? What do you sell? How should the AI behave? What makes your company unique?",
       "label": "Business description"
-    },
-    "language": {
-      "title": "What language should your AI reply in?",
-      "description": "This is the language your AI employee uses when talking to customers."
     },
     "tone": {
       "title": "Choose your AI's tone",
@@ -162,41 +185,6 @@
         "casual": "Casual",
         "medical": "Medical",
         "corporate": "Corporate"
-      }
-    },
-    "creativity": {
-      "title": "How creative should your AI be?",
-      "description": "This controls how much your AI varies its replies.",
-      "options": {
-        "low": {
-          "label": "Low",
-          "description": "Sticks closely to facts and scripted answers."
-        },
-        "medium": {
-          "label": "Medium",
-          "description": "Balanced — natural but predictable."
-        },
-        "high": {
-          "label": "High",
-          "description": "More conversational and expressive."
-        }
-      }
-    },
-    "hours": {
-      "title": "Set your working hours",
-      "description": "Your AI can let customers know when the team is available.",
-      "timezoneLabel": "Timezone",
-      "closedLabel": "Closed",
-      "holidayNotesLabel": "Holiday / closed-date notes (optional)",
-      "holidayNotesPlaceholder": "e.g. Closed on public holidays",
-      "weekdays": {
-        "mon": "Monday",
-        "tue": "Tuesday",
-        "wed": "Wednesday",
-        "thu": "Thursday",
-        "fri": "Friday",
-        "sat": "Saturday",
-        "sun": "Sunday"
       }
     },
     "handover": {
@@ -269,12 +257,9 @@
     "integrationsLink": "Integrations",
     "campaignsLink": "Campaigns",
     "adsLink": "Ads",
-    "accountMenuLabel": "Workspace settings",
-    "workspaceProfileLink": "Workspace Profile",
-    "billingLink": "Billing",
-    "teamLink": "Team",
-    "auditLogLink": "Audit log",
-    "supportLink": "Support",
+    "manageBusinessLink": "Manage your business",
+    "workspaceSwitcherLabel": "Workspace",
+    "agentSwitcherLabel": "AI employee",
     "platformAdminLink": "Admin Panel",
     "bands": {
       "today": {
@@ -796,6 +781,23 @@
       "killSwitchOffHint": "AI replies are disabled — every workspace's conversations are handed to a human automatically.",
       "enabledToast": "AI replies re-enabled.",
       "disabledToast": "AI replies disabled platform-wide.",
+      "defaultCreativityLabel": "Default AI creativity",
+      "defaultCreativityHint": "Controls how much the AI varies its replies across every workspace — no longer a per-merchant choice.",
+      "defaultCreativitySavedToast": "Default creativity saved.",
+      "creativity": {
+        "low": {
+          "label": "Low",
+          "description": "Sticks closely to facts and scripted answers."
+        },
+        "medium": {
+          "label": "Medium",
+          "description": "Balanced — natural but predictable."
+        },
+        "high": {
+          "label": "High",
+          "description": "More conversational and expressive."
+        }
+      },
       "byModelHeading": "By model",
       "emptyState": "No AI requests logged yet.",
       "modelRequests": "{count} requests",
@@ -1092,7 +1094,14 @@
       "ordersHeading": "Orders",
       "appointmentsHeading": "Appointments",
       "empty": "Nothing here yet.",
-      "noMessages": "No messages yet."
+      "noMessages": "No messages yet.",
+      "ownerHeading": "Owner account"
+    },
+    "workspaceDetail": {
+      "resetPassword": "Reset password",
+      "resettingPassword": "Resetting…",
+      "passwordResetDone": "Password reset. Share the new password below with the owner.",
+      "passwordResetInstructions": "New temporary password — share this with the account owner directly. It will not be shown again."
     }
   },
   "automations": {
@@ -1769,7 +1778,7 @@
     "pageTitle": "AI Employee",
     "pageDescription": "Manage how your AI employee behaves and responds to customers.",
     "businessInfoTitle": "Business Info",
-    "businessInfoDescription": "Your business details and dashboard language.",
+    "businessInfoDescription": "Your business details.",
     "agentProfileTitle": "AI Employee",
     "agentProfileDescription": "Your AI employee's name and business description.",
     "personalityTitle": "Personality",
@@ -1782,8 +1791,10 @@
     "handoverOff": "Handover off"
   },
   "workspaceProfile": {
-    "pageTitle": "Workspace Profile",
-    "pageDescription": "Your business details and dashboard language."
+    "pageTitle": "Manage your business",
+    "pageDescription": "Your business details.",
+    "logoUrlLabel": "Logo URL (optional)",
+    "profileTabLabel": "Business info"
   },
   "auditLog": {
     "pageTitle": "Activity Log",

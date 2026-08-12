@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Plan, Workspace } from "@/db/schema";
+import { WORKSPACE_TIMEZONE, type Plan, type Workspace } from "@/db/schema";
 import { activateSubscriptionAction } from "../actions/activate-subscription.action";
 import { deleteWorkspaceAction } from "../actions/delete-workspace.action";
 import type { AiUsageByWorkspace } from "../repository/ai-usage-admin.repository";
@@ -43,7 +43,7 @@ export function WorkspaceRow({
   const [confirmSlug, setConfirmSlug] = useState("");
   const [isDeleted, setIsDeleted] = useState(false);
 
-  const formatter = new Intl.DateTimeFormat("en-GB", { timeZone: workspace.timezone, dateStyle: "medium" });
+  const formatter = new Intl.DateTimeFormat("en-GB", { timeZone: WORKSPACE_TIMEZONE, dateStyle: "medium" });
 
   function handlePlanSelect(planId: string) {
     setSelectedPlanId(planId);

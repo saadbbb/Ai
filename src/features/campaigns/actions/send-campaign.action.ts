@@ -19,6 +19,7 @@ export async function sendCampaignAction(input: unknown): Promise<ActionResult<C
   try {
     const campaign = await campaignService.sendCampaign(workspace.id, parsed.data.campaignId, {
       userId: user.id,
+      name: user.name,
       email: user.email,
     });
     return actionOk(campaign);

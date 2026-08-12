@@ -17,7 +17,7 @@ export async function adminReplyTicketAction(input: unknown): Promise<ActionResu
   try {
     const message = await ticketAdminService.replyToTicket(
       admin.id,
-      admin.email,
+      admin.name ?? admin.email ?? "Unknown",
       parsed.data.ticketId,
       parsed.data.content,
       parsed.data.isInternal,

@@ -37,14 +37,15 @@ export const IN_GOOD_STANDING_STATUSES = ["active", "past_due", "grace"] as cons
 /** Statuses that block dashboard access entirely — see dashboard/layout.tsx. */
 export const BLOCKED_SUBSCRIPTION_STATUSES = ["suspended", "cancelled", "expired"] as const;
 
+/** Iraq-only for now (see PART 3 spec) — every workspace/appointment/date display uses this instead of a per-workspace timezone column. */
+export const WORKSPACE_TIMEZONE = "Asia/Baghdad";
+
 export const workspaces = pgTable("workspaces", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   businessType: text("business_type"),
-  country: text("country"),
-  timezone: text("timezone").notNull().default("UTC"),
-  language: languageEnum("language").notNull().default("en"),
+  language: languageEnum("language").notNull().default("ar"),
   logoUrl: text("logo_url"),
   onboardingStep: integer("onboarding_step").notNull().default(0),
   onboardingCompletedAt: timestamp("onboarding_completed_at", { withTimezone: true }),

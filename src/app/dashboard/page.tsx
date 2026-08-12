@@ -8,7 +8,6 @@ import {
   ListChecks,
   MessageSquare,
   Snowflake,
-  TrendingUp,
   UserCheck,
   UserPlus,
 } from "lucide-react";
@@ -83,8 +82,8 @@ export default async function DashboardPage() {
   const topAgent = teamPerformance.length > 0 ? teamPerformance[0] : undefined;
 
   return (
-    <PageContainer className="space-y-8">
-      <PageHeader title={t("welcomeBack")} description={t("signedInAs", { email: user.email })} />
+    <PageContainer>
+      <PageHeader title={t("welcomeBack")} description={t("signedInAs", { email: user.name ?? user.email ?? user.phone ?? "" })} />
 
       <InsightsPanel />
 
@@ -153,15 +152,7 @@ export default async function DashboardPage() {
       </Section>
 
       {growth && (
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="size-4 text-primary" />
-            <div>
-              <h2 className="font-heading text-sm font-semibold text-foreground">{t("bands.growing.heading")}</h2>
-              <p className="text-xs text-muted-foreground">{t("bands.growing.subheading")}</p>
-            </div>
-          </div>
-
+        <Section title={t("bands.growing.heading")} description={t("bands.growing.subheading")}>
           <div className="grid gap-6 md:grid-cols-2">
             <HealthScoreCard
               healthScore={growth.healthScore}
@@ -187,7 +178,7 @@ export default async function DashboardPage() {
 
             <div className="space-y-4">
               <StatGrid
-                className="grid-cols-3 sm:grid-cols-3 lg:grid-cols-3"
+                className="grid-cols-1 sm:grid-cols-3"
                 stats={[
                   { label: t("bands.growing.revenue"), value: growth.kpis.revenueTotal.toFixed(2), icon: DollarSign, tone: "success" },
                   { label: t("bands.growing.ordersCompleted"), value: growth.kpis.ordersCompleted, icon: ListChecks },
@@ -213,7 +204,7 @@ export default async function DashboardPage() {
               </div>
             </div>
           </div>
-        </section>
+        </Section>
       )}
 
       {isOwner && (
@@ -233,7 +224,7 @@ export default async function DashboardPage() {
                 icon: MessageSquare,
               },
               { label: t("bands.business.topProduct"), value: topProduct?.productName ?? "—" },
-              { label: t("bands.business.topAgent"), value: topAgent?.email ?? "—" },
+              { label: t("bands.business.topAgent"), value: topAgent?.name ?? topAgent?.email ?? "—" },
             ]}
           />
         </Section>

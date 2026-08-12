@@ -18,17 +18,31 @@ export interface StatTileProps {
 }
 
 export function StatTile({ label, value, icon: Icon, tone = "default", href }: StatTileProps) {
+  // Numeric/short KPIs ("128", "Trial") read best large; longer strings (channel
+  // and product names) need to step down a size or two so they don't blow out
+  // the tile's fixed width instead of just looking a little smaller.
+  const valueText = String(value);
+  const valueSizeClass =
+    valueText.length > 16 ? "text-sm leading-snug" : valueText.length > 10 ? "text-lg leading-snug" : "text-2xl";
+
   const content = (
     <Card className={cn("gap-2 px-4", href && "transition-shadow hover:shadow-md")}>
       <div className="flex items-center justify-between gap-2">
-        <p className="truncate text-xs font-semibold text-text-muted">{label}</p>
+        <p className="line-clamp-2 break-words text-xs font-semibold text-text-muted">{label}</p>
         {Icon && (
           <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-[8px]", TONE_CLASSES[tone])}>
             <Icon className="size-3.5" />
           </span>
         )}
       </div>
-      <p className="font-heading text-2xl font-extrabold tabular-nums text-foreground">{value}</p>
+      <p
+        className={cn(
+          "font-heading font-extrabold tabular-nums text-foreground line-clamp-2 break-words",
+          valueSizeClass,
+        )}
+      >
+        {value}
+      </p>
     </Card>
   );
 

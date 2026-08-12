@@ -4,6 +4,7 @@ import { RowList } from "@/components/data-table";
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
+import { WORKSPACE_TIMEZONE } from "@/db/schema";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { buildUnifiedActivityFeed } from "@/features/workspace/lib/unified-activity";
 import { workspaceAuditLogRepository } from "@/features/workspace/repository/workspace-audit-log.repository";
@@ -21,7 +22,7 @@ export default async function AuditLogPage() {
   ]);
   const events = buildUnifiedActivityFeed(activities, auditLogs);
   const formatter = new Intl.DateTimeFormat("en-GB", {
-    timeZone: workspace.timezone,
+    timeZone: WORKSPACE_TIMEZONE,
     dateStyle: "medium",
     timeStyle: "short",
   });

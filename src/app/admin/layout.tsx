@@ -67,7 +67,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <SidebarNav groups={groups} />
         </div>
         <div className="border-t p-2">
-          <AccountMenu email={admin.email} items={accountItems} logoutSlot={<LogoutButton />} />
+          <AccountMenu email={admin.name ?? admin.email ?? ""} items={accountItems} logoutSlot={<LogoutButton />} />
         </div>
       </aside>
 
@@ -78,6 +78,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <MobileNav
                 groups={groups}
                 productName={productName}
+                homeHref="/admin"
                 accountItems={accountItems}
                 navLabel={t("menuLabel")}
                 logoutSlot={<LogoutButton />}

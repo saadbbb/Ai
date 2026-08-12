@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import type { AiAgent, Faq, Product, Service } from "@/db/schema";
-import { DEFAULT_WORKING_HOURS } from "../constants";
 import { buildSystemPrompt } from "./prompt-builder";
 
 function makeAgent(overrides: Partial<AiAgent> = {}): AiAgent {
@@ -9,10 +8,7 @@ function makeAgent(overrides: Partial<AiAgent> = {}): AiAgent {
     workspaceId: "workspace-1",
     name: "Sara",
     businessDescription: null,
-    language: "en",
     tone: "friendly",
-    creativity: "medium",
-    workingHours: null,
     handoverEnabled: false,
     handoverInstructions: null,
     createdAt: new Date(),
@@ -21,28 +17,26 @@ function makeAgent(overrides: Partial<AiAgent> = {}): AiAgent {
   };
 }
 
-const BASE_INPUT = { agent: makeAgent(), faqs: [] as Faq[], products: [] as Product[], services: [] as Service[], policy: null };
+const BASE_INPUT = {
+  agent: makeAgent(),
+  faqs: [] as Faq[],
+  products: [] as Product[],
+  services: [] as Service[],
+  policy: null,
+  creativity: "medium" as const,
+};
 
-describe("buildSystemPrompt — working hours", () => {
-  it("says nothing about hours when the agent has none configured", () => {
+describe("buildSystemPrompt — language", () => {
+  it("always instructs the AI to match the customer's language rather than a fixed one", () => {
     const prompt = buildSystemPrompt(BASE_INPUT);
-    expect(prompt).not.toContain("currently open");
-    expect(prompt).not.toContain("currently closed");
+    expect(prompt).toContain("Always reply in the same language the customer's most recent message is written in");
   });
+});
 
-  it("tells the AI the business is open when the current time is within schedule", () => {
-    const mondayNoonUtc = new Date("2026-03-16T12:00:00.000Z"); // a Monday
-    const agent = makeAgent({ workingHours: DEFAULT_WORKING_HOURS });
-    const prompt = buildSystemPrompt({ ...BASE_INPUT, agent }, mondayNoonUtc);
-    expect(prompt).toContain("currently open");
-  });
-
-  it("tells the AI the business is closed and includes holiday notes when outside schedule", () => {
-    const sundayUtc = new Date("2026-03-15T12:00:00.000Z"); // a Sunday, closed in DEFAULT_WORKING_HOURS
-    const agent = makeAgent({ workingHours: { ...DEFAULT_WORKING_HOURS, holidayNotes: "Closed for Eid" } });
-    const prompt = buildSystemPrompt({ ...BASE_INPUT, agent }, sundayUtc);
-    expect(prompt).toContain("currently closed");
-    expect(prompt).toContain("Closed for Eid");
+describe("buildSystemPrompt — creativity", () => {
+  it("uses the platform-wide creativity passed in, not a per-agent value", () => {
+    const prompt = buildSystemPrompt({ ...BASE_INPUT, creativity: "high" });
+    expect(prompt).toContain("more conversational, expressive, and varied");
   });
 });
 

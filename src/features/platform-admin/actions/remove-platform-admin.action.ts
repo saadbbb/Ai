@@ -22,7 +22,7 @@ export async function removePlatformAdminAction(input: unknown): Promise<ActionR
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "platform_admin_removed",
       targetType: "platform_admin",
       targetId: parsed.data.id,

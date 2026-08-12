@@ -17,7 +17,8 @@ interface CreateCampaignInput {
 
 interface AdsActor {
   userId: string;
-  email: string;
+  name: string | null;
+  email: string | null;
 }
 
 /** Check-then-create, same pattern as ai_agents/storefronts — one row per workspace. */
@@ -44,7 +45,7 @@ async function createCampaign(workspaceId: string, input: CreateCampaignInput, a
   await workspaceAuditLogRepository.log({
     workspaceId,
     actorUserId: actor.userId,
-    actorEmail: actor.email,
+    actorEmail: actor.name ?? actor.email ?? "Unknown",
     action: "ad_campaign_created",
     targetType: "ad_campaign",
     targetId: campaign.id,

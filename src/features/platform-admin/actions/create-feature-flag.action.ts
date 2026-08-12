@@ -28,7 +28,7 @@ export async function createFeatureFlagAction(input: unknown): Promise<ActionRes
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "feature_flag_created",
       targetType: "feature_flag",
       targetId: flag.id,

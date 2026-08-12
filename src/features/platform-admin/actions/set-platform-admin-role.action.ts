@@ -21,7 +21,7 @@ export async function setPlatformAdminRoleAction(input: unknown): Promise<Action
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "platform_admin_role_changed",
       targetType: "platform_admin",
       targetId: updated.id,

@@ -15,7 +15,7 @@ export async function setTicketCategoryAction(input: unknown): Promise<ActionRes
   const admin = await requireWritePlatformAdmin();
 
   try {
-    const ticket = await ticketAdminService.setCategory(admin.id, admin.email, parsed.data.ticketId, parsed.data.category);
+    const ticket = await ticketAdminService.setCategory(admin.id, admin.name ?? admin.email ?? "Unknown", parsed.data.ticketId, parsed.data.category);
     return actionOk(ticket);
   } catch (error) {
     return actionFail(error);

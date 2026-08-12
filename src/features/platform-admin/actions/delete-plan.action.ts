@@ -22,7 +22,7 @@ export async function deletePlanAction(input: unknown): Promise<ActionResult<und
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "plan_deleted",
       targetType: "plan",
       targetId: parsed.data.id,

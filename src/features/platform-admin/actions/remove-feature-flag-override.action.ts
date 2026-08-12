@@ -19,7 +19,7 @@ export async function removeFeatureFlagOverrideAction(input: unknown): Promise<A
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "feature_flag_override_removed",
       targetType: "feature_flag",
       targetId: parsed.data.id,

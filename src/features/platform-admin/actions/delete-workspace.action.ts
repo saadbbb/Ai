@@ -33,7 +33,7 @@ export async function deleteWorkspaceAction(input: unknown): Promise<ActionResul
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "workspace_deleted",
       targetType: "workspace",
       targetId: workspace.id,

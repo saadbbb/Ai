@@ -31,7 +31,7 @@ export async function notifyWorkspaceOwner(input: NotifyWorkspaceOwnerInput): Pr
   try {
     const ownerUserId = await membershipRepository.findOwnerUserId(input.workspaceId);
     const owner = ownerUserId ? await userRepository.findById(ownerUserId) : null;
-    if (!owner) return;
+    if (!owner?.email) return;
     await emailService.sendNotificationEmail({ to: owner.email, subject: input.title, text: input.message });
   } catch (error) {
     console.error(`[notify-owner] email failed for workspace ${input.workspaceId}:`, error);

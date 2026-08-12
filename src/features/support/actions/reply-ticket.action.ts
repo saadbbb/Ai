@@ -17,7 +17,7 @@ export async function replyTicketAction(input: unknown): Promise<ActionResult<Su
   await requireWorkspacePermission(user.id, workspace.id, "support.tickets.view");
 
   try {
-    const message = await ticketService.replyToTicket(workspace.id, user.id, user.email, parsed.data.ticketId, parsed.data.content);
+    const message = await ticketService.replyToTicket(workspace.id, user.id, user.name ?? user.email ?? user.phone ?? "Unknown", parsed.data.ticketId, parsed.data.content);
     return actionOk(message);
   } catch (error) {
     return actionFail(error);

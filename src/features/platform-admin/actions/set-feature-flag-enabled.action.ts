@@ -21,7 +21,7 @@ export async function setFeatureFlagEnabledAction(input: unknown): Promise<Actio
 
     await auditLogRepository.log({
       actorUserId: admin.id,
-      actorEmail: admin.email,
+      actorEmail: admin.name ?? admin.email ?? "Unknown",
       action: "feature_flag_toggled",
       targetType: "feature_flag",
       targetId: flag.id,

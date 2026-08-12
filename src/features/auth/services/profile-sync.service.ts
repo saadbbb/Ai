@@ -86,20 +86,37 @@ async function notifyAdminsOfNewSignup(workspaceName: string, ownerEmail: string
  * Creates the workspace in the same beat as the local user row, since
  * Supabase now owns the credential/verification step that used to precede
  * completeRegistrationAction's workspace creation.
+ *
+ * Identity is email OR phone (see users.ts) — phone accounts (see the phone
+ * sign-up action) have no email at all, so there's nothing to re-key by; the
+ * migration-era reKeyUserId path only applies to the email side.
  */
-async function ensureLocalUser(supabaseUserId: string, email: string): Promise<User> {
-  const existingByEmail = await userRepository.findByEmail(email);
-  if (existingByEmail) {
-    if (existingByEmail.id === supabaseUserId) return existingByEmail;
-    return reKeyUserId(existingByEmail.id, supabaseUserId, email);
+async function ensureLocalUser(
+  supabaseUserId: string,
+  identity: { email?: string | null; phone?: string | null },
+): Promise<User> {
+  // Supabase's User object uses "" (not null) for whichever of email/phone wasn't
+  // used to sign up — normalize here too so nothing downstream treats "" as a real value.
+  const email = identity.email || null;
+  const phone = identity.phone || null;
+
+  if (email) {
+    const existingByEmail = await userRepository.findByEmail(email);
+    if (existingByEmail) {
+      if (existingByEmail.id === supabaseUserId) return existingByEmail;
+      return reKeyUserId(existingByEmail.id, supabaseUserId, email);
+    }
+  } else if (phone) {
+    const existingByPhone = await userRepository.findByPhone(phone);
+    if (existingByPhone) return existingByPhone;
   }
 
-  const user = await userRepository.createFromSupabase(supabaseUserId, email);
-  const workspace = await workspaceService.createWorkspaceForNewUser(user.id, user.email);
+  const user = await userRepository.createFromSupabase(supabaseUserId, { email, phone });
+  const workspace = await workspaceService.createWorkspaceForNewUser(user.id, user.email ?? user.phone ?? user.id);
   // Awaited, not fire-and-forget — a serverless function can be frozen/killed
   // right after returning, so a detached promise here risks silently never
   // running. The try/catch inside already guarantees this can't fail registration.
-  await notifyAdminsOfNewSignup(workspace.name, user.email);
+  await notifyAdminsOfNewSignup(workspace.name, user.email ?? user.phone ?? "unknown");
   return user;
 }
 

@@ -28,7 +28,7 @@ export default async function NewAppointmentPage({ searchParams }: PageProps) {
       <NewAppointmentForm
         contacts={contacts}
         services={services}
-        members={members.map((item) => ({ id: item.user.id, label: item.user.email }))}
+        members={members.map((item) => ({ id: item.user.id, label: item.user.name ?? item.user.email ?? item.user.phone ?? "" }))}
         defaultContactId={contactId}
       />
     </div>

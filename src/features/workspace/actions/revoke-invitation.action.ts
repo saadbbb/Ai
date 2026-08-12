@@ -16,7 +16,7 @@ export async function revokeInvitationAction(input: unknown): Promise<ActionResu
   await requireWorkspacePermission(user.id, workspace.id, "workspace.members.manage");
 
   try {
-    await teamService.revokeInvitation(workspace.id, parsed.data.invitationId, { userId: user.id, email: user.email });
+    await teamService.revokeInvitation(workspace.id, parsed.data.invitationId, { userId: user.id, name: user.name, email: user.email });
     return actionOk(undefined);
   } catch (error) {
     return actionFail(error);

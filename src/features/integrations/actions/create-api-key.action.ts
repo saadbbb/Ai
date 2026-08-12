@@ -18,7 +18,7 @@ export async function createApiKeyAction(input: unknown): Promise<ActionResult<{
   await requireWorkspacePermission(user.id, workspace.id, "integrations.manage");
 
   try {
-    const result = await integrationService.createApiKey(workspace.id, parsed.data.name, { userId: user.id, email: user.email });
+    const result = await integrationService.createApiKey(workspace.id, parsed.data.name, { userId: user.id, name: user.name, email: user.email });
     return actionOk(result);
   } catch (error) {
     return actionFail(error);

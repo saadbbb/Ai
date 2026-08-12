@@ -21,7 +21,7 @@ export default async function NewWorkflowPage() {
     serviceRepository.findByWorkspaceId(workspace.id),
   ]);
 
-  const memberOptions = members.map((item) => ({ id: item.user.id, label: item.user.email }));
+  const memberOptions = members.map((item) => ({ id: item.user.id, label: item.user.name ?? item.user.email ?? item.user.phone ?? "" }));
   const workflowOptions = workflows.map((workflow) => ({ id: workflow.id, name: workflow.name }));
   const productOptions = products
     .filter((product) => product.price !== null)

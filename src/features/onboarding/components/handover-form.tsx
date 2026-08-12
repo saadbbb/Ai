@@ -67,7 +67,7 @@ export function HandoverForm({ defaultValues }: { defaultValues: HandoverInput }
           />
         </Field>
 
-        <StepFooter backHref="/onboarding/hours" isSubmitting={isSubmitting} />
+        <StepFooter backHref="/onboarding/tone" isSubmitting={isSubmitting} />
       </form>
     </StepShell>
   );

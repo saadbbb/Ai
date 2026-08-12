@@ -72,7 +72,7 @@ async function replyToTicket(
 
   if (row.ticket.createdByUserId) {
     const owner = await userRepository.findById(row.ticket.createdByUserId);
-    if (owner) {
+    if (owner?.email) {
       try {
         await emailService.sendNotificationEmail({
           to: owner.email,
