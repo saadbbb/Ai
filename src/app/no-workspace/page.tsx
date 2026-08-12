@@ -1,7 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/logo";
+import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { createRecoveryWorkspaceAction } from "@/features/workspace/actions/create-recovery-workspace.action";
 import { workspaceService } from "@/features/workspace/services/workspace.service";
 import { requireUser } from "@/lib/auth/auth-guard";
 
@@ -27,7 +29,12 @@ export default async function NoWorkspacePage() {
         <h1 className="font-heading text-xl font-extrabold text-foreground">{t("title")}</h1>
         <p className="text-sm text-text-secondary">{t("description")}</p>
       </div>
-      <LogoutButton />
+      <div className="flex items-center gap-3">
+        <form action={createRecoveryWorkspaceAction}>
+          <Button type="submit">{t("createWorkspace")}</Button>
+        </form>
+        <LogoutButton />
+      </div>
     </div>
   );
 }

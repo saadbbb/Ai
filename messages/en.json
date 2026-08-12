@@ -1847,6 +1847,7 @@
   },
   "noWorkspace": {
     "title": "No workspace found",
-    "description": "Your account isn't linked to any workspace right now. This can happen if it was removed by a platform admin. Sign out, or contact support if you think this is a mistake."
+    "description": "Your account isn't linked to any workspace right now — this can happen if it was removed by a platform admin. You can start a new workspace to keep using the app, or sign out.",
+    "createWorkspace": "Create a new workspace"
   }
 }
