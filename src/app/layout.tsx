@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Cairo, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
@@ -59,12 +59,17 @@ export const dynamic = "force-dynamic";
  * truth) client-side on mount — see components/theme-sync.tsx — since this
  * root layout has no user context of its own and must stay fast for every
  * public page (marketing, storefronts) that never call requireUser().
+ *
+ * `only <scheme>` (not just `<scheme>`) is deliberate — plain `color-scheme:
+ * dark` still lets some Android OEM browsers/WebViews (Samsung One UI,
+ * MIUI, etc., and some Chrome versions' "Force Dark") apply their own
+ * darkening on top when the device's system dark mode is on, regardless of
+ * what the page already declares. `only` is the CSS Color Adjustment spec's
+ * explicit "do not adapt this document to any other color scheme, under any
+ * circumstance" signal — the strongest opt-out available, rendered directly
+ * as a <meta> tag here rather than via generateViewport() because Next's
+ * typed Viewport.colorScheme doesn't include "only dark" as a value.
  */
-export async function generateViewport(): Promise<Viewport> {
-  const theme = await resolveThemeFromCookie();
-  return { colorScheme: theme };
-}
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -73,14 +78,18 @@ export default async function RootLayout({
   const locale = await getLocale();
   const messages = await getMessages();
   const theme = await resolveThemeFromCookie();
+  const colorScheme = `only ${theme}`;
 
   return (
     <html
       lang={locale}
       dir={dirFor(locale)}
       className={`${jakarta.variable} ${geistMono.variable} ${cairo.variable} h-full antialiased ${theme === "light" ? "light" : ""}`}
-      style={{ colorScheme: theme }}
+      style={{ colorScheme }}
     >
+      <head>
+        <meta name="color-scheme" content={colorScheme} />
+      </head>
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
           <TooltipProvider delayDuration={300}>

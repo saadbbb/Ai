@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { THEME_COOKIE_NAME, type Theme } from "@/lib/theme/config";
+import { applyThemeToDocument } from "@/lib/theme/apply-client";
+import type { Theme } from "@/lib/theme/config";
 
 /**
  * Cross-device correction: the account's stored theme (users.theme, passed
@@ -15,14 +16,11 @@ import { THEME_COOKIE_NAME, type Theme } from "@/lib/theme/config";
  */
 export function ThemeSync({ accountTheme }: { accountTheme: Theme }) {
   useEffect(() => {
-    const root = document.documentElement;
-    const currentlyLight = root.classList.contains("light");
+    const currentlyLight = document.documentElement.classList.contains("light");
     const shouldBeLight = accountTheme === "light";
     if (currentlyLight === shouldBeLight) return;
 
-    root.classList.toggle("light", shouldBeLight);
-    root.style.colorScheme = accountTheme;
-    document.cookie = `${THEME_COOKIE_NAME}=${accountTheme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+    applyThemeToDocument(accountTheme);
   }, [accountTheme]);
 
   return null;

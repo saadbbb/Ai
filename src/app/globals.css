@@ -92,12 +92,14 @@
  * genuine second palette reached only through an explicit user toggle (see
  * src/lib/theme) — never the OS/browser preference. `color-scheme` is set
  * here in CSS (not just via the server-rendered inline style/meta tag in
- * layout.tsx) as a second, cascade-driven guarantee — this is what stops
- * Android Chrome's "Auto Dark Theme for Web Contents" from algorithmically
- * re-darkening/inverting the page regardless of which theme is active.
+ * layout.tsx) as a second, cascade-driven guarantee. `only` is required, not
+ * just `dark`/`light` — some Android OEM browsers/WebViews apply their own
+ * forced darkening on top of a page regardless of system dark mode unless
+ * the document explicitly opts out with `only`, the CSS Color Adjustment
+ * spec's strongest "never adapt this document" signal.
  */
 :root {
-  color-scheme: dark;
+  color-scheme: only dark;
   --background: #0a0c11;
   --foreground: #f3f4f7;
   --card: #151923;
@@ -188,7 +190,7 @@
 
 /* Genuine light palette — light surfaces, dark text, same violet/mint brand colors. */
 .light {
-  color-scheme: light;
+  color-scheme: only light;
   --background: #f7f7fb;
   --foreground: #14161f;
   --card: #ffffff;
