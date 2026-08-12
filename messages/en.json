@@ -1844,5 +1844,9 @@
       "title": "Track deals by stage",
       "description": "Change a lead's stage from the dropdown on its card as the deal progresses. Score and temperature update automatically."
     }
+  },
+  "noWorkspace": {
+    "title": "No workspace found",
+    "description": "Your account isn't linked to any workspace right now. This can happen if it was removed by a platform admin. Sign out, or contact support if you think this is a mistake."
   }
 }

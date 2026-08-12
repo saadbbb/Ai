@@ -37,16 +37,20 @@ export const CURRENT_WORKSPACE_COOKIE = "current_workspace_id";
 
 /**
  * Every user gets a workspace at registration (see workspaceService.createWorkspaceForNewUser),
- * so a missing one here means corrupted state, not an unauthenticated request — send them
- * back through login rather than surfacing a raw error. If the user belongs to more than one
- * workspace (accepted a team invitation elsewhere), the CURRENT_WORKSPACE_COOKIE — set by
- * switchWorkspaceAction — picks which one; otherwise falls back to the first-joined.
+ * so a missing one here normally means corrupted state — except a platform admin can now hard-delete
+ * a workspace out from under an already-logged-in member (see admin/workspaces' delete action). That
+ * user is still authenticated, so redirecting to /login would loop forever: middleware bounces any
+ * authenticated request away from the auth pages straight back to /dashboard, which lands here again.
+ * /no-workspace is outside both the AUTH_PAGES list and the protected-route matcher, so middleware
+ * leaves it alone and the loop can't happen. If the user belongs to more than one workspace (accepted
+ * a team invitation elsewhere), the CURRENT_WORKSPACE_COOKIE — set by switchWorkspaceAction — picks
+ * which one; otherwise falls back to the first-joined.
  */
 export const requireWorkspaceForUser = cache(async (userId: string): Promise<Workspace> => {
   const cookieStore = await cookies();
   const preferredWorkspaceId = cookieStore.get(CURRENT_WORKSPACE_COOKIE)?.value;
   const workspace = await workspaceService.getPrimaryWorkspaceForUser(userId, preferredWorkspaceId);
-  if (!workspace) redirect("/login");
+  if (!workspace) redirect("/no-workspace");
 
   return workspace;
 });
