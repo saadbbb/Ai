@@ -11,13 +11,22 @@ type PreviewSize = keyof typeof WIDTHS;
 
 /**
  * A real iframe of the live/draft storefront (`?preview=1`, see get-storefront-data.ts's
- * owner-bypass) — not a static mockup. Re-mounts the iframe (via `key`) each time "Refresh"
- * fires so the owner sees their latest saved changes without a full page reload.
+ * owner-bypass) — not a static mockup. Re-mounts the iframe (via `key`) each time `refreshKey`
+ * changes, so the owner sees their latest saved changes without a full page reload. `refreshKey`
+ * is owned by the parent (`WebsiteEditorPanel`) so it can be bumped automatically right after a
+ * successful save, not just via this component's own manual "↻" button.
  */
-export function WebsitePreview({ storeUrl }: { storeUrl: string }) {
+export function WebsitePreview({
+  storeUrl,
+  refreshKey,
+  onManualRefresh,
+}: {
+  storeUrl: string;
+  refreshKey: number;
+  onManualRefresh: () => void;
+}) {
   const t = useTranslations("website");
   const [size, setSize] = useState<PreviewSize>("desktop");
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const sizes: { key: PreviewSize; label: string; icon: typeof Monitor }[] = [
     { key: "desktop", label: t("previewDesktop"), icon: Monitor },
@@ -45,11 +54,7 @@ export function WebsitePreview({ storeUrl }: { storeUrl: string }) {
                 <Icon className="size-4" />
               </button>
             ))}
-            <button
-              type="button"
-              onClick={() => setRefreshKey((current) => current + 1)}
-              className="rounded-md px-2 text-xs text-muted-foreground hover:bg-muted"
-            >
+            <button type="button" onClick={onManualRefresh} className="rounded-md px-2 text-xs text-muted-foreground hover:bg-muted">
               ↻
             </button>
           </div>

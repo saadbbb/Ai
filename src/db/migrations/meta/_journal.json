@@ -561,6 +561,13 @@
       "when": 1786589826127,
       "tag": "0079_broken_warbird",
       "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1786654909203,
+      "tag": "0080_steep_golden_guardian",
+      "breakpoints": true
     }
   ]
 }

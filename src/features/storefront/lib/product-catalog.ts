@@ -1,6 +1,19 @@
-import type { Product } from "@/db/schema";
+import type { Product, StorefrontProductDisplayMode } from "@/db/schema";
 
 export type ProductSort = "newest" | "price_asc" | "price_desc" | "best_selling" | "discounted";
+
+/** Wrapping container className for a `ProductCard` grid, shared by every catalog call site so the 3 display modes stay visually consistent. */
+export function productGridClass(mode: StorefrontProductDisplayMode): string {
+  switch (mode) {
+    case "list":
+      return "flex flex-col gap-2";
+    case "full":
+      return "flex flex-col gap-4";
+    case "grid":
+    default:
+      return "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4";
+  }
+}
 
 export interface CatalogFilters {
   search?: string;

@@ -1,5 +1,6 @@
 import "server-only";
 import type {
+  Order,
   Storefront,
   StorefrontButtonStyle,
   StorefrontCornerStyle,
@@ -8,6 +9,7 @@ import type {
   StorefrontFooterStyle,
   StorefrontHeaderStyle,
   StorefrontPopupTrigger,
+  StorefrontProductDisplayMode,
   StorefrontTheme,
 } from "@/db/schema";
 import type { Contact } from "@/db/schema";
@@ -20,7 +22,7 @@ import { contactRepository } from "@/features/inbox/repository/contact.repositor
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
 import { orderService } from "@/features/orders/services/order.service";
-import type { OrderListItem } from "@/features/orders/repository/order.repository";
+import { orderRepository, type OrderListItem } from "@/features/orders/repository/order.repository";
 import { workspaceRepository } from "@/features/workspace/repository/workspace.repository";
 import { AppError } from "@/lib/errors/app-error";
 import { connectDomain, removeDomain, verifyDomain } from "@/lib/vercel/domains-client";
@@ -65,6 +67,12 @@ interface StorefrontInput {
   popupButtonLink?: string;
   popupTrigger: StorefrontPopupTrigger;
   popupDelaySeconds: number;
+  productDisplayMode: StorefrontProductDisplayMode;
+  showProductDescription: boolean;
+  showComparePrice: boolean;
+  showCategories: boolean;
+  showSearch: boolean;
+  showFooter: boolean;
 }
 
 interface InquiryInput {
@@ -180,6 +188,12 @@ async function updateStorefront(workspaceId: string, input: StorefrontInput): Pr
     popupButtonLink: input.popupButtonLink || null,
     popupTrigger: input.popupTrigger,
     popupDelaySeconds: input.popupDelaySeconds,
+    productDisplayMode: input.productDisplayMode,
+    showProductDescription: input.showProductDescription,
+    showComparePrice: input.showComparePrice,
+    showCategories: input.showCategories,
+    showSearch: input.showSearch,
+    showFooter: input.showFooter,
   });
   return updated ?? existing;
 }
@@ -273,6 +287,40 @@ async function submitOrder(workspaceId: string, input: OrderInput): Promise<Orde
     },
     { type: "system" },
   );
+}
+
+export interface OrderConfirmation {
+  orderId: string;
+  createdAt: Date;
+  status: Order["status"];
+  customerName: string;
+  items: { name: string; unitPrice: string; quantity: number }[];
+  total: number;
+}
+
+/**
+ * The storefront's order-success screen — the one place an anonymous visitor can read back their
+ * own order after checkout. Workspace is resolved from the URL's own `slug`, never from a session,
+ * so this is safe to call with zero auth: an order ID from another workspace can never resolve here
+ * (findByIdForConfirmation is workspace-scoped), and the response is a hand-picked whitelist, never
+ * the full Contact row — phone/address never leave the server, only the name for a "thank you {name}" line.
+ */
+async function getOrderConfirmation(slug: string, orderId: string): Promise<OrderConfirmation | null> {
+  const workspace = await workspaceRepository.findBySlug(slug);
+  if (!workspace) return null;
+
+  const result = await orderRepository.findByIdForConfirmation(orderId, workspace.id);
+  if (!result) return null;
+
+  const total = result.items.reduce((sum, item) => sum + Number.parseFloat(item.unitPrice) * item.quantity, 0);
+  return {
+    orderId: result.order.id,
+    createdAt: result.order.createdAt,
+    status: result.order.status,
+    customerName: result.contact.fullName,
+    items: result.items.map((item) => ({ name: item.name, unitPrice: item.unitPrice, quantity: item.quantity })),
+    total,
+  };
 }
 
 interface AppointmentRequestInput {
@@ -383,6 +431,7 @@ export const storefrontService = {
   removeCustomDomain,
   submitInquiry,
   submitOrder,
+  getOrderConfirmation,
   submitAppointmentRequest,
   subscribeToNewsletter,
 };

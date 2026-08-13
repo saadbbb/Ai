@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { AppointmentRequestForm } from "@/features/storefront/components/appointment-request-form";
 import { InquiryForm } from "@/features/storefront/components/inquiry-form";
+import { ProductCard } from "@/features/storefront/components/product-card";
 import { PromotionCountdown } from "@/features/storefront/components/promotion-countdown";
 import { StorefrontShell } from "@/features/storefront/components/storefront-shell";
 import { getStorefrontData } from "@/features/storefront/lib/get-storefront-data";
 import { resolveLocalizedStorefrontText } from "@/features/storefront/lib/localized-content";
+import { productGridClass } from "@/features/storefront/lib/product-catalog";
 import { buildStorefrontMetadata } from "@/features/storefront/lib/seo";
-import { storefrontThemeClasses } from "@/features/storefront/lib/style-classes";
+import { storefrontButtonClass, storefrontCornerClass, storefrontThemeClasses } from "@/features/storefront/lib/style-classes";
 import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
 import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
@@ -62,7 +63,10 @@ export default async function PublicStorePage({ params, searchParams }: PageProp
   const activeProducts = products.filter((product) => product.isActive);
   const activeServices = services.filter((service) => service.isActive);
   const accentColor = storefront.primaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.primaryColor) ? storefront.primaryColor : "#2563eb";
+  const secondaryColor = storefront.secondaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.secondaryColor) ? storefront.secondaryColor : "#f97316";
   const themeClasses = storefrontThemeClasses(storefront);
+  const cornerClass = storefrontCornerClass(storefront);
+  const buttonClass = storefrontButtonClass(storefront);
   const visibleSections = storefront.sections;
 
   const sectionRenderers: Record<string, React.ReactNode> = {
@@ -100,73 +104,50 @@ export default async function PublicStorePage({ params, searchParams }: PageProp
       const featuredProducts = activeProducts.filter((product) => product.featured);
       if (featuredProducts.length === 0) return null;
       return (
-        <section key="featured" className="mx-auto max-w-4xl space-y-3 px-6 py-8">
+        <section key="featured" className="mx-auto max-w-5xl space-y-3 px-6 py-8">
           <h2 className={`text-lg ${themeClasses.heading}`}>{t("featuredHeading")}</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className={productGridClass(storefront.productDisplayMode)}>
             {featuredProducts.slice(0, 6).map((product) => (
-              <Link key={product.id} href={`/store/${slug}/products/${product.id}`}>
-                <Card className="h-full transition-shadow hover:shadow-md">
-                  {product.imageUrl && (
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.name}
-                      width={400}
-                      height={300}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="h-40 w-full rounded-t-lg object-cover"
-                    />
-                  )}
-                  <CardContent className="space-y-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium">{product.name}</p>
-                      {product.promotionEndsAt && <PromotionCountdown endsAt={product.promotionEndsAt.toISOString()} />}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {product.discountedPrice ? (
-                        <>
-                          <p className="text-sm font-medium" style={{ color: accentColor }}>{product.discountedPrice}</p>
-                          <p className="text-xs text-muted-foreground line-through">{product.price}</p>
-                        </>
-                      ) : (
-                        product.price && <p className="text-sm font-medium" style={{ color: accentColor }}>{product.price}</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+              <ProductCard
+                key={product.id}
+                slug={slug}
+                product={product}
+                mode={storefront.productDisplayMode}
+                accentColor={accentColor}
+                secondaryColor={secondaryColor}
+                cornerClass={cornerClass}
+                buttonClass={buttonClass}
+                showDescription={storefront.showProductDescription}
+                showComparePrice={storefront.showComparePrice}
+                badge={product.promotionEndsAt ? <PromotionCountdown endsAt={product.promotionEndsAt.toISOString()} /> : undefined}
+              />
             ))}
           </div>
         </section>
       );
     })(),
     products: activeProducts.length > 0 ? (
-      <section key="products" className="mx-auto max-w-4xl space-y-3 px-6 py-8">
+      <section key="products" className="mx-auto max-w-5xl space-y-3 px-6 py-8">
         <div className="flex items-center justify-between">
           <h2 className={`text-lg ${themeClasses.heading}`}>{t("productsHeading")}</h2>
           <Link href={`/store/${slug}/products`} className="text-sm text-primary hover:underline">
             {t("viewAll")}
           </Link>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={productGridClass(storefront.productDisplayMode)}>
           {activeProducts.slice(0, 3).map((product) => (
-            <Link key={product.id} href={`/store/${slug}/products/${product.id}`}>
-              <Card className="h-full transition-shadow hover:shadow-md">
-                {product.imageUrl && (
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    width={400}
-                    height={300}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="h-40 w-full rounded-t-lg object-cover"
-                  />
-                )}
-                <CardContent className="space-y-1">
-                  <p className="font-medium">{product.name}</p>
-                  {product.price && <p className="text-sm font-medium" style={{ color: accentColor }}>{product.price}</p>}
-                </CardContent>
-              </Card>
-            </Link>
+            <ProductCard
+              key={product.id}
+              slug={slug}
+              product={product}
+              mode={storefront.productDisplayMode}
+              accentColor={accentColor}
+              secondaryColor={secondaryColor}
+              cornerClass={cornerClass}
+              buttonClass={buttonClass}
+              showDescription={storefront.showProductDescription}
+              showComparePrice={storefront.showComparePrice}
+            />
           ))}
         </div>
       </section>

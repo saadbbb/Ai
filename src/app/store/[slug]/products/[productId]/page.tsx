@@ -3,15 +3,15 @@ import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { AddToCartButton } from "@/features/storefront/components/add-to-cart-button";
 import { InquiryForm } from "@/features/storefront/components/inquiry-form";
+import { CartControl, ProductCard } from "@/features/storefront/components/product-card";
 import { ProductViewTracker } from "@/features/storefront/components/product-view-tracker";
 import { ShareButton } from "@/features/storefront/components/share-button";
 import { StorefrontShell } from "@/features/storefront/components/storefront-shell";
 import { getStorefrontData } from "@/features/storefront/lib/get-storefront-data";
 import { recommendProducts } from "@/features/storefront/lib/product-catalog";
 import { buildStorefrontMetadata } from "@/features/storefront/lib/seo";
+import { storefrontButtonClass, storefrontCornerClass } from "@/features/storefront/lib/style-classes";
 import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
 import { storefrontAnalyticsService } from "@/features/storefront/services/storefront-analytics.service";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
@@ -58,6 +58,9 @@ export default async function StoreProductPage({ params }: PageProps) {
   const related = recommendProducts(allProducts, product.id, product.category, salesCounts);
 
   const accentColor = storefront.primaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.primaryColor) ? storefront.primaryColor : "#2563eb";
+  const secondaryColor = storefront.secondaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.secondaryColor) ? storefront.secondaryColor : "#f97316";
+  const cornerClass = storefrontCornerClass(storefront);
+  const buttonClass = storefrontButtonClass(storefront);
   const gallery = [product.imageUrl, ...product.galleryImageUrls].filter((url): url is string => !!url);
   const productUrl = `${getAppUrl()}/store/${slug}/products/${product.id}`;
   const whatsappNumber = storefront.socialLinks.whatsapp;
@@ -170,13 +173,8 @@ export default async function StoreProductPage({ params }: PageProps) {
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-2 pt-2">
-                <AddToCartButton
-                  productId={product.id}
-                  name={product.name}
-                  unitPrice={product.discountedPrice ?? product.price ?? "0"}
-                  outOfStock={outOfStock}
-                />
+              <div className="flex flex-wrap items-center gap-2 pt-2">
+                <CartControl product={product} buttonClass={buttonClass} />
                 <ShareButton title={product.name} url={productUrl} />
                 {whatsappHref && (
                   <a
@@ -200,26 +198,21 @@ export default async function StoreProductPage({ params }: PageProps) {
           {related.length > 0 && (
             <section className="space-y-3 border-t pt-8">
               <h2 className="text-lg font-medium">{t("relatedHeading")}</h2>
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
                 {related.map((item) => (
-                  <Link key={item.id} href={`/store/${slug}/products/${item.id}`}>
-                    <Card className="h-full transition-shadow hover:shadow-md">
-                      {item.imageUrl && (
-                        <Image
-                          src={item.imageUrl}
-                          alt={item.name}
-                          width={300}
-                          height={240}
-                          sizes="(max-width: 640px) 100vw, 33vw"
-                          className="h-32 w-full rounded-t-lg object-cover"
-                        />
-                      )}
-                      <CardContent className="space-y-1">
-                        <p className="text-sm font-medium">{item.name}</p>
-                        {item.price && <p className="text-xs text-muted-foreground">{item.price}</p>}
-                      </CardContent>
-                    </Card>
-                  </Link>
+                  <ProductCard
+                    key={item.id}
+                    slug={slug}
+                    product={item}
+                    mode="grid"
+                    size="sm"
+                    accentColor={accentColor}
+                    secondaryColor={secondaryColor}
+                    cornerClass={cornerClass}
+                    buttonClass={buttonClass}
+                    showDescription={storefront.showProductDescription}
+                    showComparePrice={storefront.showComparePrice}
+                  />
                 ))}
               </div>
             </section>

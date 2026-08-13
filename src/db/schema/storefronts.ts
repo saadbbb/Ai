@@ -10,6 +10,8 @@ export const storefrontHeaderStyleEnum = pgEnum("storefront_header_style", ["sta
 export const storefrontFooterStyleEnum = pgEnum("storefront_footer_style", ["standard", "minimal"]);
 /** Popup Builder depth (PART 13 gap #139), scoped to a single configurable popup rather than a full multi-popup builder. */
 export const storefrontPopupTriggerEnum = pgEnum("storefront_popup_trigger", ["first_visit", "delay", "exit_intent"]);
+/** How the public store lays out its product grids/sections — merchant-controlled, see storefront-editor.tsx's appearance tab. */
+export const storefrontProductDisplayModeEnum = pgEnum("storefront_product_display_mode", ["grid", "list", "full"]);
 /** "none" until a domain is entered; "pending" until Vercel's DNS check passes; "failed" is surfaced so the owner can re-check. */
 export const storefrontCustomDomainStatusEnum = pgEnum("storefront_custom_domain_status", [
   "none",
@@ -107,6 +109,14 @@ export const storefronts = pgTable(
     popupButtonLink: text("popup_button_link"),
     popupTrigger: storefrontPopupTriggerEnum("popup_trigger").notNull().default("delay"),
     popupDelaySeconds: integer("popup_delay_seconds").notNull().default(5),
+    // Modern-storefront redesign — merchant-controlled product layout + visibility toggles,
+    // deliberately kept to this short list (see storefront-editor.tsx's appearance tab).
+    productDisplayMode: storefrontProductDisplayModeEnum("product_display_mode").notNull().default("grid"),
+    showProductDescription: boolean("show_product_description").notNull().default(true),
+    showComparePrice: boolean("show_compare_price").notNull().default(true),
+    showCategories: boolean("show_categories").notNull().default(true),
+    showSearch: boolean("show_search").notNull().default(true),
+    showFooter: boolean("show_footer").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -123,3 +133,4 @@ export type StorefrontHeaderStyle = (typeof storefrontHeaderStyleEnum.enumValues
 export type StorefrontFooterStyle = (typeof storefrontFooterStyleEnum.enumValues)[number];
 export type StorefrontPopupTrigger = (typeof storefrontPopupTriggerEnum.enumValues)[number];
 export type StorefrontCustomDomainStatus = (typeof storefrontCustomDomainStatusEnum.enumValues)[number];
+export type StorefrontProductDisplayMode = (typeof storefrontProductDisplayModeEnum.enumValues)[number];

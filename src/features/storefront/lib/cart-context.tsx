@@ -7,6 +7,8 @@ export interface CartItem {
   name: string;
   unitPrice: string;
   quantity: number;
+  /** Optional — old localStorage carts won't have this; the cart page falls back to a placeholder. */
+  imageUrl?: string;
 }
 
 interface CartContextValue {
@@ -27,6 +29,15 @@ function storageKey(slug: string): string {
 /** localStorage-backed, per-store cart — no account/session needed for an anonymous storefront visitor. */
 export function CartProvider({ slug, children }: { slug: string; children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  // Every full page navigation remounts this provider from scratch (it isn't in a persistent
+  // layout), so the read-from-localStorage effect below and the write effect further down both
+  // fire on the very same mount. Without this guard, the write effect's first run captures the
+  // *initial* `items = []` closure (the read's `setItems` hasn't been applied to state yet) and
+  // immediately overwrites the just-restored cart with an empty array — a real data-loss bug
+  // caught by testing the products→cart navigation live, not a hypothetical. `hasHydrated` and
+  // `items` are set together (batched) once the read completes, so the write effect only ever
+  // sees them change in sync — never a stale-empty `items` paired with "go ahead and persist."
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem(storageKey(slug));
@@ -37,11 +48,13 @@ export function CartProvider({ slug, children }: { slug: string; children: React
         // Corrupt/old cart data — start fresh rather than crash the page.
       }
     }
+    setHasHydrated(true);
   }, [slug]);
 
   useEffect(() => {
+    if (!hasHydrated) return;
     localStorage.setItem(storageKey(slug), JSON.stringify(items));
-  }, [slug, items]);
+  }, [slug, items, hasHydrated]);
 
   const addItem = useCallback((item: Omit<CartItem, "quantity">, quantity = 1) => {
     setItems((current) => {

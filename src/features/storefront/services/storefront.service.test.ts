@@ -113,6 +113,12 @@ function makeStorefront(overrides: Partial<Storefront> = {}): Storefront {
     popupButtonLink: null,
     popupTrigger: "delay",
     popupDelaySeconds: 5,
+    productDisplayMode: "grid",
+    showProductDescription: true,
+    showComparePrice: true,
+    showCategories: true,
+    showSearch: true,
+    showFooter: true,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
@@ -187,6 +193,12 @@ describe("storefrontService.updateStorefront", () => {
     popupEnabled: false,
     popupTrigger: "delay" as const,
     popupDelaySeconds: 5,
+    productDisplayMode: "grid" as const,
+    showProductDescription: true,
+    showComparePrice: true,
+    showCategories: true,
+    showSearch: true,
+    showFooter: true,
   };
 
   it("drops blank entries from socialLinks and trackingIds before persisting", async () => {

@@ -2,11 +2,14 @@
 
 import { MessageCircle, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { askStoreAssistantAction } from "../actions/ask-store-assistant.action";
+import { useCart } from "../lib/cart-context";
+import { isCartOverlayRoute } from "../lib/cart-routes";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -19,6 +22,9 @@ export function StoreAssistantWidget({ slug }: { slug: string }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const { itemCount } = useCart();
+  const pathname = usePathname();
+  const cartBarVisible = itemCount > 0 && !isCartOverlayRoute(pathname, slug);
 
   async function handleSend() {
     const content = input.trim();
@@ -41,7 +47,7 @@ export function StoreAssistantWidget({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="fixed bottom-4 end-4 z-50">
+    <div className={cn("fixed end-4 z-50 transition-[bottom]", cartBarVisible ? "bottom-24" : "bottom-4")}>
       {isOpen && (
         <div className="mb-3 flex h-96 w-80 flex-col rounded-lg border bg-popover shadow-lg">
           <div className="flex items-center justify-between border-b p-3">

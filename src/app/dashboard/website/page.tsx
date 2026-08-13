@@ -6,8 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SetupScoreCard } from "@/features/storefront/components/setup-score-card";
-import { StorefrontEditor } from "@/features/storefront/components/storefront-editor";
-import { WebsitePreview } from "@/features/storefront/components/website-preview";
+import { WebsiteEditorPanel } from "@/features/storefront/components/website-editor-panel";
 import { storefrontService } from "@/features/storefront/services/storefront.service";
 import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
@@ -79,10 +78,7 @@ export default async function WebsitePage() {
         hasTracking={Object.values(storefront.trackingIds ?? {}).some((value) => !!value)}
       />
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_420px]">
-        <StorefrontEditor storefront={storefront} storeUrl={storeUrl} slug={workspace.slug} logoUrl={workspace.logoUrl} />
-        <WebsitePreview storeUrl={storeUrl} />
-      </div>
+      <WebsiteEditorPanel storefront={storefront} storeUrl={storeUrl} slug={workspace.slug} logoUrl={workspace.logoUrl} />
     </PageContainer>
   );
 }

@@ -76,6 +76,17 @@ export const orderRepository = {
     return withItems;
   },
 
+  /**
+   * Public order-confirmation lookup — the storefront checkout success screen's only entry point
+   * to an anonymous visitor's own order. Same query/shape as `findById`, kept as a distinctly named
+   * alias so it's clear at every call site that this one is meant to be reachable with no session,
+   * scoped only by knowing the exact order UUID plus a workspace resolved from the store's own slug
+   * (never from auth) — the same trust model any e-commerce "order confirmation" link uses.
+   */
+  async findByIdForConfirmation(id: string, workspaceId: string): Promise<OrderListItem | null> {
+    return orderRepository.findById(id, workspaceId);
+  },
+
   async create(order: NewOrder, items: Omit<NewOrderItem, "orderId">[]): Promise<OrderListItem> {
     return db.transaction(async (tx) => {
       const [createdOrder] = await tx.insert(orders).values(order).returning();

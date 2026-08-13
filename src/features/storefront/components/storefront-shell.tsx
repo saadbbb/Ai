@@ -1,16 +1,14 @@
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
-import Link from "next/link";
-import { LocaleSwitcher } from "@/components/locale-switcher";
 import type { Storefront } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import { CartProvider } from "../lib/cart-context";
-import { CartBadge } from "./cart-badge";
-import { NewsletterSignupForm } from "./newsletter-signup-form";
+import { CartSummaryBar } from "./cart-summary-bar";
 import { PageViewTracker } from "./page-view-tracker";
 import { PromoPopup } from "./promo-popup";
-import { SocialLinksRow } from "./social-links-row";
 import { StoreAssistantWidget } from "./store-assistant-widget";
+import { StoreFooter } from "./store-footer";
+import { StoreHeader } from "./store-header";
 import { TrackingScripts } from "./tracking-scripts";
 
 interface StorefrontShellProps {
@@ -53,42 +51,7 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
           </div>
         )}
 
-        <header className="border-b" style={{ borderColor: accentColor }}>
-          <div
-            className={cn(
-              "mx-auto flex max-w-5xl flex-wrap items-center gap-4 px-6 py-4",
-              storefront.headerStyle === "centered" && "flex-col text-center",
-              storefront.headerStyle === "minimal" ? "justify-between" : "justify-between",
-            )}
-          >
-            <Link href={base} className="flex items-center gap-3">
-              {logoUrl && (
-                <Image
-                  src={logoUrl}
-                  alt={workspaceName}
-                  width={40}
-                  height={40}
-                  sizes="40px"
-                  className="h-10 w-10 rounded-full object-cover"
-                />
-              )}
-              <span className="text-lg font-semibold">{workspaceName}</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              {storefront.headerStyle !== "minimal" && (
-                <nav className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                  {links.map((link) => (
-                    <Link key={link.href} href={link.href} className="hover:text-foreground">
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
-              )}
-              <LocaleSwitcher />
-              <CartBadge slug={slug} />
-            </div>
-          </div>
-        </header>
+        <StoreHeader storefront={storefront} workspaceName={workspaceName} logoUrl={logoUrl} slug={slug} links={links} />
 
         {storefront.bannerImageUrl && (
           <div className="relative h-48 w-full sm:h-64">
@@ -98,25 +61,9 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
 
         <main>{children}</main>
 
-        <footer className={cn("border-t", storefront.footerStyle === "minimal" ? "py-6" : "py-10")}>
-          <div className="mx-auto max-w-5xl space-y-3 px-6 text-center">
-            {storefront.footerStyle !== "minimal" && (
-              <nav className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-                {links.map((link) => (
-                  <Link key={link.href} href={link.href} className="hover:text-foreground">
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-            )}
-            <SocialLinksRow links={storefront.socialLinks} />
-            {storefront.footerStyle !== "minimal" && <NewsletterSignupForm slug={slug} />}
-            <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} {workspaceName}
-            </p>
-          </div>
-        </footer>
+        <StoreFooter storefront={storefront} workspaceName={workspaceName} slug={slug} links={links} />
 
+        <CartSummaryBar slug={slug} />
         <StoreAssistantWidget slug={slug} />
       </div>
     </CartProvider>

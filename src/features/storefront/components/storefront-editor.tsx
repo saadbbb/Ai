@@ -1,5 +1,6 @@
 "use client";
 
+import { LayoutGrid, List, Rows3 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -20,6 +21,7 @@ import type {
   StorefrontFooterStyle,
   StorefrontHeaderStyle,
   StorefrontPopupTrigger,
+  StorefrontProductDisplayMode,
   StorefrontTheme,
 } from "@/db/schema";
 import { updateSlugAction } from "@/features/workspace/actions/update-slug.action";
@@ -40,6 +42,12 @@ const ALL_SECTION_KEYS = ["hero", "about", "featured", "products", "services", "
 const TRACKING_KEYS = ["metaPixelId", "googleAnalyticsId", "googleTagManagerId", "tiktokPixelId"] as const;
 const CONTENT_LOCALES = ["en", "ar", "ku"] as const;
 const CONTENT_LOCALE_LABELS: Record<(typeof CONTENT_LOCALES)[number], string> = { en: "English", ar: "العربية", ku: "کوردی" };
+const PRODUCT_DISPLAY_MODES: StorefrontProductDisplayMode[] = ["grid", "list", "full"];
+const PRODUCT_DISPLAY_MODE_ICONS: Record<StorefrontProductDisplayMode, typeof LayoutGrid> = {
+  grid: LayoutGrid,
+  list: List,
+  full: Rows3,
+};
 type StorefrontTranslations = Record<string, { heroTitle?: string; heroSubtitle?: string; aboutText?: string }>;
 
 function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
@@ -64,11 +72,13 @@ export function StorefrontEditor({
   storeUrl,
   slug,
   logoUrl,
+  onSaved,
 }: {
   storefront: Storefront;
   storeUrl: string;
   slug: string;
   logoUrl: string | null;
+  onSaved?: () => void;
 }) {
   const t = useTranslations("website");
   const [isPublished, setIsPublished] = useState(storefront.isPublished);
@@ -118,6 +128,12 @@ export function StorefrontEditor({
   const [isRemovingDomain, setIsRemovingDomain] = useState(false);
   const [contentLocale, setContentLocale] = useState<(typeof CONTENT_LOCALES)[number]>("en");
   const [translations, setTranslations] = useState<StorefrontTranslations>(storefront.translations ?? {});
+  const [productDisplayMode, setProductDisplayMode] = useState<StorefrontProductDisplayMode>(storefront.productDisplayMode);
+  const [showProductDescription, setShowProductDescription] = useState(storefront.showProductDescription);
+  const [showComparePrice, setShowComparePrice] = useState(storefront.showComparePrice);
+  const [showCategories, setShowCategories] = useState(storefront.showCategories);
+  const [showSearch, setShowSearch] = useState(storefront.showSearch);
+  const [showFooter, setShowFooter] = useState(storefront.showFooter);
 
   const hiddenSections = ALL_SECTION_KEYS.filter((key) => !sections.includes(key));
 
@@ -189,6 +205,12 @@ export function StorefrontEditor({
       popupButtonLink: popupButtonLink || undefined,
       popupTrigger,
       popupDelaySeconds,
+      productDisplayMode,
+      showProductDescription,
+      showComparePrice,
+      showCategories,
+      showSearch,
+      showFooter,
     });
     setIsSaving(false);
 
@@ -198,6 +220,7 @@ export function StorefrontEditor({
     }
 
     toast.success(t("saved"));
+    onSaved?.();
   }
 
   async function handleSaveSlug() {
@@ -369,8 +392,38 @@ export function StorefrontEditor({
 
           <Card>
             <CardContent className="space-y-3">
+              <p className="text-sm font-medium">{t("productDisplayModeLabel")}</p>
+              <div className="grid grid-cols-3 gap-2">
+                {PRODUCT_DISPLAY_MODES.map((mode) => {
+                  const Icon = PRODUCT_DISPLAY_MODE_ICONS[mode];
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setProductDisplayMode(mode)}
+                      className={cn(
+                        "flex flex-col items-center gap-1.5 rounded-lg border p-3 text-xs font-medium transition-colors",
+                        productDisplayMode === mode
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "border-input text-muted-foreground hover:bg-muted",
+                      )}
+                    >
+                      <Icon className="size-5" />
+                      {t(`productDisplayModes.${mode}`)}
+                    </button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="space-y-3">
               <div className="grid gap-2 sm:grid-cols-2">
                 <ColorField label={t("colorLabel")} value={primaryColor} onChange={setPrimaryColor} />
+                <ColorField label={t("accentColorLabel")} value={secondaryColor} onChange={setSecondaryColor} />
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-sm text-muted-foreground">{t("fontLabel")}</label>
                   <Select value={font} onValueChange={(value) => setFont(value as StorefrontFont)}>
@@ -386,21 +439,62 @@ export function StorefrontEditor({
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">{t("buttonStyleLabel")}</label>
+                  <Select value={buttonStyle} onValueChange={(value) => setButtonStyle(value as StorefrontButtonStyle)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUTTON_STYLES.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {t(`buttonStyles.${option}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">{t("buttonStyleLabel")}</label>
-                <Select value={buttonStyle} onValueChange={(value) => setButtonStyle(value as StorefrontButtonStyle)}>
+                <label className="text-sm text-muted-foreground">{t("cardShapeLabel")}</label>
+                <Select value={cornerStyle} onValueChange={(value) => setCornerStyle(value as StorefrontCornerStyle)}>
                   <SelectTrigger className="w-full sm:w-56">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUTTON_STYLES.map((option) => (
+                    {CORNER_STYLES.map((option) => (
                       <SelectItem key={option} value={option}>
-                        {t(`buttonStyles.${option}`)}
+                        {t(`cardShapes.${option}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="space-y-1">
+              <p className="pb-2 text-sm font-medium">{t("displayTogglesHeading")}</p>
+              <div className="flex items-center justify-between gap-4 py-2">
+                <p className="text-sm text-muted-foreground">{t("showProductDescriptionLabel")}</p>
+                <Switch checked={showProductDescription} onCheckedChange={setShowProductDescription} />
+              </div>
+              <div className="flex items-center justify-between gap-4 border-t py-2">
+                <p className="text-sm text-muted-foreground">{t("showComparePriceLabel")}</p>
+                <Switch checked={showComparePrice} onCheckedChange={setShowComparePrice} />
+              </div>
+              <div className="flex items-center justify-between gap-4 border-t py-2">
+                <p className="text-sm text-muted-foreground">{t("showCategoriesLabel")}</p>
+                <Switch checked={showCategories} onCheckedChange={setShowCategories} />
+              </div>
+              <div className="flex items-center justify-between gap-4 border-t py-2">
+                <p className="text-sm text-muted-foreground">{t("showSearchLabel")}</p>
+                <Switch checked={showSearch} onCheckedChange={setShowSearch} />
+              </div>
+              <div className="flex items-center justify-between gap-4 border-t py-2">
+                <p className="text-sm text-muted-foreground">{t("showFooterLabel")}</p>
+                <Switch checked={showFooter} onCheckedChange={setShowFooter} />
               </div>
             </CardContent>
           </Card>
@@ -566,40 +660,22 @@ export function StorefrontEditor({
           <Card>
             <CardContent className="space-y-3">
               <p className="text-sm font-medium">{t("advancedAppearanceHeading")}</p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <ColorField label={t("secondaryColorLabel")} value={secondaryColor} onChange={setSecondaryColor} />
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground">{t("themeLabel")}</label>
-                  <Select value={theme} onValueChange={(value) => setTheme(value as StorefrontTheme)}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {THEMES.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {t(`themes.${option}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">{t("themeLabel")}</label>
+                <Select value={theme} onValueChange={(value) => setTheme(value as StorefrontTheme)}>
+                  <SelectTrigger className="w-full sm:w-56">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {THEMES.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {t(`themes.${option}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="grid gap-2 sm:grid-cols-3">
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground">{t("cornerStyleLabel")}</label>
-                  <Select value={cornerStyle} onValueChange={(value) => setCornerStyle(value as StorefrontCornerStyle)}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CORNER_STYLES.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {t(`cornerStyles.${option}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="grid gap-2 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-sm text-muted-foreground">{t("headerStyleLabel")}</label>
                   <Select value={headerStyle} onValueChange={(value) => setHeaderStyle(value as StorefrontHeaderStyle)}>

@@ -6,6 +6,7 @@ import {
   storefrontFooterStyleEnum,
   storefrontHeaderStyleEnum,
   storefrontPopupTriggerEnum,
+  storefrontProductDisplayModeEnum,
   storefrontThemeEnum,
 } from "@/db/schema";
 const translationSchema = z.object({
@@ -64,6 +65,12 @@ export const updateStorefrontSchema = z.object({
   popupButtonLink: optionalUrl,
   popupTrigger: z.enum(storefrontPopupTriggerEnum.enumValues),
   popupDelaySeconds: z.coerce.number().int().min(0).max(120),
+  productDisplayMode: z.enum(storefrontProductDisplayModeEnum.enumValues),
+  showProductDescription: z.boolean(),
+  showComparePrice: z.boolean(),
+  showCategories: z.boolean(),
+  showSearch: z.boolean(),
+  showFooter: z.boolean(),
 });
 
 export const submitInquirySchema = z.object({
@@ -123,7 +130,7 @@ export const submitOrderSchema = z.object({
   slug: z.string().trim().min(1),
   fullName: z.string().trim().min(1).max(200),
   phone: z.string().trim().min(3).max(30),
-  deliveryAddress: z.string().trim().max(500).optional(),
+  deliveryAddress: z.string().trim().min(1).max(500),
   notes: z.string().trim().max(1000).optional(),
   items: z
     .array(
