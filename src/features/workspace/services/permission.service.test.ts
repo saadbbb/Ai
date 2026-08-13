@@ -9,7 +9,7 @@ vi.mock("../repository/membership.repository", () => ({
 
 vi.mock("../repository/role-permission.repository", () => ({
   rolePermissionRepository: {
-    roleHasPermission: vi.fn(),
+    findPermissionKeysForRole: vi.fn(),
   },
 }));
 
@@ -28,26 +28,26 @@ describe("permissionService.hasPermission", () => {
     const result = await permissionService.hasPermission("user-1", "workspace-1", "analytics.view");
 
     expect(result).toBe(false);
-    expect(rolePermissionRepository.roleHasPermission).not.toHaveBeenCalled();
+    expect(rolePermissionRepository.findPermissionKeysForRole).not.toHaveBeenCalled();
   });
 
-  it("delegates to rolePermissionRepository.roleHasPermission with the membership's roleId", async () => {
+  it("returns true when the role's permission set includes the requested key", async () => {
     vi.mocked(membershipRepository.findByUserAndWorkspace).mockResolvedValue({
       roleId: "role-owner",
     } as WorkspaceMember);
-    vi.mocked(rolePermissionRepository.roleHasPermission).mockResolvedValue(true);
+    vi.mocked(rolePermissionRepository.findPermissionKeysForRole).mockResolvedValue(new Set(["analytics.view"]));
 
     const result = await permissionService.hasPermission("user-1", "workspace-1", "analytics.view");
 
     expect(result).toBe(true);
-    expect(rolePermissionRepository.roleHasPermission).toHaveBeenCalledWith("role-owner", "analytics.view");
+    expect(rolePermissionRepository.findPermissionKeysForRole).toHaveBeenCalledWith("role-owner");
   });
 
-  it("returns false when the role doesn't have the permission", async () => {
+  it("returns false when the role's permission set doesn't include the requested key", async () => {
     vi.mocked(membershipRepository.findByUserAndWorkspace).mockResolvedValue({
       roleId: "role-viewer",
     } as WorkspaceMember);
-    vi.mocked(rolePermissionRepository.roleHasPermission).mockResolvedValue(false);
+    vi.mocked(rolePermissionRepository.findPermissionKeysForRole).mockResolvedValue(new Set());
 
     const result = await permissionService.hasPermission("user-1", "workspace-1", "workspace.manage");
 
