@@ -15,6 +15,11 @@ const pool =
     connectionString,
     // Supabase (and most managed Postgres) require TLS; local Docker Postgres does not speak it.
     ssl: isLocalDb ? false : { rejectUnauthorized: false },
+    // Explicit bounds so a cold/exhausted pool fails fast with a clear timeout
+    // error instead of queuing silently — pg's own defaults (no connect
+    // timeout, max 10) previously left this undiagnosable.
+    max: 10,
+    connectionTimeoutMillis: 10_000,
   });
 
 if (process.env.NODE_ENV !== "production") {
