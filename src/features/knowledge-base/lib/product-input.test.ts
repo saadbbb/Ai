@@ -24,18 +24,22 @@ describe("parseGalleryImageUrls", () => {
 
 describe("parseVariantNames", () => {
   it("splits on commas and trims each name", () => {
-    expect(parseVariantNames("Small, Medium,  Large")).toEqual([
+    const result = parseVariantNames("Small, Medium,  Large");
+    expect(result).toMatchObject([
       { name: "Small", priceOverride: null },
       { name: "Medium", priceOverride: null },
       { name: "Large", priceOverride: null },
     ]);
+    expect(result.every((variant) => typeof variant.id === "string" && variant.id.length > 0)).toBe(true);
   });
 
   it("drops empty entries from trailing commas", () => {
-    expect(parseVariantNames("Red,,Blue,")).toEqual([
+    const result = parseVariantNames("Red,,Blue,");
+    expect(result).toMatchObject([
       { name: "Red", priceOverride: null },
       { name: "Blue", priceOverride: null },
     ]);
+    expect(result.every((variant) => typeof variant.id === "string" && variant.id.length > 0)).toBe(true);
   });
 
   it("returns an empty array for undefined or blank input", () => {

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { submitAppointmentRequestAction } from "../actions/submit-appointment-request.action";
+import { trackEvent } from "../lib/track-event";
 
 interface AppointmentRequestFormProps {
   slug: string;
@@ -47,6 +48,7 @@ export function AppointmentRequestForm({ slug, services }: AppointmentRequestFor
     }
 
     setIsSent(true);
+    trackEvent("Lead");
   }
 
   if (isSent) {

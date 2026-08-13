@@ -224,7 +224,27 @@
       "policiesHeading": "سیاسەتەکان (ئارەزوومەندانە)",
       "shippingPlaceholder": "سیاسەتی گەیاندن",
       "returnsPlaceholder": "سیاسەتی گەڕاندنەوە",
-      "paymentsPlaceholder": "سیاسەتی پارەدان"
+      "paymentsPlaceholder": "سیاسەتی پارەدان",
+      "imagesLabel": "وێنەکانی بەرهەم",
+      "addImage": "زیادکردنی وێنە",
+      "uploading": "بارکردن...",
+      "primaryBadge": "سەرەکی",
+      "availabilityQuestion": "ئایا ئەم بەرهەمە بڕی سنووردار هەیە؟",
+      "availabilityAlways": "هەمیشە بەردەستە",
+      "availabilityLimited": "بڕی سنووردار هەیە",
+      "quantityLabel": "بڕی بەردەست",
+      "quantityHint": "ژمارەی دانەکانی بەردەست بۆ فرۆشتن بنووسە.",
+      "variantsQuestion": "ئایا ئەم بەرهەمە هەڵبژاردنی وەک ڕەنگ یان قەبارەی هەیە؟",
+      "variantsYes": "بەڵێ",
+      "variantsNo": "نەخێر",
+      "showMoreOptions": "هەڵبژاردنی زیاتر",
+      "hideMoreOptions": "شاردنەوەی هەڵبژاردنی زیاتر",
+      "publishedLabel": "بڵاوکراوەتەوە لە فرۆشگا",
+      "statusPublished": "بڵاوکراوەتەوە",
+      "statusHidden": "شاراوەتەوە",
+      "statusInStock": "بەردەستە",
+      "statusLowStock": "بڕی کەم ماوە",
+      "statusOutOfStock": "بەردەست نییە"
     },
     "channels": {
       "title": "کەناڵەکانت بەستەوە",
@@ -320,7 +340,8 @@
       "refreshing": "نوێ دەکرێتەوە..."
     },
     "menuLabel": "کردنەوەی لیستە",
-    "shellSubtitle": "داشبۆرد"
+    "shellSubtitle": "داشبۆرد",
+    "productsLink": "بەرهەمەکان"
   },
   "analytics": {
     "title": "شیکاری",
@@ -1637,14 +1658,57 @@
         "contact": "پەیوەندی",
         "quote": "داواکاری نرخ",
         "support": "پشتگیری"
-      }
+      },
+      "outOfStock": "بەردەست نییە"
     },
     "tabs": {
       "storefront": "فرۆشگا",
       "reviews": "هەڵسەنگاندنەکان",
       "blog": "بلۆگ"
     },
-    "notPublished": "بڵاونەکراوەتەوە"
+    "notPublished": "بڵاونەکراوەتەوە",
+    "subTabs": {
+      "publish": "بڵاوکردنەوە و دۆمەین",
+      "appearance": "ڕووکار",
+      "sections": "بەشەکانی ماڵپەڕ",
+      "tracking": "شوێنکەوتن",
+      "advanced": "ڕێکخستنی پێشکەوتوو"
+    },
+    "logoLabel": "لۆگۆ",
+    "logoManagedHint": "لۆگۆکەت لە پرۆفایلی بازرگانییەکەت بەڕێوە دەبرێت.",
+    "manageLogoLink": "دەستکاریکردنی لۆگۆ",
+    "heroCtaLabelLabel": "دەقی دوگمە",
+    "heroCtaLabelPlaceholder": "نموونە: ئێستا بکڕە",
+    "heroCtaLinkLabel": "بەستەری دوگمە",
+    "customDomainLabel": "دۆمەینی تایبەت",
+    "customDomainPlaceholder": "www.yourbusiness.com",
+    "customDomainHint": "دۆمەینی تایبەت خۆت بەستەوە لە جیاتی بەستەری بنەڕەتی.",
+    "connectDomain": "بەستنەوە",
+    "verifyDomain": "ئێستا پشکنین بکە",
+    "removeDomain": "سڕینەوە",
+    "domainStatus": {
+      "none": "نەبەسترووە",
+      "pending": "چاوەڕوانی پشتڕاستکردنەوەی DNS",
+      "verified": "بەسترا",
+      "failed": "پشتڕاستکردنەوە شکستی هێنا — تۆمارەکەی DNS بپشکنە و دووبارە هەوڵ بدەرەوە"
+    },
+    "domainDnsInstructions": "ئەم تۆمارەی DNS لەلای دابینکەری دۆمەینەکەت زیاد بکە، پاشان دووبارە پشکنین بکە:",
+    "advancedAppearanceHeading": "ڕێکخستنی پێشکەوتووی ڕووکار",
+    "setupScore": {
+      "ready": "ماڵپەڕەکەت ئامادەیە بۆ بڵاوکردنەوە",
+      "needsAttention": "{count} شت ماوە تەواو بکرێت",
+      "items": {
+        "hasBusinessDescription": "پێناسەیەک بۆ بازرگانییەکەت زیاد بکە",
+        "hasLogo": "لۆگۆیەک زیاد بکە",
+        "hasCatalog": "لانیکەم یەک بەرهەم یان خزمەتگوزاری زیاد بکە",
+        "hasContactInfo": "ژمارەی مۆبایل یان ئیمەیلی پەیوەندی زیاد بکە",
+        "hasTracking": "پیکسڵی شوێنکەوتن ببەستەوە (ئارەزوومەندانە)"
+      }
+    },
+    "previewHeading": "پێشبینین",
+    "previewDesktop": "ديسکتۆپ",
+    "previewTablet": "تابلێت",
+    "previewMobile": "مۆبایل"
   },
   "integrations": {
     "title": "پەیوەندییەکان",
@@ -1807,7 +1871,7 @@
   },
   "knowledgeBasePage": {
     "pageTitle": "بنکەی زانیاری",
-    "pageDescription": "پرسیارە باوەکان و بەرهەم و خزمەتگوزاری و سیاسەتەکان بەڕێوە ببە کە کارمەندە زیرەکەکەت دەتوانێت لێیانەوە وەڵام بداتەوە.",
+    "pageDescription": "ئەو پرسیارە باوەکان، خزمەتگوزارییەکان و سیاسەتانە بەڕێوە ببە کە فەرمانبەری زیرەکت لەسەریان وەڵام دەداتەوە.",
     "noItems": "هێشتا هیچ زیاد نەکراوە."
   },
   "localeSwitcher": {
@@ -1860,5 +1924,9 @@
     "title": "هیچ خەزنگەیەک نەدۆزرایەوە",
     "description": "هەژمارەکەت ئێستا بە هیچ خەزنگەیەک گرێدراو نییە — ئەمە ڕوودەدات ئەگەر بەڕێوەبەرێکی پلاتفۆرم سڕیبێتیەوە. دەتوانیت خەزنگەیەکی نوێ دروست بکەیت بۆ بەردەوامبوون لە بەکارهێنانی ئەپەکە، یان بچیتە دەرەوە.",
     "createWorkspace": "دروستکردنی خەزنگەیەکی نوێ"
+  },
+  "productsPage": {
+    "pageTitle": "بەرهەمەکان",
+    "pageDescription": "بەرهەمەکان زیاد بکە و بەڕێوەیان ببە — ئەمانە ئەو بەرهەمانەن کە کڕیارەکانت لە ماڵپەڕەکەت دەیانبینن و داوایان دەکەن."
   }
 }

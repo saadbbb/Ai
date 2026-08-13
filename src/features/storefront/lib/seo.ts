@@ -11,6 +11,8 @@ interface BuildStorefrontMetadataInput {
   title: string;
   description?: string;
   imageUrl?: string | null;
+  /** Last-resort OG/Twitter image when neither `imageUrl` nor the storefront banner is set — the business logo. */
+  fallbackImageUrl?: string | null;
   noIndex?: boolean;
 }
 
@@ -23,10 +25,11 @@ export function buildStorefrontMetadata({
   title,
   description,
   imageUrl,
+  fallbackImageUrl,
   noIndex,
 }: BuildStorefrontMetadataInput): Metadata {
   const url = `${getAppUrl()}/store/${slug}${path}`;
-  const image = imageUrl || storefront.bannerImageUrl || undefined;
+  const image = imageUrl || storefront.bannerImageUrl || fallbackImageUrl || undefined;
 
   return {
     title,

@@ -6,10 +6,7 @@ import { AdAccountCard } from "@/features/ads/components/ad-account-card";
 import { AdCampaignManager } from "@/features/ads/components/ad-campaign-manager";
 import { AdInsightsPanel } from "@/features/ads/components/ad-insights-panel";
 import { AttributionReport } from "@/features/ads/components/attribution-report";
-import { TrackingSettingsForm } from "@/features/ads/components/tracking-settings-form";
 import { adsService } from "@/features/ads/services/ads.service";
-import { storefrontService } from "@/features/storefront/services/storefront.service";
-import { permissionService } from "@/features/workspace/services/permission.service";
 import { requireFeature, requireUser, requireWorkspaceForUser, requireWorkspacePermission } from "@/lib/auth/auth-guard";
 
 export default async function AdsPage() {
@@ -19,13 +16,11 @@ export default async function AdsPage() {
   await requireWorkspacePermission(user.id, workspace.id, "ads.manage");
   const t = await getTranslations("ads");
 
-  const [adAccount, campaigns, attributionStats, canManageTracking] = await Promise.all([
+  const [adAccount, campaigns, attributionStats] = await Promise.all([
     adsService.getOrCreateAdAccount(workspace.id),
     adsService.listCampaigns(workspace.id),
     adsService.getAttributionReport(workspace.id),
-    permissionService.hasPermission(user.id, workspace.id, "workspace.settings.manage"),
   ]);
-  const storefront = canManageTracking ? await storefrontService.getOrCreateForWorkspace(workspace.id) : null;
 
   return (
     <PageContainer className="mx-auto max-w-2xl">
@@ -49,7 +44,6 @@ export default async function AdsPage() {
 
         <TabsContent value="account" className="space-y-6 pt-4">
           <AdAccountCard adAccount={adAccount} />
-          {storefront && <TrackingSettingsForm storefront={storefront} />}
         </TabsContent>
       </Tabs>
     </PageContainer>

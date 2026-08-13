@@ -75,6 +75,9 @@ export const orderItems = pgTable(
       .notNull()
       .references(() => orders.id, { onDelete: "cascade" }),
     productId: uuid("product_id").references(() => products.id, { onDelete: "set null" }),
+    /** Snapshotted, same convention as name/unitPrice — captured now for forward-compatibility even though this schema's inventory is product-level only today (no per-variant stock). */
+    variantId: text("variant_id"),
+    variantName: text("variant_name"),
     name: text("name").notNull(),
     unitPrice: numeric("unit_price", { precision: 12, scale: 2 }).notNull(),
     quantity: integer("quantity").notNull().default(1),

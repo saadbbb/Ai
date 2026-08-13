@@ -49,6 +49,8 @@ export const updateStorefrontSchema = z.object({
   trackingIds: z.record(z.enum(TRACKING_ID_KEYS), z.string().trim().max(200)).optional(),
   seoTitle: z.string().trim().max(70).optional(),
   seoDescription: z.string().trim().max(200).optional(),
+  heroCtaLabel: z.string().trim().max(50).optional(),
+  heroCtaLink: z.string().trim().max(2000).optional(),
   translations: z.record(z.enum(["ar", "ku"]), translationSchema).optional(),
   sections: z.array(z.enum(SECTION_KEYS)),
   privacyPolicyText: z.string().trim().max(20000).optional(),

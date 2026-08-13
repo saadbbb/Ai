@@ -11,6 +11,8 @@ import {
   orders,
   type OrderStatus,
 } from "@/db/schema";
+import { AppError } from "@/lib/errors/app-error";
+import { decrementStock, restockOrderItems } from "@/features/inventory/lib/stock";
 
 export interface OrderListItem {
   order: Order;
@@ -84,6 +86,16 @@ export const orderRepository = {
             .returning()
         : [];
 
+      const trackedItems = createdItems
+        .filter((item) => item.productId)
+        .map((item) => ({ productId: item.productId as string, quantity: item.quantity }));
+      if (trackedItems.length > 0) {
+        const result = await decrementStock(tx, order.workspaceId, trackedItems);
+        if (!result.ok) {
+          throw new AppError("OUT_OF_STOCK", "One or more items in this order are no longer available in the requested quantity.");
+        }
+      }
+
       const [contact] = await tx.select().from(contacts).where(eq(contacts.id, createdOrder.contactId)).limit(1);
 
       return { order: createdOrder, contact, items: createdItems };
@@ -91,12 +103,20 @@ export const orderRepository = {
   },
 
   async updateStatus(id: string, workspaceId: string, status: OrderStatus): Promise<Order | null> {
-    const [order] = await db
-      .update(orders)
-      .set({ status, updatedAt: new Date() })
-      .where(and(eq(orders.id, id), eq(orders.workspaceId, workspaceId)))
-      .returning();
-    return order ?? null;
+    return db.transaction(async (tx) => {
+      const [order] = await tx
+        .update(orders)
+        .set({ status, updatedAt: new Date() })
+        .where(and(eq(orders.id, id), eq(orders.workspaceId, workspaceId)))
+        .returning();
+      if (!order) return null;
+
+      if (status === "cancelled") {
+        await restockOrderItems(tx, workspaceId, order.id);
+      }
+
+      return order;
+    });
   },
 
   async updateShipping(

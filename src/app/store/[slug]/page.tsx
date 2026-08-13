@@ -12,6 +12,7 @@ import { resolveLocalizedStorefrontText } from "@/features/storefront/lib/locali
 import { buildStorefrontMetadata } from "@/features/storefront/lib/seo";
 import { storefrontThemeClasses } from "@/features/storefront/lib/style-classes";
 import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
+import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
 import { reviewRepository } from "@/features/storefront/repository/review.repository";
@@ -19,6 +20,7 @@ import { getAppUrl } from "@/lib/env";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -26,19 +28,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const row = await storefrontRepository.findPublishedByWorkspaceSlug(slug);
   if (!row) return {};
 
-  const { storefront, workspaceName } = row;
+  const { storefront, workspaceName, workspaceId, logoUrl } = row;
   const locale = await getLocale();
   const localized = resolveLocalizedStorefrontText(storefront, locale);
   const title = storefront.seoTitle || localized.heroTitle || workspaceName;
-  const description = storefront.seoDescription || localized.heroSubtitle || localized.aboutText || undefined;
 
-  return buildStorefrontMetadata({ slug, workspaceName, storefront, title, description });
+  let description = storefront.seoDescription || localized.heroSubtitle || localized.aboutText || undefined;
+  let fallbackImageUrl = logoUrl;
+  if (!description || !storefront.bannerImageUrl) {
+    const [agent, products] = await Promise.all([
+      !description ? aiAgentRepository.findByWorkspaceId(workspaceId) : null,
+      !storefront.bannerImageUrl ? productRepository.findByWorkspaceId(workspaceId) : [],
+    ]);
+    description = description || agent?.businessDescription || undefined;
+    fallbackImageUrl = products.find((p) => p.isActive && p.imageUrl)?.imageUrl || logoUrl;
+  }
+
+  return buildStorefrontMetadata({ slug, workspaceName, storefront, title, description, fallbackImageUrl });
 }
 
-export default async function PublicStorePage({ params }: PageProps) {
+export default async function PublicStorePage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const { preview } = await searchParams;
   const [t, locale] = await Promise.all([getTranslations("website.public"), getLocale()]);
-  const { storefront, workspaceId, workspaceName, logoUrl } = await getStorefrontData(slug);
+  const { storefront, workspaceId, workspaceName, logoUrl } = await getStorefrontData(slug, { preview: preview === "1" });
   const localizedText = resolveLocalizedStorefrontText(storefront, locale);
 
   const [products, services, reviews] = await Promise.all([
@@ -55,9 +68,22 @@ export default async function PublicStorePage({ params }: PageProps) {
   const sectionRenderers: Record<string, React.ReactNode> = {
     hero: (
       <section key="hero" className={`px-6 text-center ${themeClasses.section}`} style={{ backgroundColor: `${accentColor}14` }}>
-        <div className="mx-auto max-w-2xl space-y-3">
+        <div className="mx-auto max-w-2xl space-y-4">
           <h1 className={`text-3xl ${themeClasses.heading}`}>{localizedText.heroTitle || workspaceName}</h1>
           {localizedText.heroSubtitle && <p className="text-muted-foreground">{localizedText.heroSubtitle}</p>}
+          {storefront.heroCtaLabel && storefront.heroCtaLink && (
+            <Link
+              href={
+                storefront.heroCtaLink.startsWith("#") || storefront.heroCtaLink.startsWith("/")
+                  ? `/store/${slug}${storefront.heroCtaLink}`
+                  : storefront.heroCtaLink
+              }
+              className="inline-flex h-10 items-center rounded-md px-5 text-sm font-medium text-white"
+              style={{ backgroundColor: accentColor }}
+            >
+              {storefront.heroCtaLabel}
+            </Link>
+          )}
         </div>
       </section>
     ),

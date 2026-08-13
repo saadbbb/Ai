@@ -3,6 +3,7 @@ import type {
   Storefront,
   StorefrontButtonStyle,
   StorefrontCornerStyle,
+  StorefrontCustomDomainStatus,
   StorefrontFont,
   StorefrontFooterStyle,
   StorefrontHeaderStyle,
@@ -12,6 +13,7 @@ import type {
 import type { Contact } from "@/db/schema";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
 import { leadRepository } from "@/features/crm/repository/lead.repository";
+import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
 import { automationService } from "@/features/automation/services/automation.service";
 import { appointmentService } from "@/features/appointments/services/appointment.service";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
@@ -19,7 +21,10 @@ import { productRepository } from "@/features/knowledge-base/repository/product.
 import { serviceRepository } from "@/features/knowledge-base/repository/service.repository";
 import { orderService } from "@/features/orders/services/order.service";
 import type { OrderListItem } from "@/features/orders/repository/order.repository";
+import { workspaceRepository } from "@/features/workspace/repository/workspace.repository";
 import { AppError } from "@/lib/errors/app-error";
+import { connectDomain, removeDomain, verifyDomain } from "@/lib/vercel/domains-client";
+import { defaultSectionsForBusinessType, generateHeroDefaults } from "../lib/generate-defaults";
 import { newsletterSubscriberRepository } from "../repository/newsletter-subscriber.repository";
 import { storefrontRepository } from "../repository/storefront.repository";
 
@@ -45,6 +50,8 @@ interface StorefrontInput {
   trackingIds?: Record<string, string>;
   seoTitle?: string;
   seoDescription?: string;
+  heroCtaLabel?: string;
+  heroCtaLink?: string;
   translations?: Record<string, { heroTitle?: string; heroSubtitle?: string; aboutText?: string }>;
   sections: string[];
   privacyPolicyText?: string;
@@ -83,11 +90,34 @@ async function findOrCreateContactByPhone(
   });
 }
 
-/** One row per workspace, created on first visit to the editor — same check-then-create pattern as ai_agents. */
+/**
+ * One row per workspace, created on first visit to the editor — same check-then-create
+ * pattern as ai_agents. Seeds the hero/CTA/section-order defaults from data the system
+ * already has (business name/type/description) so a brand-new storefront never opens on
+ * an empty page — still 100% editable afterward, this only picks better starting values.
+ */
 async function getOrCreateForWorkspace(workspaceId: string): Promise<Storefront> {
   const existing = await storefrontRepository.findByWorkspaceId(workspaceId);
   if (existing) return existing;
-  return storefrontRepository.create({ workspaceId });
+
+  const [workspace, agent] = await Promise.all([
+    workspaceRepository.findById(workspaceId),
+    aiAgentRepository.findByWorkspaceId(workspaceId),
+  ]);
+
+  if (!workspace) {
+    return storefrontRepository.create({ workspaceId });
+  }
+
+  const heroDefaults = generateHeroDefaults(workspace, agent);
+  return storefrontRepository.create({
+    workspaceId,
+    heroTitle: heroDefaults.heroTitle,
+    heroSubtitle: heroDefaults.heroSubtitle,
+    heroCtaLabel: heroDefaults.heroCtaLabel,
+    heroCtaLink: heroDefaults.heroCtaLink,
+    sections: defaultSectionsForBusinessType(workspace.businessType),
+  });
 }
 
 /** Drops blank values from a link/tracking-id map so an untouched field never overwrites a real one with "". */
@@ -135,6 +165,8 @@ async function updateStorefront(workspaceId: string, input: StorefrontInput): Pr
     trackingIds: pruneBlank(input.trackingIds),
     seoTitle: input.seoTitle || null,
     seoDescription: input.seoDescription || null,
+    heroCtaLabel: input.heroCtaLabel || null,
+    heroCtaLink: input.heroCtaLink || null,
     translations: pruneTranslations(input.translations),
     sections: input.sections,
     privacyPolicyText: input.privacyPolicyText || null,
@@ -214,6 +246,9 @@ async function submitOrder(workspaceId: string, input: OrderInput): Promise<Orde
     if (!product) {
       throw new AppError("VALIDATION_ERROR", "One of the items in your cart is no longer available.");
     }
+    if (product.trackQuantity && (product.quantity ?? 0) < item.quantity) {
+      throw new AppError("OUT_OF_STOCK", `"${product.name}" is no longer available in that quantity.`);
+    }
     const unitPrice = product.discountedPrice ?? product.price;
     if (!unitPrice) {
       throw new AppError("VALIDATION_ERROR", `"${product.name}" doesn't have a price set yet.`);
@@ -275,6 +310,64 @@ async function submitAppointmentRequest(workspaceId: string, input: AppointmentR
   );
 }
 
+/**
+ * Custom domain connection (Vercel Domains API) — same "code ready, needs an external
+ * credential" pattern as every other DEFERRED_TASKS.md item; connectDomain/verifyDomain
+ * throw a friendly AppError when VERCEL_API_TOKEN/VERCEL_PROJECT_ID aren't configured yet.
+ */
+async function connectCustomDomain(
+  workspaceId: string,
+  domain: string,
+): Promise<{ status: string; record: { type: string; name: string; value: string } | null }> {
+  const existing = await getOrCreateForWorkspace(workspaceId);
+
+  try {
+    const result = await connectDomain(domain);
+    const status: StorefrontCustomDomainStatus = result.verified ? "verified" : "pending";
+    await storefrontRepository.update(existing.id, workspaceId, {
+      customDomain: domain,
+      customDomainStatus: status,
+      customDomainVerificationToken: result.verificationRecord?.value ?? null,
+      customDomainVerifiedAt: result.verified ? new Date() : null,
+    });
+    return { status, record: result.verificationRecord };
+  } catch (error) {
+    throw new AppError("VALIDATION_ERROR", error instanceof Error ? error.message : "Couldn't connect that domain.");
+  }
+}
+
+async function verifyCustomDomain(workspaceId: string): Promise<StorefrontCustomDomainStatus> {
+  const existing = await getOrCreateForWorkspace(workspaceId);
+  if (!existing.customDomain) {
+    throw new AppError("VALIDATION_ERROR", "No custom domain is connected yet.");
+  }
+
+  try {
+    const verified = await verifyDomain(existing.customDomain);
+    const status: StorefrontCustomDomainStatus = verified ? "verified" : "failed";
+    await storefrontRepository.update(existing.id, workspaceId, {
+      customDomainStatus: status,
+      customDomainVerifiedAt: verified ? new Date() : null,
+    });
+    return status;
+  } catch (error) {
+    throw new AppError("VALIDATION_ERROR", error instanceof Error ? error.message : "Couldn't verify that domain yet.");
+  }
+}
+
+async function removeCustomDomain(workspaceId: string): Promise<void> {
+  const existing = await getOrCreateForWorkspace(workspaceId);
+  if (!existing.customDomain) return;
+
+  await removeDomain(existing.customDomain);
+  await storefrontRepository.update(existing.id, workspaceId, {
+    customDomain: null,
+    customDomainStatus: "none",
+    customDomainVerificationToken: null,
+    customDomainVerifiedAt: null,
+  });
+}
+
 /** Idempotent — resubscribing with the same email is a silent no-op, not an error. */
 async function subscribeToNewsletter(workspaceId: string, email: string): Promise<void> {
   const existing = await newsletterSubscriberRepository.findByWorkspaceAndEmail(workspaceId, email);
@@ -285,6 +378,9 @@ async function subscribeToNewsletter(workspaceId: string, email: string): Promis
 export const storefrontService = {
   getOrCreateForWorkspace,
   updateStorefront,
+  connectCustomDomain,
+  verifyCustomDomain,
+  removeCustomDomain,
   submitInquiry,
   submitOrder,
   submitAppointmentRequest,

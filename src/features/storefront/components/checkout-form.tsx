@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "../lib/cart-context";
 import { submitOrderAction } from "../actions/submit-order.action";
+import { trackEvent } from "../lib/track-event";
 
 export function CheckoutForm({ slug }: { slug: string }) {
   const t = useTranslations("website.public");
@@ -44,6 +45,7 @@ export function CheckoutForm({ slug }: { slug: string }) {
     }
 
     setOrderId(result.data.orderId);
+    trackEvent("Purchase", { value: total });
     clear();
   }
 

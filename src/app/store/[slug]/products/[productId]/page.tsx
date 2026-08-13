@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { AddToCartButton } from "@/features/storefront/components/add-to-cart-button";
 import { InquiryForm } from "@/features/storefront/components/inquiry-form";
+import { ProductViewTracker } from "@/features/storefront/components/product-view-tracker";
 import { ShareButton } from "@/features/storefront/components/share-button";
 import { StorefrontShell } from "@/features/storefront/components/storefront-shell";
 import { getStorefrontData } from "@/features/storefront/lib/get-storefront-data";
@@ -35,6 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `${product.name} — ${row.workspaceName}`,
     description: product.description ?? undefined,
     imageUrl: product.imageUrl,
+    fallbackImageUrl: row.logoUrl,
   });
 }
 
@@ -45,6 +47,7 @@ export default async function StoreProductPage({ params }: PageProps) {
 
   const product = await productRepository.findById(productId, workspaceId);
   if (!product || !product.isActive) notFound();
+  const outOfStock = product.trackQuantity && (product.quantity ?? 0) <= 0;
 
   await storefrontAnalyticsService.trackProductView(workspaceId, product.id);
 
@@ -77,7 +80,7 @@ export default async function StoreProductPage({ params }: PageProps) {
             url: productUrl,
             price,
             priceCurrency: "IQD",
-            availability: "https://schema.org/InStock",
+            availability: outOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
           },
         }
       : undefined),
@@ -86,6 +89,7 @@ export default async function StoreProductPage({ params }: PageProps) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <ProductViewTracker productName={product.name} price={price} />
       <StorefrontShell storefront={storefront} workspaceName={workspaceName} logoUrl={logoUrl} slug={slug}>
         <div className="mx-auto max-w-4xl space-y-8 px-6 py-12">
           <Link href={`/store/${slug}/products`} className="text-sm text-muted-foreground hover:text-foreground">
@@ -144,6 +148,11 @@ export default async function StoreProductPage({ params }: PageProps) {
                     </p>
                   )
                 )}
+                {outOfStock && (
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    {t("outOfStock")}
+                  </span>
+                )}
               </div>
               {product.description && <p className="whitespace-pre-wrap text-sm text-muted-foreground">{product.description}</p>}
 
@@ -166,6 +175,7 @@ export default async function StoreProductPage({ params }: PageProps) {
                   productId={product.id}
                   name={product.name}
                   unitPrice={product.discountedPrice ?? product.price ?? "0"}
+                  outOfStock={outOfStock}
                 />
                 <ShareButton title={product.name} url={productUrl} />
                 {whatsappHref && (

@@ -45,7 +45,17 @@ vi.mock("../repository/newsletter-subscriber.repository", () => ({
   newsletterSubscriberRepository: { findByWorkspaceAndEmail: vi.fn(), create: vi.fn() },
 }));
 
+vi.mock("@/features/workspace/repository/workspace.repository", () => ({
+  workspaceRepository: { findById: vi.fn() },
+}));
+
+vi.mock("@/features/ai/repository/ai-agent.repository", () => ({
+  aiAgentRepository: { findByWorkspaceId: vi.fn() },
+}));
+
 const { storefrontRepository } = await import("../repository/storefront.repository");
+const { workspaceRepository } = await import("@/features/workspace/repository/workspace.repository");
+const { aiAgentRepository } = await import("@/features/ai/repository/ai-agent.repository");
 const { activityRepository } = await import("@/features/crm/repository/activity.repository");
 const { leadRepository } = await import("@/features/crm/repository/lead.repository");
 const { automationService } = await import("@/features/automation/services/automation.service");
@@ -84,6 +94,12 @@ function makeStorefront(overrides: Partial<Storefront> = {}): Storefront {
     trackingIds: {},
     seoTitle: null,
     seoDescription: null,
+    heroCtaLabel: null,
+    heroCtaLink: null,
+    customDomain: null,
+    customDomainStatus: "none",
+    customDomainVerificationToken: null,
+    customDomainVerifiedAt: null,
     translations: {},
     sections: ["hero", "about", "products", "services", "contact"],
     privacyPolicyText: null,
@@ -118,8 +134,35 @@ describe("storefrontService.getOrCreateForWorkspace", () => {
     expect(storefrontRepository.create).not.toHaveBeenCalled();
   });
 
-  it("creates a storefront on first visit when none exists yet", async () => {
+  it("seeds hero/CTA/section defaults from the workspace's business type on first visit", async () => {
     vi.mocked(storefrontRepository.findByWorkspaceId).mockResolvedValue(null);
+    vi.mocked(workspaceRepository.findById).mockResolvedValue({
+      name: "Acme Clinic",
+      businessType: "clinic",
+      language: "ar",
+    } as never);
+    vi.mocked(aiAgentRepository.findByWorkspaceId).mockResolvedValue({ businessDescription: "We treat people well." } as never);
+    const created = makeStorefront();
+    vi.mocked(storefrontRepository.create).mockResolvedValue(created);
+
+    const result = await storefrontService.getOrCreateForWorkspace(WORKSPACE_ID);
+
+    expect(storefrontRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: WORKSPACE_ID,
+        heroTitle: "Acme Clinic",
+        heroSubtitle: "We treat people well.",
+        heroCtaLabel: "احجز موعدك",
+        heroCtaLink: "#contact",
+        sections: ["hero", "services", "about", "testimonials", "contact"],
+      }),
+    );
+    expect(result).toBe(created);
+  });
+
+  it("falls back to a bare create when the workspace can't be found", async () => {
+    vi.mocked(storefrontRepository.findByWorkspaceId).mockResolvedValue(null);
+    vi.mocked(workspaceRepository.findById).mockResolvedValue(null);
     const created = makeStorefront();
     vi.mocked(storefrontRepository.create).mockResolvedValue(created);
 
@@ -331,6 +374,11 @@ describe("storefrontService.submitOrder", () => {
       imageUrl: null,
       galleryImageUrls: [],
       variants: [],
+      trackQuantity: false,
+      quantity: null,
+      lowStockThreshold: 5,
+      sku: null,
+      slug: null,
       isActive: true,
       aiVisible: true,
       featured: false,

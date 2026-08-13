@@ -8,6 +8,7 @@ export type AppErrorCode =
   | "UNAUTHENTICATED"
   | "VALIDATION_ERROR"
   | "NOT_FOUND"
+  | "OUT_OF_STOCK"
   | "RATE_LIMITED"
   | "SERVICE_UNAVAILABLE"
   | "INTERNAL_ERROR";

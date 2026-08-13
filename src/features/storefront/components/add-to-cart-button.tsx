@@ -9,13 +9,23 @@ export function AddToCartButton({
   productId,
   name,
   unitPrice,
+  outOfStock,
 }: {
   productId: string;
   name: string;
   unitPrice: string;
+  outOfStock?: boolean;
 }) {
   const t = useTranslations("website.public");
   const { addItem } = useCart();
+
+  if (outOfStock) {
+    return (
+      <Button type="button" disabled>
+        {t("outOfStock")}
+      </Button>
+    );
+  }
 
   return (
     <Button

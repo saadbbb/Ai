@@ -17,6 +17,11 @@ export const productEntrySchema = z.object({
   galleryImageUrlsText: z.string().trim().max(4000).optional(),
   /** Comma-separated option names, e.g. "Small, Medium, Large" — no per-variant price override in this form yet. */
   variantNamesText: z.string().trim().max(1000).optional(),
+  /** "Does this product have limited quantity?" — false means always orderable, quantity is ignored. */
+  trackQuantity: z.boolean().default(false),
+  /** Required by the service layer (not here) when trackQuantity is true — see saveProductAction. */
+  quantity: z.coerce.number().int().nonnegative().optional(),
+  isActive: z.boolean().default(true),
   aiVisible: z.boolean().default(true),
   featured: z.boolean().default(false),
   promotionEndsAt: z.coerce.date().optional(),

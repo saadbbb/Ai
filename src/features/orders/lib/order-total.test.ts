@@ -7,6 +7,8 @@ function item(unitPrice: string, quantity: number): OrderItem {
     id: "item-id",
     orderId: "order-id",
     productId: null,
+    variantId: null,
+    variantName: null,
     name: "Test item",
     unitPrice,
     quantity,

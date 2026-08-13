@@ -224,7 +224,27 @@
       "policiesHeading": "Policies (optional)",
       "shippingPlaceholder": "Shipping policy",
       "returnsPlaceholder": "Returns policy",
-      "paymentsPlaceholder": "Payments policy"
+      "paymentsPlaceholder": "Payments policy",
+      "imagesLabel": "Product photos",
+      "addImage": "Add photo",
+      "uploading": "Uploading...",
+      "primaryBadge": "Main",
+      "availabilityQuestion": "Does this product have a limited quantity?",
+      "availabilityAlways": "Always available",
+      "availabilityLimited": "Limited quantity",
+      "quantityLabel": "Available quantity",
+      "quantityHint": "Enter how many units are currently available for sale.",
+      "variantsQuestion": "Does this product have options like color or size?",
+      "variantsYes": "Yes",
+      "variantsNo": "No",
+      "showMoreOptions": "More options",
+      "hideMoreOptions": "Hide more options",
+      "publishedLabel": "Published on storefront",
+      "statusPublished": "Published",
+      "statusHidden": "Hidden",
+      "statusInStock": "In stock",
+      "statusLowStock": "Low stock",
+      "statusOutOfStock": "Out of stock"
     },
     "channels": {
       "title": "Connect your channels",
@@ -320,7 +340,8 @@
       "refreshing": "Refreshing..."
     },
     "menuLabel": "Open menu",
-    "shellSubtitle": "Dashboard"
+    "shellSubtitle": "Dashboard",
+    "productsLink": "Products"
   },
   "analytics": {
     "title": "Analytics",
@@ -1637,14 +1658,57 @@
         "contact": "Contact",
         "quote": "Request a quote",
         "support": "Support"
-      }
+      },
+      "outOfStock": "Out of stock"
     },
     "tabs": {
       "storefront": "Storefront",
       "reviews": "Reviews",
       "blog": "Blog"
     },
-    "notPublished": "Not published"
+    "notPublished": "Not published",
+    "subTabs": {
+      "publish": "Publishing & domain",
+      "appearance": "Appearance",
+      "sections": "Sections",
+      "tracking": "Tracking",
+      "advanced": "Advanced"
+    },
+    "logoLabel": "Logo",
+    "logoManagedHint": "Your logo is managed from your business profile.",
+    "manageLogoLink": "Edit logo",
+    "heroCtaLabelLabel": "Button text",
+    "heroCtaLabelPlaceholder": "e.g. Shop now",
+    "heroCtaLinkLabel": "Button link",
+    "customDomainLabel": "Custom domain",
+    "customDomainPlaceholder": "www.yourbusiness.com",
+    "customDomainHint": "Point your own domain at this store instead of the default address.",
+    "connectDomain": "Connect",
+    "verifyDomain": "Check now",
+    "removeDomain": "Remove",
+    "domainStatus": {
+      "none": "Not connected",
+      "pending": "Waiting for DNS verification",
+      "verified": "Connected",
+      "failed": "Verification failed — check the DNS record and try again"
+    },
+    "domainDnsInstructions": "Add this DNS record at your domain registrar, then check again:",
+    "advancedAppearanceHeading": "Advanced customization",
+    "setupScore": {
+      "ready": "Your site is ready to publish",
+      "needsAttention": "{count} things need finishing",
+      "items": {
+        "hasBusinessDescription": "Add a business description",
+        "hasLogo": "Add a logo",
+        "hasCatalog": "Add at least one product or service",
+        "hasContactInfo": "Add a contact phone or email",
+        "hasTracking": "Connect a tracking pixel (optional)"
+      }
+    },
+    "previewHeading": "Preview",
+    "previewDesktop": "Desktop",
+    "previewTablet": "Tablet",
+    "previewMobile": "Mobile"
   },
   "integrations": {
     "title": "Integrations",
@@ -1807,7 +1871,7 @@
   },
   "knowledgeBasePage": {
     "pageTitle": "Knowledge Base",
-    "pageDescription": "Manage the FAQs, products, services, and policies your AI employee can answer from.",
+    "pageDescription": "Manage the FAQs, services, and policies your AI employee can answer from.",
     "noItems": "Nothing added yet."
   },
   "localeSwitcher": {
@@ -1860,5 +1924,9 @@
     "title": "No workspace found",
     "description": "Your account isn't linked to any workspace right now — this can happen if it was removed by a platform admin. You can start a new workspace to keep using the app, or sign out.",
     "createWorkspace": "Create a new workspace"
+  },
+  "productsPage": {
+    "pageTitle": "Products",
+    "pageDescription": "Add and manage the products customers see and order from your storefront."
   }
 }

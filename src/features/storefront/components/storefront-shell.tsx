@@ -29,7 +29,6 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
     { href: base, label: t("home") },
     { href: `${base}/products`, label: t("products") },
     { href: `${base}/about`, label: t("about") },
-    { href: `${base}/blog`, label: t("blog") },
     { href: `${base}/faq`, label: t("faq") },
     { href: `${base}/contact`, label: t("contact") },
   ];

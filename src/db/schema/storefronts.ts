@@ -10,6 +10,13 @@ export const storefrontHeaderStyleEnum = pgEnum("storefront_header_style", ["sta
 export const storefrontFooterStyleEnum = pgEnum("storefront_footer_style", ["standard", "minimal"]);
 /** Popup Builder depth (PART 13 gap #139), scoped to a single configurable popup rather than a full multi-popup builder. */
 export const storefrontPopupTriggerEnum = pgEnum("storefront_popup_trigger", ["first_visit", "delay", "exit_intent"]);
+/** "none" until a domain is entered; "pending" until Vercel's DNS check passes; "failed" is surfaced so the owner can re-check. */
+export const storefrontCustomDomainStatusEnum = pgEnum("storefront_custom_domain_status", [
+  "none",
+  "pending",
+  "verified",
+  "failed",
+]);
 
 /**
  * One published storefront per workspace, reachable at /store/[workspaces.slug]
@@ -60,6 +67,16 @@ export const storefronts = pgTable(
     trackingIds: jsonb("tracking_ids").$type<Record<string, string>>().notNull().default({}),
     seoTitle: text("seo_title"),
     seoDescription: text("seo_description"),
+    // Auto-generated on storefront creation from business type/name (see
+    // generate-defaults.ts) — the hero previously had no CTA at all.
+    heroCtaLabel: text("hero_cta_label"),
+    heroCtaLink: text("hero_cta_link"),
+    // Custom domain connection (Vercel Domains API) — app-enforced unique like slug.
+    // verificationToken is the TXT record value Vercel issues on connect.
+    customDomain: text("custom_domain"),
+    customDomainStatus: storefrontCustomDomainStatusEnum("custom_domain_status").notNull().default("none"),
+    customDomainVerificationToken: text("custom_domain_verification_token"),
+    customDomainVerifiedAt: timestamp("custom_domain_verified_at", { withTimezone: true }),
     // Multi-language storefront content (PART 13 gap #145) — heroTitle/
     // heroSubtitle/aboutText above are the default-locale ("en") copy; this
     // holds per-locale overrides for every OTHER configured locale (ar/ku),
@@ -105,3 +122,4 @@ export type StorefrontCornerStyle = (typeof storefrontCornerStyleEnum.enumValues
 export type StorefrontHeaderStyle = (typeof storefrontHeaderStyleEnum.enumValues)[number];
 export type StorefrontFooterStyle = (typeof storefrontFooterStyleEnum.enumValues)[number];
 export type StorefrontPopupTrigger = (typeof storefrontPopupTriggerEnum.enumValues)[number];
+export type StorefrontCustomDomainStatus = (typeof storefrontCustomDomainStatusEnum.enumValues)[number];

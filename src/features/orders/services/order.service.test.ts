@@ -142,7 +142,19 @@ describe("orderService.createOrder", () => {
     vi.mocked(contactRepository.findById).mockResolvedValue(makeContact({ tags: ["VIP"] }));
     vi.mocked(orderRepository.create).mockResolvedValue(
       makeOrderListItem({
-        items: [{ id: "item-1", orderId: "order-1", productId: null, name: "Widget", unitPrice: "10.00", quantity: 1, createdAt: new Date() }],
+        items: [
+          {
+            id: "item-1",
+            orderId: "order-1",
+            productId: null,
+            variantId: null,
+            variantName: null,
+            name: "Widget",
+            unitPrice: "10.00",
+            quantity: 1,
+            createdAt: new Date(),
+          },
+        ],
       }),
     );
 

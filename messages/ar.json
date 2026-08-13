@@ -224,7 +224,27 @@
       "policiesHeading": "السياسات (اختياري)",
       "shippingPlaceholder": "سياسة الشحن",
       "returnsPlaceholder": "سياسة الإرجاع",
-      "paymentsPlaceholder": "سياسة الدفع"
+      "paymentsPlaceholder": "سياسة الدفع",
+      "imagesLabel": "صور المنتج",
+      "addImage": "إضافة صورة",
+      "uploading": "جارٍ الرفع...",
+      "primaryBadge": "الرئيسية",
+      "availabilityQuestion": "هل هذا المنتج له كمية محدودة؟",
+      "availabilityAlways": "متوفر دائمًا",
+      "availabilityLimited": "يتوفر بكمية محدودة",
+      "quantityLabel": "الكمية المتاحة",
+      "quantityHint": "أدخل عدد القطع المتاحة للبيع حاليًا.",
+      "variantsQuestion": "هل لهذا المنتج خيارات مثل اللون أو المقاس؟",
+      "variantsYes": "نعم",
+      "variantsNo": "لا",
+      "showMoreOptions": "خيارات إضافية",
+      "hideMoreOptions": "إخفاء الخيارات الإضافية",
+      "publishedLabel": "منشور في المتجر",
+      "statusPublished": "منشور",
+      "statusHidden": "مخفي",
+      "statusInStock": "متوفر",
+      "statusLowStock": "مخزون منخفض",
+      "statusOutOfStock": "غير متوفر"
     },
     "channels": {
       "title": "اربط قنواتك",
@@ -320,7 +340,8 @@
       "refreshing": "جارٍ التحديث..."
     },
     "menuLabel": "فتح القائمة",
-    "shellSubtitle": "لوحة التحكم"
+    "shellSubtitle": "لوحة التحكم",
+    "productsLink": "المنتجات"
   },
   "analytics": {
     "title": "التحليلات",
@@ -1637,14 +1658,57 @@
         "contact": "تواصل",
         "quote": "طلب عرض سعر",
         "support": "الدعم"
-      }
+      },
+      "outOfStock": "غير متوفر"
     },
     "tabs": {
       "storefront": "المتجر",
       "reviews": "التقييمات",
       "blog": "المدونة"
     },
-    "notPublished": "غير منشور"
+    "notPublished": "غير منشور",
+    "subTabs": {
+      "publish": "النشر والدومين",
+      "appearance": "المظهر",
+      "sections": "أقسام الموقع",
+      "tracking": "التتبع",
+      "advanced": "إعدادات متقدمة"
+    },
+    "logoLabel": "الشعار",
+    "logoManagedHint": "شعارك يُدار من ملف النشاط.",
+    "manageLogoLink": "تعديل الشعار",
+    "heroCtaLabelLabel": "نص الزر",
+    "heroCtaLabelPlaceholder": "مثال: تسوق الآن",
+    "heroCtaLinkLabel": "رابط الزر",
+    "customDomainLabel": "الدومين المخصص",
+    "customDomainPlaceholder": "www.yourbusiness.com",
+    "customDomainHint": "اربط دومينك الخاص بدلاً من الرابط الافتراضي.",
+    "connectDomain": "ربط",
+    "verifyDomain": "تحقق الآن",
+    "removeDomain": "إزالة",
+    "domainStatus": {
+      "none": "غير مرتبط",
+      "pending": "بانتظار التحقق من DNS",
+      "verified": "مرتبط",
+      "failed": "فشل التحقق — تأكد من سجل DNS وحاول مجددًا"
+    },
+    "domainDnsInstructions": "أضف سجل DNS هذا لدى مزود الدومين الخاص بك، ثم تحقق مرة أخرى:",
+    "advancedAppearanceHeading": "تخصيص متقدم",
+    "setupScore": {
+      "ready": "موقعك جاهز للنشر",
+      "needsAttention": "هناك {count} أشياء تحتاج إكمالها",
+      "items": {
+        "hasBusinessDescription": "أضف وصفًا للنشاط",
+        "hasLogo": "أضف شعارًا",
+        "hasCatalog": "أضف منتجًا أو خدمة واحدة على الأقل",
+        "hasContactInfo": "أضف رقم هاتف أو بريدًا للتواصل",
+        "hasTracking": "اربط بيكسل تتبع (اختياري)"
+      }
+    },
+    "previewHeading": "معاينة",
+    "previewDesktop": "سطح المكتب",
+    "previewTablet": "لوحي",
+    "previewMobile": "جوال"
   },
   "integrations": {
     "title": "التكاملات",
@@ -1807,7 +1871,7 @@
   },
   "knowledgeBasePage": {
     "pageTitle": "قاعدة المعرفة",
-    "pageDescription": "أدر الأسئلة الشائعة والمنتجات والخدمات والسياسات التي يمكن لموظفك الذكي الإجابة منها.",
+    "pageDescription": "أدر الأسئلة الشائعة والخدمات والسياسات التي يعتمد عليها موظفك الذكي في الإجابة.",
     "noItems": "لم تتم إضافة شيء بعد."
   },
   "localeSwitcher": {
@@ -1860,5 +1924,9 @@
     "title": "لا توجد مساحة عمل",
     "description": "حسابك غير مرتبط حالياً بأي مساحة عمل — قد يحدث هذا إذا تم حذفها من قبل أحد مشرفي المنصة. تقدر تنشئ مساحة عمل جديدة لتكمل استخدام التطبيق، أو تسجّل الخروج.",
     "createWorkspace": "إنشاء مساحة عمل جديدة"
+  },
+  "productsPage": {
+    "pageTitle": "المنتجات",
+    "pageDescription": "أضف المنتجات وأدرها — هذه هي المنتجات التي يراها عملاؤك ويطلبونها من موقعك."
   }
 }

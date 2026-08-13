@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     workspaceName: row.workspaceName,
     storefront: row.storefront,
     title: `${t("productsHeading")} — ${row.workspaceName}`,
+    fallbackImageUrl: row.logoUrl,
   });
 }
 
@@ -121,6 +122,11 @@ export default async function StoreProductsPage({ params, searchParams }: PagePr
                               {product.price}
                             </p>
                           )
+                        )}
+                        {product.trackQuantity && (product.quantity ?? 0) <= 0 && (
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                            {t("outOfStock")}
+                          </span>
                         )}
                       </div>
                     </CardContent>

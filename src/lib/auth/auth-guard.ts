@@ -57,6 +57,36 @@ export const requireUser = cache(async (): Promise<User> => {
   return user;
 });
 
+/**
+ * Non-redirecting counterpart to requireUser() — for the handful of public routes (storefront
+ * preview bypass) that need to know "is anyone signed in?" without ever redirecting an
+ * anonymous visitor. Deliberately not cached/shared with requireUser's implementation so that
+ * security-critical, already-working auth code isn't touched by this addition.
+ */
+export async function getOptionalUser(): Promise<User | null> {
+  const headerStore = await headers();
+  const forwardedUserId = headerStore.get("x-supabase-user-id");
+  if (forwardedUserId) {
+    const existing = await userRepository.findById(forwardedUserId);
+    if (existing) return existing;
+    return profileSyncService.ensureLocalUser(forwardedUserId, {
+      email: headerStore.get("x-supabase-user-email"),
+      phone: headerStore.get("x-supabase-user-phone"),
+    });
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user: supabaseUser },
+  } = await supabase.auth.getUser();
+  if (!supabaseUser || (!supabaseUser.email && !supabaseUser.phone)) return null;
+
+  return (
+    (await userRepository.findById(supabaseUser.id)) ??
+    (await profileSyncService.ensureLocalUser(supabaseUser.id, { email: supabaseUser.email, phone: supabaseUser.phone }))
+  );
+}
+
 export const CURRENT_WORKSPACE_COOKIE = "current_workspace_id";
 
 /**

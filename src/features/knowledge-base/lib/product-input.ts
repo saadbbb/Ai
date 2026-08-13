@@ -16,5 +16,5 @@ export function parseVariantNames(text: string | undefined): ProductVariant[] {
     .split(",")
     .map((name) => name.trim())
     .filter(Boolean)
-    .map((name) => ({ name, priceOverride: null }));
+    .map((name) => ({ id: crypto.randomUUID(), name, priceOverride: null }));
 }

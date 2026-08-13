@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
-import { blogPostRepository } from "@/features/storefront/repository/blog-post.repository";
 import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
 import { getAppUrl } from "@/lib/env";
 
@@ -25,7 +24,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: base, lastModified: store.updatedAt, changeFrequency: "daily", priority: 1 },
       { url: `${base}/products`, lastModified: store.updatedAt, changeFrequency: "daily", priority: 0.8 },
       { url: `${base}/about`, lastModified: store.updatedAt, changeFrequency: "monthly", priority: 0.5 },
-      { url: `${base}/blog`, lastModified: store.updatedAt, changeFrequency: "weekly", priority: 0.6 },
       { url: `${base}/faq`, lastModified: store.updatedAt, changeFrequency: "monthly", priority: 0.4 },
       { url: `${base}/contact`, lastModified: store.updatedAt, changeFrequency: "monthly", priority: 0.5 },
     );
@@ -38,16 +36,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: product.createdAt,
         changeFrequency: "weekly",
         priority: 0.7,
-      });
-    }
-
-    const posts = await blogPostRepository.findPublishedByWorkspaceId(store.workspaceId);
-    for (const post of posts) {
-      entries.push({
-        url: `${base}/blog/${post.slug}`,
-        lastModified: post.updatedAt,
-        changeFrequency: "monthly",
-        priority: 0.5,
       });
     }
   }

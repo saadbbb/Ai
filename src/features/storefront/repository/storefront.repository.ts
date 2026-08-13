@@ -38,6 +38,41 @@ export const storefrontRepository = {
     return row ?? null;
   },
 
+  /** Owner-preview bypass (get-storefront-data.ts) — unlike findPublishedByWorkspaceSlug, returns a storefront regardless of publish state. Callers must independently verify the requester actually owns this workspace before using this. */
+  async findByWorkspaceSlugAnyStatus(
+    slug: string,
+  ): Promise<{ storefront: Storefront; workspaceId: string; workspaceName: string; logoUrl: string | null } | null> {
+    const [row] = await db
+      .select({
+        storefront: storefronts,
+        workspaceId: workspaces.id,
+        workspaceName: workspaces.name,
+        logoUrl: workspaces.logoUrl,
+      })
+      .from(storefronts)
+      .innerJoin(workspaces, eq(workspaces.id, storefronts.workspaceId))
+      .where(eq(workspaces.slug, slug))
+      .limit(1);
+    return row ?? null;
+  },
+
+  /** Custom-domain routing (middleware.ts) — only ever resolves a domain that's both verified and published, same rule as the slug lookup above. */
+  async findPublishedByCustomDomain(domain: string): Promise<{ slug: string } | null> {
+    const [row] = await db
+      .select({ slug: workspaces.slug })
+      .from(storefronts)
+      .innerJoin(workspaces, eq(workspaces.id, storefronts.workspaceId))
+      .where(
+        and(
+          eq(storefronts.customDomain, domain),
+          eq(storefronts.customDomainStatus, "verified"),
+          eq(storefronts.isPublished, true),
+        ),
+      )
+      .limit(1);
+    return row ?? null;
+  },
+
   /** SEO sitemap (PART 13 gap #141) — every published storefront, for building the site-wide sitemap.xml. */
   async findAllPublished(): Promise<{ slug: string; workspaceId: string; updatedAt: Date }[]> {
     return db

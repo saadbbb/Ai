@@ -82,6 +82,8 @@ function makeItem(overrides: Partial<OrderItem> = {}): OrderItem {
     id: "item-1",
     orderId: "order-1",
     productId: null,
+    variantId: null,
+    variantName: null,
     name: "Widget",
     unitPrice: "19.99",
     quantity: 2,

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { submitInquiryAction } from "../actions/submit-inquiry.action";
+import { trackEvent } from "../lib/track-event";
 
 interface InquiryFormProps {
   slug: string;
@@ -38,6 +39,7 @@ export function InquiryForm({ slug, initialMessage = "", formType = "contact" }:
     }
 
     setIsSent(true);
+    trackEvent("Lead");
   }
 
   if (isSent) {

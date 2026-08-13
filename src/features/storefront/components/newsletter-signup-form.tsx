@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { subscribeNewsletterAction } from "../actions/subscribe-newsletter.action";
+import { trackEvent } from "../lib/track-event";
 
 export function NewsletterSignupForm({ slug }: { slug: string }) {
   const t = useTranslations("website.public.newsletter");
@@ -26,6 +27,7 @@ export function NewsletterSignupForm({ slug }: { slug: string }) {
     }
 
     setIsSent(true);
+    trackEvent("Lead");
   }
 
   if (isSent) {

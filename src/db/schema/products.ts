@@ -1,8 +1,14 @@
-import { boolean, index, jsonb, numeric, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, numeric, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { workspaces } from "./workspaces";
 
-/** A named option (e.g. "Large", "Red") with an optional price override — not a separate stock-tracked SKU, since there's no inventory system in the schema to track stock against yet. */
+/**
+ * A named option (e.g. "Large", "Red") with an optional price override — options only,
+ * not independently stock-tracked (inventory in this schema is product-level, see
+ * `trackQuantity`/`quantity` below). `id` is generated server-side the next time a
+ * variant list is saved without one, so pre-existing rows pick it up lazily.
+ */
 export interface ProductVariant {
+  id: string;
   name: string;
   priceOverride: string | null;
 }
@@ -27,6 +33,15 @@ export const products = pgTable(
     /** Additional gallery images beyond imageUrl (the primary/thumbnail) — same raw-URL convention, no upload widget. */
     galleryImageUrls: jsonb("gallery_image_urls").$type<string[]>().notNull().default([]),
     variants: jsonb("variants").$type<ProductVariant[]>().notNull().default([]),
+    /** Simple product-level inventory (spec: no ERP — no warehouses/locations/ledgers). When false, `quantity` is ignored and the product is always orderable. */
+    trackQuantity: boolean("track_quantity").notNull().default(false),
+    quantity: integer("quantity"),
+    /** "Low stock" badge threshold — not exposed in the basic product form, editable only from Advanced. */
+    lowStockThreshold: integer("low_stock_threshold").notNull().default(5),
+    /** Auto-generated ("PRD-0001"), editable only from Advanced — never required from the user. */
+    sku: text("sku"),
+    /** Auto-generated from `name`, unique per workspace (app-enforced, same convention as storefronts.slug uniqueness). */
+    slug: text("slug"),
     isActive: boolean("is_active").notNull().default(true),
     /** Separate from isActive — a product can be shown on the storefront but deliberately excluded from what the AI recommends (e.g. an item requiring an in-person fitting). Defaults true so existing products behave exactly as before. */
     aiVisible: boolean("ai_visible").notNull().default(true),
