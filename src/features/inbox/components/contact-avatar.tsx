@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 function initialsOf(fullName: string): string {
   const parts = fullName.trim().split(/\s+/);
   const first = parts[0]?.[0] ?? "";
@@ -7,8 +9,16 @@ function initialsOf(fullName: string): string {
 
 export function ContactAvatar({ fullName, avatarUrl }: { fullName: string; avatarUrl: string | null }) {
   if (avatarUrl) {
-    // eslint-disable-next-line @next/next/no-img-element -- external, per-contact URLs; not part of the app's own optimized asset set
-    return <img src={avatarUrl} alt={fullName} className="h-9 w-9 shrink-0 rounded-full object-cover" />;
+    return (
+      <Image
+        src={avatarUrl}
+        alt={fullName}
+        width={36}
+        height={36}
+        sizes="36px"
+        className="h-9 w-9 shrink-0 rounded-full object-cover"
+      />
+    );
   }
 
   return (

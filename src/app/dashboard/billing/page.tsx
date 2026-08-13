@@ -36,7 +36,7 @@ export default async function BillingPage() {
   const isOverdue = workspace.subscriptionStatus === "past_due" || workspace.subscriptionStatus === "grace";
 
   const [settings, plan, invoices] = await Promise.all([
-    platformSettingsRepository.get(),
+    platformSettingsRepository.getCached(),
     workspace.planId ? planRepository.findById(workspace.planId) : Promise.resolve(null),
     invoiceService.listForWorkspace(workspace.id),
   ]);

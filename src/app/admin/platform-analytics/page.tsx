@@ -1,9 +1,13 @@
 import { Percent, UserCheck, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import dynamic from "next/dynamic";
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
-import { BarChartCard } from "@/features/analytics/components/bar-chart-card";
 import { StatGrid } from "@/components/stat-grid";
+
+// recharts is a heavy dependency (~100kb+) — split into its own chunk so it
+// doesn't ship on pages that don't render a chart.
+const BarChartCard = dynamic(() => import("@/features/analytics/components/bar-chart-card").then((m) => m.BarChartCard));
 import { workspaceAdminRepository } from "@/features/platform-admin/repository/workspace-admin.repository";
 import { requirePlatformAdmin } from "@/lib/auth/auth-guard";
 

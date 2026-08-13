@@ -46,12 +46,14 @@ const INDIVIDUAL_CONTRIBUTOR_ROLES = new Set(["agent", "viewer"]);
 export default async function DashboardPage() {
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
-  const t = await getTranslations("dashboard");
-  const tLeads = await getTranslations("leads");
-  const tAnalytics = await getTranslations("analytics");
-  const tChannel = await getTranslations("inbox.thread.channel");
-  const tCoach = await getTranslations("coachMarks.attention");
-  const tBilling = await getTranslations("billing");
+  const [t, tLeads, tAnalytics, tChannel, tCoach, tBilling] = await Promise.all([
+    getTranslations("dashboard"),
+    getTranslations("leads"),
+    getTranslations("analytics"),
+    getTranslations("inbox.thread.channel"),
+    getTranslations("coachMarks.attention"),
+    getTranslations("billing"),
+  ]);
 
   // Today and attention bands share the same authorization requirement (base workspace
   // membership, already verified above). Growth is independently re-verified below since
@@ -63,9 +65,10 @@ export default async function DashboardPage() {
   ]);
 
   const isIndividualContributor = roleKey !== null && INDIVIDUAL_CONTRIBUTOR_ROLES.has(roleKey);
-  const myWork = isIndividualContributor ? await dashboardService.getMyWorkBand(workspace.id, user.id) : null;
-
-  const growth = canViewGrowth ? await analyticsService.getSummary(workspace.id, resolveAnalyticsRange(undefined)) : null;
+  const [myWork, growth] = await Promise.all([
+    isIndividualContributor ? dashboardService.getMyWorkBand(workspace.id, user.id) : Promise.resolve(null),
+    canViewGrowth ? analyticsService.getSummary(workspace.id, resolveAnalyticsRange(undefined)) : Promise.resolve(null),
+  ]);
 
   // PART 7 gap: Owner/Admin/Manager saw an identical dashboard — this "Business"
   // band (subscription health + top performers) is Owner-only, the one piece of

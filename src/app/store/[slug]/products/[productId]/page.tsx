@@ -101,7 +101,8 @@ export default async function StoreProductPage({ params }: PageProps) {
                     alt={product.name}
                     width={600}
                     height={600}
-                    unoptimized
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    priority
                     className="aspect-square w-full rounded-lg object-cover"
                   />
                   {gallery.length > 1 && (
@@ -113,7 +114,7 @@ export default async function StoreProductPage({ params }: PageProps) {
                           alt=""
                           width={150}
                           height={150}
-                          unoptimized
+                          sizes="25vw"
                           className="aspect-square w-full rounded object-cover"
                         />
                       ))}
@@ -199,7 +200,7 @@ export default async function StoreProductPage({ params }: PageProps) {
                           alt={item.name}
                           width={300}
                           height={240}
-                          unoptimized
+                          sizes="(max-width: 640px) 100vw, 33vw"
                           className="h-32 w-full rounded-t-lg object-cover"
                         />
                       )}

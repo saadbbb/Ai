@@ -1,10 +1,11 @@
 ﻿"use server";
 
+import { revalidateTag } from "next/cache";
 import type { PlatformSettings } from "@/db/schema";
 import { requireWritePlatformAdmin } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { auditLogRepository } from "../repository/audit-log.repository";
-import { platformSettingsRepository } from "../repository/platform-settings.repository";
+import { PLATFORM_SETTINGS_CACHE_TAG, platformSettingsRepository } from "../repository/platform-settings.repository";
 import { updatePlatformSettingsSchema } from "../validation/schemas";
 
 export async function updatePlatformSettingsAction(input: unknown): Promise<ActionResult<PlatformSettings>> {
@@ -30,6 +31,7 @@ export async function updatePlatformSettingsAction(input: unknown): Promise<Acti
       summary: "Updated platform settings.",
     });
 
+    revalidateTag(PLATFORM_SETTINGS_CACHE_TAG);
     return actionOk(settings);
   } catch (error) {
     return actionFail(error);

@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { profileSyncService } from "@/features/auth/services/profile-sync.service";
 import { userRepository } from "@/features/auth/repository/user.repository";
@@ -20,8 +20,30 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  * profileSyncService for why a lazy, centralized sync here is simpler than
  * having every sign-in path — password, OAuth, email confirmation — do it
  * separately).
+ *
+ * Every protected route already goes through middleware.ts, which calls
+ * supabase.auth.getUser() (a real network round-trip to Supabase's Auth
+ * server) to decide whether to redirect. It forwards that already-verified
+ * identity via x-supabase-user-* request headers, so this reads those first
+ * instead of paying for a second, redundant getUser() network call on every
+ * single page load — a real, measurable duplicate-latency fix (2026-08-13).
+ * The full getUser() path below only runs as a fallback for routes that,
+ * for whatever reason, weren't covered by middleware's matcher.
  */
 export const requireUser = cache(async (): Promise<User> => {
+  const headerStore = await headers();
+  const forwardedUserId = headerStore.get("x-supabase-user-id");
+
+  if (forwardedUserId) {
+    const existing = await userRepository.findById(forwardedUserId);
+    if (existing) return existing;
+
+    return profileSyncService.ensureLocalUser(forwardedUserId, {
+      email: headerStore.get("x-supabase-user-email"),
+      phone: headerStore.get("x-supabase-user-phone"),
+    });
+  }
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user: supabaseUser },

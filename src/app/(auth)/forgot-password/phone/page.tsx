@@ -7,7 +7,7 @@ import { platformSettingsRepository } from "@/features/platform-admin/repository
 
 export default async function ForgotPasswordPhonePage() {
   const t = await getTranslations("auth.forgotPasswordPhone");
-  const settings = await platformSettingsRepository.get();
+  const settings = await platformSettingsRepository.getCached();
 
   return (
     <Card>

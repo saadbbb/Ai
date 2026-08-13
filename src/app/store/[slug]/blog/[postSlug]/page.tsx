@@ -63,7 +63,8 @@ export default async function StoreBlogPostPage({ params }: PageProps) {
               alt={post.title}
               width={1200}
               height={675}
-              unoptimized
+              sizes="(max-width: 768px) 100vw, 768px"
+              priority
               className="aspect-video w-full rounded-lg object-cover"
             />
           )}

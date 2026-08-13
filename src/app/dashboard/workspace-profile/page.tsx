@@ -70,7 +70,7 @@ export default async function BusinessSettingsHubPage() {
   const isOverdue = workspace.subscriptionStatus === "past_due" || workspace.subscriptionStatus === "grace";
 
   const [settings, plan, invoices, teamData, canInviteTeam, canManageTeam, auditData, tickets] = await Promise.all([
-    platformSettingsRepository.get(),
+    platformSettingsRepository.getCached(),
     workspace.planId ? planRepository.findById(workspace.planId) : Promise.resolve(null),
     invoiceService.listForWorkspace(workspace.id),
     canViewTeam ? teamService.getTeam(workspace.id) : Promise.resolve({ members: [], invitations: [], roles: [] }),

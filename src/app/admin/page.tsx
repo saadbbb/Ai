@@ -11,11 +11,15 @@ import {
   Zap,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import dynamic from "next/dynamic";
 import { RowList } from "@/components/data-table";
 import { PageContainer, Section } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
-import { LineChartCard } from "@/features/analytics/components/line-chart-card";
 import { enumerateDays } from "@/features/analytics/lib/date-range";
+
+// recharts is a heavy dependency (~100kb+) — split into its own chunk so it
+// doesn't ship on pages that don't render a chart.
+const LineChartCard = dynamic(() => import("@/features/analytics/components/line-chart-card").then((m) => m.LineChartCard));
 import { StatGrid } from "@/components/stat-grid";
 import { calculateRevenue } from "@/features/platform-admin/lib/revenue";
 import { aiUsageAdminRepository } from "@/features/platform-admin/repository/ai-usage-admin.repository";

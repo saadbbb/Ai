@@ -50,7 +50,7 @@ export default async function StoreBlogPage({ params }: PageProps) {
                       alt={post.title}
                       width={400}
                       height={300}
-                      unoptimized
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="h-40 w-full rounded-t-lg object-cover"
                     />
                   )}

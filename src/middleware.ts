@@ -14,9 +14,17 @@ const AUTH_PAGES = ["/login", "/register", "/verify", "/forgot-password"];
  * server rather than trusting a locally-decoded token — worth the network
  * call here since this is the actual authorization check, not just a
  * presence probe like the old cookie-only version of this file.
+ *
+ * The validated identity is forwarded to the Server Component render via
+ * request headers (x-supabase-user-*) — requireUser() (auth-guard.ts),
+ * called in every protected layout, reads these first instead of making its
+ * own second network round-trip to re-verify the exact same JWT this
+ * middleware just verified. That was a genuine duplicate Supabase Auth call
+ * on every single dashboard/onboarding/admin page load before this.
  */
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  const requestHeaders = new Headers(request.headers);
+  let cookiesToApply: { name: string; value: string; options?: Parameters<NextResponse["cookies"]["set"]>[2] }[] = [];
 
   const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     cookies: {
@@ -27,10 +35,7 @@ export async function middleware(request: NextRequest) {
         for (const { name, value } of cookiesToSet) {
           request.cookies.set(name, value);
         }
-        response = NextResponse.next({ request });
-        for (const { name, value, options } of cookiesToSet) {
-          response.cookies.set(name, value, options);
-        }
+        cookiesToApply = cookiesToSet;
       },
     },
   });
@@ -52,6 +57,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
+  if (user) {
+    requestHeaders.set("x-supabase-user-id", user.id);
+    if (user.email) requestHeaders.set("x-supabase-user-email", user.email);
+    if (user.phone) requestHeaders.set("x-supabase-user-phone", user.phone);
+  }
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  for (const { name, value, options } of cookiesToApply) {
+    response.cookies.set(name, value, options);
+  }
   return response;
 }
 

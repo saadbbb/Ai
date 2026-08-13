@@ -1,14 +1,18 @@
 import { BarChart3 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import dynamic from "next/dynamic";
 import { DataTable } from "@/components/data-table";
 import { ExportButtons } from "@/components/export-buttons";
 import { PageContainer, Section } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
 import { StatGrid } from "@/components/stat-grid";
-import { BarChartCard } from "@/features/analytics/components/bar-chart-card";
 import { DateRangeSelect } from "@/features/analytics/components/date-range-select";
-import { LineChartCard } from "@/features/analytics/components/line-chart-card";
 import { HealthScoreCard } from "@/features/analytics/components/health-score-card";
+
+// recharts is a heavy dependency (~100kb+) — split into its own chunk so it
+// doesn't ship on pages that don't render a chart.
+const BarChartCard = dynamic(() => import("@/features/analytics/components/bar-chart-card").then((m) => m.BarChartCard));
+const LineChartCard = dynamic(() => import("@/features/analytics/components/line-chart-card").then((m) => m.LineChartCard));
 import { resolveAnalyticsRange, type AnalyticsRangeKey } from "@/features/analytics/lib/date-range";
 import { analyticsService } from "@/features/analytics/services/analytics.service";
 import { featureAccessService } from "@/features/platform-admin/services/feature-access.service";

@@ -1,11 +1,12 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import type { PlatformSettings } from "@/db/schema";
 import { requireWritePlatformAdmin } from "@/lib/auth/auth-guard";
 import { actionFail, actionOk, actionValidationError, type ActionResult } from "@/lib/errors/app-error";
 import { auditLogRepository } from "../repository/audit-log.repository";
-import { platformSettingsRepository } from "../repository/platform-settings.repository";
+import { PLATFORM_SETTINGS_CACHE_TAG, platformSettingsRepository } from "../repository/platform-settings.repository";
 
 const schema = z.object({ creativity: z.enum(["low", "medium", "high"]) });
 
@@ -28,6 +29,7 @@ export async function setDefaultCreativityAction(input: unknown): Promise<Action
       summary: `Changed the platform-wide default AI creativity to "${parsed.data.creativity}".`,
     });
 
+    revalidateTag(PLATFORM_SETTINGS_CACHE_TAG);
     return actionOk(settings);
   } catch (error) {
     return actionFail(error);

@@ -17,6 +17,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
+  images: {
+    // Product photos, blog images, and logos are free-text URLs merchants paste in
+    // (see knowledge-base's imageUrl fields) — there's no fixed set of domains to
+    // whitelist, so every storefront <Image> was passing `unoptimized` as a
+    // workaround, which fully disables resizing/format conversion/responsive
+    // srcset. This wildcard re-enables real optimization for any HTTPS host.
+    remotePatterns: [{ protocol: "https", hostname: "**" }],
+  },
 };
 
 export default withNextIntl(nextConfig);

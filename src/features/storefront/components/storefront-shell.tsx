@@ -69,7 +69,7 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
                   alt={workspaceName}
                   width={40}
                   height={40}
-                  unoptimized
+                  sizes="40px"
                   className="h-10 w-10 rounded-full object-cover"
                 />
               )}
@@ -93,7 +93,7 @@ export async function StorefrontShell({ storefront, workspaceName, logoUrl, slug
 
         {storefront.bannerImageUrl && (
           <div className="relative h-48 w-full sm:h-64">
-            <Image src={storefront.bannerImageUrl} alt="" fill unoptimized className="object-cover" />
+            <Image src={storefront.bannerImageUrl} alt="" fill sizes="100vw" priority className="object-cover" />
           </div>
         )}
 
