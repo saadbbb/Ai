@@ -27,10 +27,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function StoreContactPage({ params }: PageProps) {
   const { slug } = await params;
   const t = await getTranslations("website.public");
-  const { storefront, workspaceName, logoUrl } = await getStorefrontData(slug);
+  const { storefront, workspaceId, workspaceName, logoUrl } = await getStorefrontData(slug);
 
   return (
-    <StorefrontShell storefront={storefront} workspaceName={workspaceName} logoUrl={logoUrl} slug={slug}>
+    <StorefrontShell storefront={storefront} workspaceName={workspaceName} workspaceId={workspaceId} logoUrl={logoUrl} slug={slug}>
       <section className="mx-auto max-w-md space-y-4 px-6 py-12">
         <h1 className="text-2xl font-semibold">{t("contactHeading")}</h1>
         {(storefront.contactPhone || storefront.contactEmail) && (

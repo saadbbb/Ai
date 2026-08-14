@@ -1,13 +1,16 @@
+import { PackageX } from "lucide-react";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { EmptyState } from "@/components/empty-state";
+import { Button } from "@/components/ui/button";
 import { InquiryForm } from "@/features/storefront/components/inquiry-form";
 import { CartControl, ProductCard } from "@/features/storefront/components/product-card";
 import { ProductViewTracker } from "@/features/storefront/components/product-view-tracker";
 import { ShareButton } from "@/features/storefront/components/share-button";
 import { StorefrontShell } from "@/features/storefront/components/storefront-shell";
+import { formatPrice } from "@/features/storefront/lib/format-price";
 import { getStorefrontData } from "@/features/storefront/lib/get-storefront-data";
 import { recommendProducts } from "@/features/storefront/lib/product-catalog";
 import { buildStorefrontMetadata } from "@/features/storefront/lib/seo";
@@ -42,11 +45,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function StoreProductPage({ params }: PageProps) {
   const { slug, productId } = await params;
-  const t = await getTranslations("website.public");
+  const [t, locale] = await Promise.all([getTranslations("website.public"), getLocale()]);
   const { storefront, workspaceId, workspaceName, logoUrl } = await getStorefrontData(slug);
 
   const product = await productRepository.findById(productId, workspaceId);
-  if (!product || !product.isActive) notFound();
+  if (!product || !product.isActive) {
+    return (
+      <StorefrontShell storefront={storefront} workspaceName={workspaceName} workspaceId={workspaceId} logoUrl={logoUrl} slug={slug}>
+        <section className="mx-auto max-w-3xl px-6 py-16">
+          <EmptyState
+            icon={PackageX}
+            title={t("notFound.productTitle")}
+            description={t("notFound.productDescription")}
+            action={
+              <Button asChild variant="outline">
+                <Link href={`/store/${slug}/products`}>{t("browseProducts")}</Link>
+              </Button>
+            }
+          />
+        </section>
+      </StorefrontShell>
+    );
+  }
   const outOfStock = product.trackQuantity && (product.quantity ?? 0) <= 0;
 
   await storefrontAnalyticsService.trackProductView(workspaceId, product.id);
@@ -57,7 +77,6 @@ export default async function StoreProductPage({ params }: PageProps) {
   ]);
   const related = recommendProducts(allProducts, product.id, product.category, salesCounts);
 
-  const accentColor = storefront.primaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.primaryColor) ? storefront.primaryColor : "#2563eb";
   const secondaryColor = storefront.secondaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.secondaryColor) ? storefront.secondaryColor : "#f97316";
   const cornerClass = storefrontCornerClass(storefront);
   const buttonClass = storefrontButtonClass(storefront);
@@ -93,7 +112,7 @@ export default async function StoreProductPage({ params }: PageProps) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <ProductViewTracker productName={product.name} price={price} />
-      <StorefrontShell storefront={storefront} workspaceName={workspaceName} logoUrl={logoUrl} slug={slug}>
+      <StorefrontShell storefront={storefront} workspaceName={workspaceName} workspaceId={workspaceId} logoUrl={logoUrl} slug={slug}>
         <div className="mx-auto max-w-4xl space-y-8 px-6 py-12">
           <Link href={`/store/${slug}/products`} className="text-sm text-muted-foreground hover:text-foreground">
             {t("backToProducts")}
@@ -139,17 +158,11 @@ export default async function StoreProductPage({ params }: PageProps) {
               <div className="flex items-center gap-2">
                 {product.discountedPrice ? (
                   <>
-                    <p className="text-xl font-medium" style={{ color: accentColor }}>
-                      {product.discountedPrice}
-                    </p>
-                    <p className="text-sm text-muted-foreground line-through">{product.price}</p>
+                    <p className="text-xl font-medium text-primary">{formatPrice(product.discountedPrice, locale)}</p>
+                    <p className="text-sm text-muted-foreground line-through">{formatPrice(product.price ?? "0", locale)}</p>
                   </>
                 ) : (
-                  product.price && (
-                    <p className="text-xl font-medium" style={{ color: accentColor }}>
-                      {product.price}
-                    </p>
-                  )
+                  product.price && <p className="text-xl font-medium text-primary">{formatPrice(product.price, locale)}</p>
                 )}
                 {outOfStock && (
                   <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
@@ -157,21 +170,10 @@ export default async function StoreProductPage({ params }: PageProps) {
                   </span>
                 )}
               </div>
-              {product.description && <p className="whitespace-pre-wrap text-sm text-muted-foreground">{product.description}</p>}
-
-              {product.variants.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">{t("variantsLabel")}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {product.variants.map((variant) => (
-                      <span key={variant.name} className="rounded-full bg-muted px-2 py-1 text-xs">
-                        {variant.name}
-                        {variant.priceOverride ? ` — ${variant.priceOverride}` : ""}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+              {product.trackQuantity && (product.quantity ?? 0) > 0 && (
+                <p className="text-sm text-muted-foreground">{t("quantityAvailable", { count: product.quantity ?? 0 })}</p>
               )}
+              {product.description && <p className="whitespace-pre-wrap text-sm text-muted-foreground">{product.description}</p>}
 
               <div className="flex flex-wrap items-center gap-2 pt-2">
                 <CartControl product={product} buttonClass={buttonClass} />
@@ -206,7 +208,6 @@ export default async function StoreProductPage({ params }: PageProps) {
                     product={item}
                     mode="grid"
                     size="sm"
-                    accentColor={accentColor}
                     secondaryColor={secondaryColor}
                     cornerClass={cornerClass}
                     buttonClass={buttonClass}

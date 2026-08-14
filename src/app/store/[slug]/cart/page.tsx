@@ -30,16 +30,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function StoreCartPage({ params }: PageProps) {
   const { slug } = await params;
   const t = await getTranslations("website.public");
-  const { storefront, workspaceName, logoUrl } = await getStorefrontData(slug);
-  const accentColor = storefront.primaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.primaryColor) ? storefront.primaryColor : "#2563eb";
+  const { storefront, workspaceId, workspaceName, logoUrl } = await getStorefrontData(slug);
 
   return (
-    <StorefrontShell storefront={storefront} workspaceName={workspaceName} logoUrl={logoUrl} slug={slug}>
+    <StorefrontShell storefront={storefront} workspaceName={workspaceName} workspaceId={workspaceId} logoUrl={logoUrl} slug={slug}>
       <section className="mx-auto max-w-2xl space-y-4 px-6 py-12">
         <h1 className="text-2xl font-semibold">{t("cartPageHeading")}</h1>
         <CartPageContent
           slug={slug}
-          accentColor={accentColor}
           cornerClass={storefrontCornerClass(storefront)}
           buttonClass={storefrontButtonClass(storefront)}
         />

@@ -1,6 +1,17 @@
 import type { Product, StorefrontProductDisplayMode } from "@/db/schema";
 
 export type ProductSort = "newest" | "price_asc" | "price_desc" | "best_selling" | "discounted";
+export const SORT_OPTIONS: ProductSort[] = ["newest", "price_asc", "price_desc", "best_selling", "discounted"];
+
+/** Below this many products, a search box has nothing meaningful to narrow down — hide it even if the merchant's manual toggle is on. */
+export const PRODUCT_SEARCH_MIN = 8;
+/** Above this many categories, inline pills get cramped — collapse behind an "All categories" picker instead. */
+export const CATEGORY_PILL_THRESHOLD = 5;
+
+/** Search only actually renders when the merchant's toggle is on AND the catalog is large enough to need it — gate on the *total* catalog size, never the post-filter result count, or the box would vanish mid-search as results narrow. */
+export function shouldShowSearch(showSearchSetting: boolean, totalProductCount: number): boolean {
+  return showSearchSetting && totalProductCount >= PRODUCT_SEARCH_MIN;
+}
 
 /** Wrapping container className for a `ProductCard` grid, shared by every catalog call site so the 3 display modes stay visually consistent. */
 export function productGridClass(mode: StorefrontProductDisplayMode): string {

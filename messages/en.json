@@ -1505,7 +1505,8 @@
       "tiktok": "TikTok",
       "youtube": "YouTube",
       "snapchat": "Snapchat",
-      "telegram": "Telegram"
+      "telegram": "Telegram",
+      "twitter": "X (Twitter)"
     },
     "seoHeading": "Search engine optimization",
     "seoTitleLabel": "SEO title",
@@ -1604,6 +1605,7 @@
         "discounted": "On sale"
       },
       "applyFilters": "Apply",
+      "resetFilters": "Reset",
       "share": "Share",
       "linkCopied": "Link copied.",
       "backToProducts": "← Back to products",
@@ -1674,23 +1676,60 @@
         "submit": "Request appointment",
         "thankYou": "Thanks! We'll confirm your appointment soon."
       },
-      "newsletter": {
-        "emailPlaceholder": "Your email",
-        "subscribe": "Subscribe",
-        "submitting": "Subscribing...",
-        "thankYou": "You're subscribed!"
-      },
       "formTabs": {
         "contact": "Contact",
         "quote": "Request a quote",
         "support": "Support"
       },
-      "outOfStock": "Out of stock"
+      "outOfStock": "Out of stock",
+      "multipleOptions": "Multiple options",
+      "selectVariantHint": "Select an option",
+      "quantityAvailable": "Available: {count}",
+      "notFound": {
+        "pageTitle": "Page not found",
+        "pageDescription": "This page isn't available right now.",
+        "productTitle": "Product not found",
+        "productDescription": "This product isn't available right now.",
+        "orderTitle": "Order not found",
+        "orderDescription": "We couldn't find that order confirmation.",
+        "policyTitle": "Not available",
+        "policyDescription": "This store hasn't published this page yet."
+      }
     },
     "tabs": {
       "storefront": "Storefront",
+      "pages": "Store pages",
+      "ads": "Advertisements",
       "reviews": "Reviews",
       "blog": "Blog"
+    },
+    "pages": {
+      "heading": "Store pages",
+      "noPages": "No pages yet.",
+      "titlePlaceholder": "Page title (e.g. About us)",
+      "slugPlaceholder": "URL slug (auto-generated if left blank)",
+      "contentPlaceholder": "Write the page content...",
+      "publishedLabel": "Published",
+      "draftLabel": "Draft",
+      "addPage": "Add page",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
+    },
+    "ads": {
+      "heading": "Website advertisements",
+      "noAds": "No advertisements yet.",
+      "untitled": "Untitled ad",
+      "uploadImage": "Upload image",
+      "uploading": "Uploading...",
+      "linkPlaceholder": "Link (URL or /path) — optional",
+      "titlePlaceholder": "Title (for your reference only) — optional",
+      "altTextPlaceholder": "Alt text (for accessibility) — optional",
+      "publishedLabel": "Published",
+      "draftLabel": "Draft",
+      "addAd": "Add advertisement",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "lastEdited": "Last edited {date}"
     },
     "notPublished": "Not published",
     "subTabs": {

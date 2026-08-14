@@ -48,7 +48,7 @@ export default async function StoreFaqPage({ params }: PageProps) {
       {structuredData && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       )}
-      <StorefrontShell storefront={storefront} workspaceName={workspaceName} logoUrl={logoUrl} slug={slug}>
+      <StorefrontShell storefront={storefront} workspaceName={workspaceName} workspaceId={workspaceId} logoUrl={logoUrl} slug={slug}>
         <section className="mx-auto max-w-3xl space-y-4 px-6 py-12">
           <h1 className="text-2xl font-semibold">{t("faqHeading")}</h1>
           {faqs.length === 0 ? (

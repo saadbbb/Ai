@@ -24,7 +24,16 @@ const hexColor = z
 
 const optionalUrl = z.string().trim().url().max(2000).optional().or(z.literal(""));
 
-const SOCIAL_LINK_KEYS = ["whatsapp", "instagram", "facebook", "tiktok", "youtube", "snapchat", "telegram"] as const;
+/** Accepts an absolute URL or an internal path like "/products" — ad links may point either way. */
+const optionalLinkUrl = z
+  .string()
+  .trim()
+  .max(2000)
+  .refine((value) => value === "" || value.startsWith("/") || z.string().url().safeParse(value).success, "Must be a valid URL or path.")
+  .optional()
+  .or(z.literal(""));
+
+const SOCIAL_LINK_KEYS = ["whatsapp", "instagram", "facebook", "tiktok", "youtube", "snapchat", "telegram", "twitter"] as const;
 const TRACKING_ID_KEYS = ["metaPixelId", "googleAnalyticsId", "googleTagManagerId", "tiktokPixelId"] as const;
 export const SECTION_KEYS = ["hero", "about", "featured", "products", "services", "testimonials", "contact"] as const;
 
@@ -126,6 +135,41 @@ export const generateBlogDraftSchema = z.object({
   topic: z.string().trim().min(3).max(300),
 });
 
+export const saveStorefrontPageSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().trim().min(1).max(200),
+  slug: z.string().trim().max(100).optional(),
+  content: z.string().trim().min(1).max(20000),
+  isPublished: z.boolean(),
+});
+
+export const deleteStorefrontPageSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export const reorderStorefrontPageSchema = z.object({
+  id: z.string().uuid(),
+  direction: z.union([z.literal(-1), z.literal(1)]),
+});
+
+export const saveStorefrontAdSchema = z.object({
+  id: z.string().uuid().optional(),
+  imageUrl: z.string().trim().url().max(2000),
+  linkUrl: optionalLinkUrl,
+  title: z.string().trim().max(200).optional(),
+  altText: z.string().trim().max(300).optional(),
+  isPublished: z.boolean(),
+});
+
+export const deleteStorefrontAdSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export const reorderStorefrontAdSchema = z.object({
+  id: z.string().uuid(),
+  direction: z.union([z.literal(-1), z.literal(1)]),
+});
+
 export const submitOrderSchema = z.object({
   slug: z.string().trim().min(1),
   fullName: z.string().trim().min(1).max(200),
@@ -137,6 +181,9 @@ export const submitOrderSchema = z.object({
       z.object({
         productId: z.string().uuid(),
         quantity: z.coerce.number().int().min(1).max(100),
+        // Never a variantName from the client — the server resolves it authoritatively from the
+        // product's own variant list, same trust model as unitPrice never coming from the client.
+        variantId: z.string().optional(),
       }),
     )
     .min(1)

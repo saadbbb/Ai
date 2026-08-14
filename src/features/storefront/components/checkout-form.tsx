@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,10 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useCart } from "../lib/cart-context";
 import { submitOrderAction } from "../actions/submit-order.action";
+import { formatPrice } from "../lib/format-price";
 import { trackEvent } from "../lib/track-event";
 
 export function CheckoutForm({ slug, buttonClass }: { slug: string; buttonClass?: string }) {
   const t = useTranslations("website.public");
+  const locale = useLocale();
   const router = useRouter();
   const { items, clear } = useCart();
   const [fullName, setFullName] = useState("");
@@ -39,7 +41,7 @@ export function CheckoutForm({ slug, buttonClass }: { slug: string; buttonClass?
       phone,
       deliveryAddress,
       notes: notes || undefined,
-      items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+      items: items.map((item) => ({ productId: item.productId, quantity: item.quantity, variantId: item.variantId })),
     });
     setIsSubmitting(false);
 
@@ -73,17 +75,18 @@ export function CheckoutForm({ slug, buttonClass }: { slug: string; buttonClass?
           <p className="text-sm font-medium">{t("orderSummaryHeading")}</p>
           <div className="divide-y">
             {items.map((item) => (
-              <div key={item.productId} className="flex items-center justify-between gap-3 py-2 text-sm">
+              <div key={`${item.productId}-${item.variantId ?? ""}`} className="flex items-center justify-between gap-3 py-2 text-sm">
                 <span className="min-w-0 truncate text-muted-foreground">
-                  {item.name} × {item.quantity}
+                  {item.name}
+                  {item.variantName ? ` — ${item.variantName}` : ""} × {item.quantity}
                 </span>
-                <span className="shrink-0 font-medium">{(Number.parseFloat(item.unitPrice || "0") * item.quantity).toFixed(2)}</span>
+                <span className="shrink-0 font-medium">{formatPrice(Number.parseFloat(item.unitPrice || "0") * item.quantity, locale)}</span>
               </div>
             ))}
           </div>
           <div className="flex items-center justify-between border-t pt-2 text-sm font-semibold">
             <span>{t("cartTotal")}</span>
-            <span>{total.toFixed(2)}</span>
+            <span>{formatPrice(total, locale)}</span>
           </div>
         </CardContent>
       </Card>

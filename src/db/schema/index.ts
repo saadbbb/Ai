@@ -44,6 +44,8 @@ export * from "./storefronts";
 export * from "./newsletter-subscribers";
 export * from "./reviews";
 export * from "./blog-posts";
+export * from "./storefront-pages";
+export * from "./storefront-ads";
 export * from "./storefront-events";
 export * from "./integrations";
 export * from "./campaigns";

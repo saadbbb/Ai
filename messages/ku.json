@@ -1505,7 +1505,8 @@
       "tiktok": "تیک تۆک",
       "youtube": "یوتیوب",
       "snapchat": "سناپچات",
-      "telegram": "تلێگرام"
+      "telegram": "تلێگرام",
+      "twitter": "X (تویتەر)"
     },
     "seoHeading": "باشترکردنی بۆ ماشێنی گەڕان (SEO)",
     "seoTitleLabel": "ناونیشانی SEO",
@@ -1604,6 +1605,7 @@
         "discounted": "داشکاندنی هەیە"
       },
       "applyFilters": "جێبەجێکردن",
+      "resetFilters": "ڕێکخستنەوە",
       "share": "هاوبەشکردن",
       "linkCopied": "بەستەرەکە کۆپی کرا.",
       "backToProducts": "← گەڕانەوە بۆ بەرهەمەکان",
@@ -1674,23 +1676,60 @@
         "submit": "داواکاری کات",
         "thankYou": "سوپاس! بەم زووانە کاتەکەت پشتڕاست دەکەینەوە."
       },
-      "newsletter": {
-        "emailPlaceholder": "ئیمەیڵەکەت",
-        "subscribe": "بەشداربوون",
-        "submitting": "بەشداربوون...",
-        "thankYou": "بەسەرکەوتوویی بەشدار بوویت!"
-      },
       "formTabs": {
         "contact": "پەیوەندی",
         "quote": "داواکاری نرخ",
         "support": "پشتگیری"
       },
-      "outOfStock": "بەردەست نییە"
+      "outOfStock": "بەردەست نییە",
+      "multipleOptions": "چەند بژاردەیەک",
+      "selectVariantHint": "بژاردەیەک هەڵبژێرە",
+      "quantityAvailable": "بەردەستە: {count}",
+      "notFound": {
+        "pageTitle": "پەڕە نەدۆزرایەوە",
+        "pageDescription": "ئەم پەڕەیە لە ئێستادا بەردەست نییە.",
+        "productTitle": "بەرهەم نەدۆزرایەوە",
+        "productDescription": "ئەم بەرهەمە لە ئێستادا بەردەست نییە.",
+        "orderTitle": "داواکاری نەدۆزرایەوە",
+        "orderDescription": "نەمانتوانی دووپاتکردنەوەی ئەم داواکارییە بدۆزینەوە.",
+        "policyTitle": "بەردەست نییە",
+        "policyDescription": "ئەم فرۆشگایە هێشتا ئەم پەڕەیەی بڵاونەکردووەتەوە."
+      }
     },
     "tabs": {
       "storefront": "فرۆشگا",
+      "pages": "پەڕەکانی فرۆشگا",
+      "ads": "ڕیکلامەکانی ماڵپەڕ",
       "reviews": "هەڵسەنگاندنەکان",
       "blog": "بلۆگ"
+    },
+    "pages": {
+      "heading": "پەڕەکانی فرۆشگا",
+      "noPages": "هێشتا هیچ پەڕەیەک نییە.",
+      "titlePlaceholder": "ناونیشانی پەڕە (نموونە: دەربارەمان)",
+      "slugPlaceholder": "لینکی پەڕە (خۆکار دروست دەبێت ئەگەر بەتاڵ بێت)",
+      "contentPlaceholder": "ناوەڕۆکی پەڕەکە بنووسە...",
+      "publishedLabel": "بڵاوکراوەتەوە",
+      "draftLabel": "ڕەشنووس",
+      "addPage": "زیادکردنی پەڕە",
+      "moveUp": "بەرەو سەرەوە",
+      "moveDown": "بەرەو خوارەوە"
+    },
+    "ads": {
+      "heading": "ڕیکلامەکانی ماڵپەڕ",
+      "noAds": "هێشتا هیچ ڕیکلامێک نییە.",
+      "untitled": "ڕیکلامی بێ ناونیشان",
+      "uploadImage": "بارکردنی وێنە",
+      "uploading": "بارکردن...",
+      "linkPlaceholder": "لینک (URL یان /ڕێچکە) — ئارەزوومەندانە",
+      "titlePlaceholder": "ناونیشان (تەنها بۆ بەکارهێنانی ناوخۆیی) — ئارەزوومەندانە",
+      "altTextPlaceholder": "دەقی جێگرەوە (بۆ ڕوونی) — ئارەزوومەندانە",
+      "publishedLabel": "بڵاوکراوەتەوە",
+      "draftLabel": "ڕەشنووس",
+      "addAd": "زیادکردنی ڕیکلام",
+      "moveUp": "بەرەو سەرەوە",
+      "moveDown": "بەرەو خوارەوە",
+      "lastEdited": "دوایین دەستکاری {date}"
     },
     "notPublished": "بڵاونەکراوەتەوە",
     "subTabs": {

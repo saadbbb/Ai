@@ -1497,7 +1497,7 @@
       "minimal": "بسيط"
     },
     "darkModeLabel": "الوضع الليلي",
-    "socialHeading": "روابط التواصل الاجتماعي",
+    "socialHeading": "حسابات التواصل الاجتماعي",
     "social": {
       "whatsapp": "واتساب",
       "instagram": "إنستغرام",
@@ -1505,7 +1505,8 @@
       "tiktok": "تيك توك",
       "youtube": "يوتيوب",
       "snapchat": "سناب شات",
-      "telegram": "تيليجرام"
+      "telegram": "تيليجرام",
+      "twitter": "X (تويتر)"
     },
     "seoHeading": "تحسين محركات البحث (SEO)",
     "seoTitleLabel": "عنوان SEO",
@@ -1604,6 +1605,7 @@
         "discounted": "عليها خصم"
       },
       "applyFilters": "تطبيق",
+      "resetFilters": "إعادة تعيين",
       "share": "مشاركة",
       "linkCopied": "تم نسخ الرابط.",
       "backToProducts": "← الرجوع إلى المنتجات",
@@ -1674,23 +1676,60 @@
         "submit": "طلب موعد",
         "thankYou": "شكراً! سنؤكد موعدك قريباً."
       },
-      "newsletter": {
-        "emailPlaceholder": "بريدك الإلكتروني",
-        "subscribe": "اشتراك",
-        "submitting": "جارٍ الاشتراك...",
-        "thankYou": "تم اشتراكك بنجاح!"
-      },
       "formTabs": {
         "contact": "تواصل",
         "quote": "طلب عرض سعر",
         "support": "الدعم"
       },
-      "outOfStock": "غير متوفر"
+      "outOfStock": "غير متوفر",
+      "multipleOptions": "خيارات متعددة",
+      "selectVariantHint": "اختر خياراً",
+      "quantityAvailable": "الكمية المتوفرة: {count}",
+      "notFound": {
+        "pageTitle": "الصفحة غير موجودة",
+        "pageDescription": "هذه الصفحة غير متاحة حاليًا.",
+        "productTitle": "المنتج غير موجود",
+        "productDescription": "هذا المنتج غير متوفر حاليًا.",
+        "orderTitle": "الطلب غير موجود",
+        "orderDescription": "لم نتمكن من العثور على تأكيد هذا الطلب.",
+        "policyTitle": "غير متاح",
+        "policyDescription": "لم ينشر هذا المتجر هذه الصفحة بعد."
+      }
     },
     "tabs": {
       "storefront": "المتجر",
+      "pages": "صفحات المتجر",
+      "ads": "إعلانات الموقع",
       "reviews": "التقييمات",
       "blog": "المدونة"
+    },
+    "pages": {
+      "heading": "صفحات المتجر",
+      "noPages": "لا توجد صفحات بعد.",
+      "titlePlaceholder": "عنوان الصفحة (مثال: من نحن)",
+      "slugPlaceholder": "رابط الصفحة (يُنشأ تلقائيًا إذا تُرك فارغًا)",
+      "contentPlaceholder": "اكتب محتوى الصفحة...",
+      "publishedLabel": "منشورة",
+      "draftLabel": "مسودة",
+      "addPage": "إضافة صفحة",
+      "moveUp": "تحريك لأعلى",
+      "moveDown": "تحريك لأسفل"
+    },
+    "ads": {
+      "heading": "إعلانات الموقع",
+      "noAds": "لا توجد إعلانات بعد.",
+      "untitled": "إعلان بدون عنوان",
+      "uploadImage": "رفع صورة",
+      "uploading": "جارٍ الرفع...",
+      "linkPlaceholder": "الرابط (URL أو /مسار) — اختياري",
+      "titlePlaceholder": "العنوان (للاستخدام الداخلي فقط) — اختياري",
+      "altTextPlaceholder": "نص بديل (لإمكانية الوصول) — اختياري",
+      "publishedLabel": "منشور",
+      "draftLabel": "مسودة",
+      "addAd": "إضافة إعلان",
+      "moveUp": "تحريك لأعلى",
+      "moveDown": "تحريك لأسفل",
+      "lastEdited": "آخر تعديل {date}"
     },
     "notPublished": "غير منشور",
     "subTabs": {

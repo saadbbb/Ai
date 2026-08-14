@@ -1,10 +1,11 @@
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, PackageSearch } from "lucide-react";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { EmptyState } from "@/components/empty-state";
 import { Card, CardContent } from "@/components/ui/card";
 import { StorefrontShell } from "@/features/storefront/components/storefront-shell";
+import { formatPrice } from "@/features/storefront/lib/format-price";
 import { getStorefrontData } from "@/features/storefront/lib/get-storefront-data";
 import { buildStorefrontMetadata } from "@/features/storefront/lib/seo";
 import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
@@ -32,14 +33,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function OrderSuccessPage({ params }: PageProps) {
   const { slug, orderId } = await params;
-  const t = await getTranslations("website.public");
-  const { storefront, workspaceName, logoUrl } = await getStorefrontData(slug);
+  const [t, locale] = await Promise.all([getTranslations("website.public"), getLocale()]);
+  const { storefront, workspaceId, workspaceName, logoUrl } = await getStorefrontData(slug);
 
   const confirmation = await storefrontService.getOrderConfirmation(slug, orderId);
-  if (!confirmation) notFound();
+  if (!confirmation) {
+    return (
+      <StorefrontShell storefront={storefront} workspaceName={workspaceName} workspaceId={workspaceId} logoUrl={logoUrl} slug={slug}>
+        <section className="mx-auto max-w-3xl px-6 py-16">
+          <EmptyState icon={PackageSearch} title={t("notFound.orderTitle")} description={t("notFound.orderDescription")} />
+        </section>
+      </StorefrontShell>
+    );
+  }
 
   return (
-    <StorefrontShell storefront={storefront} workspaceName={workspaceName} logoUrl={logoUrl} slug={slug}>
+    <StorefrontShell storefront={storefront} workspaceName={workspaceName} workspaceId={workspaceId} logoUrl={logoUrl} slug={slug}>
       <section className="mx-auto max-w-md space-y-6 px-6 py-16 text-center">
         <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-success-soft text-success">
           <CheckCircle2 className="size-9" />
@@ -59,15 +68,16 @@ export default async function OrderSuccessPage({ params }: PageProps) {
               {confirmation.items.map((item, index) => (
                 <div key={index} className="flex items-center justify-between gap-3 py-1.5 text-sm">
                   <span className="min-w-0 truncate text-muted-foreground">
-                    {item.name} × {item.quantity}
+                    {item.name}
+                    {item.variantName ? ` — ${item.variantName}` : ""} × {item.quantity}
                   </span>
-                  <span className="shrink-0 font-medium">{(Number.parseFloat(item.unitPrice) * item.quantity).toFixed(2)}</span>
+                  <span className="shrink-0 font-medium">{formatPrice(Number.parseFloat(item.unitPrice) * item.quantity, locale)}</span>
                 </div>
               ))}
             </div>
             <div className="flex items-center justify-between border-t pt-2 text-sm font-semibold">
               <span>{t("cartGrandTotal")}</span>
-              <span>{confirmation.total.toFixed(2)}</span>
+              <span>{formatPrice(confirmation.total, locale)}</span>
             </div>
           </CardContent>
         </Card>

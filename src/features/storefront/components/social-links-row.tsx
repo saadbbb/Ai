@@ -1,3 +1,5 @@
+import { SOCIAL_ICONS } from "./social-icons";
+
 const SOCIAL_LABELS: Record<string, string> = {
   whatsapp: "WhatsApp",
   instagram: "Instagram",
@@ -6,6 +8,7 @@ const SOCIAL_LABELS: Record<string, string> = {
   youtube: "YouTube",
   snapchat: "Snapchat",
   telegram: "Telegram",
+  twitter: "X (Twitter)",
 };
 
 export function SocialLinksRow({ links }: { links: Record<string, string> }) {
@@ -14,17 +17,23 @@ export function SocialLinksRow({ links }: { links: Record<string, string> }) {
 
   return (
     <div className="flex flex-wrap justify-center gap-3 pt-2">
-      {entries.map(([key, url]) => (
-        <a
-          key={key}
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-muted-foreground hover:text-foreground hover:underline"
-        >
-          {SOCIAL_LABELS[key] ?? key}
-        </a>
-      ))}
+      {entries.map(([key, url]) => {
+        const Icon = SOCIAL_ICONS[key];
+        const label = SOCIAL_LABELS[key] ?? key;
+        return (
+          <a
+            key={key}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={label}
+            aria-label={label}
+            className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-primary-soft hover:text-primary"
+          >
+            {Icon ? <Icon /> : <span className="text-sm">{label}</span>}
+          </a>
+        );
+      })}
     </div>
   );
 }

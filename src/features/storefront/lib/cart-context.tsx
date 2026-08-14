@@ -9,13 +9,17 @@ export interface CartItem {
   quantity: number;
   /** Optional — old localStorage carts won't have this; the cart page falls back to a placeholder. */
   imageUrl?: string;
+  /** Set when the product has variants and the customer picked one — a different variant of the same product is a distinct cart line. */
+  variantId?: string;
+  variantName?: string;
 }
 
 interface CartContextValue {
   items: CartItem[];
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  removeItem: (productId: string) => void;
+  /** `variantId` narrows which line to update — two variants of the same product must never be conflated into one line. */
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
+  removeItem: (productId: string, variantId?: string) => void;
   clear: () => void;
   itemCount: number;
 }
@@ -58,26 +62,28 @@ export function CartProvider({ slug, children }: { slug: string; children: React
 
   const addItem = useCallback((item: Omit<CartItem, "quantity">, quantity = 1) => {
     setItems((current) => {
-      const existing = current.find((line) => line.productId === item.productId);
+      const existing = current.find((line) => line.productId === item.productId && line.variantId === item.variantId);
       if (existing) {
         return current.map((line) =>
-          line.productId === item.productId ? { ...line, quantity: line.quantity + quantity } : line,
+          line.productId === item.productId && line.variantId === item.variantId
+            ? { ...line, quantity: line.quantity + quantity }
+            : line,
         );
       }
       return [...current, { ...item, quantity }];
     });
   }, []);
 
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
+  const updateQuantity = useCallback((productId: string, quantity: number, variantId?: string) => {
     setItems((current) =>
       quantity <= 0
-        ? current.filter((line) => line.productId !== productId)
-        : current.map((line) => (line.productId === productId ? { ...line, quantity } : line)),
+        ? current.filter((line) => !(line.productId === productId && line.variantId === variantId))
+        : current.map((line) => (line.productId === productId && line.variantId === variantId ? { ...line, quantity } : line)),
     );
   }, []);
 
-  const removeItem = useCallback((productId: string) => {
-    setItems((current) => current.filter((line) => line.productId !== productId));
+  const removeItem = useCallback((productId: string, variantId?: string) => {
+    setItems((current) => current.filter((line) => !(line.productId === productId && line.variantId === variantId)));
   }, []);
 
   const clear = useCallback(() => setItems([]), []);

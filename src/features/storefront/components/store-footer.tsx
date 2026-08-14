@@ -1,18 +1,27 @@
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import type { Storefront } from "@/db/schema";
 import { cn } from "@/lib/utils";
-import { NewsletterSignupForm } from "./newsletter-signup-form";
 import { SocialLinksRow } from "./social-links-row";
 
 interface StoreFooterProps {
   storefront: Storefront;
   workspaceName: string;
   slug: string;
-  links: { href: string; label: string }[];
+  /** Published custom pages (Store Pages system) — appended after the two built-in links. */
+  customPages: { href: string; label: string }[];
 }
 
-export function StoreFooter({ storefront, workspaceName, slug, links }: StoreFooterProps) {
+export async function StoreFooter({ storefront, workspaceName, slug, customPages }: StoreFooterProps) {
   if (!storefront.showFooter) return null;
+
+  const t = await getTranslations("website.public.nav");
+  const base = `/store/${slug}`;
+  const links = [
+    { href: base, label: t("home") },
+    { href: `${base}/products`, label: t("products") },
+    ...customPages,
+  ];
 
   return (
     <footer className={cn("border-t bg-surface-elevated/40", storefront.footerStyle === "minimal" ? "py-6" : "py-12")}>
@@ -27,11 +36,6 @@ export function StoreFooter({ storefront, workspaceName, slug, links }: StoreFoo
           </nav>
         )}
         <SocialLinksRow links={storefront.socialLinks} />
-        {storefront.footerStyle !== "minimal" && (
-          <div className="mx-auto max-w-sm">
-            <NewsletterSignupForm slug={slug} />
-          </div>
-        )}
         <p className="text-xs text-muted-foreground">
           © {new Date().getFullYear()} {workspaceName}
         </p>

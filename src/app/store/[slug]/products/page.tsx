@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/features/storefront/components/product-card";
+import { ProductFilters } from "@/features/storefront/components/product-filters";
 import { StorefrontShell } from "@/features/storefront/components/storefront-shell";
 import { getStorefrontData } from "@/features/storefront/lib/get-storefront-data";
 import {
   extractCategories,
   filterAndSortProducts,
   productGridClass,
+  shouldShowSearch,
+  SORT_OPTIONS,
   type ProductSort,
 } from "@/features/storefront/lib/product-catalog";
 import { buildStorefrontMetadata } from "@/features/storefront/lib/seo";
@@ -21,8 +24,6 @@ interface PageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ q?: string; category?: string; sort?: string; preview?: string }>;
 }
-
-const SORT_OPTIONS: ProductSort[] = ["newest", "price_asc", "price_desc", "best_selling", "discounted"];
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -52,52 +53,24 @@ export default async function StoreProductsPage({ params, searchParams }: PagePr
   ]);
   const activeProducts = products.filter((product) => product.isActive);
   const activeServices = services.filter((service) => service.isActive);
-  const categories = extractCategories(activeProducts);
+  const categories = storefront.showCategories ? extractCategories(activeProducts) : [];
   const resolvedSort = SORT_OPTIONS.includes(sort as ProductSort) ? (sort as ProductSort) : "newest";
   const visibleProducts = filterAndSortProducts(activeProducts, { search: q, category, sort: resolvedSort }, salesCounts);
-  const accentColor = storefront.primaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.primaryColor) ? storefront.primaryColor : "#2563eb";
   const secondaryColor = storefront.secondaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.secondaryColor) ? storefront.secondaryColor : "#f97316";
   const cornerClass = storefrontCornerClass(storefront);
   const buttonClass = storefrontButtonClass(storefront);
+  // Gated on the total catalog size, never the post-filter result count, so the search box can't
+  // disappear mid-search just because a query narrowed the visible results below the threshold.
+  const searchVisible = shouldShowSearch(storefront.showSearch, activeProducts.length);
 
   return (
-    <StorefrontShell storefront={storefront} workspaceName={workspaceName} logoUrl={logoUrl} slug={slug}>
+    <StorefrontShell storefront={storefront} workspaceName={workspaceName} workspaceId={workspaceId} logoUrl={logoUrl} slug={slug}>
       <div className="mx-auto max-w-5xl space-y-10 px-6 py-12">
         <section className="space-y-4">
           <h1 className="text-2xl font-semibold">{t("productsHeading")}</h1>
 
-          {(storefront.showSearch || (storefront.showCategories && categories.length > 0)) && (
-            <form className="flex flex-wrap items-center gap-2" method="get">
-              {storefront.showSearch && (
-                <input
-                  type="search"
-                  name="q"
-                  defaultValue={q}
-                  placeholder={t("searchPlaceholder")}
-                  className="h-9 min-w-48 flex-1 rounded-md border bg-transparent px-3 text-sm outline-none"
-                />
-              )}
-              {storefront.showCategories && categories.length > 0 && (
-                <select name="category" defaultValue={category ?? ""} className="h-9 rounded-md border bg-transparent px-2 text-sm">
-                  <option value="">{t("allCategories")}</option>
-                  {categories.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              )}
-              <select name="sort" defaultValue={resolvedSort} className="h-9 rounded-md border bg-transparent px-2 text-sm">
-                {SORT_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {t(`sortOptions.${option}`)}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="h-9 rounded-md border px-3 text-sm hover:bg-muted">
-                {t("applyFilters")}
-              </button>
-            </form>
+          {(searchVisible || categories.length > 0) && (
+            <ProductFilters slug={slug} q={q} category={category} sort={resolvedSort} categories={categories} showSearch={searchVisible} />
           )}
 
           {visibleProducts.length === 0 ? (
@@ -110,7 +83,6 @@ export default async function StoreProductsPage({ params, searchParams }: PagePr
                   slug={slug}
                   product={product}
                   mode={storefront.productDisplayMode}
-                  accentColor={accentColor}
                   secondaryColor={secondaryColor}
                   cornerClass={cornerClass}
                   buttonClass={buttonClass}
@@ -131,7 +103,7 @@ export default async function StoreProductsPage({ params, searchParams }: PagePr
                   <CardContent className="space-y-1">
                     <p className="font-medium">{service.name}</p>
                     {service.description && <p className="text-sm text-muted-foreground">{service.description}</p>}
-                    {service.price && <p className="text-sm font-medium" style={{ color: accentColor }}>{service.price}</p>}
+                    {service.price && <p className="text-sm font-medium text-primary">{service.price}</p>}
                   </CardContent>
                 </Card>
               ))}

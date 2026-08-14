@@ -1,4 +1,4 @@
-import { ExternalLink, Globe, Star } from "lucide-react";
+import { ExternalLink, FileText, Globe, Image as ImageIcon, Star } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { PageContainer } from "@/components/page-container";
@@ -55,6 +55,18 @@ export default async function WebsitePage() {
           </div>
         </div>
         <div className="flex shrink-0 gap-2">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/dashboard/website/pages">
+              <FileText className="size-3.5" />
+              {t("tabs.pages")}
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/dashboard/website/ads">
+              <ImageIcon className="size-3.5" />
+              {t("tabs.ads")}
+            </Link>
+          </Button>
           <Button asChild variant="ghost" size="sm">
             <Link href="/dashboard/website/reviews">
               <Star className="size-3.5" />

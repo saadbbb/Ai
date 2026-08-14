@@ -10,10 +10,9 @@ interface StoreHeaderProps {
   workspaceName: string;
   logoUrl: string | null;
   slug: string;
-  links: { href: string; label: string }[];
 }
 
-export function StoreHeader({ storefront, workspaceName, logoUrl, slug, links }: StoreHeaderProps) {
+export function StoreHeader({ storefront, workspaceName, logoUrl, slug }: StoreHeaderProps) {
   const base = `/store/${slug}`;
 
   return (
@@ -42,20 +41,9 @@ export function StoreHeader({ storefront, workspaceName, logoUrl, slug, links }:
           <span className="text-base font-semibold tracking-tight">{workspaceName}</span>
         </Link>
 
-        <div className={cn("flex flex-1 items-center gap-5", storefront.headerStyle === "centered" ? "flex-col" : "justify-end")}>
-          {storefront.headerStyle !== "minimal" && (
-            <nav className="flex flex-wrap items-center gap-5 text-sm font-medium text-muted-foreground">
-              {links.map((link) => (
-                <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground">
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          )}
-          <div className="flex items-center gap-3">
-            <LocaleSwitcher />
-            <CartBadge slug={slug} />
-          </div>
+        <div className={cn("flex flex-1 items-center gap-3", storefront.headerStyle === "centered" ? "justify-center" : "justify-end")}>
+          <LocaleSwitcher />
+          <CartBadge slug={slug} />
         </div>
       </div>
     </header>

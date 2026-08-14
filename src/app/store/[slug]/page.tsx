@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { AppointmentRequestForm } from "@/features/storefront/components/appointment-request-form";
-import { InquiryForm } from "@/features/storefront/components/inquiry-form";
+import { HeroAdCarousel } from "@/features/storefront/components/hero-ad-carousel";
 import { ProductCard } from "@/features/storefront/components/product-card";
 import { PromotionCountdown } from "@/features/storefront/components/promotion-countdown";
 import { StorefrontShell } from "@/features/storefront/components/storefront-shell";
@@ -12,6 +12,7 @@ import { resolveLocalizedStorefrontText } from "@/features/storefront/lib/locali
 import { productGridClass } from "@/features/storefront/lib/product-catalog";
 import { buildStorefrontMetadata } from "@/features/storefront/lib/seo";
 import { storefrontButtonClass, storefrontCornerClass, storefrontThemeClasses } from "@/features/storefront/lib/style-classes";
+import { storefrontAdRepository } from "@/features/storefront/repository/storefront-ad.repository";
 import { storefrontRepository } from "@/features/storefront/repository/storefront.repository";
 import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
 import { productRepository } from "@/features/knowledge-base/repository/product.repository";
@@ -55,14 +56,14 @@ export default async function PublicStorePage({ params, searchParams }: PageProp
   const { storefront, workspaceId, workspaceName, logoUrl } = await getStorefrontData(slug, { preview: preview === "1" });
   const localizedText = resolveLocalizedStorefrontText(storefront, locale);
 
-  const [products, services, reviews] = await Promise.all([
+  const [products, services, reviews, publishedAds] = await Promise.all([
     productRepository.findByWorkspaceId(workspaceId),
     serviceRepository.findByWorkspaceId(workspaceId),
     reviewRepository.findPublishedByWorkspaceId(workspaceId),
+    storefrontAdRepository.findPublishedByWorkspaceId(workspaceId),
   ]);
   const activeProducts = products.filter((product) => product.isActive);
   const activeServices = services.filter((service) => service.isActive);
-  const accentColor = storefront.primaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.primaryColor) ? storefront.primaryColor : "#2563eb";
   const secondaryColor = storefront.secondaryColor && /^#[0-9a-fA-F]{6}$/.test(storefront.secondaryColor) ? storefront.secondaryColor : "#f97316";
   const themeClasses = storefrontThemeClasses(storefront);
   const cornerClass = storefrontCornerClass(storefront);
@@ -70,27 +71,31 @@ export default async function PublicStorePage({ params, searchParams }: PageProp
   const visibleSections = storefront.sections;
 
   const sectionRenderers: Record<string, React.ReactNode> = {
-    hero: (
-      <section key="hero" className={`px-6 text-center ${themeClasses.section}`} style={{ backgroundColor: `${accentColor}14` }}>
-        <div className="mx-auto max-w-2xl space-y-4">
-          <h1 className={`text-3xl ${themeClasses.heading}`}>{localizedText.heroTitle || workspaceName}</h1>
-          {localizedText.heroSubtitle && <p className="text-muted-foreground">{localizedText.heroSubtitle}</p>}
-          {storefront.heroCtaLabel && storefront.heroCtaLink && (
-            <Link
-              href={
-                storefront.heroCtaLink.startsWith("#") || storefront.heroCtaLink.startsWith("/")
-                  ? `/store/${slug}${storefront.heroCtaLink}`
-                  : storefront.heroCtaLink
-              }
-              className="inline-flex h-10 items-center rounded-md px-5 text-sm font-medium text-white"
-              style={{ backgroundColor: accentColor }}
-            >
-              {storefront.heroCtaLabel}
-            </Link>
-          )}
-        </div>
-      </section>
-    ),
+    hero:
+      publishedAds.length > 0 ? (
+        <section key="hero">
+          <HeroAdCarousel ads={publishedAds} slug={slug} />
+        </section>
+      ) : (
+        <section key="hero" className={`bg-primary-soft px-6 text-center ${themeClasses.section}`}>
+          <div className="mx-auto max-w-2xl space-y-4">
+            <h1 className={`text-3xl ${themeClasses.heading}`}>{localizedText.heroTitle || workspaceName}</h1>
+            {localizedText.heroSubtitle && <p className="text-muted-foreground">{localizedText.heroSubtitle}</p>}
+            {storefront.heroCtaLabel && storefront.heroCtaLink && (
+              <Link
+                href={
+                  storefront.heroCtaLink.startsWith("#") || storefront.heroCtaLink.startsWith("/")
+                    ? `/store/${slug}${storefront.heroCtaLink}`
+                    : storefront.heroCtaLink
+                }
+                className="inline-flex h-10 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground"
+              >
+                {storefront.heroCtaLabel}
+              </Link>
+            )}
+          </div>
+        </section>
+      ),
     about: localizedText.aboutText ? (
       <section key="about" className="mx-auto max-w-4xl space-y-2 px-6 py-8">
         <h2 className={`text-lg ${themeClasses.heading}`}>{t("aboutHeading")}</h2>
@@ -113,7 +118,6 @@ export default async function PublicStorePage({ params, searchParams }: PageProp
                 slug={slug}
                 product={product}
                 mode={storefront.productDisplayMode}
-                accentColor={accentColor}
                 secondaryColor={secondaryColor}
                 cornerClass={cornerClass}
                 buttonClass={buttonClass}
@@ -141,7 +145,6 @@ export default async function PublicStorePage({ params, searchParams }: PageProp
               slug={slug}
               product={product}
               mode={storefront.productDisplayMode}
-              accentColor={accentColor}
               secondaryColor={secondaryColor}
               cornerClass={cornerClass}
               buttonClass={buttonClass}
@@ -162,7 +165,7 @@ export default async function PublicStorePage({ params, searchParams }: PageProp
                 <CardContent className="space-y-1">
                   <p className="font-medium">{service.name}</p>
                   {service.description && <p className="text-sm text-muted-foreground">{service.description}</p>}
-                  {service.price && <p className="text-sm font-medium" style={{ color: accentColor }}>{service.price}</p>}
+                  {service.price && <p className="text-sm font-medium text-primary">{service.price}</p>}
                 </CardContent>
               </Card>
             ))}
@@ -198,17 +201,6 @@ export default async function PublicStorePage({ params, searchParams }: PageProp
         </section>
       );
     })(),
-    contact: (
-      <section key="contact" className="mx-auto max-w-md space-y-3 px-6 py-8">
-        <h2 className={`text-lg ${themeClasses.heading}`}>{t("contactHeading")}</h2>
-        {(storefront.contactPhone || storefront.contactEmail) && (
-          <p className="text-sm text-muted-foreground">
-            {[storefront.contactPhone, storefront.contactEmail].filter(Boolean).join(" · ")}
-          </p>
-        )}
-        <InquiryForm slug={slug} />
-      </section>
-    ),
   };
 
   const averageRating =
@@ -237,7 +229,7 @@ export default async function PublicStorePage({ params, searchParams }: PageProp
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <StorefrontShell storefront={storefront} workspaceName={workspaceName} logoUrl={logoUrl} slug={slug}>
+      <StorefrontShell storefront={storefront} workspaceName={workspaceName} workspaceId={workspaceId} logoUrl={logoUrl} slug={slug}>
         {visibleSections.map((key) => sectionRenderers[key] ?? null)}
       </StorefrontShell>
     </>

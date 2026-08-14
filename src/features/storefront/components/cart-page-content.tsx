@@ -1,7 +1,7 @@
 "use client";
 
 import { ImageOff, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,16 +9,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useCart } from "../lib/cart-context";
+import { formatPrice } from "../lib/format-price";
 
 interface CartPageContentProps {
   slug: string;
-  accentColor: string;
   cornerClass: string;
   buttonClass: string;
 }
 
-export function CartPageContent({ slug, accentColor, cornerClass, buttonClass }: CartPageContentProps) {
+export function CartPageContent({ slug, cornerClass, buttonClass }: CartPageContentProps) {
   const t = useTranslations("website.public");
+  const locale = useLocale();
   const { items, updateQuantity, removeItem } = useCart();
   const router = useRouter();
 
@@ -46,7 +47,7 @@ export function CartPageContent({ slug, accentColor, cornerClass, buttonClass }:
         {items.map((item) => {
           const lineTotal = Number.parseFloat(item.unitPrice || "0") * item.quantity;
           return (
-            <Card key={item.productId} className={cn("flex-row items-center gap-3 border-border/60 p-3", cornerClass)}>
+            <Card key={`${item.productId}-${item.variantId ?? ""}`} className={cn("flex-row items-center gap-3 border-border/60 p-3", cornerClass)}>
               <div className={cn("relative size-16 shrink-0 overflow-hidden bg-muted", cornerClass)}>
                 {item.imageUrl ? (
                   <Image src={item.imageUrl} alt={item.name} fill sizes="64px" className="object-cover" />
@@ -58,14 +59,15 @@ export function CartPageContent({ slug, accentColor, cornerClass, buttonClass }:
               </div>
               <CardContent className="min-w-0 flex-1 space-y-1 p-0">
                 <p className="truncate text-sm font-medium">{item.name}</p>
-                <p className="text-xs text-muted-foreground">{item.unitPrice}</p>
+                {item.variantName && <p className="truncate text-xs text-muted-foreground">{item.variantName}</p>}
+                <p className="text-xs text-muted-foreground">{formatPrice(item.unitPrice, locale)}</p>
                 <div className="flex items-center gap-2 pt-1">
                   <div className={cn("flex items-center gap-1 border", buttonClass)}>
                     <button
                       type="button"
                       aria-label={t("quantityDecrease")}
                       className="flex size-7 items-center justify-center rounded-[inherit] text-muted-foreground hover:bg-muted hover:text-foreground"
-                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                      onClick={() => updateQuantity(item.productId, item.quantity - 1, item.variantId)}
                     >
                       <Minus className="size-3.5" />
                     </button>
@@ -74,7 +76,7 @@ export function CartPageContent({ slug, accentColor, cornerClass, buttonClass }:
                       type="button"
                       aria-label={t("quantityIncrease")}
                       className="flex size-7 items-center justify-center rounded-[inherit] text-muted-foreground hover:bg-muted hover:text-foreground"
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.productId, item.quantity + 1, item.variantId)}
                     >
                       <Plus className="size-3.5" />
                     </button>
@@ -82,16 +84,14 @@ export function CartPageContent({ slug, accentColor, cornerClass, buttonClass }:
                   <button
                     type="button"
                     aria-label={t("removeFromCart")}
-                    onClick={() => removeItem(item.productId)}
+                    onClick={() => removeItem(item.productId, item.variantId)}
                     className="ms-auto flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                   >
                     <Trash2 className="size-4" />
                   </button>
                 </div>
               </CardContent>
-              <p className="shrink-0 self-start text-sm font-semibold" style={{ color: accentColor }}>
-                {lineTotal.toFixed(2)}
-              </p>
+              <p className="shrink-0 self-start text-sm font-semibold text-primary">{formatPrice(lineTotal, locale)}</p>
             </Card>
           );
         })}
@@ -100,9 +100,7 @@ export function CartPageContent({ slug, accentColor, cornerClass, buttonClass }:
       <Card className={cornerClass}>
         <CardContent className="flex items-center justify-between p-4">
           <span className="text-sm font-medium">{t("cartGrandTotal")}</span>
-          <span className="text-lg font-semibold" style={{ color: accentColor }}>
-            {total.toFixed(2)}
-          </span>
+          <span className="text-lg font-semibold text-primary">{formatPrice(total, locale)}</span>
         </CardContent>
       </Card>
 

@@ -17,6 +17,8 @@ interface OrderItemInput {
   name: string;
   unitPrice: string;
   quantity: number;
+  variantId?: string | null;
+  variantName?: string | null;
 }
 
 interface CreateOrderInput {
@@ -72,6 +74,8 @@ async function createOrder(workspaceId: string, input: CreateOrderInput, actor: 
       name: item.name,
       unitPrice: item.unitPrice,
       quantity: item.quantity,
+      variantId: item.variantId ?? null,
+      variantName: item.variantName ?? null,
     })),
   );
 

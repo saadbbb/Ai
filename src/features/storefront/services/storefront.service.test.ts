@@ -416,10 +416,55 @@ describe("storefrontService.submitOrder", () => {
       WORKSPACE_ID,
       expect.objectContaining({
         contactId: "contact-1",
-        items: [{ productId: "product-1", name: "Widget", unitPrice: "14.99", quantity: 2 }],
+        items: [{ productId: "product-1", name: "Widget", unitPrice: "14.99", quantity: 2, variantId: null, variantName: null }],
       }),
       { type: "system" },
     );
+  });
+
+  it("resolves a chosen variant server-side and prefers its price override over the product discount", async () => {
+    vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([
+      makeProduct({
+        discountedPrice: "14.99",
+        variants: [
+          { id: "variant-1", name: "Large", priceOverride: "19.99" },
+          { id: "variant-2", name: "Small", priceOverride: null },
+        ],
+      }),
+    ]);
+    vi.mocked(contactRepository.findByPhone).mockResolvedValue(null);
+    vi.mocked(contactRepository.create).mockResolvedValue({ id: "contact-1" } as Contact);
+    vi.mocked(orderService.createOrder).mockResolvedValue({ order: { id: "order-1" } } as never);
+
+    await storefrontService.submitOrder(WORKSPACE_ID, {
+      fullName: "Jane",
+      phone: "+9647701234567",
+      items: [{ productId: "product-1", quantity: 1, variantId: "variant-1" }],
+    });
+
+    expect(orderService.createOrder).toHaveBeenCalledWith(
+      WORKSPACE_ID,
+      expect.objectContaining({
+        items: [
+          { productId: "product-1", name: "Widget", unitPrice: "19.99", quantity: 1, variantId: "variant-1", variantName: "Large" },
+        ],
+      }),
+      { type: "system" },
+    );
+  });
+
+  it("rejects an order for a variant that no longer exists on the product", async () => {
+    vi.mocked(productRepository.findByWorkspaceId).mockResolvedValue([makeProduct({ variants: [{ id: "variant-1", name: "Large", priceOverride: null }] })]);
+    vi.mocked(contactRepository.findByPhone).mockResolvedValue(null);
+    vi.mocked(contactRepository.create).mockResolvedValue({ id: "contact-1" } as Contact);
+
+    await expect(
+      storefrontService.submitOrder(WORKSPACE_ID, {
+        fullName: "Jane",
+        phone: "+9647701234567",
+        items: [{ productId: "product-1", quantity: 1, variantId: "gone" }],
+      }),
+    ).rejects.toThrow();
   });
 
   it("rejects a cart item that isn't an active product in this workspace", async () => {

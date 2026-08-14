@@ -231,6 +231,7 @@ async function submitInquiry(workspaceId: string, input: InquiryInput): Promise<
 interface OrderCartItemInput {
   productId: string;
   quantity: number;
+  variantId?: string;
 }
 
 interface OrderInput {
@@ -263,11 +264,29 @@ async function submitOrder(workspaceId: string, input: OrderInput): Promise<Orde
     if (product.trackQuantity && (product.quantity ?? 0) < item.quantity) {
       throw new AppError("OUT_OF_STOCK", `"${product.name}" is no longer available in that quantity.`);
     }
-    const unitPrice = product.discountedPrice ?? product.price;
+
+    let variant = null;
+    if (item.variantId) {
+      variant = product.variants.find((candidate) => candidate.id === item.variantId) ?? null;
+      if (!variant) {
+        throw new AppError("VALIDATION_ERROR", `The selected option for "${product.name}" is no longer available.`);
+      }
+    }
+
+    // A variant's own price, when set, is the merchant's explicit final word for that specific
+    // option — it takes precedence over the product-level discount.
+    const unitPrice = variant?.priceOverride ?? product.discountedPrice ?? product.price;
     if (!unitPrice) {
       throw new AppError("VALIDATION_ERROR", `"${product.name}" doesn't have a price set yet.`);
     }
-    return { productId: product.id, name: product.name, unitPrice, quantity: item.quantity };
+    return {
+      productId: product.id,
+      name: product.name,
+      unitPrice,
+      quantity: item.quantity,
+      variantId: variant?.id ?? null,
+      variantName: variant?.name ?? null,
+    };
   });
 
   const contact = await findOrCreateContactByPhone(workspaceId, {
@@ -294,7 +313,7 @@ export interface OrderConfirmation {
   createdAt: Date;
   status: Order["status"];
   customerName: string;
-  items: { name: string; unitPrice: string; quantity: number }[];
+  items: { name: string; unitPrice: string; quantity: number; variantName: string | null }[];
   total: number;
 }
 
@@ -318,7 +337,7 @@ async function getOrderConfirmation(slug: string, orderId: string): Promise<Orde
     createdAt: result.order.createdAt,
     status: result.order.status,
     customerName: result.contact.fullName,
-    items: result.items.map((item) => ({ name: item.name, unitPrice: item.unitPrice, quantity: item.quantity })),
+    items: result.items.map((item) => ({ name: item.name, unitPrice: item.unitPrice, quantity: item.quantity, variantName: item.variantName })),
     total,
   };
 }

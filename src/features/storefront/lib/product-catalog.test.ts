@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest";
 import type { Product } from "@/db/schema";
-import { extractCategories, filterAndSortProducts, recommendProducts } from "./product-catalog";
+import { extractCategories, filterAndSortProducts, recommendProducts, shouldShowSearch } from "./product-catalog";
+
+describe("shouldShowSearch", () => {
+  it("stays hidden below the threshold even with the merchant toggle on", () => {
+    expect(shouldShowSearch(true, 3)).toBe(false);
+  });
+
+  it("shows once the catalog is large enough and the toggle is on", () => {
+    expect(shouldShowSearch(true, 8)).toBe(true);
+  });
+
+  it("stays hidden regardless of catalog size when the merchant toggle is off", () => {
+    expect(shouldShowSearch(false, 50)).toBe(false);
+  });
+});
 
 function makeProduct(overrides: Partial<Product> = {}): Product {
   return {
