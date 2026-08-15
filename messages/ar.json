@@ -341,7 +341,8 @@
     },
     "menuLabel": "فتح القائمة",
     "shellSubtitle": "لوحة التحكم",
-    "productsLink": "المنتجات"
+    "productsLink": "المنتجات",
+    "moreLink": "المزيد"
   },
   "analytics": {
     "title": "التحليلات",

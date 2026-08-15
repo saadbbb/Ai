@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AgentPicker, WorkspacePicker } from "@/components/app-shell/sidebar-switchers";
+import { MobileBottomNav } from "@/components/app-shell/mobile-bottom-nav";
 import { MobileNav } from "@/components/app-shell/mobile-nav";
 import { ProfileMenu } from "@/components/app-shell/profile-menu";
 import { SidebarNav } from "@/components/app-shell/sidebar-nav";
@@ -228,8 +229,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         )}
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
+        <main className="flex-1 p-4 pb-24 md:p-6 lg:p-8">{children}</main>
       </div>
+
+      <MobileBottomNav
+        groups={groups}
+        productName={productName}
+        homeLabel={t("homeLink")}
+        inboxLabel={t("inboxLink")}
+        contactsLabel={t("contactsLink")}
+        moreLabel={t("moreLink")}
+      />
     </div>
   );
 }

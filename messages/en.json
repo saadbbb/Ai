@@ -341,7 +341,8 @@
     },
     "menuLabel": "Open menu",
     "shellSubtitle": "Dashboard",
-    "productsLink": "Products"
+    "productsLink": "Products",
+    "moreLink": "More"
   },
   "analytics": {
     "title": "Analytics",

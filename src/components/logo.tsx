@@ -4,9 +4,9 @@ import { useId } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * The Yaqiz / يقظ brand mark: a gradient (violet → mint) brow-arc over a
- * gradient crescent, forming a stylized watchful eye — approved design per
- * the redesign PDF (Aug 2026). `variant="tile"` renders it on a dark
+ * The Yaqiz / يقظ brand mark: a gradient (lime → green) brow-arc over a
+ * gradient crescent, forming a stylized watchful eye — recolored to the
+ * neon-green brand palette (Aug 2026). `variant="tile"` renders it on a dark
  * rounded-square backdrop (favicons, empty states, loading screens); the
  * default renders the mark alone so it can sit on any surface.
  */
@@ -17,8 +17,8 @@ function LogoMark({ className }: { className?: string }) {
     <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#8b7dff" />
-          <stop offset="1" stopColor="#2ad9a8" />
+          <stop stopColor="#c3f27a" />
+          <stop offset="1" stopColor="#86e13a" />
         </linearGradient>
       </defs>
       <path d="M10 34 Q50 2 90 34" stroke={`url(#${gradientId})`} strokeWidth="14" strokeLinecap="round" />

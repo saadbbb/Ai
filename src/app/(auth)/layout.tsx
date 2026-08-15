@@ -12,7 +12,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
         className="relative flex w-full shrink-0 flex-col items-start justify-between overflow-hidden p-6 text-white md:max-w-md md:p-12 lg:max-w-lg"
         style={{
           backgroundImage:
-            "radial-gradient(700px 500px at 20% 0%, rgba(255,255,255,.12), transparent 60%), linear-gradient(160deg, #221bb8 0%, #6d63f6 55%, #2ad9a8 130%)",
+            "radial-gradient(700px 500px at 20% 0%, rgba(255,255,255,.12), transparent 60%), linear-gradient(160deg, #12310c 0%, #86e13a 55%, #2ad9a8 130%)",
         }}
       >
         <div
