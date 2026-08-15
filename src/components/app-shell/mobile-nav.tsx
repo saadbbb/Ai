@@ -11,9 +11,8 @@ import { Logo } from "@/components/logo";
 import type { Workspace } from "@/db/schema";
 import { isRtl } from "@/i18n/config";
 import type { AccountMenuItem } from "./account-menu";
-import { NavLink } from "./nav-link";
+import { NavGroupList, type NavGroupItem } from "./nav-group-list";
 import { AgentPicker, WorkspacePicker } from "./sidebar-switchers";
-import type { NavGroupItem } from "./sidebar-nav";
 
 interface WorkspaceSwitcherProps {
   workspaces: Workspace[];
@@ -75,20 +74,7 @@ export function MobileNav({
         )}
 
         <div className="flex-1 overflow-y-auto px-3 py-4">
-          <nav className="flex flex-col gap-5">
-            {groups.map((group) => (
-              <div key={group.heading ?? group.links[0]?.href} className="space-y-0.5">
-                {group.heading && (
-                  <p className="px-3 pb-1 text-[0.6875rem] font-semibold tracking-wider text-muted-foreground uppercase">
-                    {group.heading}
-                  </p>
-                )}
-                {group.links.map((link) => (
-                  <NavLink key={link.href} href={link.href} label={link.label} size="mobile" onClick={() => setOpen(false)} />
-                ))}
-              </div>
-            ))}
-          </nav>
+          <NavGroupList groups={groups} onLinkClick={() => setOpen(false)} size="mobile" />
         </div>
 
         {accountItems && (

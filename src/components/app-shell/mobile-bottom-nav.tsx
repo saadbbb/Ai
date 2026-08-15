@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { isLinkActive, NavLink } from "./nav-link";
-import type { NavGroupItem } from "./sidebar-nav";
+import { isLinkActive } from "./nav-link";
+import { NavGroupList, type NavGroupItem } from "./nav-group-list";
 
 export function MobileBottomNav({
   groups,
@@ -70,20 +70,7 @@ export function MobileBottomNav({
             <SheetTitle>{productName}</SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-3 py-4">
-            <nav className="flex flex-col gap-5">
-              {groups.map((group) => (
-                <div key={group.heading ?? group.links[0]?.href} className="space-y-0.5">
-                  {group.heading && (
-                    <p className="px-3 pb-1 text-[0.6875rem] font-semibold tracking-wider text-muted-foreground uppercase">
-                      {group.heading}
-                    </p>
-                  )}
-                  {group.links.map((link) => (
-                    <NavLink key={link.href} href={link.href} label={link.label} size="mobile" onClick={() => setMoreOpen(false)} />
-                  ))}
-                </div>
-              ))}
-            </nav>
+            <NavGroupList groups={groups} onLinkClick={() => setMoreOpen(false)} size="mobile" />
           </div>
         </SheetContent>
       </Sheet>
