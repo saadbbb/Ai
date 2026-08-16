@@ -12,6 +12,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IN_GOOD_STANDING_STATUSES, WORKSPACE_TIMEZONE } from "@/db/schema";
 import { BusinessInfoSettingsForm } from "@/features/ai/components/business-info-settings-form";
 import { activityRepository } from "@/features/crm/repository/activity.repository";
+import { ApiKeyManager } from "@/features/integrations/components/api-key-manager";
+import { WebhookSubscriptionManager } from "@/features/integrations/components/webhook-subscription-manager";
+import { integrationService } from "@/features/integrations/services/integration.service";
+import { featureAccessService } from "@/features/platform-admin/services/feature-access.service";
 import { planRepository } from "@/features/platform-admin/repository/plan.repository";
 import { platformSettingsRepository } from "@/features/platform-admin/repository/platform-settings.repository";
 import { invoiceService } from "@/features/platform-admin/services/invoice.service";
@@ -48,28 +52,40 @@ function toWhatsappDigits(number: string): string {
  * direct URLs (invitation emails, support-ticket-detail links, etc. still point
  * there) — this page just fetches the same data and reuses the same components.
  */
-export default async function BusinessSettingsHubPage() {
+interface PageProps {
+  searchParams: Promise<{ tab?: string }>;
+}
+
+const VALID_TABS = new Set(["profile", "billing", "team", "integrations", "auditLog", "support"]);
+
+export default async function BusinessSettingsHubPage({ searchParams }: PageProps) {
+  const { tab } = await searchParams;
+  const defaultTab = tab && VALID_TABS.has(tab) ? tab : "profile";
   const user = await requireUser();
   const workspace = await requireWorkspaceForUser(user.id);
 
-  const [t, tTeam, tBilling, tFeatures, tAuditLog, tSupport] = await Promise.all([
+  const [t, tTeam, tBilling, tFeatures, tAuditLog, tSupport, tIntegrations] = await Promise.all([
     getTranslations("workspaceProfile"),
     getTranslations("team"),
     getTranslations("billing"),
     getTranslations("platformAdmin.plans"),
     getTranslations("auditLog"),
     getTranslations("support"),
+    getTranslations("integrations"),
   ]);
 
-  const [canViewTeam, canViewSupport] = await Promise.all([
+  const [canViewTeam, canViewSupport, canManageIntegrations, enabledFeatures] = await Promise.all([
     permissionService.hasPermission(user.id, workspace.id, "workspace.members.view"),
     permissionService.hasPermission(user.id, workspace.id, "support.tickets.view"),
+    permissionService.hasPermission(user.id, workspace.id, "integrations.manage"),
+    featureAccessService.getEnabledFeatures(workspace),
   ]);
+  const canViewIntegrations = canManageIntegrations && enabledFeatures.includes("integrations");
 
   const isInGoodStanding = (IN_GOOD_STANDING_STATUSES as readonly string[]).includes(workspace.subscriptionStatus);
   const isOverdue = workspace.subscriptionStatus === "past_due" || workspace.subscriptionStatus === "grace";
 
-  const [settings, plan, invoices, teamData, canInviteTeam, canManageTeam, auditData, tickets] = await Promise.all([
+  const [settings, plan, invoices, teamData, canInviteTeam, canManageTeam, auditData, tickets, apiKeys, webhookSubscriptions] = await Promise.all([
     platformSettingsRepository.getCached(),
     workspace.planId ? planRepository.findById(workspace.planId) : Promise.resolve(null),
     invoiceService.listForWorkspace(workspace.id),
@@ -80,6 +96,8 @@ export default async function BusinessSettingsHubPage() {
       ? Promise.all([activityRepository.findByWorkspaceId(workspace.id), workspaceAuditLogRepository.findRecentForWorkspace(workspace.id)])
       : Promise.resolve([[], []] as [Awaited<ReturnType<typeof activityRepository.findByWorkspaceId>>, Awaited<ReturnType<typeof workspaceAuditLogRepository.findRecentForWorkspace>>]),
     canViewSupport ? ticketService.listTickets(workspace.id) : Promise.resolve([]),
+    canViewIntegrations ? integrationService.listApiKeys(workspace.id) : Promise.resolve([]),
+    canViewIntegrations ? integrationService.listWebhookSubscriptions(workspace.id) : Promise.resolve([]),
   ]);
   const usage = isInGoodStanding ? await usageService.getUsageSnapshot(workspace.id, plan) : null;
   const whatsappDigits = settings?.whatsappNumber ? toWhatsappDigits(settings.whatsappNumber) : null;
@@ -94,11 +112,12 @@ export default async function BusinessSettingsHubPage() {
     <PageContainer>
       <PageHeader title={t("pageTitle")} description={t("pageDescription")} />
 
-      <Tabs defaultValue="profile">
+      <Tabs defaultValue={defaultTab}>
         <TabsList>
           <TabsTrigger value="profile">{t("profileTabLabel")}</TabsTrigger>
           <TabsTrigger value="billing">{tBilling("title")}</TabsTrigger>
           {canViewTeam && <TabsTrigger value="team">{tTeam("title")}</TabsTrigger>}
+          {canViewIntegrations && <TabsTrigger value="integrations">{tIntegrations("title")}</TabsTrigger>}
           {canViewTeam && <TabsTrigger value="auditLog">{tAuditLog("pageTitle")}</TabsTrigger>}
           {canViewSupport && <TabsTrigger value="support">{tSupport("title")}</TabsTrigger>}
         </TabsList>
@@ -227,6 +246,15 @@ export default async function BusinessSettingsHubPage() {
                 canManage={canManageTeam}
                 currentUserId={user.id}
               />
+            </div>
+          </TabsContent>
+        )}
+
+        {canViewIntegrations && (
+          <TabsContent value="integrations" className="pt-4">
+            <div className="mx-auto max-w-2xl space-y-4">
+              <ApiKeyManager initialApiKeys={apiKeys} />
+              <WebhookSubscriptionManager initialSubscriptions={webhookSubscriptions} />
             </div>
           </TabsContent>
         )}

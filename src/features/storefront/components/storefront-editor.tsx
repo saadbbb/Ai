@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CollapsibleSection } from "@/components/collapsible-section";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -289,45 +291,31 @@ export function StorefrontEditor({
           <TabsTrigger value="publish">{t("subTabs.publish")}</TabsTrigger>
           <TabsTrigger value="appearance">{t("subTabs.appearance")}</TabsTrigger>
           <TabsTrigger value="sections">{t("subTabs.sections")}</TabsTrigger>
-          <TabsTrigger value="tracking">{t("subTabs.tracking")}</TabsTrigger>
-          <TabsTrigger value="advanced">{t("subTabs.advanced")}</TabsTrigger>
+          <TabsTrigger value="promotions">{t("subTabs.promotions")}</TabsTrigger>
+          <TabsTrigger value="seoTracking">{t("subTabs.seoTracking")}</TabsTrigger>
+          <TabsTrigger value="legal">{t("subTabs.legal")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="publish" className="space-y-4 pt-4">
-          <Card>
-            <CardContent className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium">{t("publishLabel")}</p>
-                <p className="text-sm text-muted-foreground">
-                  {isPublished ? t("publishedHint", { url: storeUrl }) : t("unpublishedHint")}
-                </p>
-              </div>
-              <Switch checked={isPublished} onCheckedChange={setIsPublished} />
-            </CardContent>
-          </Card>
+          <SettingsCard
+            title={t("publishLabel")}
+            description={isPublished ? t("publishedHint", { url: storeUrl }) : t("unpublishedHint")}
+            actions={<Switch checked={isPublished} onCheckedChange={setIsPublished} />}
+          />
 
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("urlHeading")}</p>
-              <div className="flex items-end gap-2">
-                <div className="flex-1 space-y-2">
-                  <label className="text-sm text-muted-foreground">{t("urlLabel")}</label>
-                  <Input value={slugValue} onChange={(event) => setSlugValue(event.target.value)} />
-                </div>
-                <Button type="button" variant="outline" disabled={isSavingSlug || slugValue === slug} onClick={handleSaveSlug}>
-                  {isSavingSlug ? t("saving") : t("save")}
-                </Button>
+          <SettingsCard title={t("urlHeading")}>
+            <div className="flex items-end gap-2">
+              <div className="flex-1 space-y-2">
+                <label className="text-sm text-muted-foreground">{t("urlLabel")}</label>
+                <Input value={slugValue} onChange={(event) => setSlugValue(event.target.value)} />
               </div>
-            </CardContent>
-          </Card>
+              <Button type="button" variant="outline" disabled={isSavingSlug || slugValue === slug} onClick={handleSaveSlug}>
+                {isSavingSlug ? t("saving") : t("save")}
+              </Button>
+            </div>
+          </SettingsCard>
 
-          <Card>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-sm font-medium">{t("customDomainLabel")}</p>
-                <p className="text-xs text-muted-foreground">{t("customDomainHint")}</p>
-              </div>
-
+          <SettingsCard title={t("customDomainLabel")} description={t("customDomainHint")}>
               {customDomain ? (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2 rounded-lg border border-input p-2">
@@ -365,34 +353,28 @@ export function StorefrontEditor({
                   </Button>
                 </div>
               )}
-            </CardContent>
-          </Card>
+          </SettingsCard>
         </TabsContent>
 
         <TabsContent value="appearance" className="space-y-4 pt-4">
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("logoLabel")}</p>
-              <div className="flex items-center gap-3">
-                {logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logoUrl} alt="" className="size-12 rounded-lg border border-input object-cover" />
-                ) : (
-                  <div className="size-12 rounded-lg border border-dashed border-input" />
-                )}
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">{t("logoManagedHint")}</p>
-                  <Link href="/dashboard/workspace-profile" className="text-xs font-medium text-primary hover:underline">
-                    {t("manageLogoLink")}
-                  </Link>
-                </div>
+          <SettingsCard title={t("logoLabel")}>
+            <div className="flex items-center gap-3">
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt="" className="size-12 rounded-lg border border-input object-cover" />
+              ) : (
+                <div className="size-12 rounded-lg border border-dashed border-input" />
+              )}
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">{t("logoManagedHint")}</p>
+                <Link href="/dashboard/workspace-profile" className="text-xs font-medium text-primary hover:underline">
+                  {t("manageLogoLink")}
+                </Link>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </SettingsCard>
 
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("productDisplayModeLabel")}</p>
+          <SettingsCard title={t("productDisplayModeLabel")}>
               <div className="grid grid-cols-3 gap-2">
                 {PRODUCT_DISPLAY_MODES.map((mode) => {
                   const Icon = PRODUCT_DISPLAY_MODE_ICONS[mode];
@@ -414,8 +396,7 @@ export function StorefrontEditor({
                   );
                 })}
               </div>
-            </CardContent>
-          </Card>
+          </SettingsCard>
 
           <Card>
             <CardContent className="space-y-3">
@@ -473,9 +454,8 @@ export function StorefrontEditor({
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="space-y-1">
-              <p className="pb-2 text-sm font-medium">{t("displayTogglesHeading")}</p>
+          <SettingsCard title={t("displayTogglesHeading")}>
+            <div className="-space-y-px">
               <div className="flex items-center justify-between gap-4 py-2">
                 <p className="text-sm text-muted-foreground">{t("showProductDescriptionLabel")}</p>
                 <Switch checked={showProductDescription} onCheckedChange={setShowProductDescription} />
@@ -496,170 +476,10 @@ export function StorefrontEditor({
                 <p className="text-sm text-muted-foreground">{t("showFooterLabel")}</p>
                 <Switch checked={showFooter} onCheckedChange={setShowFooter} />
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </SettingsCard>
 
-        <TabsContent value="sections" className="space-y-4 pt-4">
-          <Card>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-medium">{t("contentHeading")}</p>
-                <div className="flex gap-1">
-                  {CONTENT_LOCALES.map((locale) => (
-                    <button
-                      key={locale}
-                      type="button"
-                      onClick={() => setContentLocale(locale)}
-                      className={cn(
-                        "rounded-md px-2 py-1 text-xs",
-                        contentLocale === locale ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
-                      )}
-                    >
-                      {CONTENT_LOCALE_LABELS[locale]}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">{t("heroTitleLabel")}</label>
-                <Input
-                  value={contentFieldValue("heroTitle")}
-                  onChange={(event) => setContentFieldValue("heroTitle", event.target.value)}
-                  placeholder={t("heroTitlePlaceholder")}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">{t("heroSubtitleLabel")}</label>
-                <Input
-                  value={contentFieldValue("heroSubtitle")}
-                  onChange={(event) => setContentFieldValue("heroSubtitle", event.target.value)}
-                  placeholder={t("heroSubtitlePlaceholder")}
-                />
-              </div>
-              {contentLocale === "en" && (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">{t("heroCtaLabelLabel")}</label>
-                    <Input value={heroCtaLabel} onChange={(event) => setHeroCtaLabel(event.target.value)} placeholder={t("heroCtaLabelPlaceholder")} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">{t("heroCtaLinkLabel")}</label>
-                    <Input value={heroCtaLink} onChange={(event) => setHeroCtaLink(event.target.value)} placeholder="/products" />
-                  </div>
-                </div>
-              )}
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">{t("aboutLabel")}</label>
-                <Textarea
-                  value={contentFieldValue("aboutText")}
-                  onChange={(event) => setContentFieldValue("aboutText", event.target.value)}
-                  rows={4}
-                  placeholder={t("aboutPlaceholder")}
-                />
-              </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground">{t("contactPhoneLabel")}</label>
-                  <Input value={contactPhone} onChange={(event) => setContactPhone(event.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground">{t("contactEmailLabel")}</label>
-                  <Input value={contactEmail} onChange={(event) => setContactEmail(event.target.value)} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("sectionsHeading")}</p>
-              <p className="text-xs text-muted-foreground">{t("sectionsHint")}</p>
-              <div className="divide-y rounded-lg border">
-                {sections.map((key, index) => (
-                  <div key={key} className="flex items-center justify-between gap-2 p-2">
-                    <span className="text-sm">{t(`sections.${key}`)}</span>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        disabled={index === 0}
-                        onClick={() => moveSection(index, -1)}
-                        className="rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted disabled:opacity-30"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        type="button"
-                        disabled={index === sections.length - 1}
-                        onClick={() => moveSection(index, 1)}
-                        className="rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted disabled:opacity-30"
-                      >
-                        ↓
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => toggleSection(key)}
-                        className="rounded px-2 py-1 text-xs text-muted-foreground hover:text-destructive"
-                      >
-                        {t("hideSection")}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {hiddenSections.map((key) => (
-                  <div key={key} className="flex items-center justify-between gap-2 p-2 opacity-60">
-                    <span className="text-sm">{t(`sections.${key}`)}</span>
-                    <button
-                      type="button"
-                      onClick={() => toggleSection(key)}
-                      className="rounded px-2 py-1 text-xs text-primary hover:underline"
-                    >
-                      {t("showSection")}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="tracking" className="space-y-4 pt-4">
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("trackingHeading")}</p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {TRACKING_KEYS.map((key) => (
-                  <div key={key} className="space-y-2">
-                    <label className="text-sm text-muted-foreground">{t(`tracking.${key}`)}</label>
-                    <Input
-                      value={trackingIds[key] ?? ""}
-                      onChange={(event) => setTrackingIds((current) => ({ ...current, [key]: event.target.value }))}
-                    />
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="advanced" className="space-y-4 pt-4">
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("seoHeading")}</p>
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">{t("seoTitleLabel")}</label>
-                <Input value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} maxLength={70} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">{t("seoDescriptionLabel")}</label>
-                <Textarea value={seoDescription} onChange={(event) => setSeoDescription(event.target.value)} rows={2} maxLength={200} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("advancedAppearanceHeading")}</p>
+          <CollapsibleSection title={t("advancedAppearanceHeading")}>
               <div className="space-y-2">
                 <label className="text-sm text-muted-foreground">{t("themeLabel")}</label>
                 <Select value={theme} onValueChange={(value) => setTheme(value as StorefrontTheme)}>
@@ -721,44 +541,129 @@ export function StorefrontEditor({
                 <p className="text-sm text-muted-foreground">{t("darkModeLabel")}</p>
                 <Switch checked={darkMode} onCheckedChange={setDarkMode} />
               </div>
-            </CardContent>
-          </Card>
+          </CollapsibleSection>
+        </TabsContent>
 
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("socialHeading")}</p>
+        <TabsContent value="sections" className="space-y-4 pt-4">
+          <SettingsCard
+            title={t("contentHeading")}
+            actions={
+              <div className="flex gap-1">
+                {CONTENT_LOCALES.map((locale) => (
+                  <button
+                    key={locale}
+                    type="button"
+                    onClick={() => setContentLocale(locale)}
+                    className={cn(
+                      "rounded-md px-2 py-1 text-xs",
+                      contentLocale === locale ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
+                    )}
+                  >
+                    {CONTENT_LOCALE_LABELS[locale]}
+                  </button>
+                ))}
+              </div>
+            }
+          >
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">{t("heroTitleLabel")}</label>
+                <Input
+                  value={contentFieldValue("heroTitle")}
+                  onChange={(event) => setContentFieldValue("heroTitle", event.target.value)}
+                  placeholder={t("heroTitlePlaceholder")}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">{t("heroSubtitleLabel")}</label>
+                <Input
+                  value={contentFieldValue("heroSubtitle")}
+                  onChange={(event) => setContentFieldValue("heroSubtitle", event.target.value)}
+                  placeholder={t("heroSubtitlePlaceholder")}
+                />
+              </div>
+              {contentLocale === "en" && (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm text-muted-foreground">{t("heroCtaLabelLabel")}</label>
+                    <Input value={heroCtaLabel} onChange={(event) => setHeroCtaLabel(event.target.value)} placeholder={t("heroCtaLabelPlaceholder")} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm text-muted-foreground">{t("heroCtaLinkLabel")}</label>
+                    <Input value={heroCtaLink} onChange={(event) => setHeroCtaLink(event.target.value)} placeholder="/products" />
+                  </div>
+                </div>
+              )}
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">{t("aboutLabel")}</label>
+                <Textarea
+                  value={contentFieldValue("aboutText")}
+                  onChange={(event) => setContentFieldValue("aboutText", event.target.value)}
+                  rows={4}
+                  placeholder={t("aboutPlaceholder")}
+                />
+              </div>
               <div className="grid gap-2 sm:grid-cols-2">
-                {SOCIAL_KEYS.map((key) => (
-                  <div key={key} className="space-y-2">
-                    <label className="text-sm text-muted-foreground">{t(`social.${key}`)}</label>
-                    <Input
-                      value={socialLinks[key] ?? ""}
-                      onChange={(event) => setSocialLinks((current) => ({ ...current, [key]: event.target.value }))}
-                      placeholder="https://..."
-                    />
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">{t("contactPhoneLabel")}</label>
+                  <Input value={contactPhone} onChange={(event) => setContactPhone(event.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">{t("contactEmailLabel")}</label>
+                  <Input value={contactEmail} onChange={(event) => setContactEmail(event.target.value)} />
+                </div>
+              </div>
+          </SettingsCard>
+
+          <SettingsCard title={t("sectionsHeading")} description={t("sectionsHint")}>
+              <div className="divide-y rounded-lg border">
+                {sections.map((key, index) => (
+                  <div key={key} className="flex items-center justify-between gap-2 p-2">
+                    <span className="text-sm">{t(`sections.${key}`)}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        disabled={index === 0}
+                        onClick={() => moveSection(index, -1)}
+                        className="rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted disabled:opacity-30"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        disabled={index === sections.length - 1}
+                        onClick={() => moveSection(index, 1)}
+                        className="rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted disabled:opacity-30"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleSection(key)}
+                        className="rounded px-2 py-1 text-xs text-muted-foreground hover:text-destructive"
+                      >
+                        {t("hideSection")}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {hiddenSections.map((key) => (
+                  <div key={key} className="flex items-center justify-between gap-2 p-2 opacity-60">
+                    <span className="text-sm">{t(`sections.${key}`)}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(key)}
+                      className="rounded px-2 py-1 text-xs text-primary hover:underline"
+                    >
+                      {t("showSection")}
+                    </button>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+          </SettingsCard>
+        </TabsContent>
 
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("legalHeading")}</p>
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">{t("privacyLabel")}</label>
-                <Textarea value={privacyPolicyText} onChange={(event) => setPrivacyPolicyText(event.target.value)} rows={4} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">{t("termsLabel")}</label>
-                <Textarea value={termsText} onChange={(event) => setTermsText(event.target.value)} rows={4} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="space-y-3">
-              <p className="text-sm font-medium">{t("promotionsHeading")}</p>
+        <TabsContent value="promotions" className="space-y-4 pt-4">
+          <SettingsCard title={t("promotionsHeading")}>
               <div className="space-y-2">
                 <label className="text-sm text-muted-foreground">{t("announcementBarLabel")}</label>
                 <Input
@@ -830,8 +735,62 @@ export function StorefrontEditor({
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+          </SettingsCard>
+        </TabsContent>
+
+        <TabsContent value="seoTracking" className="space-y-4 pt-4">
+          <SettingsCard title={t("seoHeading")}>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">{t("seoTitleLabel")}</label>
+                <Input value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} maxLength={70} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">{t("seoDescriptionLabel")}</label>
+                <Textarea value={seoDescription} onChange={(event) => setSeoDescription(event.target.value)} rows={2} maxLength={200} />
+              </div>
+          </SettingsCard>
+
+          <SettingsCard title={t("trackingHeading")}>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {TRACKING_KEYS.map((key) => (
+                  <div key={key} className="space-y-2">
+                    <label className="text-sm text-muted-foreground">{t(`tracking.${key}`)}</label>
+                    <Input
+                      value={trackingIds[key] ?? ""}
+                      onChange={(event) => setTrackingIds((current) => ({ ...current, [key]: event.target.value }))}
+                    />
+                  </div>
+                ))}
+              </div>
+          </SettingsCard>
+
+          <SettingsCard title={t("socialHeading")}>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {SOCIAL_KEYS.map((key) => (
+                  <div key={key} className="space-y-2">
+                    <label className="text-sm text-muted-foreground">{t(`social.${key}`)}</label>
+                    <Input
+                      value={socialLinks[key] ?? ""}
+                      onChange={(event) => setSocialLinks((current) => ({ ...current, [key]: event.target.value }))}
+                      placeholder="https://..."
+                    />
+                  </div>
+                ))}
+              </div>
+          </SettingsCard>
+        </TabsContent>
+
+        <TabsContent value="legal" className="space-y-4 pt-4">
+          <SettingsCard title={t("legalHeading")}>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">{t("privacyLabel")}</label>
+                <Textarea value={privacyPolicyText} onChange={(event) => setPrivacyPolicyText(event.target.value)} rows={4} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">{t("termsLabel")}</label>
+                <Textarea value={termsText} onChange={(event) => setTermsText(event.target.value)} rows={4} />
+              </div>
+          </SettingsCard>
         </TabsContent>
       </Tabs>
 

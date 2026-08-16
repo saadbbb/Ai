@@ -6,6 +6,7 @@ import { ExportButtons } from "@/components/export-buttons";
 import { Input } from "@/components/ui/input";
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
+import { RouteTabs } from "@/components/route-tabs";
 import { LeadBoard } from "@/features/crm/components/lead-board";
 import { crmService } from "@/features/crm/services/crm.service";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -42,6 +43,14 @@ export default async function LeadsPage({ searchParams }: PageProps) {
           />
         }
       />
+
+      <RouteTabs
+        tabs={[
+          { href: "/dashboard/contacts", label: t("viewToggle.list"), exact: true },
+          { href: "/dashboard/leads", label: t("viewToggle.pipeline"), exact: true },
+        ]}
+      />
+
       <form className="flex flex-wrap items-end gap-2">
         <Input
           type="search"

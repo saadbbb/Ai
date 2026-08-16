@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
+import { RouteTabs } from "@/components/route-tabs";
 import { contactLifecycleStageEnum, type ContactLifecycleStage } from "@/db/schema";
 import { contactRepository } from "@/features/inbox/repository/contact.repository";
 import { requireFeature, requireUser, requireWorkspaceForUser } from "@/lib/auth/auth-guard";
@@ -46,6 +47,13 @@ export default async function ContactsPage({ searchParams }: PageProps) {
             labels={{ csv: tCommon("exportCsv"), excel: tCommon("exportExcel"), pdf: tCommon("exportPdf") }}
           />
         }
+      />
+
+      <RouteTabs
+        tabs={[
+          { href: "/dashboard/contacts", label: t("viewToggle.list"), exact: true },
+          { href: "/dashboard/leads", label: t("viewToggle.pipeline"), exact: true },
+        ]}
       />
 
       <form className="flex flex-wrap items-end gap-2">

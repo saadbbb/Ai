@@ -52,7 +52,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
     agent,
     canViewAnalytics,
     canViewAutomations,
-    canManageIntegrations,
     canManageCampaigns,
     canManageAds,
   ] = await Promise.all([
@@ -64,7 +63,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
     aiAgentRepository.findByWorkspaceId(workspace.id),
     permissionService.hasPermission(user.id, workspace.id, "analytics.view"),
     permissionService.hasPermission(user.id, workspace.id, "automation.workflows.view"),
-    permissionService.hasPermission(user.id, workspace.id, "integrations.manage"),
     permissionService.hasPermission(user.id, workspace.id, "campaigns.manage"),
     permissionService.hasPermission(user.id, workspace.id, "ads.manage"),
   ]);
@@ -75,42 +73,43 @@ export default async function DashboardLayout({ children }: { children: React.Re
     isBlocked ? Promise.resolve([]) : featureAccessService.getEnabledFeatures(workspace),
   ]);
 
-  // PART 13B's 5-section IA: HOME and INBOX stand alone; CUSTOMERS, AI EMPLOYEE, and GROWTH
-  // are groups. Team/Billing/Workspace Profile/Audit Log/Support live behind the topbar
-  // Profile menu's "Manage your business" hub (/dashboard/workspace-profile) instead of
-  // the main sidebar — that's WORKSPACE SETTINGS, reached less often than daily work.
+  // IA rebuilt from a full codebase audit (2026-08-15): Leads has no data or identity of its
+  // own beyond `contacts.lifecycleStage` filtering — it's a pipeline VIEW of Contacts, reached
+  // from a toggle on the Contacts page, not a separate sidebar destination. AI Employee's three
+  // old sidebar items (Overview/Knowledge Base/Test AI) are one destination with tabs now — see
+  // ai-employee/layout.tsx. "Growth" bucketed six unrelated things together (a CRM workflow
+  // engine, a cross-domain reporting rollup, a developer/API admin page, an email tool, an ad
+  // tracker, and the storefront) — Automations/Analytics/Website now stand alone since none of
+  // them share a real theme with the others; Campaigns+Ads (both outbound customer-acquisition
+  // tools) keep a small, genuinely coherent Marketing group; Integrations (API keys + webhooks,
+  // rare/technical) moved into the Workspace Settings hub instead of the main sidebar. Products/
+  // Orders/Appointments are the transactional/operational side of the business, kept distinct
+  // from Contacts (the relationship side). Team/Billing/Audit Log/Support live behind the
+  // topbar Profile menu's "Manage your business" hub (/dashboard/workspace-profile) — that's
+  // WORKSPACE SETTINGS, reached less often than daily work.
   const rawGroups: NavGroup[] = [
     { links: [{ href: "/dashboard", label: t("homeLink") }] },
     { links: [{ href: "/dashboard/inbox", label: t("inboxLink"), feature: "inbox" }] },
+    { links: [{ href: "/dashboard/contacts", label: t("contactsLink"), feature: "contacts" }] },
     {
-      heading: t("customersSection"),
+      heading: t("salesSection"),
       links: [
-        { href: "/dashboard/contacts", label: t("contactsLink"), feature: "contacts" },
-        { href: "/dashboard/leads", label: t("leadsLink"), feature: "leads" },
         { href: "/dashboard/products", label: t("productsLink"), feature: "knowledge_base" },
         { href: "/dashboard/orders", label: t("ordersLink"), feature: "orders" },
         { href: "/dashboard/appointments", label: t("appointmentsLink"), feature: "appointments" },
       ],
     },
+    { links: [{ href: "/dashboard/ai-employee", label: t("aiEmployeeSection") }] },
+    ...(canViewAutomations ? [{ links: [{ href: "/dashboard/automations", label: t("automationsLink"), feature: "automations" as const }] }] : []),
+    ...(canViewAnalytics ? [{ links: [{ href: "/dashboard/analytics", label: t("analyticsLink"), feature: "analytics" as const }] }] : []),
     {
-      heading: t("aiEmployeeSection"),
+      heading: t("marketingSection"),
       links: [
-        { href: "/dashboard/ai-employee", label: t("settingsLink") },
-        { href: "/dashboard/knowledge-base", label: t("knowledgeBaseLink"), feature: "knowledge_base" },
-        { href: "/dashboard/test-ai", label: t("testAiLink") },
-      ],
-    },
-    {
-      heading: t("growthSection"),
-      links: [
-        ...(canViewAutomations ? [{ href: "/dashboard/automations", label: t("automationsLink"), feature: "automations" as const }] : []),
-        ...(canViewAnalytics ? [{ href: "/dashboard/analytics", label: t("analyticsLink"), feature: "analytics" as const }] : []),
-        { href: "/dashboard/website", label: t("websiteLink"), feature: "website" as const },
-        ...(canManageIntegrations ? [{ href: "/dashboard/integrations", label: t("integrationsLink"), feature: "integrations" as const }] : []),
         ...(canManageCampaigns ? [{ href: "/dashboard/campaigns", label: t("campaignsLink"), feature: "campaigns" as const }] : []),
         ...(canManageAds ? [{ href: "/dashboard/ads", label: t("adsLink"), feature: "ads" as const }] : []),
       ],
     },
+    { links: [{ href: "/dashboard/website", label: t("websiteLink"), feature: "website" as const }] },
   ];
 
   const groups = rawGroups
