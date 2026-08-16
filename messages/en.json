@@ -353,6 +353,11 @@
   "analytics": {
     "title": "Analytics",
     "description": "How your business is doing, at a glance.",
+    "trendsHeading": "Main trends",
+    "advancedDetails": {
+      "heading": "Advanced details",
+      "description": "Sales depth, team performance, and website analytics"
+    },
     "range": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -1441,6 +1446,13 @@
   "website": {
     "title": "Website & Store",
     "description": "A public storefront for your business — customers can browse your catalog and send an inquiry.",
+    "overview": {
+      "quickActionsHeading": "Manage your site",
+      "editorDescription": "Content, appearance, publishing, promotions, SEO & tracking, legal pages.",
+      "pagesDescription": "Custom pages like About, FAQ, or a landing page.",
+      "adsDescription": "The image carousel shown on your homepage.",
+      "reviewsDescription": "Customer reviews and testimonials shown on your site."
+    },
     "saved": "Saved.",
     "publishLabel": "Store is live",
     "publishedHint": "Your store is live at {url}",
@@ -1713,6 +1725,8 @@
       }
     },
     "tabs": {
+      "overview": "Overview",
+      "editor": "Editor",
       "storefront": "Storefront",
       "pages": "Store pages",
       "ads": "Homepage banner",
@@ -1732,7 +1746,7 @@
       "moveDown": "Move down"
     },
     "ads": {
-      "heading": "Website advertisements",
+      "heading": "Homepage banner",
       "noAds": "No advertisements yet.",
       "untitled": "Untitled ad",
       "uploadImage": "Upload image",

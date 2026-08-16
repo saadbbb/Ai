@@ -64,8 +64,8 @@ export function WebsitePreview({
             key={refreshKey}
             src={`${storeUrl}?preview=1`}
             title={t("previewHeading")}
-            style={{ width: WIDTHS[size], height: 600 }}
-            className="mx-auto max-w-full rounded-md border bg-background"
+            style={{ width: WIDTHS[size] }}
+            className="mx-auto h-[380px] max-w-full rounded-md border bg-background sm:h-[600px]"
           />
         </div>
       </CardContent>

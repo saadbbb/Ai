@@ -1,6 +1,7 @@
 import { BarChart3 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import dynamic from "next/dynamic";
+import { CollapsibleSection } from "@/components/collapsible-section";
 import { DataTable } from "@/components/data-table";
 import { ExportButtons } from "@/components/export-buttons";
 import { PageContainer, Section } from "@/components/page-container";
@@ -110,7 +111,9 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
         ]}
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-foreground">{t("trendsHeading")}</h2>
+        <div className="grid gap-4 lg:grid-cols-2">
         <LineChartCard
           title={t("charts.leadsByDay")}
           data={summary.leadsByDay.map((row) => ({ label: row.day.slice(5), value: row.value }))}
@@ -146,8 +149,10 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           emptyMessage={t("charts.empty")}
           format="currency"
         />
+        </div>
       </div>
 
+      <CollapsibleSection title={t("advancedDetails.heading")} description={t("advancedDetails.description")}>
       <Section
         title={t("depth.title")}
         actions={
@@ -315,6 +320,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           </div>
         </Section>
       )}
+      </CollapsibleSection>
     </PageContainer>
   );
 }
