@@ -34,13 +34,17 @@ export const serviceEntrySchema = z.object({
   durationMinutes: z.coerce.number().int().positive().optional(),
 });
 
+export const policyFormSchema = z.object({
+  shippingPolicy: z.string().trim().max(2000).optional(),
+  returnsPolicy: z.string().trim().max(2000).optional(),
+  paymentsPolicy: z.string().trim().max(2000).optional(),
+});
+
 export const knowledgeBaseSchema = z.object({
   faqs: z.array(faqEntrySchema).default([]),
   products: z.array(productEntrySchema).default([]),
   services: z.array(serviceEntrySchema).default([]),
-  shippingPolicy: z.string().trim().max(2000).optional(),
-  returnsPolicy: z.string().trim().max(2000).optional(),
-  paymentsPolicy: z.string().trim().max(2000).optional(),
+  ...policyFormSchema.shape,
 });
 
 /**
@@ -50,9 +54,3 @@ export const knowledgeBaseSchema = z.object({
 export const faqFormSchema = faqEntrySchema.extend({ id: z.string().uuid().optional() });
 export const productFormSchema = productEntrySchema.extend({ id: z.string().uuid().optional() });
 export const serviceFormSchema = serviceEntrySchema.extend({ id: z.string().uuid().optional() });
-
-export const policyFormSchema = z.object({
-  shippingPolicy: z.string().trim().max(2000).optional(),
-  returnsPolicy: z.string().trim().max(2000).optional(),
-  paymentsPolicy: z.string().trim().max(2000).optional(),
-});

@@ -6,6 +6,7 @@
   "common": {
     "continue": "Continue",
     "back": "Back",
+    "moreOptions": "More options",
     "saving": "Saving...",
     "finishSetup": "Finish setup",
     "comingSoon": "Coming soon",
@@ -222,6 +223,9 @@
       "durationPlaceholder": "Duration (minutes)",
       "addService": "Add service",
       "policiesHeading": "Policies (optional)",
+      "shippingLabel": "Shipping policy",
+      "returnsLabel": "Returns policy",
+      "paymentsLabel": "Payments policy",
       "shippingPlaceholder": "Shipping policy",
       "returnsPlaceholder": "Returns policy",
       "paymentsPlaceholder": "Payments policy",
@@ -342,7 +346,9 @@
     "menuLabel": "Open menu",
     "shellSubtitle": "Dashboard",
     "productsLink": "Products",
-    "moreLink": "More"
+    "moreLink": "More",
+    "salesSection": "Sales & Operations",
+    "marketingSection": "Marketing"
   },
   "analytics": {
     "title": "Analytics",
@@ -1391,12 +1397,21 @@
       "tagPlaceholder": "Filter by tag",
       "clear": "Clear filters"
     },
-    "timelineHeading": "Timeline"
+    "timelineHeading": "Timeline",
+    "moreDetails": "More details",
+    "viewToggle": {
+      "list": "List",
+      "pipeline": "Pipeline"
+    }
   },
   "leads": {
     "title": "Leads",
     "description": "Every lead your business has, grouped by stage. Drag nowhere yet — just change the stage on a card.",
     "emptyBoard": "No leads yet. Open a conversation in the Inbox and create a lead from it.",
+    "viewToggle": {
+      "list": "List",
+      "pipeline": "Pipeline"
+    },
     "filters": {
       "tagPlaceholder": "Filter by tag",
       "languagePlaceholder": "Language, e.g. ar",
@@ -1700,7 +1715,7 @@
     "tabs": {
       "storefront": "Storefront",
       "pages": "Store pages",
-      "ads": "Advertisements",
+      "ads": "Homepage banner",
       "reviews": "Reviews",
       "blog": "Blog"
     },
@@ -1737,8 +1752,9 @@
       "publish": "Publishing & domain",
       "appearance": "Appearance",
       "sections": "Sections",
-      "tracking": "Tracking",
-      "advanced": "Advanced"
+      "promotions": "Promotions",
+      "seoTracking": "SEO & Tracking",
+      "legal": "Legal pages"
     },
     "logoLabel": "Logo",
     "logoManagedHint": "Your logo is managed from your business profile.",
@@ -1918,7 +1934,8 @@
     "handoverTitle": "Transfer to Human",
     "handoverDescription": "Control when your AI employee hands a conversation over to your team.",
     "handoverOn": "Handover on",
-    "handoverOff": "Handover off"
+    "handoverOff": "Handover off",
+    "settingsTab": "Settings"
   },
   "workspaceProfile": {
     "pageTitle": "Manage your business",

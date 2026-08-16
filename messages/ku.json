@@ -6,6 +6,7 @@
   "common": {
     "continue": "بەردەوامبوون",
     "back": "گەڕانەوە",
+    "moreOptions": "بژاردەی زیاتر",
     "saving": "پاشەکەوت دەکرێت...",
     "finishSetup": "ڕێکخستن تەواو بکە",
     "comingSoon": "بەم زووانە",
@@ -222,6 +223,9 @@
       "durationPlaceholder": "ماوە (بە خولەک)",
       "addService": "زیادکردنی خزمەتگوزاری",
       "policiesHeading": "سیاسەتەکان (ئارەزوومەندانە)",
+      "shippingLabel": "سیاسەتی گەیاندن",
+      "returnsLabel": "سیاسەتی گەڕاندنەوە",
+      "paymentsLabel": "سیاسەتی پارەدان",
       "shippingPlaceholder": "سیاسەتی گەیاندن",
       "returnsPlaceholder": "سیاسەتی گەڕاندنەوە",
       "paymentsPlaceholder": "سیاسەتی پارەدان",
@@ -342,7 +346,9 @@
     "menuLabel": "کردنەوەی لیستە",
     "shellSubtitle": "داشبۆرد",
     "productsLink": "بەرهەمەکان",
-    "moreLink": "زیاتر"
+    "moreLink": "زیاتر",
+    "salesSection": "فرۆشتن و کارەکان",
+    "marketingSection": "بازاڕگەری"
   },
   "analytics": {
     "title": "شیکاری",
@@ -1391,12 +1397,21 @@
       "tagPlaceholder": "پاڵاوتن بە نیشانە",
       "clear": "سڕینەوەی پاڵاوتنەکان"
     },
-    "timelineHeading": "هێڵی کات"
+    "timelineHeading": "هێڵی کات",
+    "moreDetails": "زانیاری زیاتر",
+    "viewToggle": {
+      "list": "لیست",
+      "pipeline": "هێڵی فرۆشتن"
+    }
   },
   "leads": {
     "title": "کڕیارە ئەگەرییەکان",
     "description": "هەموو کڕیارێکی ئەگەری، پۆلێن کراوە بەپێی قۆناغ. هێشتا ڕاکێشان نییە — تەنها قۆناغەکە لە کارتەکە بگۆڕە.",
     "emptyBoard": "هێشتا هیچ کڕیارێکی ئەگەری نییە. گفتوگۆیەک لە سندوقی گفتوگۆکان بکەرەوە و کڕیارێکی ئەگەری لێی دروست بکە.",
+    "viewToggle": {
+      "list": "لیست",
+      "pipeline": "هێڵی فرۆشتن"
+    },
     "filters": {
       "tagPlaceholder": "پاڵاوتن بە نیشانە",
       "languagePlaceholder": "زمان، بۆ نموونە: ar",
@@ -1700,7 +1715,7 @@
     "tabs": {
       "storefront": "فرۆشگا",
       "pages": "پەڕەکانی فرۆشگا",
-      "ads": "ڕیکلامەکانی ماڵپەڕ",
+      "ads": "بانەری پەڕەی سەرەکی",
       "reviews": "هەڵسەنگاندنەکان",
       "blog": "بلۆگ"
     },
@@ -1737,8 +1752,9 @@
       "publish": "بڵاوکردنەوە و دۆمەین",
       "appearance": "ڕووکار",
       "sections": "بەشەکانی ماڵپەڕ",
-      "tracking": "شوێنکەوتن",
-      "advanced": "ڕێکخستنی پێشکەوتوو"
+      "promotions": "پڕۆپاگەندە",
+      "seoTracking": "SEO و شوێنکەوتن",
+      "legal": "پەڕەی یاسایی"
     },
     "logoLabel": "لۆگۆ",
     "logoManagedHint": "لۆگۆکەت لە پرۆفایلی بازرگانییەکەت بەڕێوە دەبرێت.",
@@ -1918,7 +1934,8 @@
     "handoverTitle": "گواستنەوە بۆ کەسی مرۆڤ",
     "handoverDescription": "کۆنترۆڵی ئەوە بکە کە کارمەندە زیرەکەکەت کەی گفتوگۆکە دەگوازێتەوە بۆ تیمەکەت.",
     "handoverOn": "گواستنەوە چالاکە",
-    "handoverOff": "گواستنەوە ناچالاکە"
+    "handoverOff": "گواستنەوە ناچالاکە",
+    "settingsTab": "ڕێکخستنەکان"
   },
   "workspaceProfile": {
     "pageTitle": "بەڕێوەبردنی بزنسەکەت",

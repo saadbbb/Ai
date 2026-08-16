@@ -8,10 +8,9 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { Field } from "@/components/form/field";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { saveBusinessTypeAction } from "../actions/save-business-type.action";
-import { BUSINESS_TYPE_KEYS } from "../constants";
 import { createBusinessTypeSchema } from "../validation/schemas";
+import { BusinessTypeField } from "./business-type-field";
 import { StepFooter } from "./step-footer";
 import { StepShell } from "./step-shell";
 
@@ -48,20 +47,7 @@ export function BusinessTypeForm({ defaultValues }: { defaultValues: Partial<Bus
           <Controller
             control={control}
             name="businessType"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="businessType" className="w-full">
-                  <SelectValue placeholder={t("placeholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {BUSINESS_TYPE_KEYS.map((key) => (
-                    <SelectItem key={key} value={key}>
-                      {t(`options.${key}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            render={({ field }) => <BusinessTypeField value={field.value} onChange={field.onChange} />}
           />
         </Field>
         <StepFooter backHref="/onboarding/business" isSubmitting={isSubmitting} />

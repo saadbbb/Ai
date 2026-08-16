@@ -7,11 +7,11 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
-import { toneEnumSchema, toneSchema } from "@/features/ai/validation/schemas";
+import { toneSchema } from "@/features/ai/validation/schemas";
 import { saveToneAction } from "../actions/save-tone.action";
-import { RadioOptionGroup } from "./radio-option-group";
 import { StepFooter } from "./step-footer";
 import { StepShell } from "./step-shell";
+import { ToneField } from "./tone-field";
 
 type ToneInput = z.infer<typeof toneSchema>;
 
@@ -23,8 +23,6 @@ export function ToneForm({ defaultValues }: { defaultValues: Partial<ToneInput> 
     resolver: zodResolver(toneSchema),
     defaultValues: { tone: "friendly", ...defaultValues },
   });
-
-  const toneOptions = toneEnumSchema.options.map((value) => ({ value, label: t(`options.${value}`) }));
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -45,9 +43,7 @@ export function ToneForm({ defaultValues }: { defaultValues: Partial<ToneInput> 
         <Controller
           control={control}
           name="tone"
-          render={({ field }) => (
-            <RadioOptionGroup name="tone" value={field.value} onValueChange={field.onChange} options={toneOptions} />
-          )}
+          render={({ field }) => <ToneField value={field.value} onChange={field.onChange} />}
         />
         <StepFooter backHref="/onboarding/description" isSubmitting={isSubmitting} />
       </form>

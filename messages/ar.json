@@ -6,6 +6,7 @@
   "common": {
     "continue": "متابعة",
     "back": "رجوع",
+    "moreOptions": "خيارات إضافية",
     "saving": "جارٍ الحفظ...",
     "finishSetup": "إنهاء الإعداد",
     "comingSoon": "قريباً",
@@ -222,6 +223,9 @@
       "durationPlaceholder": "المدة (بالدقائق)",
       "addService": "إضافة خدمة",
       "policiesHeading": "السياسات (اختياري)",
+      "shippingLabel": "سياسة الشحن",
+      "returnsLabel": "سياسة الإرجاع",
+      "paymentsLabel": "سياسة الدفع",
       "shippingPlaceholder": "سياسة الشحن",
       "returnsPlaceholder": "سياسة الإرجاع",
       "paymentsPlaceholder": "سياسة الدفع",
@@ -342,7 +346,9 @@
     "menuLabel": "فتح القائمة",
     "shellSubtitle": "لوحة التحكم",
     "productsLink": "المنتجات",
-    "moreLink": "المزيد"
+    "moreLink": "المزيد",
+    "salesSection": "المبيعات والعمليات",
+    "marketingSection": "التسويق"
   },
   "analytics": {
     "title": "التحليلات",
@@ -1391,12 +1397,21 @@
       "tagPlaceholder": "فلترة بالوسم",
       "clear": "إزالة الفلاتر"
     },
-    "timelineHeading": "الخط الزمني"
+    "timelineHeading": "الخط الزمني",
+    "moreDetails": "تفاصيل إضافية",
+    "viewToggle": {
+      "list": "قائمة",
+      "pipeline": "خط الأنابيب"
+    }
   },
   "leads": {
     "title": "العملاء المحتملون",
     "description": "كل عميل محتمل لديك، مجمّع حسب المرحلة. لا سحب وإفلات بعد — فقط غيّر المرحلة من البطاقة.",
     "emptyBoard": "لا يوجد عملاء محتملون بعد. افتح محادثة من صندوق المحادثات وأنشئ عميلاً محتملاً منها.",
+    "viewToggle": {
+      "list": "قائمة",
+      "pipeline": "خط الأنابيب"
+    },
     "filters": {
       "tagPlaceholder": "فلترة بالوسم",
       "languagePlaceholder": "اللغة، مثال: ar",
@@ -1700,7 +1715,7 @@
     "tabs": {
       "storefront": "المتجر",
       "pages": "صفحات المتجر",
-      "ads": "إعلانات الموقع",
+      "ads": "بانر الصفحة الرئيسية",
       "reviews": "التقييمات",
       "blog": "المدونة"
     },
@@ -1737,8 +1752,9 @@
       "publish": "النشر والدومين",
       "appearance": "المظهر",
       "sections": "أقسام الموقع",
-      "tracking": "التتبع",
-      "advanced": "إعدادات متقدمة"
+      "promotions": "الترويج",
+      "seoTracking": "SEO والتتبع",
+      "legal": "الصفحات القانونية"
     },
     "logoLabel": "الشعار",
     "logoManagedHint": "شعارك يُدار من ملف النشاط.",
@@ -1918,7 +1934,8 @@
     "handoverTitle": "التحويل إلى موظف بشري",
     "handoverDescription": "تحكّم بمتى يحوّل موظفك الذكي المحادثة إلى فريقك.",
     "handoverOn": "التحويل مفعّل",
-    "handoverOff": "التحويل معطّل"
+    "handoverOff": "التحويل معطّل",
+    "settingsTab": "الإعدادات"
   },
   "workspaceProfile": {
     "pageTitle": "إدارة نشاطك",
