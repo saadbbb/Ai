@@ -73,7 +73,7 @@ export function ApiKeyManager({ initialApiKeys }: { initialApiKeys: ApiKey[] }) 
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{key.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {key.keyPrefix}… · {key.revokedAt ? t("revoked") : t("active")}
+                    <bdi>{key.keyPrefix}…</bdi> · {key.revokedAt ? t("revoked") : t("active")}
                   </p>
                 </div>
                 {!key.revokedAt && (

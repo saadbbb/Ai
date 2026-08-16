@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { JoinedBdi } from "@/components/ltr-text";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -96,7 +97,13 @@ export function WorkspaceRow({
         <div className="min-w-0">
           <p className="truncate font-medium">{workspace.name}</p>
           <p className="truncate text-sm text-muted-foreground">
-            {ownerEmail ?? t("noOwner")} · {new Date(workspace.createdAt).toISOString().slice(0, 10)}
+            {ownerEmail ? (
+              <JoinedBdi items={[ownerEmail, new Date(workspace.createdAt).toISOString().slice(0, 10)]} />
+            ) : (
+              <>
+                {t("noOwner")} · <bdi>{new Date(workspace.createdAt).toISOString().slice(0, 10)}</bdi>
+              </>
+            )}
           </p>
           {plan && (
             <p className="text-xs text-muted-foreground">

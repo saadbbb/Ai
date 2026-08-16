@@ -49,7 +49,11 @@ export function ProfileMenu({
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="flex flex-col gap-0.5 font-normal">
           <span className="truncate text-sm font-semibold text-foreground">{name}</span>
-          {identifier && <span className="truncate text-xs text-muted-foreground">{identifier}</span>}
+          {identifier && (
+            <span dir="ltr" className="truncate text-xs text-muted-foreground">
+              {identifier}
+            </span>
+          )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

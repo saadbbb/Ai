@@ -5,6 +5,7 @@ import { PageContainer } from "@/components/page-container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { LtrLink } from "@/components/ltr-text";
 import { SetupScoreCard } from "@/features/storefront/components/setup-score-card";
 import { storefrontService } from "@/features/storefront/services/storefront.service";
 import { aiAgentRepository } from "@/features/ai/repository/ai-agent.repository";
@@ -45,20 +46,20 @@ export default async function WebsiteOverviewPage() {
             "radial-gradient(500px 260px at 100% -20%, rgba(42,217,168,.2), transparent 60%), linear-gradient(135deg, #23204a 0%, #171b25 60%)",
         }}
       >
-        <div className="flex min-w-0 items-center gap-4">
+        <div className="flex w-full min-w-0 items-center gap-4 sm:w-auto">
           <span className="flex size-[72px] shrink-0 items-center justify-center rounded-[22px] bg-gradient-to-br from-primary to-accent shadow-glow">
             <Globe className="size-7 text-white" />
           </span>
-          <div className="min-w-0 space-y-1.5">
+          <div className="min-w-0 flex-1 space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-heading text-xl font-extrabold text-foreground">{t("title")}</h1>
               <Badge variant={storefront.isPublished ? "success" : "outline"}>
                 {storefront.isPublished ? t("publishLabel") : t("notPublished")}
               </Badge>
             </div>
-            <a href={storeUrl} target="_blank" rel="noopener noreferrer" className="block truncate text-sm text-primary hover:underline">
+            <LtrLink href={storeUrl} target="_blank" rel="noopener noreferrer" className="max-w-full text-sm text-primary hover:underline">
               {storeUrl}
-            </a>
+            </LtrLink>
           </div>
         </div>
         <Button asChild variant="secondary" size="sm" className="w-full shrink-0 sm:w-auto">

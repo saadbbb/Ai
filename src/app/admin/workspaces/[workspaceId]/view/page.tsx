@@ -2,6 +2,7 @@ import { CalendarDays, MessageSquare, ShoppingCart, Target, Users } from "lucide
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { EmptyState } from "@/components/empty-state";
+import { JoinedBdi } from "@/components/ltr-text";
 import { PageHeader } from "@/components/page-header";
 import { StatTile } from "@/components/stat-grid";
 import { WORKSPACE_TIMEZONE } from "@/db/schema";
@@ -77,7 +78,9 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
           <div className="min-w-0">
             <p className="text-xs font-semibold text-muted-foreground">{t("ownerHeading")}</p>
             <p className="truncate text-sm font-semibold">{owner.name ?? "—"}</p>
-            <p className="truncate text-xs text-muted-foreground">{[owner.email, owner.phone].filter(Boolean).join(" · ")}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              <JoinedBdi items={[owner.email, owner.phone]} />
+            </p>
           </div>
           <ResetPasswordButton userId={owner.id} />
         </div>
@@ -119,7 +122,7 @@ export default async function AdminWorkspaceViewPage({ params }: PageProps) {
                 <div key={contact.id} className="p-3 text-sm">
                   <p className="truncate font-medium">{contact.fullName}</p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {[contact.phone, contact.email].filter(Boolean).join(" · ")}
+                    <JoinedBdi items={[contact.phone, contact.email]} />
                   </p>
                 </div>
               ))}

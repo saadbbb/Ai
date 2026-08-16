@@ -45,11 +45,15 @@ export function AccountMenu({
             {initial}
           </AvatarFallback>
         </Avatar>
-        <span className="min-w-0 flex-1 truncate text-sm font-medium">{email}</span>
+        <span dir="ltr" className="min-w-0 flex-1 truncate text-sm font-medium">
+          {email}
+        </span>
         <ChevronsUpDown className="size-3.5 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent side={side} align="start" className="w-64">
-        <DropdownMenuLabel className="truncate font-normal text-muted-foreground">{email}</DropdownMenuLabel>
+        <DropdownMenuLabel dir="ltr" className="truncate font-normal text-muted-foreground">
+          {email}
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {items.map((item) => (
           <DropdownMenuItem key={item.href} asChild>

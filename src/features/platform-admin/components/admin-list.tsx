@@ -102,7 +102,9 @@ export function AdminList({
               const isSelf = admin.email === currentUserEmail.toLowerCase();
               return (
                 <div key={admin.id} className="flex items-center justify-between gap-2 p-3 text-sm">
-                  <span className="truncate">{admin.email}</span>
+                  <span dir="ltr" className="truncate">
+                    {admin.email}
+                  </span>
                   <div className="flex items-center gap-2">
                     <Select
                       value={admin.role}

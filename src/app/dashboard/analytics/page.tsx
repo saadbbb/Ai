@@ -156,20 +156,20 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
       <Section
         title={t("depth.title")}
         actions={
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
+          <>
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("depth.salesReport")}</span>
               <ExportButtons reportPath={`/api/reports/sales?${rangeQuery}`} labels={exportLabels} />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("depth.customersReport")}</span>
               <ExportButtons reportPath={`/api/reports/customers?${rangeQuery}`} labels={exportLabels} />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("depth.channelsReport")}</span>
               <ExportButtons reportPath={`/api/reports/channels?${rangeQuery}`} labels={exportLabels} />
             </div>
-          </div>
+          </>
         }
       >
         <StatGrid
@@ -255,16 +255,16 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
       <Section
         title={t("teamPerformance.title")}
         actions={
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
+          <>
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("teamPerformance.revenueReport")}</span>
               <ExportButtons reportPath={`/api/reports/revenue?${rangeQuery}`} labels={exportLabels} />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">{t("teamPerformance.title")}</span>
               <ExportButtons reportPath={`/api/reports/team-performance?${rangeQuery}`} labels={exportLabels} />
             </div>
-          </div>
+          </>
         }
       >
         <DataTable

@@ -30,7 +30,7 @@ export function Section({
             {title && <h2 className="font-heading text-sm font-extrabold text-foreground">{title}</h2>}
             {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>
-          {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+          {actions && <div className="flex min-w-0 flex-wrap items-center gap-2">{actions}</div>}
         </div>
       )}
       {children}

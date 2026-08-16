@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { LtrText } from "@/components/ltr-text";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -112,7 +113,7 @@ export function TeamManager({
         <div className="divide-y rounded-lg border">
           {members.map(({ member, user, role }) => (
             <div key={member.id} className="flex items-center justify-between gap-4 p-3 text-sm">
-              <span className="truncate">
+              <span className="truncate" dir={user.name ? undefined : "ltr"}>
                 {user.name ?? user.email ?? user.phone}
                 {user.id === currentUserId && <span className="text-muted-foreground"> ({t("you")})</span>}
               </span>
@@ -152,7 +153,7 @@ export function TeamManager({
           <div className="divide-y rounded-lg border">
             {invitations.map(({ invitation, role }) => (
               <div key={invitation.id} className="flex items-center justify-between gap-4 p-3 text-sm">
-                <span className="truncate">{invitation.email}</span>
+                <LtrText>{invitation.email}</LtrText>
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="text-xs text-muted-foreground">{role.name}</span>
                   {canManage && invitation.status === "pending" && (

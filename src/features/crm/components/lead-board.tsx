@@ -65,7 +65,11 @@ export function LeadBoard({ initialLeads }: { initialLeads: LeadListItemWithScor
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{contact.fullName}</p>
-                        {contact.phone && <p className="truncate text-xs text-muted-foreground">{contact.phone}</p>}
+                        {contact.phone && (
+                          <p dir="ltr" className="truncate text-xs text-muted-foreground">
+                            {contact.phone}
+                          </p>
+                        )}
                       </div>
                       <span
                         className={cn(

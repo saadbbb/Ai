@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { LtrText } from "@/components/ltr-text";
 import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -117,7 +118,7 @@ export function WebhookSubscriptionManager({ initialSubscriptions }: { initialSu
               <div key={subscription.id} className="p-3 text-sm">
                 <div className="flex items-center justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{subscription.url}</p>
+                    <LtrText className="font-medium">{subscription.url}</LtrText>
                     <p className="truncate text-xs text-muted-foreground">
                       {subscription.eventTypes.map((type) => tEvents(type)).join(", ")}
                     </p>

@@ -320,7 +320,9 @@ export function StorefrontEditor({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2 rounded-lg border border-input p-2">
                     <div>
-                      <p className="text-sm font-medium">{customDomain}</p>
+                      <p dir="ltr" className="text-sm font-medium">
+                        {customDomain}
+                      </p>
                       <p className="text-xs text-muted-foreground">{t(`domainStatus.${domainStatus}`)}</p>
                     </div>
                     <div className="flex gap-1">

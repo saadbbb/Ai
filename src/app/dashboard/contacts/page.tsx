@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { RowList } from "@/components/data-table";
 import { ExportButtons } from "@/components/export-buttons";
+import { JoinedBdi } from "@/components/ltr-text";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { PageContainer } from "@/components/page-container";
@@ -98,7 +99,11 @@ export default async function ContactsPage({ searchParams }: PageProps) {
             <div className="min-w-0">
               <p className="truncate font-medium">{contact.fullName}</p>
               <p className="truncate text-sm text-muted-foreground">
-                {[contact.phone, contact.email, contact.country].filter(Boolean).join(" · ") || t("noContactInfo")}
+                {contact.phone || contact.email || contact.country ? (
+                  <JoinedBdi items={[contact.phone, contact.email, contact.country]} />
+                ) : (
+                  t("noContactInfo")
+                )}
               </p>
               <div className="mt-1.5 flex flex-wrap items-center gap-1">
                 <Badge variant="secondary">{t(`lifecycle.${contact.lifecycleStage}`)}</Badge>
