@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CollapsibleSection } from "@/components/collapsible-section";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ export function NewAppointmentForm({
 }) {
   const router = useRouter();
   const t = useTranslations("appointments.new");
+  const tCommon = useTranslations("common");
   const [contactId, setContactId] = useState(defaultContactId ?? "");
   const [serviceId, setServiceId] = useState("");
   const [serviceName, setServiceName] = useState("");
@@ -110,10 +112,12 @@ export function NewAppointmentForm({
           </div>
         )}
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">{t("serviceNameLabel")}</label>
-          <Input value={serviceName} onChange={(event) => setServiceName(event.target.value)} placeholder={t("serviceNamePlaceholder")} />
-        </div>
+        {!serviceId && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("serviceNameLabel")}</label>
+            <Input value={serviceName} onChange={(event) => setServiceName(event.target.value)} placeholder={t("serviceNamePlaceholder")} />
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -135,28 +139,30 @@ export function NewAppointmentForm({
           </div>
         </div>
 
-        {members.length > 0 && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t("assignedToLabel")}</label>
-            <Select value={assignedToUserId} onValueChange={setAssignedToUserId}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t("assignedToPlaceholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                {members.map((member) => (
-                  <SelectItem key={member.id} value={member.id}>
-                    {member.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+        <CollapsibleSection title={tCommon("moreOptions")} defaultOpen={Boolean(assignedToUserId || notes)}>
+          {members.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t("assignedToLabel")}</label>
+              <Select value={assignedToUserId} onValueChange={setAssignedToUserId}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("assignedToPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((member) => (
+                    <SelectItem key={member.id} value={member.id}>
+                      {member.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">{t("notesLabel")}</label>
-          <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={2} />
-        </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("notesLabel")}</label>
+            <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={2} />
+          </div>
+        </CollapsibleSection>
 
         <div className="flex justify-end">
           <Button type="button" disabled={isSubmitting} onClick={handleSubmit}>

@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { adCampaignStatusEnum, type AdCampaign, type AdCampaignStatus } from "@/db/schema";
@@ -79,19 +79,14 @@ export function AdCampaignManager({ initialCampaigns }: { initialCampaigns: AdCa
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm font-medium">{t("heading")}</p>
-          <p className="text-sm text-muted-foreground">{t("description")}</p>
-        </div>
-
+    <SettingsCard title={t("heading")} description={t("description")}>
+      <div className="space-y-4">
         <div className="space-y-2 rounded-lg border border-dashed border-input p-2">
           <Input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("namePlaceholder")} />
           <Input value={utmCampaign} onChange={(event) => setUtmCampaign(event.target.value)} placeholder={t("utmPlaceholder")} />
           <Input type="number" step="0.01" value={budget} onChange={(event) => setBudget(event.target.value)} placeholder={t("budgetPlaceholder")} />
           <div className="flex justify-end">
-            <Button type="button" variant="outline" size="sm" disabled={isCreating} onClick={handleCreate}>
+            <Button type="button" disabled={isCreating} onClick={handleCreate}>
               {isCreating ? t("creating") : t("create")}
             </Button>
           </div>
@@ -139,7 +134,7 @@ export function AdCampaignManager({ initialCampaigns }: { initialCampaigns: AdCa
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

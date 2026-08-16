@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CollapsibleSection } from "@/components/collapsible-section";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,7 @@ export function NewOrderForm({
 }) {
   const router = useRouter();
   const t = useTranslations("orders.new");
+  const tCommon = useTranslations("common");
   const [contactId, setContactId] = useState(defaultContactId ?? "");
   const [items, setItems] = useState<ItemDraft[]>([{ ...emptyItem }]);
   const [notes, setNotes] = useState("");
@@ -181,49 +183,51 @@ export function NewOrderForm({
           </Button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t("discountLabel")}</label>
-            <Input type="number" step="0.01" min="0" value={discountAmount} onChange={(event) => setDiscountAmount(event.target.value)} placeholder="0" />
+        <CollapsibleSection title={tCommon("moreOptions")} defaultOpen={Boolean(discountAmount || taxAmount || deliveryFee || paymentMethod || deliveryMethod)}>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t("discountLabel")}</label>
+              <Input type="number" step="0.01" min="0" value={discountAmount} onChange={(event) => setDiscountAmount(event.target.value)} placeholder="0" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t("taxLabel")}</label>
+              <Input type="number" step="0.01" min="0" value={taxAmount} onChange={(event) => setTaxAmount(event.target.value)} placeholder="0" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t("deliveryFeeLabel")}</label>
+              <Input type="number" step="0.01" min="0" value={deliveryFee} onChange={(event) => setDeliveryFee(event.target.value)} placeholder="0" />
+            </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t("taxLabel")}</label>
-            <Input type="number" step="0.01" min="0" value={taxAmount} onChange={(event) => setTaxAmount(event.target.value)} placeholder="0" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t("deliveryFeeLabel")}</label>
-            <Input type="number" step="0.01" min="0" value={deliveryFee} onChange={(event) => setDeliveryFee(event.target.value)} placeholder="0" />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t("paymentMethodLabel")}</label>
-            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t("paymentMethodPlaceholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="cash">{t("paymentMethods.cash")}</SelectItem>
-                <SelectItem value="card">{t("paymentMethods.card")}</SelectItem>
-                <SelectItem value="bank_transfer">{t("paymentMethods.bank_transfer")}</SelectItem>
-                <SelectItem value="other">{t("paymentMethods.other")}</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t("paymentMethodLabel")}</label>
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("paymentMethodPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">{t("paymentMethods.cash")}</SelectItem>
+                  <SelectItem value="card">{t("paymentMethods.card")}</SelectItem>
+                  <SelectItem value="bank_transfer">{t("paymentMethods.bank_transfer")}</SelectItem>
+                  <SelectItem value="other">{t("paymentMethods.other")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{t("deliveryMethodLabel")}</label>
+              <Select value={deliveryMethod} onValueChange={setDeliveryMethod}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("deliveryMethodPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pickup">{t("deliveryMethods.pickup")}</SelectItem>
+                  <SelectItem value="delivery">{t("deliveryMethods.delivery")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t("deliveryMethodLabel")}</label>
-            <Select value={deliveryMethod} onValueChange={setDeliveryMethod}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t("deliveryMethodPlaceholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pickup">{t("deliveryMethods.pickup")}</SelectItem>
-                <SelectItem value="delivery">{t("deliveryMethods.delivery")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        </CollapsibleSection>
 
         <div className="space-y-2">
           <label className="text-sm font-medium">{t("notesLabel")}</label>

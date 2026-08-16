@@ -447,9 +447,11 @@ export function WorkflowCanvas({ memberOptions, workflowOptions, productOptions,
       </div>
 
       {viewMode === "simple" ? (
-        <div className="space-y-4">
+        <div className="space-y-2">
           <SimpleTriggerFields data={triggerData} />
+          <div className="flex justify-center text-muted-foreground/50">↓</div>
           <SimpleConditionsFields data={conditionsData} />
+          <div className="flex justify-center text-muted-foreground/50">↓</div>
           <SimpleActionFields data={actionData} />
         </div>
       ) : (

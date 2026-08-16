@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -100,9 +100,8 @@ export function CampaignManager({ initialCampaigns, templates }: CampaignManager
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardContent className="space-y-3">
-          <p className="text-sm font-medium">{t("newHeading")}</p>
+      <SettingsCard title={t("newHeading")}>
+        <div className="space-y-3">
           <Input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("namePlaceholder")} />
           <Input value={subject} onChange={(event) => setSubject(event.target.value)} placeholder={t("subjectPlaceholder")} />
           {templates.length > 0 && (
@@ -174,8 +173,8 @@ export function CampaignManager({ initialCampaigns, templates }: CampaignManager
               {isCreating ? t("creating") : t("create")}
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </SettingsCard>
 
       {campaigns.length === 0 ? (
         <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">{t("emptyState")}</p>
@@ -190,7 +189,7 @@ export function CampaignManager({ initialCampaigns, templates }: CampaignManager
                 </p>
               </div>
               {campaign.status === "draft" && (
-                <Button type="button" size="sm" disabled={sendingId === campaign.id} onClick={() => handleSend(campaign.id)}>
+                <Button type="button" variant="outline" size="sm" disabled={sendingId === campaign.id} onClick={() => handleSend(campaign.id)}>
                   {sendingId === campaign.id ? t("sending") : t("send")}
                 </Button>
               )}

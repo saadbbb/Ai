@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { updateAgentProfileAction } from "../actions/update-agent-profile.action";
 import { createAgentProfileSchema } from "../validation/schemas";
-import { SettingsCard } from "./settings-card";
+import { SettingsCard } from "@/components/settings-card";
 
 type AgentProfileInput = z.infer<ReturnType<typeof createAgentProfileSchema>>;
 

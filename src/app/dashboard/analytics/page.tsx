@@ -73,21 +73,6 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
         }
       />
 
-      <StatGrid
-        className="sm:grid-cols-3 lg:grid-cols-6"
-        stats={[
-          { label: t("kpis.newLeads"), value: summary.kpis.newLeads },
-          { label: t("kpis.revenue"), value: currency(summary.kpis.revenueTotal) },
-          { label: t("kpis.ordersCompleted"), value: summary.kpis.ordersCompleted },
-          { label: t("kpis.appointmentsCompleted"), value: summary.kpis.appointmentsCompleted },
-          { label: t("kpis.aiRequests"), value: summary.kpis.aiRequests },
-          {
-            label: t("kpis.aiSuccessRate"),
-            value: summary.kpis.aiSuccessRate === null ? "—" : `${Math.round(summary.kpis.aiSuccessRate * 100)}%`,
-          },
-        ]}
-      />
-
       <HealthScoreCard
         healthScore={summary.healthScore}
         title={t("healthScore.title")}
@@ -108,6 +93,21 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
           automationSuccess: t("healthScore.breakdown.automationSuccess"),
           revenueTrend: t("healthScore.breakdown.revenueTrend"),
         }}
+      />
+
+      <StatGrid
+        className="sm:grid-cols-3 lg:grid-cols-6"
+        stats={[
+          { label: t("kpis.newLeads"), value: summary.kpis.newLeads },
+          { label: t("kpis.revenue"), value: currency(summary.kpis.revenueTotal) },
+          { label: t("kpis.ordersCompleted"), value: summary.kpis.ordersCompleted },
+          { label: t("kpis.appointmentsCompleted"), value: summary.kpis.appointmentsCompleted },
+          { label: t("kpis.aiRequests"), value: summary.kpis.aiRequests },
+          {
+            label: t("kpis.aiSuccessRate"),
+            value: summary.kpis.aiSuccessRate === null ? "—" : `${Math.round(summary.kpis.aiSuccessRate * 100)}%`,
+          },
+        ]}
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -169,6 +169,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
       >
         <StatGrid
           className="sm:grid-cols-3 lg:grid-cols-5"
+          size="compact"
           stats={[
             { label: t("depth.avgOrderValue"), value: summary.sales.avgOrderValue === null ? "—" : currency(summary.sales.avgOrderValue) },
             {
@@ -293,6 +294,7 @@ export default async function AnalyticsPage({ searchParams }: PageProps) {
         <Section title={t("website.title")}>
           <StatGrid
             className="sm:grid-cols-3 lg:grid-cols-3"
+            size="compact"
             stats={[
               { label: t("website.pageViews"), value: websiteSummary.pageViews },
               { label: t("website.productViews"), value: websiteSummary.productViews },

@@ -6,8 +6,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
+import { Field } from "@/components/form/field";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { updatePolicyAction } from "../actions/update-policy.action";
 import { policyFormSchema } from "../validation/schemas";
@@ -41,22 +42,23 @@ export function PolicySettingsForm({ defaultValues }: PolicySettingsFormProps) {
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("policiesHeading")}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="space-y-3">
-          <Textarea placeholder={t("shippingPlaceholder")} {...register("shippingPolicy")} />
-          <Textarea placeholder={t("returnsPlaceholder")} {...register("returnsPolicy")} />
-          <Textarea placeholder={t("paymentsPlaceholder")} {...register("paymentsPolicy")} />
-          <div className="flex justify-end">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? tCommon("saving") : tCommon("save")}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <SettingsCard title={t("policiesHeading")}>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <Field label={t("shippingLabel")} htmlFor="shippingPolicy">
+          <Textarea id="shippingPolicy" rows={2} {...register("shippingPolicy")} />
+        </Field>
+        <Field label={t("returnsLabel")} htmlFor="returnsPolicy">
+          <Textarea id="returnsPolicy" rows={2} {...register("returnsPolicy")} />
+        </Field>
+        <Field label={t("paymentsLabel")} htmlFor="paymentsPolicy">
+          <Textarea id="paymentsPolicy" rows={2} {...register("paymentsPolicy")} />
+        </Field>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? tCommon("saving") : tCommon("save")}
+          </Button>
+        </div>
+      </form>
+    </SettingsCard>
   );
 }

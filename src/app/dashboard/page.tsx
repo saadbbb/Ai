@@ -133,7 +133,7 @@ export default async function DashboardPage() {
             <p className="text-sm text-muted-foreground">{t("bands.attention.empty")}</p>
           </div>
         ) : (
-          <div className="divide-y overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="divide-y overflow-hidden rounded-xl border border-warning/40 bg-card shadow-sm">
             {attention.items.map((item) => {
               const style = ATTENTION_STYLE[item.type];
               const Icon = style.icon;

@@ -3,8 +3,9 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import type { WebhookDelivery, WebhookSubscription } from "@/db/schema";
@@ -89,19 +90,14 @@ export function WebhookSubscriptionManager({ initialSubscriptions }: { initialSu
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm font-medium">{t("heading")}</p>
-          <p className="text-sm text-muted-foreground">{t("description")}</p>
-        </div>
-
+    <SettingsCard title={t("heading")} description={t("description")}>
+      <div className="space-y-4">
         <div className="space-y-2 rounded-lg border border-dashed border-input p-2">
           <Input value={url} onChange={(event) => setUrl(event.target.value)} placeholder={t("urlPlaceholder")} />
           <div className="grid grid-cols-2 gap-2">
             {AUTOMATION_EVENT_TYPES.map((type) => (
               <label key={type} className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={eventTypes.includes(type)} onChange={() => toggleEventType(type)} />
+                <Checkbox checked={eventTypes.includes(type)} onCheckedChange={() => toggleEventType(type)} />
                 {tEvents(type)}
               </label>
             ))}
@@ -159,7 +155,7 @@ export function WebhookSubscriptionManager({ initialSubscriptions }: { initialSu
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

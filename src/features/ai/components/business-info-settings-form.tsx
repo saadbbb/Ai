@@ -9,11 +9,10 @@ import type { z } from "zod";
 import { Field } from "@/components/form/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateBusinessInfoAction } from "@/features/ai/actions/update-business-info.action";
-import { BUSINESS_TYPE_KEYS } from "@/features/onboarding/constants";
+import { BusinessTypeField } from "@/features/onboarding/components/business-type-field";
 import { createWorkspaceProfileSchema } from "@/features/workspace/validation/profile-schemas";
-import { SettingsCard } from "./settings-card";
+import { SettingsCard } from "@/components/settings-card";
 
 type WorkspaceProfileInput = z.infer<ReturnType<typeof createWorkspaceProfileSchema>>;
 
@@ -63,20 +62,7 @@ export function BusinessInfoSettingsForm({ defaultValues }: BusinessInfoSettings
           <Controller
             control={control}
             name="businessType"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="businessType" className="w-full">
-                  <SelectValue placeholder={tType("placeholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {BUSINESS_TYPE_KEYS.map((key) => (
-                    <SelectItem key={key} value={key}>
-                      {tType(`options.${key}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            render={({ field }) => <BusinessTypeField value={field.value} onChange={field.onChange} />}
           />
         </Field>
 

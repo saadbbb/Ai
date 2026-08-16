@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { ApiKey } from "@/db/schema";
 import { createApiKeyAction } from "../actions/create-api-key.action";
@@ -48,13 +48,8 @@ export function ApiKeyManager({ initialApiKeys }: { initialApiKeys: ApiKey[] }) 
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm font-medium">{t("heading")}</p>
-          <p className="text-sm text-muted-foreground">{t("description")}</p>
-        </div>
-
+    <SettingsCard title={t("heading")} description={t("description")}>
+      <div className="space-y-4">
         {revealedKey && (
           <div className="space-y-1 rounded-md bg-muted p-2 text-xs">
             <p className="text-muted-foreground">{t("revealHint")}</p>
@@ -90,7 +85,7 @@ export function ApiKeyManager({ initialApiKeys }: { initialApiKeys: ApiKey[] }) 
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

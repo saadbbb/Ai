@@ -41,7 +41,10 @@ export function SimpleTriggerFields({ data }: { data: TriggerNodeData }) {
   return (
     <Card>
       <CardContent className="space-y-3">
-        <p className="text-sm font-medium">{t("triggerLabel")}</p>
+        <div className="flex items-center gap-2">
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">1</span>
+          <p className="text-sm font-medium">{t("triggerLabel")}</p>
+        </div>
         <Select
           value={data.triggerType}
           onValueChange={(value) => data.onChange({ triggerType: value as WorkflowTrigger, triggerStage: "", triggerStatus: "" })}
@@ -114,7 +117,10 @@ export function SimpleConditionsFields({ data }: { data: ConditionsNodeData }) {
     <Card>
       <CardContent className="space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium">{t("conditionsLabel")}</p>
+          <div className="flex items-center gap-2">
+            <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">2</span>
+            <p className="text-sm font-medium">{t("conditionsLabel")}</p>
+          </div>
           {data.conditions.length < MAX_CONDITIONS && (
             <button type="button" className="text-xs text-primary hover:underline" onClick={data.onAdd}>
               {t("addCondition")}
@@ -193,7 +199,10 @@ export function SimpleActionFields({ data }: { data: ActionNodeData }) {
   return (
     <Card>
       <CardContent className="space-y-3">
-        <p className="text-sm font-medium">{t("actionLabel")}</p>
+        <div className="flex items-center gap-2">
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">3</span>
+          <p className="text-sm font-medium">{t("actionLabel")}</p>
+        </div>
 
         <Select value={data.actionType} onValueChange={(value) => data.onChange({ actionType: value as WorkflowAction })}>
           <SelectTrigger className="w-full">

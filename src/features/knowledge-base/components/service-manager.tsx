@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Service } from "@/db/schema";
@@ -99,11 +99,8 @@ export function ServiceManager({ initialServices }: ServiceManagerProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("servicesHeading")}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <SettingsCard title={t("servicesHeading")}>
+      <div className="space-y-3">
         {services.length === 0 && <p className="text-sm text-muted-foreground">{tPage("noItems")}</p>}
         {services.map((service) =>
           editingId === service.id ? (
@@ -193,12 +190,12 @@ export function ServiceManager({ initialServices }: ServiceManagerProps) {
             />
           </div>
           <div className="flex justify-end">
-            <Button type="button" variant="outline" size="sm" disabled={isSaving} onClick={handleAdd}>
+            <Button type="button" size="sm" disabled={isSaving} onClick={handleAdd}>
               {t("addService")}
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

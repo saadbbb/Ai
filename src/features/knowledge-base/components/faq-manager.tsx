@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Faq } from "@/db/schema";
@@ -78,11 +78,8 @@ export function FaqManager({ initialFaqs }: FaqManagerProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("faqsHeading")}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <SettingsCard title={t("faqsHeading")}>
+      <div className="space-y-3">
         {faqs.length === 0 && <p className="text-sm text-muted-foreground">{tPage("noItems")}</p>}
         {faqs.map((faq) =>
           editingId === faq.id ? (
@@ -136,12 +133,12 @@ export function FaqManager({ initialFaqs }: FaqManagerProps) {
             placeholder={t("answerPlaceholder")}
           />
           <div className="flex justify-end">
-            <Button type="button" variant="outline" size="sm" disabled={isSaving} onClick={handleAdd}>
+            <Button type="button" size="sm" disabled={isSaving} onClick={handleAdd}>
               {t("addFaq")}
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

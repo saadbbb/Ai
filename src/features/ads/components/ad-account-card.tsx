@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import type { AdAccount } from "@/db/schema";
 
 export async function AdAccountCard({ adAccount }: { adAccount: AdAccount }) {
@@ -8,18 +8,14 @@ export async function AdAccountCard({ adAccount }: { adAccount: AdAccount }) {
   const tCommon = await getTranslations("common");
 
   return (
-    <Card>
-      <CardContent className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium">{t("metaAccountLabel")}</p>
-          <p className="text-sm text-muted-foreground">
-            {adAccount.status === "connected" ? t("connected") : t("notConnectedHint")}
-          </p>
-        </div>
+    <SettingsCard
+      title={t("metaAccountLabel")}
+      description={adAccount.status === "connected" ? t("connected") : t("notConnectedHint")}
+      actions={
         <Button type="button" variant="outline" size="sm" disabled>
           {tCommon("comingSoon")}
         </Button>
-      </CardContent>
-    </Card>
+      }
+    />
   );
 }

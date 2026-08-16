@@ -9,9 +9,9 @@ import type { z } from "zod";
 import { Field } from "@/components/form/field";
 import { Button } from "@/components/ui/button";
 import { updatePersonalityAction } from "../actions/update-personality.action";
-import { toneEnumSchema, toneSchema } from "../validation/schemas";
-import { RadioOptionGroup } from "@/features/onboarding/components/radio-option-group";
-import { SettingsCard } from "./settings-card";
+import { toneSchema } from "../validation/schemas";
+import { ToneField } from "@/features/onboarding/components/tone-field";
+import { SettingsCard } from "@/components/settings-card";
 
 type ToneInput = z.infer<typeof toneSchema>;
 
@@ -28,8 +28,6 @@ export function PersonalitySettingsForm({ defaultValues }: PersonalitySettingsFo
     resolver: zodResolver(toneSchema),
     defaultValues,
   });
-
-  const toneOptions = toneEnumSchema.options.map((value) => ({ value, label: tTone(`options.${value}`) }));
 
   const onSubmit = handleSubmit(async (values) => {
     setIsSubmitting(true);
@@ -51,9 +49,7 @@ export function PersonalitySettingsForm({ defaultValues }: PersonalitySettingsFo
           <Controller
             control={control}
             name="tone"
-            render={({ field }) => (
-              <RadioOptionGroup name="tone" value={field.value} onValueChange={field.onChange} options={toneOptions} />
-            )}
+            render={({ field }) => <ToneField value={field.value} onChange={field.onChange} />}
           />
         </Field>
 

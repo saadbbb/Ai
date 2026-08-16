@@ -1,9 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CollapsibleSection } from "@/components/collapsible-section";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { WORKSPACE_TIMEZONE } from "@/db/schema";
 import { appointmentRepository } from "@/features/appointments/repository/appointment.repository";
 import { LifecycleStageSelect } from "@/features/crm/components/lifecycle-stage-select";
@@ -200,64 +202,80 @@ export default async function ContactDetailPage({ params }: PageProps) {
         }
       />
 
-      <div>
-        <div className="flex flex-wrap items-center gap-1">
-          <LifecycleStageSelect contactId={contact.id} initialStage={contact.lifecycleStage} />
-          {contact.source && <Badge variant="secondary">{contact.source}</Badge>}
-        </div>
-        <div className="mt-1">
-          <TagManager contactId={contact.id} initialTags={contact.tags} />
-        </div>
-        {(contact.address || contact.budget || contact.preferredContactMethod || contact.timezone || contact.birthDate || contact.gender) && (
-          <p className="mt-1 text-xs text-muted-foreground">
-            {[
-              contact.address ? t("fields.address", { value: contact.address }) : null,
-              contact.budget ? t("fields.budget", { value: contact.budget }) : null,
-              contact.preferredContactMethod
-                ? t("fields.preferredContactMethod", { value: t(`preferredContactMethods.${contact.preferredContactMethod}`) })
-                : null,
-              contact.timezone ? t("fields.timezone", { value: contact.timezone }) : null,
-              contact.birthDate ? t("fields.birthDate", { value: contact.birthDate }) : null,
-              contact.gender ? t("fields.gender", { value: contact.gender }) : null,
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-        )}
-        {contact.aiSummary && (
-          <p className="mt-2 max-w-md rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">{contact.aiSummary}</p>
-        )}
-      </div>
-
-      {nextAction && (
-        <div className="rounded-lg border border-dashed p-3 text-sm">
-          <p className="text-xs font-medium text-muted-foreground">{t("nextAction.heading")}</p>
-          <p>
-            {nextAction.detail
-              ? t(`nextAction.${nextAction.type}`, { detail: nextAction.detail })
-              : t(`nextAction.${nextAction.type}`)}
-          </p>
-        </div>
+      {(nextAction || contact.aiSummary) && (
+        <Card className="border-primary/30 bg-primary-soft/40">
+          <CardContent className="space-y-2">
+            {nextAction && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground">{t("nextAction.heading")}</p>
+                <p className="text-sm">
+                  {nextAction.detail
+                    ? t(`nextAction.${nextAction.type}`, { detail: nextAction.detail })
+                    : t(`nextAction.${nextAction.type}`)}
+                </p>
+              </div>
+            )}
+            {contact.aiSummary && <p className="text-sm text-muted-foreground">{contact.aiSummary}</p>}
+          </CardContent>
+        </Card>
       )}
+
+      <Card>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap items-center gap-1">
+            <LifecycleStageSelect contactId={contact.id} initialStage={contact.lifecycleStage} />
+            {contact.source && <Badge variant="secondary">{contact.source}</Badge>}
+          </div>
+          <TagManager contactId={contact.id} initialTags={contact.tags} />
+          {(contact.address || contact.budget || contact.preferredContactMethod || contact.timezone || contact.birthDate || contact.gender) && (
+            <CollapsibleSection title={t("moreDetails")}>
+              <p className="text-sm text-muted-foreground">
+                {[
+                  contact.address ? t("fields.address", { value: contact.address }) : null,
+                  contact.budget ? t("fields.budget", { value: contact.budget }) : null,
+                  contact.preferredContactMethod
+                    ? t("fields.preferredContactMethod", { value: t(`preferredContactMethods.${contact.preferredContactMethod}`) })
+                    : null,
+                  contact.timezone ? t("fields.timezone", { value: contact.timezone }) : null,
+                  contact.birthDate ? t("fields.birthDate", { value: contact.birthDate }) : null,
+                  contact.gender ? t("fields.gender", { value: contact.gender }) : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            </CollapsibleSection>
+          )}
+        </CardContent>
+      </Card>
 
       {(completedOrders.length > 0 || favoriteProducts.length > 0) && (
-        <div className="flex flex-wrap gap-4 rounded-lg border p-3 text-sm">
-          <div>
-            <p className="text-xs text-muted-foreground">{t("lifetimeValue")}</p>
-            <p className="font-medium">{lifetimeValue.toFixed(2)}</p>
-          </div>
-          {favoriteProducts.length > 0 && (
+        <Card>
+          <CardContent className="flex flex-wrap gap-4">
             <div>
-              <p className="text-xs text-muted-foreground">{t("favoriteProducts")}</p>
-              <p className="font-medium">{favoriteProducts.join(", ")}</p>
+              <p className="text-xs text-muted-foreground">{t("lifetimeValue")}</p>
+              <p className="text-sm font-medium">{lifetimeValue.toFixed(2)}</p>
             </div>
-          )}
-        </div>
+            {favoriteProducts.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground">{t("favoriteProducts")}</p>
+                <p className="text-sm font-medium">{favoriteProducts.join(", ")}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
-      <TaskPanel contactId={contact.id} initialTasks={tasks} />
+      <Card>
+        <CardContent>
+          <TaskPanel contactId={contact.id} initialTasks={tasks} />
+        </CardContent>
+      </Card>
 
-      <NotePanel contactId={contact.id} initialNotes={notes} />
+      <Card>
+        <CardContent>
+          <NotePanel contactId={contact.id} initialNotes={notes} />
+        </CardContent>
+      </Card>
 
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-foreground">{t("timelineHeading")}</h2>

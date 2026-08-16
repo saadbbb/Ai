@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SettingsCard } from "@/components/settings-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { generateAdInsightsAction } from "../actions/generate-ad-insights.action";
 
 export function AdInsightsPanel() {
@@ -25,19 +25,16 @@ export function AdInsightsPanel() {
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <p className="text-sm font-medium">{t("heading")}</p>
-            <p className="text-sm text-muted-foreground">{t("description")}</p>
-          </div>
-          <Button type="button" variant="outline" size="sm" disabled={isGenerating} onClick={handleGenerate}>
-            {isGenerating ? t("generating") : t("generate")}
-          </Button>
-        </div>
-        {insights && <p className="rounded-lg border bg-muted/50 p-3 text-sm">{insights}</p>}
-      </CardContent>
-    </Card>
+    <SettingsCard
+      title={t("heading")}
+      description={t("description")}
+      actions={
+        <Button type="button" variant="outline" size="sm" disabled={isGenerating} onClick={handleGenerate}>
+          {isGenerating ? t("generating") : t("generate")}
+        </Button>
+      }
+    >
+      {insights && <p className="rounded-lg border bg-muted/50 p-3 text-sm">{insights}</p>}
+    </SettingsCard>
   );
 }

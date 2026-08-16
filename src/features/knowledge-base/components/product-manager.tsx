@@ -441,7 +441,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
         <div className="space-y-2 rounded-lg border border-dashed border-input p-2">
           {renderForm(newDraft, setNewDraft, showMoreNew, setShowMoreNew)}
           <div className="flex justify-end">
-            <Button type="button" variant="outline" size="sm" disabled={isSaving} onClick={handleAdd}>
+            <Button type="button" size="sm" disabled={isSaving} onClick={handleAdd}>
               {t("addProduct")}
             </Button>
           </div>
